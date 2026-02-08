@@ -169,7 +169,7 @@ export default function Home() {
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
       {/* Smooth Progress Bar */}
       <motion.div 
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#D4AF37] via-[#FFD700] to-[#D4AF37] z-[100] origin-left"
+        className="fixed top-0 left-0 right-0 h-1 bg-linear-to-r from-[#D4AF37] via-[#FFD700] to-[#D4AF37] z-100 origin-left"
         style={{ scaleX }}
       />
 
@@ -184,7 +184,7 @@ export default function Home() {
           >
             {/* Simple Golden Badge */}
             <motion.div
-              className="relative w-14 h-14 bg-gradient-to-br from-[#D4AF37] to-[#FFD700] rounded-xl flex items-center justify-center shadow-2xl"
+              className="relative w-14 h-14 bg-linear-to-br from-[#D4AF37] to-[#FFD700] rounded-xl flex items-center justify-center shadow-2xl"
               whileHover={{ 
                 boxShadow: "0 0 30px rgba(212, 175, 55, 0.6)",
                 rotate: [0, -5, 5, 0]
@@ -214,11 +214,11 @@ export default function Home() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <div className="text-3xl font-black tracking-tighter bg-gradient-to-r from-white via-gray-200 to-white bg-clip-text text-transparent">
+              <div className="text-3xl font-black tracking-tighter bg-linear-to-r from-white via-gray-200 to-white bg-clip-text text-transparent">
                 BA GROUP
               </div>
               <motion.div 
-                className="h-0.5 bg-gradient-to-r from-[#D4AF37] to-transparent"
+                className="h-0.5 bg-linear-to-r from-[#D4AF37] to-transparent"
                 initial={{ width: 0 }}
                 animate={{ width: "100%" }}
                 transition={{ duration: 0.8, delay: 0.5 }}
@@ -370,7 +370,7 @@ export default function Home() {
       <section id="home" ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Bold Modern Background */}
         <motion.div 
-          className="absolute inset-0 bg-gradient-to-b from-[#000000] via-[#0A0A0A] to-[#000000]"
+          className="absolute inset-0 bg-linear-to-b from-[#000000] via-[#0A0A0A] to-[#000000]"
           style={{ y: heroY }}
         >
           {/* Strong Animated Gradient Mesh */}
@@ -593,7 +593,7 @@ export default function Home() {
           />
 
           {/* Bottom Fade - Smooth Transition */}
-          <div className="absolute bottom-0 left-0 right-0 h-[300px] bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none z-20" />
+          <div className="absolute bottom-0 left-0 right-0 h-[300px] bg-linear-to-t from-black via-black/80 to-transparent pointer-events-none z-20" />
         </motion.div>
 
         {/* Hero Content with Apple-style reveal */}
@@ -608,7 +608,7 @@ export default function Home() {
                 <AnimatedText delay={0.3}>THE</AnimatedText>
               </div>
               <div>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-[#FFD700] to-[#D4AF37]">
+                <span className="text-transparent bg-clip-text bg-linear-to-r from-[#D4AF37] via-[#FFD700] to-[#D4AF37]">
                   <AnimatedText delay={0.4}>FUTURE</AnimatedText>
                 </span>
               </div>
@@ -672,10 +672,10 @@ export default function Home() {
       {/* Companies Grid Section - Seamless Blend */}
       <section id="companies" className="min-h-screen py-24 px-6 lg:px-12 relative">
         {/* Top Gradient Blend with Hero */}
-        <div className="absolute top-0 left-0 right-0 h-[200px] bg-gradient-to-b from-black via-black/50 to-transparent pointer-events-none z-10" />
+        <div className="absolute top-0 left-0 right-0 h-[200px] bg-linear-to-b from-black via-black/50 to-transparent pointer-events-none z-10" />
         
         {/* Gradient Background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-[#0A0A0A] to-black opacity-50 pointer-events-none" />
+        <div className="absolute inset-0 bg-linear-to-b from-black via-[#0A0A0A] to-black opacity-50 pointer-events-none" />
         
         <div className="max-w-7xl mx-auto relative">
           <ScaleOnScroll className="mb-20">
@@ -770,7 +770,7 @@ export default function Home() {
                     />
                   </motion.div>
                   <motion.div 
-                    className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"
+                    className="absolute inset-0 bg-linear-to-t from-black via-black/60 to-transparent"
                     animate={{
                       opacity: hoveredCard === company.id ? 0.7 : 1
                     }}
@@ -905,7 +905,7 @@ export default function Home() {
       {/* About Section with Advanced Animations */}
       <section id="about" className="min-h-screen flex items-center justify-center py-24 px-6 lg:px-12 relative overflow-hidden">
         <motion.div 
-          className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/10 via-transparent to-black"
+          className="absolute inset-0 bg-linear-to-br from-[#D4AF37]/10 via-transparent to-black"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -986,10 +986,10 @@ export default function Home() {
                     whileInView={{ scale: 1 }}
                     viewport={{ once: true }}
                     transition={{ 
-                      duration: 0.6, 
                       delay: index * 0.1 + 0.3,
                       type: "spring",
-                      bounce: 0.5
+                      bounce: 0.5,
+                      stiffness: 200
                     }}
                   >
                     {stat.number}
@@ -1005,7 +1005,7 @@ export default function Home() {
       {/* Partners Section */}
       <section id="partners" className="min-h-screen flex items-center justify-center py-24 px-6 lg:px-12 relative overflow-hidden">
         <motion.div 
-          className="absolute inset-0 bg-gradient-to-br from-black via-[#0A0A0A] to-black"
+          className="absolute inset-0 bg-linear-to-br from-black via-[#0A0A0A] to-black"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -1221,8 +1221,11 @@ export default function Home() {
                   <motion.div
                     className="absolute top-3 right-3 w-2 h-2 rounded-full bg-[#D4AF37]"
                     initial={{ scale: 0, opacity: 0 }}
-                    whileInView={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: index * 0.15 + 0.4, type: "spring" }}
+                    whileInView={{ 
+                      scale: 1, 
+                      opacity: 1,
+                      transition: { delay: index * 0.15 + 0.4, type: "spring" }
+                    }}
                     animate={{
                       boxShadow: [
                         "0 0 0 0 rgba(212, 175, 55, 0.7)",
@@ -1233,7 +1236,8 @@ export default function Home() {
                     transition={{
                       duration: 2,
                       repeat: Infinity,
-                      repeatDelay: 1
+                      repeatDelay: 1,
+                      ease: "easeInOut"
                     }}
                   />
                   
@@ -1276,10 +1280,10 @@ export default function Home() {
                     whileInView={{ scale: 1 }}
                     viewport={{ once: true }}
                     transition={{ 
-                      duration: 0.6, 
                       delay: 0.9 + index * 0.1,
                       type: "spring",
-                      bounce: 0.5
+                      bounce: 0.5,
+                      stiffness: 200
                     }}
                   >
                     {stat.number}
@@ -1300,7 +1304,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 1.2 }}
             >
               <motion.button
-                className="px-10 py-5 bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-black uppercase tracking-widest rounded-full hover:shadow-2xl transition-all duration-500"
+                className="px-10 py-5 bg-linear-to-r from-[#D4AF37] to-[#FFD700] text-black font-black uppercase tracking-widest rounded-full hover:shadow-2xl transition-all duration-500"
                 whileHover={{ 
                   scale: 1.05,
                   boxShadow: "0 20px 60px rgba(212, 175, 55, 0.4)"
@@ -1323,7 +1327,7 @@ export default function Home() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-black via-[#0A0A0A] to-black" />
+          <div className="absolute inset-0 bg-linear-to-br from-black via-[#0A0A0A] to-black" />
           <motion.div
             className="absolute inset-0"
             style={{
@@ -1441,7 +1445,7 @@ export default function Home() {
                 </div>
 
                 <motion.button
-                  className="w-full bg-gradient-to-r from-[#D4AF37] to-[#FFD700] text-black font-black uppercase tracking-widest py-5 rounded-full hover:shadow-2xl transition-all duration-500"
+                  className="w-full bg-linear-to-r from-[#D4AF37] to-[#FFD700] text-black font-black uppercase tracking-widest py-5 rounded-full hover:shadow-2xl transition-all duration-500"
                   whileHover={{ scale: 1.02, boxShadow: "0 20px 60px rgba(212, 175, 55, 0.4)" }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -1522,7 +1526,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
             <motion.div 
-              className="text-2xl font-black tracking-tighter bg-gradient-to-r from-[#D4AF37] to-[#FFD700] bg-clip-text text-transparent"
+              className="text-2xl font-black tracking-tighter bg-linear-to-r from-[#D4AF37] to-[#FFD700] bg-clip-text text-transparent"
               whileHover={{ scale: 1.05 }}
             >
               BA GROUP

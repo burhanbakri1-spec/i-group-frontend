@@ -1,12 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { Language } from '../translations';
 
 interface AccountPageProps {
   onNavigate: (page: string) => void;
+  lang: Language;
 }
 
-export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate }) => {
+export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) => {
   const loginImage = "https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=1200&auto=format&fit=crop";
 
   return (

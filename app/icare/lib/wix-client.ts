@@ -9,7 +9,7 @@
 
 const WIX_CLIENT_ID = '1292b21d-5c97-42e3-b078-a553499b8d8a';
 
-export const fetchWixProducts = async () => {
+export const fetchWixProducts = async (): Promise<any[] | null> => {
   try {
     // محاكاة تأخير الشبكة
     await new Promise(resolve => setTimeout(resolve, 800));

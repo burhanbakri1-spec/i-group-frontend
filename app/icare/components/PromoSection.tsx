@@ -1,8 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { Language } from '../translations';
 
-export const PromoSection = () => {
+interface PromoSectionProps {
+  lang: Language;
+}
+
+export const PromoSection: React.FC<PromoSectionProps> = ({ lang }) => {
   return (
     <section className="px-4 md:px-6 py-4 md:py-8 bg-white">
       {/* Outer Container with reduced rounding */}
@@ -19,24 +24,30 @@ export const PromoSection = () => {
           >
             {/* Tagline or Category */}
             <span className="text-[10px] md:text-[12px] font-bold tracking-[0.3em] uppercase text-[#777] mb-6 block">
-              New Arrival
+              {lang === 'en' ? 'New Arrival' : 'وصول جديد'}
             </span>
             
             {/* Main Title - Lowercase and Bold */}
             <h2 className="text-[42px] md:text-[64px] font-[900] leading-[0.95] tracking-[-0.04em] text-[#222] lowercase mb-8">
-              chilly little <br /> flush
+              {lang === 'en' ? (
+                <>chilly little <br /> flush</>
+              ) : (
+                <>احمرار <br /> صغير بارد</>
+              )}
             </h2>
             
             {/* Description */}
             <p className="text-[15px] md:text-[18px] leading-relaxed text-[#555] font-medium mb-12 max-w-[90%]">
-              Warm up your cheeks with Pocket Blush. A touch of creamy, long-wearing color 
-              that mimics the flush you get after stepping in from the cold.
+              {lang === 'en' 
+                ? 'Warm up your cheeks with Pocket Blush. A touch of creamy, long-wearing color that mimics the flush you get after stepping in from the cold.'
+                : 'دفئي خديك مع Pocket Blush. لمسة من اللون الكريمي طويل الأمد الذي يحاكي الاحمرار الذي تحصلين عليه بعد الدخول من البرد.'
+              }
             </p>
             
             {/* Button Styling */}
             <div className="flex flex-wrap gap-4">
               <button className="border-2 border-[#222] rounded-full px-12 py-4 text-[11px] font-[900] tracking-[0.15em] uppercase text-[#222] hover:bg-[#222] hover:text-white transition-all duration-500 cursor-pointer">
-                POCKET BLUSH
+                {lang === 'en' ? 'POCKET BLUSH' : 'بوكيت بلاش'}
               </button>
             </div>
           </motion.div>

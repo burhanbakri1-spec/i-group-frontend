@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import * as RechartsPrimitive from "recharts@2.15.2";
+import * as RechartsPrimitive from "recharts";
 
 import { cn } from "./utils";
 
@@ -118,11 +118,18 @@ function ChartTooltipContent({
   color,
   nameKey,
   labelKey,
-}: React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
-  React.ComponentProps<"div"> & {
+  ...props
+}: React.ComponentProps<"div"> & {
+    active?: boolean;
+    payload?: any[];
     hideLabel?: boolean;
     hideIndicator?: boolean;
     indicator?: "line" | "dot" | "dashed";
+    label?: string;
+    labelFormatter?: (value: any, payload: any) => React.ReactNode;
+    labelClassName?: string;
+    formatter?: (value: any, name: any, item: any, index: number, payload: any) => React.ReactNode;
+    color?: string;
     nameKey?: string;
     labelKey?: string;
   }) {
@@ -256,10 +263,11 @@ function ChartLegendContent({
   payload,
   verticalAlign = "bottom",
   nameKey,
-}: React.ComponentProps<"div"> &
-  Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
+}: React.ComponentProps<"div"> & {
     hideIcon?: boolean;
     nameKey?: string;
+    payload?: any[];
+    verticalAlign?: "top" | "bottom";
   }) {
   const { config } = useChart();
 

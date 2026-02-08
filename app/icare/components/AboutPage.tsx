@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { ChevronDown } from 'lucide-react';
+import { Language } from '../translations';
 
 interface AboutPageProps {
   onNavigate: (page: string) => void;
+  lang: Language;
 }
 
 const AccordionItem = ({ title, content, isOpen, onClick }: { title: string, content: string, isOpen: boolean, onClick: () => void }) => {
@@ -44,7 +46,7 @@ const AccordionItem = ({ title, content, isOpen, onClick }: { title: string, con
   );
 };
 
-export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
+export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const valuesData = [

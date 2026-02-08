@@ -78,7 +78,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
       setLoading(true);
       try {
         const data = await fetchWixProducts();
-        if (data && data.length > 0) {
+        if (data && Array.isArray(data) && data.length > 0) {
           setWixProducts(data);
         }
       } catch (err) {
