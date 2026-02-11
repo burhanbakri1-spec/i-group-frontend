@@ -2,6 +2,11 @@ import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { Language } from '../translations';
+
+interface SocialGridProps {
+  lang: Language;
+}
 
 const lifestyleImages = [
   {
@@ -26,7 +31,7 @@ const lifestyleImages = [
   }
 ];
 
-export const SocialGrid = () => {
+export const SocialGrid: React.FC<SocialGridProps> = ({ lang }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: 'left' | 'right') => {
@@ -47,7 +52,7 @@ export const SocialGrid = () => {
             icare + you
           </h2>
           <button className="hidden md:block border border-[#222]/20 rounded-full px-8 py-2 text-[10px] font-bold tracking-[0.1em] uppercase text-[#222] hover:bg-[#222] hover:text-white transition-all duration-300">
-            FIND US ON SOCIAL
+            {lang === 'en' ? 'FIND US ON SOCIAL' : 'تابعنا على السوشيال'}
           </button>
         </div>
 
@@ -100,7 +105,7 @@ export const SocialGrid = () => {
 
         {/* Mobile Social Button */}
         <button className="md:hidden w-full mt-8 border border-[#222]/20 rounded-full py-4 text-[10px] font-bold tracking-[0.1em] uppercase text-[#222]">
-          FIND US ON SOCIAL
+          {lang === 'en' ? 'FIND US ON SOCIAL' : 'تابعنا على السوشيال'}
         </button>
       </div>
     </section>

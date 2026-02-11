@@ -1,9 +1,16 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { Language } from '../translations';
 
-export const CommitmentSection = () => {
-  const listItems = ['mission', 'philanthropy', 'sustainability'];
+interface CommitmentSectionProps {
+  lang: Language;
+}
+
+export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang }) => {
+  const listItems = lang === 'en' 
+    ? ['mission', 'philanthropy', 'sustainability']
+    : ['المهمة', 'العمل الخيري', 'الاستدامة'];
 
   return (
     <section className="px-4 md:px-8 py-4 md:py-8 bg-white">
@@ -19,14 +26,17 @@ export const CommitmentSection = () => {
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             >
               <h2 className="text-[22px] md:text-[36px] font-[500] leading-[1.25] text-[#5C5A56] mb-10 max-w-lg">
-                From consciously-sourced ingredients to packaging made with post-consumer recycled materials, we're committed to <span className="text-black font-[900]">MINDFUL SKINCARE.</span>
+                {lang === 'en' 
+                  ? <>From consciously-sourced ingredients to packaging made with post-consumer recycled materials, we're committed to <span className="text-black font-[900]">MINDFUL SKINCARE.</span></>
+                  : <>من المكونات المختارة بوعي إلى التغليف المصنوع من مواد معاد تدويرها، نحن ملتزمون بـ<span className="text-black font-[900]">العناية الواعية بالبشرة.</span></>
+                }
               </h2>
               
               <motion.button 
                 whileHover={{ scale: 1.05 }}
                 className="border border-black/10 bg-white/50 backdrop-blur-sm rounded-full px-8 py-3 text-[10px] font-black tracking-[0.2em] uppercase text-black hover:bg-black hover:text-white transition-all duration-500 shadow-sm"
               >
-                OUR FOOTPRINT
+                {lang === 'en' ? 'OUR FOOTPRINT' : 'بصمتنا'}
               </motion.button>
             </motion.div>
           </div>
