@@ -98,7 +98,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
     { id: '9', main: 'face care', sub: 'sun protection', type: 'sunscreen', brand: 'La Roche-Posay', name: 'anthelios melt-in milk', price: '$36.00', rawPrice: 36, image: 'https://images.unsplash.com/photo-1661347243240-5ce7c9992369?q=80&w=800', description: 'broad spectrum spf 60 sunscreen for face and body.', rating: '4.7', reviews: '4.2k', date: '2025-03-25' },
     { id: '16', main: 'face care', sub: 'moisturizers & treatments', type: 'eye creams', brand: 'Kiehl\'s', name: 'creamy eye treatment with avocado', price: '$54.00', rawPrice: 54, image: 'https://images.unsplash.com/photo-1594813591867-02e797aa4581?q=80&w=800', description: 'nourishing under-eye cream with avocado oil.', rating: '4.6', reviews: '2.8k', date: '2025-10-10' },
     { id: '17', main: 'face care', sub: 'cleansing & toning', type: 'toners', brand: 'Paula\'s Choice', name: 'skin perfecting 2% bha liquid exfoliant', price: '$34.00', rawPrice: 34, image: 'https://images.unsplash.com/photo-1714176774596-45946a7325fd?q=80&w=800', description: 'cult-favorite liquid exfoliant for radiant skin.', rating: '4.9', reviews: '15k', date: '2025-11-05' },
-    
+
     // HAIR CARE
     { id: '6', main: 'hair care', sub: 'hair tools', type: 'hair dryers', brand: 'Dyson', name: 'supersonic hair dryer', price: '$429.00', rawPrice: 429, image: 'https://images.unsplash.com/photo-1681837163667-2af19d19e413?q=80&w=800', description: 'engineered for different hair types.', rating: '4.9', reviews: '1.8k', date: '2025-11-12' },
     { id: '11', main: 'hair care', sub: 'washing & routine', type: 'shampoo', brand: 'SheaMoisture', name: 'raw shea butter shampoo', price: '$13.00', rawPrice: 13, image: 'https://images.unsplash.com/photo-1766142167641-507c80e35eb9?q=80&w=800', description: 'gentle cleansing for dry, damaged hair.', rating: '4.5', reviews: '2.1k', date: '2025-01-08' },
@@ -138,7 +138,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
 
   const filteredProducts = useMemo(() => {
     let result = [...allProducts];
-    
+
     if (activeMain) {
       if (activeMain === 'brands') {
         if (activeSub) {
@@ -159,7 +159,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
         }
       }
     }
-    
+
     switch (activeSort) {
       case 'newest':
         result.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -174,7 +174,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
         result.sort((a, b) => parseFloat(b.rating || '0') - parseFloat(a.rating || '0'));
         break;
     }
-    
+
     return result;
   }, [allProducts, activeMain, activeSub, activeType, activeSort]);
 
@@ -207,13 +207,13 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
     <div className="min-h-screen bg-[#FFFFFF]">
       {/* Banner */}
       <section className="relative w-full h-[30vh] md:h-[40vh] overflow-hidden rounded-b-[24px]">
-        <ImageWithFallback 
-          src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1920" 
-          alt="Shop Hero" 
+        <ImageWithFallback
+          src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1920"
+          alt="Shop Hero"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/15 flex flex-col items-center justify-center text-white text-center px-4">
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}
             className="text-[42px] md:text-[68px] font-brand lowercase italic leading-tight"
           >
@@ -227,15 +227,14 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
 
       {/* Navigation & Hierarchy */}
       <div className="max-w-[1600px] mx-auto px-6 py-10 flex flex-col gap-8">
-        
+
         {/* Level 1: Main */}
         <div className="overflow-x-auto no-scrollbar border-b border-black/5 pb-4">
           <div className="flex md:justify-center justify-start gap-4 px-4 min-w-max">
             <button
               onClick={resetFilters}
-              className={`px-8 py-2.5 rounded-full text-[12px] font-black uppercase tracking-widest transition-all ${
-                !activeMain ? 'bg-black text-white shadow-lg' : 'bg-white text-black/40 border border-black/5 hover:text-black'
-              }`}
+              className={`px-8 py-2.5 rounded-full text-[12px] font-black uppercase tracking-widest transition-all ${!activeMain ? 'bg-black text-white shadow-lg' : 'bg-white text-black/40 border border-black/5 hover:text-black'
+                }`}
             >
               {lang === 'en' ? 'shop all' : 'تسوق الكل'}
             </button>
@@ -243,9 +242,8 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
               <button
                 key={main}
                 onClick={() => { setActiveMain(main); setActiveSub(null); setActiveType(null); }}
-                className={`px-8 py-2.5 rounded-full text-[12px] font-black uppercase tracking-widest transition-all ${
-                  activeMain === main ? 'bg-black text-white shadow-lg' : 'bg-white text-black/40 border border-black/5 hover:text-black'
-                }`}
+                className={`px-8 py-2.5 rounded-full text-[12px] font-black uppercase tracking-widest transition-all ${activeMain === main ? 'bg-black text-white shadow-lg' : 'bg-white text-black/40 border border-black/5 hover:text-black'
+                  }`}
               >
                 {main}
               </button>
@@ -256,7 +254,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
         {/* Level 2: Sub / Country */}
         <AnimatePresence mode="wait">
           {activeMain && (
-            <motion.div 
+            <motion.div
               key={activeMain}
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -268,9 +266,8 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
                   <button
                     key={sub}
                     onClick={() => { setActiveSub(sub); setActiveType(null); }}
-                    className={`px-6 py-2 rounded-full text-[11px] font-bold uppercase transition-all ${
-                      activeSub === sub ? 'bg-white text-black border border-black shadow-sm' : 'bg-[#EFEEEC]/50 text-black/60 hover:bg-[#EFEEEC]'
-                    }`}
+                    className={`px-6 py-2 rounded-full text-[11px] font-bold uppercase transition-all ${activeSub === sub ? 'bg-white text-black border border-black shadow-sm' : 'bg-[#EFEEEC]/50 text-black/60 hover:bg-[#EFEEEC]'
+                      }`}
                   >
                     {sub}
                   </button>
@@ -283,7 +280,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
         {/* Level 3: Types / Brands (Logo Circles) */}
         <AnimatePresence mode="wait">
           {activeMain && activeSub && (
-            <motion.div 
+            <motion.div
               key={`${activeMain}-${activeSub}`}
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -299,17 +296,15 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
                       className="group flex flex-col items-center gap-3 transition-all"
                     >
                       {activeMain === 'brands' ? (
-                        <div className={`w-20 h-20 lg:w-24 lg:h-24 rounded-full flex items-center justify-center transition-all ${
-                          activeType === item ? 'ring-2 ring-black ring-offset-4 bg-black text-white' : 'bg-white border border-black/5 shadow-sm group-hover:shadow-md'
-                        }`}>
+                        <div className={`w-20 h-20 lg:w-24 lg:h-24 rounded-full flex items-center justify-center transition-all ${activeType === item ? 'ring-2 ring-black ring-offset-4 bg-black text-white' : 'bg-white border border-black/5 shadow-sm group-hover:shadow-md'
+                          }`}>
                           <span className="text-[10px] font-black uppercase text-center px-2 leading-tight">
                             {item}
                           </span>
                         </div>
                       ) : (
-                        <span className={`px-5 py-2 text-[11px] font-bold lowercase border rounded-full transition-all ${
-                          activeType === item ? 'bg-black text-white border-black' : 'bg-white/50 text-black/70 border-black/10 hover:border-black/30'
-                        }`}>
+                        <span className={`px-5 py-2 text-[11px] font-bold lowercase border rounded-full transition-all ${activeType === item ? 'bg-black text-white border-black' : 'bg-white/50 text-black/70 border-black/10 hover:border-black/30'
+                          }`}>
                           {item}
                         </span>
                       )}
@@ -362,16 +357,16 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
           </div>
           <AnimatePresence>
             {isSortOpen && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
                 className="absolute left-0 mt-4 w-56 bg-white rounded-[16px] shadow-2xl z-50 py-3 border border-black/5"
               >
                 {['featured', 'newest', 'price: low to high', 'price: high to low'].map((opt) => (
-                  <button 
-                    key={opt} 
-                    onClick={() => { setActiveSort(opt); setIsSortOpen(false); }} 
+                  <button
+                    key={opt}
+                    onClick={() => { setActiveSort(opt); setIsSortOpen(false); }}
                     className="w-full text-left px-6 py-3 text-[13px] font-medium hover:bg-[#F2F1ED] transition-colors lowercase"
                   >
                     {opt}
@@ -381,7 +376,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
             )}
           </AnimatePresence>
         </div>
-        
+
         <div className="flex items-center gap-6">
           <button onClick={() => setCols(2)} className={`transition-colors ${cols === 2 ? 'text-black' : 'text-black/20 hover:text-black/40'}`}><LayoutGrid size={22} /></button>
           <button onClick={() => setCols(3)} className={`transition-colors hidden lg:block ${cols === 3 ? 'text-black' : 'text-black/20 hover:text-black/40'}`}><Grid2X2 size={22} /></button>
@@ -389,16 +384,17 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
       </div>
 
       {/* Grid */}
-      <div className="max-w-[1600px] mx-auto px-6 pb-24">
-        <div className={`grid grid-cols-2 ${cols === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} gap-y-16 gap-x-8 md:gap-x-12`}>
+      <div className="max-w-[1600px] mx-auto px-3 md:px-6 pb-24">
+
+        <div className={`grid grid-cols-2 ${cols === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} gap-x-3 gap-y-3 md:gap-x-8 md:gap-y-16`}>
           {filteredProducts.slice(0, visibleCount).map((p) => (
             <ProductCard key={p.id} product={p} lang={lang} onSelect={() => onProductSelect(p)} />
           ))}
         </div>
 
         {visibleCount < filteredProducts.length && (
-          <div className="mt-20 flex justify-center">
-            <button 
+          <div className="mt-12 md:mt-20 flex justify-center">
+            <button
               onClick={() => setVisibleCount(prev => prev + 12)}
               className="px-12 py-4 bg-black text-white text-[12px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-black/90 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 active:scale-95"
             >
@@ -406,7 +402,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
             </button>
           </div>
         )}
-        
+
         {filteredProducts.length === 0 && (
           <div className="py-32 text-center">
             <h3 className="text-[24px] font-brand lowercase italic text-black/40">no products found in this selection.</h3>
