@@ -72,9 +72,9 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
 
   return (
     <div className="bg-[#FFFFFF]">
-      {/* Mobile: Grid with minimal spacing and stagger animation */}
+      {/* Mobile: Horizontal scroll with snap */}
       <motion.div 
-        className="grid grid-cols-2 gap-0 p-0 m-0 md:hidden"
+        className="flex gap-2 overflow-x-auto px-2 pb-2 md:hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] snap-x snap-mandatory"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
@@ -86,9 +86,10 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
           }
         }}
       >
-        {displayProducts.map((product, index) => (
+        {displayProducts.map((product) => (
           <motion.div
             key={product.id}
+            className="min-w-[74vw] snap-start"
             variants={{
               hidden: { opacity: 0, y: 20 },
               visible: { opacity: 1, y: 0 }
@@ -101,7 +102,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
       
       {/* Desktop: Original layout with stagger */}
       <motion.div 
-        className="hidden md:flex overflow-x-auto md:grid md:grid-cols-3 gap-6 md:gap-10 pb-8 px-6 md:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] snap-x snap-mandatory"
+        className="hidden md:grid md:grid-cols-3 gap-6 md:gap-10 pb-8 px-6 md:px-0"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
