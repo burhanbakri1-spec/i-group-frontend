@@ -1,3 +1,25 @@
+@media (max-width: 767px) {
+  .mobile-trending-scroll {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    gap: 8px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-bottom: 8px;
+  }
+
+  .mobile-trending-item {
+    flex: 0 0 76vw !important;
+    width: 76vw !important;
+    min-width: 76vw !important;
+    max-width: 76vw !important;
+    scroll-snap-align: start;
+  }
+}
 /*! tailwindcss v4.1.3 | MIT License | https://tailwindcss.com */
 @layer properties {
   @supports (((-webkit-hyphens: none)) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color: rgb(from red r g b)))) {

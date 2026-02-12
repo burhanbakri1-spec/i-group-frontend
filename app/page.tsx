@@ -91,6 +91,15 @@ const companies = [
     color: '#64748B',
     image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=1200'
   },
+  {
+    id: 9,
+    name: 'BA Supplements',
+    subtitle: 'SUPPLEMENTS & PERFORMANCE',
+    description: 'Premium nutritional supplements designed for strength, recovery, and long-term wellness.',
+    icon: Heart,
+    color: '#22C55E',
+    image: 'https://images.unsplash.com/photo-1612532275214-e4ca76d0e4d1?q=80&w=1200'
+  },
 ];
 
 // Apple-style text reveal animation component
@@ -620,7 +629,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.8, ease: [0.33, 1, 0.68, 1] }}
             >
-              A digital and wellness empire spanning 8 industries
+              A digital and wellness empire spanning 9 industries
             </motion.p>
             
             <motion.div
@@ -716,165 +725,104 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, delay: 0.3, ease: [0.33, 1, 0.68, 1] }}
               >
-                Eight businesses, one vision: to redefine excellence across digital and physical wellness
+                Nine businesses, one vision: to redefine excellence across digital and physical wellness
               </motion.p>
             </div>
           </ScaleOnScroll>
 
-          {/* Companies Grid - CR7 Style with Advanced Animations */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {companies.map((company, index) => {
-              const ref = useRef(null);
-              const isInView = useInView(ref, { once: true, margin: "-100px" });
-              
-              return (
+          {/* Companies Vertical Showcase - Premium Zoom-Out Motion */}
+          <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
+            {companies.map((company, index) => (
               <motion.a
                 key={company.id}
-                ref={ref}
                 href={company.link || '#'}
-                initial={{ opacity: 0, y: 60, scale: 0.95 }}
-                animate={isInView ? { 
-                  opacity: 1, 
-                  y: 0, 
-                  scale: 1,
-                  transition: {
-                    duration: 0.8,
-                    delay: index * 0.1,
-                    ease: [0.33, 1, 0.68, 1]
-                  }
-                } : {}}
                 onMouseEnter={() => setHoveredCard(company.id)}
                 onMouseLeave={() => setHoveredCard(null)}
-                className={`group relative overflow-hidden cursor-pointer rounded-2xl ${
-                  index === 0 ? 'md:col-span-2 md:row-span-2' : 
-                  index === 3 ? 'md:col-span-2' : ''
-                }`}
-                style={{ aspectRatio: index === 0 ? '1/1' : '1/1.2' }}
-                whileHover={{ 
-                  y: -8,
-                  transition: { duration: 0.4, ease: [0.33, 1, 0.68, 1] }
+                className="group relative block overflow-hidden rounded-3xl border border-white/10 bg-white/3 backdrop-blur-xl"
+                initial={{ opacity: 0, y: 70, scale: 1.08, filter: "blur(10px)" }}
+                whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                viewport={{ once: true, margin: "-120px" }}
+                transition={{
+                  duration: 0.9,
+                  delay: index * 0.08,
+                  ease: [0.33, 1, 0.68, 1]
+                }}
+                whileHover={{
+                  y: -6,
+                  transition: { duration: 0.35, ease: [0.33, 1, 0.68, 1] }
                 }}
               >
-                {/* Background Image with Advanced Hover */}
+                {/* Full Background */}
                 <div className="absolute inset-0">
-                  <motion.div className="w-full h-full overflow-hidden">
-                    <motion.img
-                      src={company.image}
-                      alt={company.name}
-                      className="w-full h-full object-cover"
-                      animate={{
-                        scale: hoveredCard === company.id ? 1.15 : 1,
-                        filter: hoveredCard === company.id ? "brightness(1.1)" : "brightness(0.8)"
-                      }}
-                      transition={{ duration: 0.7, ease: [0.33, 1, 0.68, 1] }}
-                    />
-                  </motion.div>
-                  <motion.div 
-                    className="absolute inset-0 bg-linear-to-t from-black via-black/60 to-transparent"
+                  <motion.img
+                    src={company.image}
+                    alt={company.name}
+                    className="w-full h-full object-cover"
+                    initial={{ scale: 1.22 }}
+                    whileInView={{ scale: 1.06 }}
+                    viewport={{ once: true }}
                     animate={{
-                      opacity: hoveredCard === company.id ? 0.7 : 1
+                      scale: hoveredCard === company.id ? 1.1 : 1.06,
+                      filter: hoveredCard === company.id ? "brightness(1.05)" : "brightness(0.78)"
                     }}
-                    transition={{ duration: 0.4 }}
+                    transition={{ duration: 0.8, ease: [0.33, 1, 0.68, 1] }}
                   />
+                  <div className="absolute inset-0 bg-linear-to-r from-black/85 via-black/60 to-black/30 md:to-transparent" />
                 </div>
 
                 {/* Content */}
-                <div className="relative h-full p-8 flex flex-col justify-between">
-                  {/* Top: Icon with Advanced Animation */}
-                  <div className="flex justify-end">
+                <div className="relative z-10 p-7 md:p-10 min-h-[280px] md:min-h-[340px] flex flex-col justify-between">
+                  <div className="flex items-start justify-between">
+                    <motion.div
+                      className="text-xs font-black tracking-[0.2em] uppercase"
+                      style={{ color: company.color }}
+                      animate={{ letterSpacing: hoveredCard === company.id ? "0.26em" : "0.2em" }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      {company.subtitle}
+                    </motion.div>
                     <motion.div
                       className="w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-xl"
                       style={{ backgroundColor: `${company.color}20`, border: `1px solid ${company.color}` }}
                       animate={{
-                        scale: hoveredCard === company.id ? 1.3 : 1,
                         rotate: hoveredCard === company.id ? 180 : 0,
-                        boxShadow: hoveredCard === company.id 
-                          ? `0 0 30px ${company.color}60` 
-                          : "0 0 0 transparent"
+                        scale: hoveredCard === company.id ? 1.1 : 1
                       }}
-                      transition={{ 
-                        duration: 0.6,
-                        ease: [0.33, 1, 0.68, 1]
-                      }}
+                      transition={{ duration: 0.5 }}
                     >
-                      <motion.div
-                        animate={{
-                          scale: hoveredCard === company.id ? 1.1 : 1
-                        }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <company.icon size={20} style={{ color: company.color }} />
-                      </motion.div>
+                      <company.icon size={20} style={{ color: company.color }} />
                     </motion.div>
                   </div>
 
-                  {/* Bottom: Text with Stagger Animation */}
-                  <div>
-                    <motion.div
-                      animate={{
-                        y: hoveredCard === company.id ? -15 : 0
-                      }}
-                      transition={{ duration: 0.5, ease: [0.33, 1, 0.68, 1] }}
+                  <div className="max-w-2xl">
+                    <motion.h3
+                      className="text-3xl md:text-5xl font-black tracking-tight mb-3"
+                      animate={{ color: hoveredCard === company.id ? company.color : "#FFFFFF" }}
+                      transition={{ duration: 0.35 }}
                     >
-                      <motion.p 
-                        className="text-xs font-bold tracking-widest uppercase mb-2" 
-                        style={{ color: company.color }}
-                        animate={{
-                          letterSpacing: hoveredCard === company.id ? "0.25em" : "0.15em"
-                        }}
-                        transition={{ duration: 0.4 }}
-                      >
-                        {company.subtitle}
-                      </motion.p>
-                      <motion.h3 
-                        className="text-3xl md:text-4xl font-black tracking-tighter mb-3"
-                        animate={{
-                          scale: hoveredCard === company.id ? 1.05 : 1,
-                          color: hoveredCard === company.id ? company.color : "#FFFFFF"
-                        }}
-                        transition={{ duration: 0.4 }}
-                      >
-                        {company.name}
-                      </motion.h3>
-                      <motion.p
-                        className="text-sm text-gray-300 leading-relaxed overflow-hidden"
-                        initial={{ opacity: 0, height: 0, y: 20 }}
-                        animate={{
-                          opacity: hoveredCard === company.id ? 1 : 0,
-                          height: hoveredCard === company.id ? 'auto' : 0,
-                          y: hoveredCard === company.id ? 0 : 20
-                        }}
-                        transition={{ duration: 0.5, ease: [0.33, 1, 0.68, 1] }}
-                      >
-                        {company.description}
-                      </motion.p>
-                    </motion.div>
+                      {company.name}
+                    </motion.h3>
+                    <motion.p
+                      className="text-sm md:text-base text-gray-200 leading-relaxed max-w-xl"
+                      initial={{ opacity: 0.6 }}
+                      animate={{ opacity: hoveredCard === company.id ? 1 : 0.75 }}
+                      transition={{ duration: 0.35 }}
+                    >
+                      {company.description}
+                    </motion.p>
 
-                    {/* Arrow with Bounce */}
                     <motion.div
-                      className="flex items-center gap-2 mt-4"
+                      className="inline-flex items-center gap-2 mt-6 text-sm font-bold tracking-[0.14em] uppercase"
                       animate={{
                         x: hoveredCard === company.id ? 10 : 0,
-                        opacity: hoveredCard === company.id ? 1 : 0.6
+                        opacity: hoveredCard === company.id ? 1 : 0.75
                       }}
-                      transition={{ duration: 0.4, ease: [0.33, 1, 0.68, 1] }}
+                      transition={{ duration: 0.35 }}
                     >
-                      <motion.span 
-                        className="text-sm font-bold tracking-wider uppercase"
-                        animate={{
-                          letterSpacing: hoveredCard === company.id ? "0.2em" : "0.1em"
-                        }}
-                      >
-                        EXPLORE
-                      </motion.span>
+                      <span>Explore</span>
                       <motion.div
-                        animate={{
-                          x: hoveredCard === company.id ? [0, 5, 0] : 0
-                        }}
-                        transition={{
-                          duration: 1,
-                          repeat: hoveredCard === company.id ? Infinity : 0
-                        }}
+                        animate={{ x: hoveredCard === company.id ? [0, 5, 0] : 0 }}
+                        transition={{ duration: 1, repeat: hoveredCard === company.id ? Infinity : 0 }}
                       >
                         <ArrowRight size={18} />
                       </motion.div>
@@ -882,22 +830,18 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Hover Border Effect with Glow */}
+                {/* Hover Glow Border */}
                 <motion.div
-                  className="absolute inset-0 border-2 rounded-2xl"
+                  className="absolute inset-0 rounded-3xl border-2"
                   style={{ borderColor: company.color }}
-                  initial={{ opacity: 0, scale: 1 }}
                   animate={{
-                    opacity: hoveredCard === company.id ? 0.7 : 0,
-                    scale: hoveredCard === company.id ? 1.02 : 1,
-                    boxShadow: hoveredCard === company.id 
-                      ? `0 0 40px ${company.color}40, inset 0 0 40px ${company.color}20` 
-                      : "none"
+                    opacity: hoveredCard === company.id ? 0.8 : 0,
+                    boxShadow: hoveredCard === company.id ? `0 0 45px ${company.color}55` : "none"
                   }}
-                  transition={{ duration: 0.5, ease: [0.33, 1, 0.68, 1] }}
+                  transition={{ duration: 0.35 }}
                 />
               </motion.a>
-            )})}
+            ))}
           </div>
         </div>
       </section>
@@ -958,7 +902,7 @@ export default function Home() {
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16">
               {[
-                { number: '8', label: 'Companies' },
+                { number: '9', label: 'Companies' },
                 { number: '50K+', label: 'Customers' },
                 { number: '100+', label: 'Team Members' },
                 { number: '15+', label: 'Countries' }

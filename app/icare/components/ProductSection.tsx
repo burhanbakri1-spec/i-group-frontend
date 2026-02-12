@@ -74,7 +74,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
     <div className="bg-[#FFFFFF]">
       {/* Mobile: Horizontal scroll with snap */}
       <motion.div 
-        className="md:hidden no-scrollbar"
+        className="md:hidden no-scrollbar mobile-trending-scroll"
         style={{
           display: 'flex',
           flexWrap: 'nowrap',
@@ -100,7 +100,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
         {displayProducts.map((product) => (
           <motion.div
             key={product.id}
-            className="snap-start"
+            className="snap-start mobile-trending-item"
             style={{
               flex: '0 0 76vw',
               width: '76vw',
