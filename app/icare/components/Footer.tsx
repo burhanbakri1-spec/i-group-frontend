@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Instagram, Youtube, Music2, Facebook, Ghost } from 'lucide-react';
 import { Language } from '../translations';
 
@@ -12,9 +13,15 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
     <footer className="bg-[#F2F0EA] border-t border-black/10 font-sans mx-4 md:mx-8 mb-8 rounded-[16px] overflow-hidden">
       {/* 1. HUGE LOGO SECTION */}
       <div className="w-full py-12 md:py-20 border-b border-black/10 overflow-hidden flex justify-center items-center">
-        <h2 className="text-[28vw] leading-[0.75] font-[900] tracking-[-0.06em] text-[#5C5A56] lowercase select-none">
+        <motion.h2 
+          className="text-[28vw] leading-[0.75] font-[900] tracking-[-0.06em] text-[#5C5A56] lowercase select-none"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+        >
           icare
-        </h2>
+        </motion.h2>
       </div>
 
       {/* 2. MAIN FOOTER CONTENT */}
@@ -67,34 +74,64 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
             <h4 className="text-[12px] font-bold uppercase tracking-widest text-[#5C5A56]">SOCIAL</h4>
             <ul className="space-y-3">
               <li>
-                <button className="flex items-center gap-2 text-[14px] text-[#706E6A] hover:text-black transition-colors group">
-                  <Instagram size={14} strokeWidth={1.5} />
+                <motion.button 
+                  className="flex items-center gap-2 text-[14px] text-[#706E6A] hover:text-black transition-colors group"
+                  whileHover={{ x: 5 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <motion.div whileHover={{ rotate: 15, scale: 1.2 }}>
+                    <Instagram size={14} strokeWidth={1.5} />
+                  </motion.div>
                   <span>Instagram</span>
-                </button>
+                </motion.button>
               </li>
               <li>
-                <button className="flex items-center gap-2 text-[14px] text-[#706E6A] hover:text-black transition-colors group">
-                  <Youtube size={14} strokeWidth={1.5} />
+                <motion.button 
+                  className="flex items-center gap-2 text-[14px] text-[#706E6A] hover:text-black transition-colors group"
+                  whileHover={{ x: 5 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <motion.div whileHover={{ rotate: 15, scale: 1.2 }}>
+                    <Youtube size={14} strokeWidth={1.5} />
+                  </motion.div>
                   <span>Youtube</span>
-                </button>
+                </motion.button>
               </li>
               <li>
-                <button className="flex items-center gap-2 text-[14px] text-[#706E6A] hover:text-black transition-colors group">
-                  <Music2 size={14} strokeWidth={1.5} />
+                <motion.button 
+                  className="flex items-center gap-2 text-[14px] text-[#706E6A] hover:text-black transition-colors group"
+                  whileHover={{ x: 5 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <motion.div whileHover={{ rotate: 15, scale: 1.2 }}>
+                    <Music2 size={14} strokeWidth={1.5} />
+                  </motion.div>
                   <span>TikTok</span>
-                </button>
+                </motion.button>
               </li>
               <li>
-                <button className="flex items-center gap-2 text-[14px] text-[#706E6A] hover:text-black transition-colors group">
-                  <Facebook size={14} strokeWidth={1.5} />
+                <motion.button 
+                  className="flex items-center gap-2 text-[14px] text-[#706E6A] hover:text-black transition-colors group"
+                  whileHover={{ x: 5 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <motion.div whileHover={{ rotate: 15, scale: 1.2 }}>
+                    <Facebook size={14} strokeWidth={1.5} />
+                  </motion.div>
                   <span>Facebook</span>
-                </button>
+                </motion.button>
               </li>
               <li>
-                <button className="flex items-center gap-2 text-[14px] text-[#706E6A] hover:text-black transition-colors group">
-                  <Ghost size={14} strokeWidth={1.5} />
+                <motion.button 
+                  className="flex items-center gap-2 text-[14px] text-[#706E6A] hover:text-black transition-colors group"
+                  whileHover={{ x: 5 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <motion.div whileHover={{ rotate: 15, scale: 1.2 }}>
+                    <Ghost size={14} strokeWidth={1.5} />
+                  </motion.div>
                   <span>Snapchat</span>
-                </button>
+                </motion.button>
               </li>
             </ul>
           </div>

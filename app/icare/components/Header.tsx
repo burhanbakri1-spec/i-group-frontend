@@ -118,21 +118,18 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
           </div>
 
           {/* Logo - Increased Size */}
-          <button 
+          <motion.button 
             onClick={() => onNavigate('home')}
-            className="absolute left-1/2 -translate-x-1/2 h-16 md:h-20 w-auto flex items-center justify-center transition-all duration-500"
+            className="absolute left-1/2 -translate-x-1/2 h-16 md:h-20 w-auto flex items-center justify-center"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             <img 
-              src="/logo.svg" 
+              src="/icare-logo.png" 
               alt="icare beauty" 
-              className="h-full w-auto object-contain transition-all duration-500 py-1"
-              style={{ 
-                filter: isPinkTheme 
-                  ? 'none' 
-                  : 'grayscale(1) brightness(0.4) contrast(1.2) opacity(0.8)' 
-              }}
+              className="h-full w-auto object-contain transition-all duration-500"
             />
-          </button>
+          </motion.button>
 
           {/* Actions */}
           <div className="flex items-center gap-4 md:gap-8">

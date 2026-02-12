@@ -65,7 +65,9 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
             <button onClick={onClose} className="p-2">
               <X size={24} className="text-[#5C5A56]" />
             </button>
-            <h1 className="text-[28px] font-black tracking-[-0.05em] text-[#5C5A56] absolute left-1/2 -translate-x-1/2">icare</h1>
+            <div className="absolute left-1/2 -translate-x-1/2 h-10">
+              <img src="/icare-logo.png" alt="icare" className="h-full w-auto object-contain" />
+            </div>
             <div className="flex items-center gap-1">
               <button 
                 onClick={onToggleLang}

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { ProductCard } from './ProductCard';
 import { Language } from '../translations';
 import { fetchWixProducts } from '../lib/wix-client';
@@ -71,21 +72,60 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
 
   return (
     <div className="bg-[#FFFFFF]">
-      {/* Mobile: Grid with minimal spacing */}
-      <div className="grid grid-cols-2 gap-0 p-0 m-0 md:hidden">
-        {displayProducts.map(product => (
-          <ProductCard key={product.id} product={product} lang={lang} onSelect={() => onProductSelect(product)} />
-        ))}
-      </div>
-      
-      {/* Desktop: Original layout */}
-      <div className="hidden md:flex overflow-x-auto md:grid md:grid-cols-3 gap-6 md:gap-10 pb-8 px-6 md:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] snap-x snap-mandatory">
-        {displayProducts.map(product => (
-          <div key={product.id} className="min-w-[85vw] md:min-w-0 snap-center">
+      {/* Mobile: Grid with minimal spacing and stagger animation */}
+      <motion.div 
+        className="grid grid-cols-2 gap-0 p-0 m-0 md:hidden"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={{
+          visible: {
+            transition: {
+              staggerChildren: 0.08
+            }
+          }
+        }}
+      >
+        {displayProducts.map((product, index) => (
+          <motion.div
+            key={product.id}
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              visible: { opacity: 1, y: 0 }
+            }}
+          >
             <ProductCard product={product} lang={lang} onSelect={() => onProductSelect(product)} />
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
+      
+      {/* Desktop: Original layout with stagger */}
+      <motion.div 
+        className="hidden md:flex overflow-x-auto md:grid md:grid-cols-3 gap-6 md:gap-10 pb-8 px-6 md:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] snap-x snap-mandatory"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={{
+          visible: {
+            transition: {
+              staggerChildren: 0.1
+            }
+          }
+        }}
+      >
+        {displayProducts.map((product, index) => (
+          <motion.div 
+            key={product.id} 
+            className="min-w-[85vw] md:min-w-0 snap-center"
+            variants={{
+              hidden: { opacity: 0, y: 30, scale: 0.9 },
+              visible: { opacity: 1, y: 0, scale: 1 }
+            }}
+          >
+            <ProductCard product={product} lang={lang} onSelect={() => onProductSelect(product)} />
+          </motion.div>
+        ))}
+      </motion.div>
     </div>
   );
 };

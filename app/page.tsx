@@ -293,7 +293,7 @@ export default function Home() {
                 transition={{ duration: 0.3 }}
               />
             </motion.button>
-          </div>
+        </div>
 
           {/* Mobile Menu Button */}
           <button 

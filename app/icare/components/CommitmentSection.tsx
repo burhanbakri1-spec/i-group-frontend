@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
 
@@ -8,6 +8,9 @@ interface CommitmentSectionProps {
 }
 
 export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang }) => {
+  const { scrollY } = useScroll();
+  const imageScale = useTransform(scrollY, [0, 1000], [1, 1.1]);
+  
   const listItems = lang === 'en' 
     ? ['mission', 'philanthropy', 'sustainability']
     : ['المهمة', 'العمل الخيري', 'الاستدامة'];
@@ -46,33 +49,67 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang }) =>
             {listItems.map((item, index) => (
               <motion.div 
                 key={item}
-                initial={{ opacity: 0, x: -10 }}
+                initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ 
+                  delay: index * 0.15, 
+                  duration: 0.6,
+                  ease: [0.22, 1, 0.36, 1]
+                }}
+                whileHover={{ 
+                  x: 10,
+                  transition: { duration: 0.3 }
+                }}
                 className={`py-6 border-t border-black/10 flex justify-between items-center group cursor-pointer ${index === listItems.length - 1 ? 'border-b' : ''}`}
               >
-                <span className="text-[20px] md:text-[28px] font-[900] text-black/30 group-hover:text-black transition-all duration-500 lowercase">
+                <motion.span 
+                  className="text-[20px] md:text-[28px] font-[900] text-black/30 group-hover:text-black transition-all duration-500 lowercase"
+                  whileHover={{ scale: 1.05 }}
+                >
                   {item}
-                </span>
-                <div className="w-8 h-8 rounded-full border border-black/5 flex items-center justify-center bg-white group-hover:bg-black group-hover:text-white transition-all duration-500">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                </motion.span>
+                <motion.div 
+                  className="w-8 h-8 rounded-full border border-black/5 flex items-center justify-center bg-white group-hover:bg-black group-hover:text-white transition-all duration-500"
+                  whileHover={{ 
+                    scale: 1.2,
+                    rotate: 45
+                  }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <motion.svg 
+                    width="14" 
+                    height="14" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2.5" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                    animate={{ x: [0, 3, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  >
                     <path d="M5 12h14M12 5l7 7-7 7"/>
-                  </svg>
-                </div>
+                  </motion.svg>
+                </motion.div>
               </motion.div>
             ))}
           </div>
         </div>
 
         {/* Right Side: Visual Box */}
-        <div className="relative aspect-square md:aspect-auto h-[400px] md:h-full overflow-hidden rounded-[16px]">
+        <motion.div 
+          className="relative aspect-square md:aspect-auto h-[400px] md:h-full overflow-hidden rounded-[16px]"
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.5 }}
+        >
           <motion.div
             initial={{ scale: 1.2, opacity: 0 }}
             whileInView={{ scale: 1, opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
             className="w-full h-full"
+            style={{ scale: imageScale }}
           >
             <ImageWithFallback 
               src="https://images.unsplash.com/photo-1603189777895-1dcbe39ec57e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200" 
@@ -80,8 +117,12 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang }) =>
               className="w-full h-full object-cover"
             />
           </motion.div>
-          <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-700" />
-        </div>
+          <motion.div 
+            className="absolute inset-0 bg-black/5"
+            whileHover={{ opacity: 0 }}
+            transition={{ duration: 0.7 }}
+          />
+        </motion.div>
       </div>
     </section>
   );

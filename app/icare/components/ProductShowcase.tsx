@@ -91,18 +91,46 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ lang, onProduc
         <div className="bg-[#F2F2F0] rounded-[12px] md:rounded-[16px] p-4 sm:p-8 md:p-16 flex flex-col justify-between relative h-[350px] sm:h-[500px] md:h-[700px] overflow-hidden">
           
           <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 flex justify-between px-1 md:px-8 z-20 pointer-events-none">
-            <button 
+            <motion.button 
               onClick={prevSlide}
-              className="w-8 h-8 md:w-14 md:h-14 border border-black/5 bg-white/60 backdrop-blur-xl rounded-full flex items-center justify-center hover:bg-white transition-all shadow-md md:shadow-lg pointer-events-auto"
+              className="w-8 h-8 md:w-14 md:h-14 border border-black/5 bg-white/60 backdrop-blur-xl rounded-full flex items-center justify-center shadow-md md:shadow-lg pointer-events-auto"
+              whileHover={{ 
+                scale: 1.1, 
+                backgroundColor: "rgba(255,255,255,1)",
+                boxShadow: "0 10px 30px rgba(0,0,0,0.15)"
+              }}
+              whileTap={{ scale: 0.9 }}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
             >
-              <ArrowLeft size={14} strokeWidth={1.5} />
-            </button>
-            <button 
+              <motion.div
+                whileHover={{ x: -2 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ArrowLeft size={14} strokeWidth={1.5} />
+              </motion.div>
+            </motion.button>
+            <motion.button 
               onClick={nextSlide}
-              className="w-8 h-8 md:w-14 md:h-14 border border-black/5 bg-white/60 backdrop-blur-xl rounded-full flex items-center justify-center hover:bg-white transition-all shadow-md md:shadow-lg pointer-events-auto"
+              className="w-8 h-8 md:w-14 md:h-14 border border-black/5 bg-white/60 backdrop-blur-xl rounded-full flex items-center justify-center shadow-md md:shadow-lg pointer-events-auto"
+              whileHover={{ 
+                scale: 1.1, 
+                backgroundColor: "rgba(255,255,255,1)",
+                boxShadow: "0 10px 30px rgba(0,0,0,0.15)"
+              }}
+              whileTap={{ scale: 0.9 }}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
             >
-              <ArrowRight size={14} strokeWidth={1.5} />
-            </button>
+              <motion.div
+                whileHover={{ x: 2 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ArrowRight size={14} strokeWidth={1.5} />
+              </motion.div>
+            </motion.button>
           </div>
 
           <div className="flex-1 flex items-center justify-center py-2 md:py-10">
@@ -147,7 +175,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ lang, onProduc
 
                 <div className="space-y-0.5 md:space-y-2">
                   <div className="flex items-center gap-2">
-                    <img src="/logo.svg" alt="icare" className="h-3 md:h-5 w-auto object-contain brightness-0 hidden sm:block" />
+                    <img src="/icare-logo.png" alt="icare" className="h-3 md:h-5 w-auto object-contain hidden sm:block" />
                     <h3 className="text-[14px] sm:text-[20px] md:text-[28px] font-[900] tracking-tight text-[#222] uppercase leading-tight">
                       {current.title}
                     </h3>

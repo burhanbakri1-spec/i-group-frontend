@@ -56,55 +56,116 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, lang, onSelec
       className="group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ 
+        duration: 0.6, 
+        ease: [0.22, 1, 0.36, 1]
+      }}
     >
       {/* Main Container - Taller for mobile like Rhode Skin */}
-      <div 
-        className="relative aspect-[2/3] md:aspect-[4/5] bg-[#F2F2F2] rounded-[8px] md:rounded-[20px] overflow-hidden p-2 md:p-8 flex flex-col justify-between border border-transparent hover:border-[#E5E5E5] transition-colors duration-300 cursor-pointer"
+      <motion.div 
+        className="relative aspect-[2/3] md:aspect-[4/5] bg-[#F2F2F2] rounded-[8px] md:rounded-[20px] overflow-hidden p-2 md:p-8 flex flex-col justify-between border border-transparent hover:border-[#E5E5E5] transition-all duration-500 cursor-pointer"
         onClick={onSelect}
+        whileHover={{ 
+          y: -8, 
+          boxShadow: "0 20px 40px rgba(0,0,0,0.08)",
+          scale: 1.02,
+          transition: { duration: 0.3 }
+        }}
+        whileTap={{ scale: 0.98 }}
       >
         
         {/* Top Section: Category Title and Badge */}
-        <div className="flex justify-between items-start w-full relative z-10">
-          <h3 className="text-[20px] md:text-[48px] font-black tracking-tighter text-[#4D4D4D] lowercase leading-[0.8] font-sans">
+        <motion.div 
+          className="flex justify-between items-start w-full relative z-10"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.4 }}
+        >
+          <motion.h3 
+            className="text-[20px] md:text-[48px] font-black tracking-tighter text-[#4D4D4D] lowercase leading-[0.8] font-sans"
+            whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
+          >
             {displayTitle}
-          </h3>
+          </motion.h3>
           <div className="flex items-center gap-1 md:gap-2">
             {product.badge && (
-              <span className="bg-[#666666] text-white px-1.5 md:px-3 py-0.5 md:py-1 rounded-full text-[7px] md:text-[10px] font-bold uppercase tracking-wider">
+              <motion.span 
+                className="bg-[#666666] text-white px-1.5 md:px-3 py-0.5 md:py-1 rounded-full text-[7px] md:text-[10px] font-bold uppercase tracking-wider"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2, type: "spring", bounce: 0.5 }}
+              >
                 {product.badge}
-              </span>
+              </motion.span>
             )}
-            <button
+            <motion.button
               onClick={handleToggleWishlist}
               className="p-1.5 md:p-2 hover:bg-white/50 rounded-full transition-colors"
+              whileHover={{ scale: 1.2, rotate: inWishlist ? 0 : 10 }}
+              whileTap={{ scale: 0.9 }}
             >
-              <Heart 
-                size={16} 
-                className={`md:w-5 md:h-5 transition-colors ${inWishlist ? 'fill-red-500 text-red-500' : 'text-[#666]'}`}
-              />
-            </button>
+              <motion.div
+                animate={inWishlist ? { scale: [1, 1.3, 1] } : {}}
+                transition={{ duration: 0.3 }}
+              >
+                <Heart 
+                  size={16} 
+                  className={`md:w-5 md:h-5 transition-colors ${inWishlist ? 'fill-red-500 text-red-500' : 'text-[#666]'}`}
+                />
+              </motion.div>
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Center Section: Product Image */}
         <div className="absolute inset-0 flex items-center justify-center p-4 md:p-12 py-10 md:py-20">
-          <ImageWithFallback 
-            src={product.image} 
-            alt={product.name} 
-            className={`max-w-[85%] md:max-w-[85%] max-h-[60%] md:max-h-[65%] object-contain drop-shadow-2xl transition-transform duration-700 ease-out ${isHovered ? 'scale-110' : 'scale-100'}`}
-          />
+          <motion.div
+            animate={isHovered ? { 
+              scale: 1.12, 
+              rotateY: 5,
+              rotateX: -5,
+            } : { 
+              scale: 1, 
+              rotateY: 0,
+              rotateX: 0
+            }}
+            transition={{ 
+              duration: 0.6, 
+              ease: [0.33, 1, 0.68, 1]
+            }}
+            style={{ transformStyle: "preserve-3d" }}
+          >
+            <ImageWithFallback 
+              src={product.image} 
+              alt={product.name} 
+              className="max-w-[85%] md:max-w-[85%] max-h-[60%] md:max-h-[65%] object-contain drop-shadow-2xl"
+            />
+          </motion.div>
         </div>
 
         {/* Bottom Section: Info */}
-        <div className="relative z-10 mt-auto space-y-2">
+        <motion.div 
+          className="relative z-10 mt-auto space-y-2"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.4 }}
+        >
           {/* Stars and Count */}
           <div className="flex items-center gap-1 mb-1">
             <div className="flex">
               {[...Array(5)].map((_, i) => (
-                <Star key={i} size={9} className="md:w-[13px] md:h-[13px]" fill="#4D4D4D" stroke="#4D4D4D" />
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2 + i * 0.05 }}
+                >
+                  <Star size={9} className="md:w-[13px] md:h-[13px]" fill="#4D4D4D" stroke="#4D4D4D" />
+                </motion.div>
               ))}
             </div>
             <span className="text-[9px] md:text-[15px] text-[#4D4D4D] font-medium">
@@ -128,25 +189,45 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, lang, onSelec
           </div>
 
           {/* Add to Cart Button - Inside Card */}
-          <button
+          <motion.button
             onClick={handleAddToCart}
             className="w-full py-2 md:py-2.5 border border-[#999] bg-transparent rounded-full text-[9px] md:text-[11px] font-black uppercase tracking-wider text-[#666] hover:bg-black hover:text-white hover:border-black transition-all duration-300"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25, duration: 0.4 }}
           >
             {lang === 'en' ? 'Add to Cart' : 'أضف للسلة'}
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
 
         {/* Desktop Overlay - Hidden on Mobile */}
-        <div className={`hidden md:flex absolute inset-0 bg-white/30 backdrop-blur-xs transition-opacity duration-300 items-center justify-center ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-          <button 
+        <motion.div 
+          className="hidden md:flex absolute inset-0 bg-white/30 backdrop-blur-xs items-center justify-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isHovered ? 1 : 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <motion.button 
             onClick={handleAddToCart}
-            className="bg-black text-white px-10 py-4 rounded-full text-[12px] font-black uppercase tracking-widest shadow-2xl transform transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2"
+            className="bg-black text-white px-10 py-4 rounded-full text-[12px] font-black uppercase tracking-widest shadow-2xl flex items-center gap-2"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={isHovered ? { scale: 1, opacity: 1 } : { scale: 0.8, opacity: 0 }}
+            transition={{ duration: 0.3, type: "spring", bounce: 0.4 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            <Plus size={18} strokeWidth={3} />
+            <motion.div
+              animate={{ rotate: isHovered ? 180 : 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Plus size={18} strokeWidth={3} />
+            </motion.div>
             {lang === 'en' ? 'Add to Cart' : 'أضف للسلة'}
-          </button>
-        </div>
-      </div>
+          </motion.button>
+        </motion.div>
+      </motion.div>
     </motion.div>
   );
 };

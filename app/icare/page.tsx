@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from './components/Header';
 import { Home } from './components/Home';
 import { AboutPage } from './components/AboutPage';
@@ -22,6 +23,22 @@ import { WishlistPage } from './components/WishlistPage';
 import { ShippingPage } from './components/ShippingPage';
 import { ShopProvider } from './context/ShopContext';
 import './icare.css';
+
+// Page Transition Wrapper Component
+const PageTransition = ({ children, pageKey }: { children: React.ReactNode; pageKey: string }) => (
+  <motion.div
+    key={pageKey}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -20 }}
+    transition={{ 
+      duration: 0.5, 
+      ease: [0.22, 1, 0.36, 1]
+    }}
+  >
+    {children}
+  </motion.div>
+);
 
 export default function ICarePage() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -47,43 +64,45 @@ export default function ICarePage() {
   const renderPage = () => {
     if (currentPage === 'product' && selectedProduct) {
       return (
-        <ProductPage 
-          product={selectedProduct} 
-          onBack={() => setCurrentPage('shop')} 
-          lang={lang} 
-        />
+        <PageTransition pageKey={`product-${selectedProduct.id}`}>
+          <ProductPage 
+            product={selectedProduct} 
+            onBack={() => setCurrentPage('shop')} 
+            lang={lang} 
+          />
+        </PageTransition>
       );
     }
 
     switch (currentPage) {
       case 'story':
-        return <AboutPage onNavigate={setCurrentPage} lang={lang} />;
+        return <PageTransition pageKey="story"><AboutPage onNavigate={setCurrentPage} lang={lang} /></PageTransition>;
       case 'shop':
-        return <ShopPage lang={lang} onProductSelect={handleProductSelect} />;
+        return <PageTransition pageKey="shop"><ShopPage lang={lang} onProductSelect={handleProductSelect} /></PageTransition>;
       case 'account':
-        return <AccountPage onNavigate={setCurrentPage} lang={lang} />;
+        return <PageTransition pageKey="account"><AccountPage onNavigate={setCurrentPage} lang={lang} /></PageTransition>;
       case 'find-us':
-        return <StoreLocator lang={lang} />;
+        return <PageTransition pageKey="find-us"><StoreLocator lang={lang} /></PageTransition>;
       case 'vlog':
-        return <VlogPage lang={lang} />;
+        return <PageTransition pageKey="vlog"><VlogPage lang={lang} /></PageTransition>;
       case 'privacy':
-        return <PrivacyPolicy lang={lang} />;
+        return <PageTransition pageKey="privacy"><PrivacyPolicy lang={lang} /></PageTransition>;
       case 'terms':
-        return <TermsOfService lang={lang} />;
+        return <PageTransition pageKey="terms"><TermsOfService lang={lang} /></PageTransition>;
       case 'accessibility':
-        return <AccessibilityStatement lang={lang} />;
+        return <PageTransition pageKey="accessibility"><AccessibilityStatement lang={lang} /></PageTransition>;
       case 'faq':
-        return <FAQPage lang={lang} />;
+        return <PageTransition pageKey="faq"><FAQPage lang={lang} /></PageTransition>;
       case 'contact':
-        return <ContactPage lang={lang} />;
+        return <PageTransition pageKey="contact"><ContactPage lang={lang} /></PageTransition>;
       case 'checkout':
-        return <CheckoutPage lang={lang} onNavigate={setCurrentPage} />;
+        return <PageTransition pageKey="checkout"><CheckoutPage lang={lang} onNavigate={setCurrentPage} /></PageTransition>;
       case 'wishlist':
-        return <WishlistPage lang={lang} onProductSelect={handleProductSelect} />;
+        return <PageTransition pageKey="wishlist"><WishlistPage lang={lang} onProductSelect={handleProductSelect} /></PageTransition>;
       case 'shipping':
-        return <ShippingPage lang={lang} />;
+        return <PageTransition pageKey="shipping"><ShippingPage lang={lang} /></PageTransition>;
       default:
-        return <Home onNavigate={setCurrentPage} lang={lang} onProductSelect={handleProductSelect} />;
+        return <PageTransition pageKey="home"><Home onNavigate={setCurrentPage} lang={lang} onProductSelect={handleProductSelect} /></PageTransition>;
     }
   };
 
@@ -111,7 +130,9 @@ export default function ICarePage() {
         />
 
         <main className="pt-[120px]">
-          {renderPage()}
+          <AnimatePresence mode="wait">
+            {renderPage()}
+          </AnimatePresence>
         </main>
 
         <Footer lang={lang} onNavigate={(page) => { setCurrentPage(page); window.scrollTo(0, 0); }} />

@@ -57,6 +57,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, lan
       {isOpen && (
         <>
           <motion.div 
+            key="search-drawer-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -65,6 +66,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, lan
           />
           
           <motion.div 
+            key="search-drawer-content"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
