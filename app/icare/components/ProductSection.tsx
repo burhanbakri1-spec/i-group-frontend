@@ -74,7 +74,18 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
     <div className="bg-[#FFFFFF]">
       {/* Mobile: Horizontal scroll with snap */}
       <motion.div 
-        className="flex gap-2 overflow-x-auto px-2 pb-2 md:hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] snap-x snap-mandatory"
+        className="md:hidden no-scrollbar"
+        style={{
+          display: 'flex',
+          flexWrap: 'nowrap',
+          gap: '8px',
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          padding: '0 8px 8px',
+          scrollSnapType: 'x mandatory',
+          WebkitOverflowScrolling: 'touch',
+          touchAction: 'pan-x',
+        }}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
@@ -89,7 +100,12 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
         {displayProducts.map((product) => (
           <motion.div
             key={product.id}
-            className="min-w-[74vw] snap-start"
+            className="snap-start"
+            style={{
+              flex: '0 0 76vw',
+              width: '76vw',
+              maxWidth: '76vw',
+            }}
             variants={{
               hidden: { opacity: 0, y: 20 },
               visible: { opacity: 1, y: 0 }
