@@ -3,13 +3,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language, translations } from '../translations';
+import { Product } from '../types';
 
 interface ProductShowcaseProps {
+  products: Product[];
   lang: Language;
-  onProductSelect: (product: any) => void;
+  onProductSelect: (product: Product) => void;
 }
 
-export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ lang, onProductSelect }) => {
+export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang, onProductSelect }) => {
+  // products prop is required by interface but component uses internal showcaseProducts
+  void products;
   const t = translations[lang];
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -185,11 +189,11 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ lang, onProduc
                   </p>
                 </div>
 
-                <motion.button 
+                <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => onProductSelect({
-                    id: current.id,
+                    id: String(current.id),
                     name: current.title,
                     description: current.description,
                     price: current.price,

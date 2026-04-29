@@ -5,10 +5,11 @@ import { ProductCard } from './ProductCard';
 import { ChevronDown, Grid2X2, LayoutGrid, X } from 'lucide-react';
 import { fetchWixProducts } from '../lib/wix-client';
 import { Language } from '../translations';
+import { Product } from '../types';
 
 interface ShopPageProps {
   lang: Language;
-  onProductSelect: (product: any) => void;
+  onProductSelect: (product: Product) => void;
 }
 
 const brandHierarchy: Record<string, string[]> = {
@@ -63,6 +64,7 @@ const categoryHierarchy = {
 };
 
 export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [wixProducts, setWixProducts] = useState<any[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeMain, setActiveMain] = useState<string | null>(null);
@@ -262,6 +264,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
               className="overflow-x-auto no-scrollbar border-b border-black/5 pb-4"
             >
               <div className="flex md:justify-center justify-start gap-3 px-4 min-w-max">
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {Object.keys((categoryHierarchy as any)[activeMain]).map((sub) => (
                   <button
                     key={sub}
@@ -289,6 +292,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
             >
               <div className="overflow-x-auto no-scrollbar">
                 <div className={`flex ${activeMain === 'brands' ? 'gap-8' : 'gap-3 flex-wrap justify-center'} min-w-max`}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {(categoryHierarchy as any)[activeMain][activeSub].map((item: string) => (
                     <button
                       key={item}

@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 export const Story: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) => {
@@ -21,7 +20,7 @@ export const Story: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavi
             icare is a range of skincare essentials. Based in skin science, we believe in great products that really work, and that everyone can use. 
           </p>
           <p className="text-[20px] text-[#706E6A] leading-relaxed max-w-lg">
-            Our formulas are intentional, high-performance, and kind to the environment. We're here to help you achieve your best skin yet.
+            Our formulas are intentional, high-performance, and kind to the environment. We&apos;re here to help you achieve your best skin yet.
           </p>
           <button 
             onClick={() => onNavigate('shop')}

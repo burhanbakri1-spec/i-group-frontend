@@ -8,7 +8,7 @@ interface VlogPageProps {
   lang: Language;
 }
 
-const VlogItem = ({ title, subtitle, image, category }: { title: string, subtitle: string, image: string, category: string }) => (
+const VlogItem = ({ title, subtitle, image }: { title: string, subtitle: string, image: string }) => (
   <motion.div 
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
@@ -49,42 +49,36 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
     {
       title: lang === 'en' ? 'POCKET-SIZED POP-UP' : 'متجر متنقل بحجم الجيب',
       subtitle: lang === 'en' ? 'rhode pops up in NYC.' : 'رود تفتتح متجرها في نيويورك.',
-      image: 'https://images.unsplash.com/photo-1760621393386-3906922b0b78?q=80&w=1200',
-      category: 'PRODUCTS'
+      image: 'https://images.unsplash.com/photo-1760621393386-3906922b0b78?q=80&w=1200'
     },
     {
       title: lang === 'en' ? 'GET TO KNOW PINEAPPLE REFRESH' : 'تعرفي على انتعاش الأناناس',
       subtitle: lang === 'en' ? 'Your cleanser for every day, every month and every season.' : 'منظفك اليومي لكل شهر ولكل موسم.',
-      image: 'https://images.unsplash.com/photo-1734599895291-d25a27e4cb45?q=80&w=1200',
-      category: 'TUTORIALS'
+      image: 'https://images.unsplash.com/photo-1734599895291-d25a27e4cb45?q=80&w=1200'
     },
     {
       title: lang === 'en' ? 'SEE THE RHODE ROUTINE' : 'شاهدي روتين رود',
-      subtitle: lang === 'en' ? 'Hailey’s skincare edit, starring Rhode’s newest product: Pineapple Refresh.' : 'مختارات هايلي للعناية بالبشرة، ببطولة منتج رود الجديد.',
-      image: 'https://images.unsplash.com/photo-1715702129041-ff31d547e498?q=80&w=1200',
-      category: 'TUTORIALS'
+      subtitle: lang === 'en' ? 'Hailey&#39;s skincare edit, starring Rhode&#39;s newest product: Pineapple Refresh.' : 'مختارات هايلي للعناية بالبشرة، ببطولة منتج رود الجديد.',
+      image: 'https://images.unsplash.com/photo-1715702129041-ff31d547e498?q=80&w=1200'
     },
     {
       title: lang === 'en' ? 'THE MAKING OF RHODE: YEAR ONE' : 'صناعة رود: العام الأول',
       subtitle: lang === 'en' ? 'Watch our journey since launch.' : 'شاهدي رحلتنا منذ الانطلاق.',
-      image: 'https://images.unsplash.com/photo-1734690201845-25322ab2be89?q=80&w=1200',
-      category: 'PRODUCTS'
+      image: 'https://images.unsplash.com/photo-1734690201845-25322ab2be89?q=80&w=1200'
     },
     {
       title: lang === 'en' ? 'GET TO KNOW LIP TINT' : 'تعرفي على ملمع الشفاه',
-      subtitle: lang === 'en' ? 'Four new day-to-night lip essentials.' : 'أربعة أساسيات جديدة للشفاه من النهار إلى الليل.',
-      image: 'https://images.unsplash.com/photo-1636715940394-493e67594b1b?q=80&w=1200',
-      category: 'PRODUCTS'
+      subtitle: lang === 'en' ? 'Four new day&#45;to&#45;night lip essentials.' : 'أربعة أساسيات جديدة للشفاه من النهار إلى الليل.',
+      image: 'https://images.unsplash.com/photo-1636715940394-493e67594b1b?q=80&w=1200'
     },
     {
       title: lang === 'en' ? 'GET TO KNOW GLAZING MILK' : 'تعرفي على حليب التوهج',
       subtitle: lang === 'en' ? 'The essential prep step in your rhode routine.' : 'خطوة التحضير الأساسية في روتين رود الخاص بك.',
-      image: 'https://images.unsplash.com/photo-1703218039342-779a2487f176?q=80&w=1200',
-      category: 'TUTORIALS'
+      image: 'https://images.unsplash.com/photo-1703218039342-779a2487f176?q=80&w=1200'
     }
   ];
 
-  const filteredVlogs = filter === 'ALL' ? vlogs : vlogs.filter(v => v.category === filter);
+  const filteredVlogs = vlogs;
 
   return (
     <div className="min-h-screen bg-[#FFFFFF] pb-32">

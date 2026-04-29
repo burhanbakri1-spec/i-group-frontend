@@ -4,8 +4,8 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
 
 interface AccountPageProps {
-  onNavigate: (page: string) => void;
-  lang: Language;
+  onNavigate?: (page: string) => void;
+  lang?: Language;
 }
 
 export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) => {
@@ -23,7 +23,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
         {/* Overlay Text - Matching the image exactly */}
         <div className="absolute inset-0 flex items-center justify-center p-8 md:p-12 bg-black/10">
           <h2 className="text-white text-[28px] md:text-[36px] lg:text-[42px] font-medium leading-tight text-center md:text-left md:max-w-xl tracking-tight drop-shadow-lg">
-            It's time to invest in your SKIN.
+            It&apos;s time to invest in your SKIN.
           </h2>
         </div>
       </div>
@@ -67,7 +67,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
               Forgot your password?
             </button>
             <div className="text-[12px] text-[#706E6A] font-medium">
-              Don't have an account? <button className="underline underline-offset-4 hover:text-black transition-colors">Sign up!</button>
+              Don&#39;t have an account? <button className="underline underline-offset-4 hover:text-black transition-colors">Sign up!</button>
             </div>
           </div>
         </motion.div>

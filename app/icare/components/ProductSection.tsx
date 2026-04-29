@@ -3,13 +3,15 @@ import { motion } from 'framer-motion';
 import { ProductCard } from './ProductCard';
 import { Language } from '../translations';
 import { fetchWixProducts } from '../lib/wix-client';
+import { Product } from '../types';
 
 interface ProductGridProps {
   lang: Language;
-  onProductSelect: (product: any) => void;
+  onProductSelect: (product: Product) => void;
 }
 
 export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [products, setProducts] = useState<any[] | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -130,7 +132,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
           }
         }}
       >
-        {displayProducts.map((product, index) => (
+        {displayProducts.map((product) => (
           <motion.div 
             key={product.id} 
             className="min-w-[85vw] md:min-w-0 snap-center"

@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
-import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language, translations } from '../translations';
 import { useShop } from '../context/ShopContext';
 

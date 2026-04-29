@@ -1,18 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, ChevronDown, Plus, Play, Grid, Image as ImageIcon, ChevronRight, ThumbsUp, ThumbsDown, CheckCircle2, SlidersHorizontal, ShoppingBag } from 'lucide-react';
+import { Star, ChevronDown, Plus, Play, ChevronRight, ThumbsUp, ThumbsDown, CheckCircle2, ShoppingBag } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { Language, translations } from '../translations';
+import { Language } from '../translations';
 import { ProductLineup } from './ProductLineup';
 import { useShop } from '../context/ShopContext';
-
-const kitTexture = "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=800";
-const applicationHero = "https://images.unsplash.com/photo-1556229010-aa31b6e4d6e4?w=800";
-const studyResults = "https://images.unsplash.com/photo-1578574577315-3fbeb0cecdc2?w=800";
-const routineHero = "https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=800";
+import { Product } from '../types';
 
 interface ProductPageProps {
-  product: any;
+  product: Product;
   onBack: () => void;
   lang: Language;
 }
@@ -109,7 +105,7 @@ const routineSteps = [
   }
 ];
 
-const ReviewItem = ({ review, isRtl }: { review: typeof reviews[0], isRtl: boolean }) => (
+const ReviewItem = ({ review }: { review: typeof reviews[0] }) => (
   <div className="py-12 border-b border-black/5 grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12">
     {/* Left Sidebar */}
     <div className="space-y-6">
@@ -188,13 +184,12 @@ const ReviewItem = ({ review, isRtl }: { review: typeof reviews[0], isRtl: boole
   </div>
 );
 
-export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack, lang }) => {
+export const ProductPage: React.FC<ProductPageProps> = ({ product, lang }) => {
   const { addToCart } = useShop();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [activeStep, setActiveStep] = useState(0);
   const [activeRoutineStep, setActiveRoutineStep] = useState(0);
   const [resultsTab, setResultsTab] = useState(0);
-  const [selectedTint, setSelectedTint] = useState('espresso');
   const [showBottomBar, setShowBottomBar] = useState(true);
   const [isReviewsExpanded, setIsReviewsExpanded] = useState(false);
   const lastScrollY = useRef(0);
@@ -218,8 +213,6 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack, lang 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const nextImage = () => setActiveImageIndex((prev) => (prev + 1) % productImages.length);
 
   return (
     <div className={`bg-white min-h-screen selection:bg-black selection:text-white ${isRtl ? 'rtl' : 'ltr'}`}>
@@ -507,7 +500,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack, lang 
                     <>
                       <div className="space-y-2">
                         <h4 className="text-[48px] md:text-[64px] font-bold text-[#4A5D4E] tracking-tight leading-none">100%</h4>
-                        <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-[#333] opacity-60">COMMUNITY AGREED IT'S THE PERFECT WINTER BASE</p>
+                        <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-[#333] opacity-60">COMMUNITY AGREED IT&apos;S THE PERFECT WINTER BASE</p>
                       </div>
                       <div className="space-y-2">
                         <h4 className="text-[48px] md:text-[64px] font-bold text-[#4A5D4E] tracking-tight leading-none">95%</h4>
@@ -726,7 +719,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack, lang 
 
               <div className="flex items-center gap-4">
                 <button className="flex items-center gap-2 px-6 py-2.5 rounded-full border border-black/10 text-[10px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all">
-                  <SlidersHorizontal size={14} /> FILTERS
+                  FILTERS
                 </button>
                 <div className="relative group">
                   <button className="flex items-center gap-6 px-6 py-2.5 rounded-full border border-black/10 text-[10px] font-black uppercase tracking-widest hover:border-black transition-all">
@@ -740,7 +733,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack, lang 
           <div className={`relative transition-all duration-700 ease-in-out overflow-hidden ${!isReviewsExpanded ? 'max-h-[500px] md:max-h-none' : 'max-h-[5000px]'}`}>
             <div className="divide-y divide-black/5">
               {reviews.map((review, idx) => (
-                <ReviewItem key={idx} review={review} isRtl={isRtl} />
+                <ReviewItem key={idx} review={review} />
               ))}
             </div>
             
@@ -762,7 +755,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, onBack, lang 
       </section>
 
       {/* 7. LINEUP SECTION */}
-      <ProductLineup isRtl={isRtl} />
+      <ProductLineup />
 
       {/* FLOATING STICKY BAR */}
       <AnimatePresence>

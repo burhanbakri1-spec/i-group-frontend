@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, MapPin, Navigation, ExternalLink, ChevronRight } from 'lucide-react';
+import { Search, Navigation, ExternalLink } from 'lucide-react';
 import { Language } from '../translations';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 

@@ -1,29 +1,10 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-
-interface CartItem {
-  id: string;
-  name: string;
-  title: string;
-  price: string;
-  image: string;
-  quantity: number;
-}
-
-interface WishlistItem {
-  id: string;
-  name: string;
-  title: string;
-  price: string;
-  image: string;
-  badge?: string;
-  rating?: string;
-  reviews?: string;
-}
+import { Product, CartItem, WishlistItem } from '../types';
 
 interface ShopContextType {
   // Cart
   cartItems: CartItem[];
-  addToCart: (product: any) => void;
+  addToCart: (product: Product) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -32,7 +13,7 @@ interface ShopContextType {
 
   // Wishlist
   wishlistItems: WishlistItem[];
-  addToWishlist: (product: any) => void;
+  addToWishlist: (product: Product) => void;
   removeFromWishlist: (id: string) => void;
   isInWishlist: (id: string) => boolean;
 }
@@ -44,7 +25,7 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
 
   // Cart Functions
-  const addToCart = (product: any) => {
+  const addToCart = (product: Product) => {
     console.log('Adding to cart:', product);
     setCartItems(prev => {
       const existing = prev.find(item => item.id === product.id);
@@ -57,8 +38,8 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
       return [...prev, {
         id: product.id,
-        name: product.name || product.title,
-        title: product.title || product.name,
+        name: product.name || product.title || 'Product',
+        title: product.title || product.name || 'Product',
         price: product.price,
         image: product.image,
         quantity: 1
@@ -94,15 +75,15 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   // Wishlist Functions
-  const addToWishlist = (product: any) => {
+  const addToWishlist = (product: Product) => {
     setWishlistItems(prev => {
       if (prev.find(item => item.id === product.id)) {
         return prev;
       }
       return [...prev, {
         id: product.id,
-        name: product.name || product.title,
-        title: product.title,
+        name: product.name || product.title || 'Product',
+        title: product.title || product.name || 'Product',
         price: product.price,
         image: product.image,
         badge: product.badge,

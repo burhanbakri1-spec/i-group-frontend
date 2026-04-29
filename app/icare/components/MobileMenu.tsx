@@ -1,20 +1,21 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Search, ShoppingBag, Globe, Instagram, Youtube, Music2, Facebook, Heart } from 'lucide-react';
-import { ImageWithFallback } from './figma/ImageWithFallback';
-import { Language, translations } from '../translations';
+import { X, ShoppingBag, Heart, Globe, Instagram, Music2, Youtube, Facebook } from 'lucide-react';
+import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';
+import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
   onNavigate: (page: string) => void;
   onOpenCart: () => void;
-  onOpenSearch: () => void;
+  onOpenSearch?: () => void;
   lang: Language;
   onToggleLang: () => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mobileCategoryProducts: Record<string, any[]> = {
   'SHOP ALL': [
     { id: 'm-sa1', title: 'BARRIER BUTTER', subtitle: 'The intensive moisture balm', badge: 'new', image: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?q=80&w=200' },
@@ -47,6 +48,8 @@ const mobileCategoryProducts: Record<string, any[]> = {
 const mobileCategories = ['SHOP ALL', 'FACE CARE', 'HAIR CARE', 'BODY CARE', 'MAKEUP', 'NAILS'];
 
 export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavigate, onOpenCart, onOpenSearch, lang, onToggleLang }) => {
+  // onOpenSearch is passed from parent but not currently used in this component
+  void onOpenSearch;
   const [activeCategory, setActiveCategory] = useState('SHOP ALL');
   const { cartCount, wishlistItems } = useShop();
 

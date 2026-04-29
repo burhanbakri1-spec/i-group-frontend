@@ -16,12 +16,13 @@ import { Cart } from './components/Cart';
 import { SearchDrawer } from './components/SearchDrawer';
 import { MobileMenu } from './components/MobileMenu';
 import { Footer } from './components/Footer';
-import { translations, Language } from './translations';
+import { Language } from './translations';
 import { ProductPage } from './components/ProductPage';
 import { CheckoutPage } from './components/CheckoutPage';
 import { WishlistPage } from './components/WishlistPage';
 import { ShippingPage } from './components/ShippingPage';
 import { ShopProvider } from './context/ShopContext';
+import { Product } from './types';
 import './icare.css';
 
 // Page Transition Wrapper Component
@@ -42,7 +43,7 @@ const PageTransition = ({ children, pageKey }: { children: React.ReactNode; page
 
 export default function ICarePage() {
   const [currentPage, setCurrentPage] = useState('home');
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -55,7 +56,7 @@ export default function ICarePage() {
 
   const toggleLang = () => setLang(l => l === 'en' ? 'ar' : 'en');
 
-  const handleProductSelect = (product: any) => {
+  const handleProductSelect = (product: Product) => {
     setSelectedProduct(product);
     setCurrentPage('product');
     window.scrollTo(0, 0);

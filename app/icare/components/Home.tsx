@@ -1,6 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Hero } from './Hero';
 import Marquee from './Marquee';
 import { ProductShowcase } from './ProductShowcase';
 import { PromoSection } from './PromoSection';
@@ -8,10 +6,12 @@ import { ProductGrid } from './ProductSection';
 import { CommitmentSection } from './CommitmentSection';
 import { SocialGrid } from './SocialGrid';
 import { Language, translations } from '../translations';
+import { Hero } from './Hero';
 
 interface HomeProps {
   onNavigate: (page: string) => void;
   lang: Language;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onProductSelect: (product: any) => void;
 }
 
@@ -29,7 +29,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, onProductSelect })
       } />
 
       {/* 3. Featured Product Showcase (Carousel) */}
-      <ProductShowcase lang={lang} onProductSelect={onProductSelect} />
+      <ProductShowcase products={[]} lang={lang} onProductSelect={onProductSelect} />
 
       {/* 4. New Arrival Promo Section */}
       <PromoSection lang={lang} />

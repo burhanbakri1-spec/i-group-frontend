@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CreditCard, ShoppingBag, MapPin, User, Mail, Phone, Lock, ChevronRight, Check, ArrowLeft } from 'lucide-react';
+import { MapPin, ShoppingBag, Check, ChevronRight, ArrowLeft, CreditCard, Lock } from 'lucide-react';
 import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';
 
@@ -215,7 +215,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                     </h2>
                     <p className="text-[#666] mb-8">
                       {lang === 'en' 
-                        ? "Thank you for your purchase. We'll send you a confirmation email shortly." 
+                        ? "Thank you for your purchase. We&#39;ll send you a confirmation email shortly." 
                         : 'شكراً لشرائك. سنرسل لك رسالة تأكيد قريباً.'}
                     </p>
                     <button

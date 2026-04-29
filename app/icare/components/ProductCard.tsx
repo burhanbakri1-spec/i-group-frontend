@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Star, Plus, Heart } from 'lucide-react';
-import { Language, translations } from '../translations';
+import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';
 
 interface Product {
@@ -29,7 +29,6 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, lang, onSelect }) => {
-  const t = translations[lang];
   const [isHovered, setIsHovered] = useState(false);
   const { addToCart, addToWishlist, isInWishlist, removeFromWishlist } = useShop();
   const inWishlist = isInWishlist(product.id);

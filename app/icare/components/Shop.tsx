@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 const products = [
@@ -11,7 +10,7 @@ const products = [
   { id: 6, title: 'LIP TINT', price: '$16', subtitle: 'Sheer peptide gloss', image: 'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?q=80&w=400' }
 ];
 
-export const Shop: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) => {
+export const Shop: React.FC = () => {
   return (
     <div className="max-w-[1440px] mx-auto px-10 py-12">
       <div className="flex items-center justify-between mb-12">

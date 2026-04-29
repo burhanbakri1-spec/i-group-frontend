@@ -117,22 +117,24 @@ function ChartTooltipContent({
   formatter,
   color,
   nameKey,
-  labelKey,
-  ...props
+  labelKey
 }: React.ComponentProps<"div"> & {
     active?: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     payload?: any[];
     hideLabel?: boolean;
     hideIndicator?: boolean;
     indicator?: "line" | "dot" | "dashed";
     label?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     labelFormatter?: (value: any, payload: any) => React.ReactNode;
     labelClassName?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     formatter?: (value: any, name: any, item: any, index: number, payload: any) => React.ReactNode;
     color?: string;
     nameKey?: string;
     labelKey?: string;
-  }) {
+}) {
   const { config } = useChart();
 
   const tooltipLabel = React.useMemo(() => {
@@ -264,11 +266,12 @@ function ChartLegendContent({
   verticalAlign = "bottom",
   nameKey,
 }: React.ComponentProps<"div"> & {
-    hideIcon?: boolean;
-    nameKey?: string;
-    payload?: any[];
-    verticalAlign?: "top" | "bottom";
-  }) {
+  hideIcon?: boolean;
+  nameKey?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  payload?: any[];
+  verticalAlign?: "top" | "bottom";
+}) {
   const { config } = useChart();
 
   if (!payload?.length) {

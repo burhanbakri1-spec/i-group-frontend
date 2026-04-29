@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
-import { Menu, Search, User, ShoppingBag, Globe, Heart } from 'lucide-react';
+import { Menu, Search, ShoppingBag, Globe, Heart } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { translations, Language } from '../translations';
 import { useShop } from '../context/ShopContext';
@@ -15,6 +15,7 @@ interface HeaderProps {
   onToggleLang: () => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const categoryProducts: Record<string, any[]> = {
   'SHOP ALL': [
     { id: 'sa1', title: 'BARRIER BUTTER', subtitle: 'The intensive moisture balm', badge: 'allure', image: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?q=80&w=400' },

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
 import { 
   Sparkles, 
@@ -144,21 +144,15 @@ const ScaleOnScroll = ({ children, className = "" }: { children: React.ReactNode
 };
 
 export default function Home() {
-  const [activeSection, setActiveSection] = useState('home');
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [particlePositions, setParticlePositions] = useState<Array<{left: number, top: number}>>([]);
+  const [particlePositions] = useState<Array<{left: number, top: number}>>(() =>
+    Array.from({ length: 30 }, () => ({
+      left: Math.random() * 100,
+      top: Math.random() * 100
+    }))
+  );
   const heroRef = useRef(null);
-  
-  // Generate random positions only on client-side
-  useEffect(() => {
-    setParticlePositions(
-      Array.from({ length: 30 }, () => ({
-        left: Math.random() * 100,
-        top: Math.random() * 100
-      }))
-    );
-  }, []);
   
   // Smooth scroll progress
   const { scrollYProgress } = useScroll();
@@ -172,7 +166,6 @@ export default function Home() {
   const { scrollY } = useScroll();
   const heroY = useTransform(scrollY, [0, 500], [0, 150]);
   const heroOpacity = useTransform(scrollY, [0, 300], [1, 0]);
-  const heroScale = useTransform(scrollY, [0, 300], [1, 1.1]);
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
@@ -1327,7 +1320,7 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, delay: 0.3 }}
               >
-                Let's build the future together. Reach out to explore partnerships and opportunities.
+                Let&apos;s build the future together. Reach out to explore partnerships and opportunities.
               </motion.p>
             </div>
 
@@ -1476,7 +1469,7 @@ export default function Home() {
               BA GROUP
             </motion.div>
             <div className="flex gap-8">
-              {['HOME', 'COMPANIES', 'ABOUT', 'PARTNERS', 'CONTACT'].map((item, index) => (
+              {['HOME', 'COMPANIES', 'ABOUT', 'PARTNERS', 'CONTACT'].map((item) => (
                 <motion.button
                   key={item}
                   onClick={() => document.getElementById(item.toLowerCase())?.scrollIntoView({ behavior: 'smooth' })}

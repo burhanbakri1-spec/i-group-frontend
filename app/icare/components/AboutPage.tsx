@@ -5,8 +5,8 @@ import { ChevronDown } from 'lucide-react';
 import { Language } from '../translations';
 
 interface AboutPageProps {
-  onNavigate: (page: string) => void;
-  lang: Language;
+  onNavigate?: (page: string) => void;
+  lang?: Language;
 }
 
 const AccordionItem = ({ title, content, isOpen, onClick }: { title: string, content: string, isOpen: boolean, onClick: () => void }) => {
@@ -86,10 +86,10 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
               A new PHILOSOPHY on SKINCARE.
             </h1>
             
-            <motion.button 
+            <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => onNavigate('shop')}
+              onClick={() => onNavigate?.('shop')}
               className="border border-white text-white px-12 py-3 rounded-full text-[11px] font-bold tracking-[0.2em] uppercase hover:bg-white hover:text-black transition-all duration-500"
             >
               SHOP NOW
@@ -116,7 +116,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
                 intentional skincare
               </h2>
               <p className="text-[16px] md:text-[18px] text-[#666] leading-[1.6]">
-                icare is a line of curated skincare essentials. Formulated for a variety of skin types and needs with high performance ingredients, it's a daily routine that nourishes your skin barrier over time.
+                icare is a line of curated skincare essentials. Formulated for a variety of skin types and needs with high performance ingredients, it&apos;s a daily routine that nourishes your skin barrier over time.
               </p>
             </div>
           </div>
@@ -139,7 +139,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
                   Founded on the belief that beauty is about essentials, not excess. We believe in high-performance formulas that actually work, without the clutter of a 12-step routine.
                 </p>
                 <p className="text-[16px] text-[#777] leading-relaxed">
-                  Every icare product is developed with intent. We spend years refining our formulas to ensure they deliver visible results while remaining gentle on your skin's barrier.
+                  Every icare product is developed with intent. We spend years refining our formulas to ensure they deliver visible results while remaining gentle on your skin&#39;s barrier.
                 </p>
               </div>
             </div>
@@ -254,7 +254,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
           </h2>
           
           <p className="text-[20px] md:text-[26px] text-[#444] leading-[1.6] font-[400] tracking-tight">
-            My journey towards healthier skin inspired me to develop products that really work, in a way that's accessible to everyone. <span className="font-bold">icare</span> is dedicated to making products based in science and great formulation, simplifying many of the mysteries and complex narratives behind efficacious skincare. I hope these will become your go-to essentials that can live in your bathroom, be your favorite travel companion, improve your skin over time, and keep your skin happy and hydrated.
+            My journey towards healthier skin inspired me to develop products that really work, in a way that&apos;s accessible to everyone. <span className="font-bold">icare</span> is dedicated to making products based in science and great formulation, simplifying many of the mysteries and complex narratives behind efficacious skincare. I hope these will become your go-to essentials that can live in your bathroom, be your favorite travel companion, improve your skin over time, and keep your skin happy and hydrated.
           </p>
 
           <div className="flex flex-col items-center pt-8">

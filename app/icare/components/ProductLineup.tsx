@@ -2,9 +2,11 @@ import React, { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, Star, Plus } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { Product } from '../types';
 
 interface ProductLineupProps {
-  isRtl: boolean;
+  lang?: string;
+  onProductSelect?: (product: Product) => void;
 }
 
 interface LineupItemProps {
@@ -107,7 +109,7 @@ const LineupCard: React.FC<LineupItemProps> = ({ category, badge, name, descript
   );
 };
 
-export const ProductLineup: React.FC<ProductLineupProps> = ({ isRtl }) => {
+export const ProductLineup: React.FC<ProductLineupProps> = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: 'left' | 'right') => {

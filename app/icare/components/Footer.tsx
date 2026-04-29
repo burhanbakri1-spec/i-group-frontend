@@ -153,7 +153,7 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
             <h4 className="text-[12px] font-bold uppercase tracking-widest text-[#5C5A56]">SUPPORT</h4>
             <div className="space-y-6">
               <div className="space-y-1">
-                <p className="text-[13px] text-[#706E6A]">We're here M-F 9am - 5pm PST.</p>
+                <p className="text-[13px] text-[#706E6A]">We&apos;re here M-F 9am - 5pm PST.</p>
                 <p className="text-[13px] text-[#706E6A]">Drop us a note anytime.</p>
               </div>
               <ul className="space-y-3">

@@ -30,7 +30,7 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang }) =>
             >
               <h2 className="text-[22px] md:text-[36px] font-[500] leading-[1.25] text-[#5C5A56] mb-10 max-w-lg">
                 {lang === 'en' 
-                  ? <>From consciously-sourced ingredients to packaging made with post-consumer recycled materials, we're committed to <span className="text-black font-[900]">MINDFUL SKINCARE.</span></>
+                  ? <>From consciously-sourced ingredients to packaging made with post-consumer recycled materials, we&apos;re committed to <span className="text-black font-[900]">MINDFUL SKINCARE.</span></>
                   : <>من المكونات المختارة بوعي إلى التغليف المصنوع من مواد معاد تدويرها، نحن ملتزمون بـ<span className="text-black font-[900]">العناية الواعية بالبشرة.</span></>
                 }
               </h2>

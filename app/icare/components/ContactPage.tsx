@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Language } from '../translations';
-import { Upload, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface ContactPageProps {

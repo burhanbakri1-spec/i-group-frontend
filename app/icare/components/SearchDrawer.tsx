@@ -3,48 +3,50 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
+import { Product } from '../types';
 
 interface SearchDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  lang: Language;
+  lang?: Language;
+  onProductSelect?: (product: Product) => void;
 }
 
-export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, lang }) => {
+export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   // Define our dataset based on the site's groups and products
-  const collections = [
+  const collections = useMemo(() => [
     'shop all',
     'face care',
     'hair care',
     'body care',
     'makeup',
     'nails'
-  ];
+  ], []);
 
-  const products = [
+  const products = useMemo(() => [
     { id: '1', name: 'BARRIER BUTTER', category: 'face care', image: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?q=80&w=200' },
     { id: '2', name: 'THE WINTER KIT', category: 'shop all', image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=200' },
     { id: '3', name: 'PEPTIDE LIP TINT', category: 'makeup', image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=200' },
     { id: '4', name: 'POCKET CLEANSER', category: 'face care', image: 'https://images.unsplash.com/photo-1594125355977-903e303f4435?q=80&w=200' },
     { id: '5', name: 'PEPTIDE GLAZE', category: 'face care', image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=200' }
-  ];
+  ], []);
 
-  const brands = ['icare', 'rhode aesthetics', 'minimal beauty'];
+  const brands = useMemo(() => ['icare', 'rhode aesthetics', 'minimal beauty'], []);
 
   // Filtering Logic
   const filteredResults = useMemo(() => {
     if (!searchQuery.trim()) return null;
 
     const query = searchQuery.toLowerCase();
-    
+
     return {
       collections: collections.filter(c => c.toLowerCase().includes(query)),
       products: products.filter(p => p.name.toLowerCase().includes(query) || p.category.toLowerCase().includes(query)),
       brands: brands.filter(b => b.toLowerCase().includes(query))
     };
-  }, [searchQuery]);
+  }, [searchQuery, collections, products, brands]);
 
   const hasResults = filteredResults && (
     filteredResults.collections.length > 0 || 
@@ -168,7 +170,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, lan
                     </>
                   ) : (
                     <div className="text-center py-20">
-                      <p className="text-[16px] text-[#706E6A] font-medium italic">No results found for "{searchQuery}"</p>
+                      <p className="text-[16px] text-[#706E6A] font-medium italic">No results found for &quot;{searchQuery}&quot;</p>
                     </div>
                   )}
                 </div>

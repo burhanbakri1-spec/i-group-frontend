@@ -3,10 +3,11 @@ import { motion } from 'framer-motion';
 import { Heart, ShoppingBag, X, Share2 } from 'lucide-react';
 import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';
+import { Product } from '../types';
 
 interface WishlistPageProps {
   lang: Language;
-  onProductSelect: (product: any) => void;
+  onProductSelect: (product: Product) => void;
 }
 
 export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelect }) => {
@@ -22,7 +23,7 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
       remove: 'Remove',
       addToBag: 'ADD TO BAG',
       share: 'SHARE WISHLIST',
-      saveForLater: 'Save your favorites and share them with friends'
+      saveForLater: 'Save your favorites and share them with friends&#39;'
     },
     ar: {
       wishlist: 'قائمة الأمنيات',
@@ -39,7 +40,7 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
 
   const text = t[lang];
 
-  const handleAddToBag = (product: any, e: React.MouseEvent) => {
+  const handleAddToBag = (product: Product, e: React.MouseEvent) => {
     e.stopPropagation();
     addToCart(product);
   };
