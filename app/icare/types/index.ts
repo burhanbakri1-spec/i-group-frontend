@@ -4,25 +4,38 @@
 
 export interface Product {
   id: string;
+  backendId?: number;
+  slug?: string;
+  variantId?: number | null;
   title?: string;
   name: string;
   price: string;
+  originalPrice?: string;
   description?: string;
   image: string;
+  images?: string[];
   rating?: string | undefined;
   reviews?: string;
   badge?: string;
   brand?: string;
+  brandId?: number;
   category?: string;
+  categoryId?: number;
   stock?: number;
+  stockStatus?: string;
   main?: string;
   sub?: string;
   type?: string;
   rawPrice?: number;
   date?: string;
+  variants?: ProductVariant[];
+  backendProduct?: BackendProduct;
+  cartLineId?: string;
+  sourceProductId?: string;
 }
 
 export interface CartItem extends Product {
+  cartItemId?: number;
   quantity: number;
 }
 
@@ -52,6 +65,36 @@ export interface Review {
   date?: string;
 }
 
+export interface ProductReview {
+  id?: number;
+  name: string;
+  verified: boolean;
+  age: string;
+  concern: string;
+  skinType: string;
+  favorites: string;
+  rating: number;
+  time: string;
+  title: string;
+  content: string;
+  hydration: number;
+}
+
+export interface FAQCategoryGroup {
+  id: string;
+  name: string;
+  items: Array<{ q: string; a: string }>;
+}
+
+export interface VlogContentItem {
+  id: string;
+  title: string;
+  subtitle: string;
+  image: string;
+  videoUrl?: string | null;
+  category: 'ALL' | 'PRODUCTS' | 'TUTORIALS';
+}
+
 export interface FilterOptions {
   brands?: string[];
   categories?: string[];
@@ -61,34 +104,296 @@ export interface FilterOptions {
 
 export interface ShopContextType {
   cartItems: CartItem[];
-  wishlistItems: WishlistItem[];
-  addToCart: (product: Product) => void;
-  removeFromCart: (productId: string) => void;
-  updateCartQuantity: (productId: string, quantity: number) => void;
-  addToWishlist: (product: Product) => void;
-  removeFromWishlist: (productId: string) => void;
-  isInCart: (productId: string) => boolean;
-  isInWishlist: (productId: string) => boolean;
+  addToCart: (product: Product, quantity?: number) => void;
+  removeFromCart: (id: string) => void;
+  updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
+  cartTotal: number;
+  cartCount: number;
+  wishlistItems: WishlistItem[];
+  addToWishlist: (product: Product) => void;
+  removeFromWishlist: (id: string) => void;
+  isInWishlist: (id: string) => boolean;
+  user: AuthUser | null;
+  accessToken: string | null;
+  isAuthenticated: boolean;
+  authError: string | null;
+  login: (email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string, phone?: string) => Promise<void>;
+  logout: () => Promise<void>;
+  refreshCart: () => Promise<void>;
 }
 
-export interface WixProduct {
-  id: string;
-  name: string;
-  price: string;
-  description: string;
-  image: string;
-  media?: {
-    image: string;
-  }[];
-  variants?: {
-      choices: {
-      name: string;
-      value: string;
-    }[];
-  }[];
-  stock?: {
-      inStock: boolean;
-      quantity: number;
+export interface ApiEnvelope<T> {
+  success: boolean;
+  message: string;
+  data: T;
+  timestamp: string;
+}
+
+export interface PaginatedData<T> {
+  data: T[];
+  meta?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
   };
+}
+
+export type BackendNumeric = string | number;
+
+export interface BackendCategory {
+  id: number;
+  slug: string;
+  name: string;
+  description?: string | null;
+  image?: string | null;
+  parentId?: number | null;
+  isActive?: boolean;
+  productCount?: number;
+}
+
+export interface BackendBrand {
+  id: number;
+  slug: string;
+  name: string;
+  description?: string | null;
+  country?: string | null;
+  logo?: string | null;
+  website?: string | null;
+  isActive?: boolean;
+  productCount?: number;
+}
+
+export interface ProductVariant {
+  id: number;
+  name: string;
+  sku?: string | null;
+  colorCode?: string | null;
+  image?: string | null;
+  price?: BackendNumeric | null;
+  salePrice?: BackendNumeric | null;
+  stockQuantity?: number;
+  stockStatus?: string;
+  isActive?: boolean;
+  isDefault?: boolean;
+}
+
+export interface BackendProductImage {
+  imageUrl: string;
+  altText?: string | null;
+  sortOrder?: number;
+  isPrimary?: boolean;
+}
+
+export interface BackendProduct {
+  id: number;
+  slug: string;
+  name: string;
+  sku?: string | null;
+  shortDescription?: string | null;
+  description?: string | null;
+  howToUse?: string | null;
+  ingredients?: string[];
+  benefits?: string[];
+  skinTypes?: string[];
+  concerns?: string[];
+  price: BackendNumeric;
+  priceCurrency?: string;
+  salePrice?: BackendNumeric | null;
+  salePriceCurrency?: string | null;
+  stockQuantity?: number;
+  stockStatus?: string;
+  size?: string | null;
+  featuredImage?: string | null;
+  videoUrl?: string | null;
+  isFeatured?: boolean;
+  isNew?: boolean;
+  isBestseller?: boolean;
+  ratingAverage?: BackendNumeric | null;
+  ratingCount?: BackendNumeric | null;
+  salesCount?: number;
+  viewsCount?: number;
+  createdAt?: string;
+  brand?: BackendBrand | null;
+  category?: BackendCategory | null;
+  images?: BackendProductImage[];
+  variants?: ProductVariant[];
+  reviews?: BackendProductReviewsSummary;
+}
+
+export interface BackendProductReview {
+  id?: number;
+  rating: BackendNumeric;
+  title?: string | null;
+  comment?: string | null;
+  ageRange?: string | null;
+  skinType?: string | null;
+  skinConcerns?: string[] | string | null;
+  favoriteFeatures?: string[] | string | null;
+  hydrationRating?: BackendNumeric | null;
+  isVerified?: boolean;
+  helpfulCount?: number;
+  createdAt?: string;
+  user?: {
+    id?: number;
+    name?: string | null;
+    avatar?: string | null;
+  } | null;
+}
+
+export interface BackendProductReviewsSummary {
+  summary?: {
+    average?: BackendNumeric | null;
+    count?: BackendNumeric | null;
+    distribution?: Record<string, number>;
+  };
+  recent?: BackendProductReview[];
+}
+
+export interface BackendFaqCategory {
+  id: number;
+  name: string;
+  slug?: string;
+  description?: string | null;
+  isActive?: boolean;
+  sortOrder?: number;
+}
+
+export interface BackendFaq {
+  id: number;
+  question: string;
+  answer: string;
+  categoryId?: number | null;
+  isActive?: boolean;
+  isFeatured?: boolean;
+  sortOrder?: number;
+  category?: Pick<BackendFaqCategory, 'id' | 'name' | 'slug'> | null;
+}
+
+export interface AdminListData<T> {
+  data?: T[];
+  items?: T[];
+  records?: T[];
+  meta?: {
+    page?: number;
+    limit?: number;
+    total?: number;
+    totalPages?: number;
+  };
+}
+
+export interface BackendCartItem {
+  id: number;
+  quantity: number;
+  product: Pick<BackendProduct, 'id' | 'slug' | 'name' | 'price' | 'salePrice' | 'featuredImage'> & {
+    deletedAt?: string | null;
+    isActive?: boolean;
+  };
+  variant?: ProductVariant | null;
+}
+
+export interface BackendCart {
+  items: BackendCartItem[];
+  summary: {
+    itemCount: number;
+    totalQuantity: number;
+    subtotal: number;
+  };
+}
+
+export interface AuthUser {
+  id: number;
+  email: string;
+  name: string;
+  phone?: string | null;
+  avatar?: string | null;
+  address?: string | null;
+  city?: string | null;
+  country?: string | null;
+  isActive?: boolean;
+}
+
+export interface AuthSession {
+  accessToken: string;
+  refreshToken: string;
+  tokenType: string;
+  expiresIn: number;
+  user: AuthUser;
+}
+
+export interface OrderItemInput {
+  productId: number;
+  variantId?: number | null;
+  quantity: number;
+}
+
+export interface CreateOrderInput {
+  paymentMethod: 'cash_on_delivery' | 'online';
+  paymentGateway?: 'paymob' | 'fawry' | 'bop' | 'lahza';
+  shippingName: string;
+  shippingEmail: string;
+  shippingPhone: string;
+  shippingAddress: string;
+  shippingCity: string;
+  shippingState?: string;
+  shippingPostalCode?: string;
+  shippingCountry?: string;
+  billingSameAsShipping: boolean;
+  notes?: string;
+  guestEmail?: string;
+  guestPhone?: string;
+  items?: OrderItemInput[];
+}
+
+export interface OrderSummaryItem {
+  productId: number;
+  variantId?: number | null;
+  productName: string;
+  variantName?: string | null;
+  sku?: string | null;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+}
+
+export interface OrderSummary {
+  items: OrderSummaryItem[];
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  discount: number;
+  total: number;
+}
+
+export interface OrderListItem {
+  id: number;
+  orderNumber: string;
+  status: string;
+  paymentStatus?: string;
+  total: number;
+  itemCount: number;
+  createdAt?: string;
+}
+
+export interface CreatedOrder {
+  id: number;
+  orderNumber: string;
+  status: string;
+  paymentMethod?: 'cash_on_delivery' | 'online';
+  paymentStatus?: string;
+  paymentGateway?: 'paymob' | 'fawry' | 'bop' | 'lahza';
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  discount: number;
+  total: number;
+  shippingName?: string;
+  shippingAddress?: string;
+  shippingCity?: string;
+  shippingCountry?: string;
+  items?: Array<OrderSummaryItem & { id: number }>;
+  statusHistory?: Array<{ status: string; comment?: string | null; createdAt: string }>;
+  createdAt?: string;
 }

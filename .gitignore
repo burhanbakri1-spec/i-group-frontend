@@ -45,4 +45,4 @@ lint-*.txt
 lint-*.json
 
 # api reference docs
-api-references*.md
+**.md

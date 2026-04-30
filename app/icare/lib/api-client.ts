@@ -1,0 +1,216 @@
+import {
+  ApiEnvelope,
+  AuthSession,
+  AuthUser,
+  AdminListData,
+  BackendBrand,
+  BackendCart,
+  BackendCategory,
+  BackendFaq,
+  BackendFaqCategory,
+  BackendProduct,
+  BackendProductReview,
+  CreateOrderInput,
+  CreatedOrder,
+  OrderListItem,
+  OrderSummary,
+  PaginatedData,
+} from '../types';
+
+type QueryValue = string | number | boolean | null | undefined;
+
+export class IcareApiError extends Error {
+  constructor(message: string, public readonly status: number) {
+    super(message);
+    this.name = 'IcareApiError';
+  }
+}
+
+const DEFAULT_API_ERROR_MESSAGE = 'iCare API request failed.';
+
+/**
+ * The browser-side API base URL points to the Next.js API proxy route
+ * which avoids CORS issues by proxying to the real backend server-side.
+ *
+ * The real backend URL is configured via ICARE_API_BASE_URL (server-only env)
+ * and consumed by the proxy route at app/api/icare/[...path]/route.ts.
+ *
+ * If you need to bypass the proxy (e.g. server-side rendering or scripts),
+ * set NEXT_PUBLIC_ICARE_API_URL to the real backend URL.
+ */
+const APPROVED_BACKEND_FALLBACK_URL = 'https://backend.igroup.website';
+const BROWSER_API_BASE_URL = '/api/icare';
+
+export const getIcareApprovedBackendFallbackUrl = () => APPROVED_BACKEND_FALLBACK_URL;
+
+export const getIcareApiBaseUrl = () => {
+  const envUrl = process.env.NEXT_PUBLIC_ICARE_API_URL;
+  if (envUrl) {
+    return envUrl.replace(/\/$/, '');
+  }
+  return BROWSER_API_BASE_URL;
+};
+
+const buildUrl = (path: string, query?: Record<string, QueryValue>) => {
+  const baseUrl = getIcareApiBaseUrl();
+  if (!baseUrl) {
+    throw new IcareApiError('iCare API base URL is not configured.', 0);
+  }
+
+  const fullUrl = `${baseUrl}${path}`;
+  const hasQuery = query && Object.entries(query).some(([, v]) => v !== undefined && v !== null && v !== '');
+  if (!hasQuery) return fullUrl;
+
+  // Build query string — works for both relative and absolute URLs
+  const params = new URLSearchParams();
+  Object.entries(query!).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      params.set(key, String(value));
+    }
+  });
+  const qs = params.toString();
+  return qs ? `${fullUrl}?${qs}` : fullUrl;
+};
+
+const parseResponseBody = async <T>(response: Response): Promise<ApiEnvelope<T> | null> => {
+  const bodyText = await response.text();
+  if (!bodyText) return null;
+
+  try {
+    return JSON.parse(bodyText) as ApiEnvelope<T>;
+  } catch {
+    if (!response.ok) {
+      throw new IcareApiError(bodyText || DEFAULT_API_ERROR_MESSAGE, response.status);
+    }
+    throw new IcareApiError('iCare API returned an invalid response.', response.status);
+  }
+};
+
+const parseEnvelope = async <T>(response: Response): Promise<T> => {
+  const envelope = await parseResponseBody<T>(response);
+  if (!response.ok || envelope?.success === false) {
+    throw new IcareApiError(envelope?.message || response.statusText || DEFAULT_API_ERROR_MESSAGE, response.status);
+  }
+  if (!envelope) {
+    throw new IcareApiError('iCare API returned an empty response.', response.status);
+  }
+  return envelope.data;
+};
+
+const request = async <T>(
+  path: string,
+  options: RequestInit & { token?: string; query?: Record<string, QueryValue> } = {},
+): Promise<T> => {
+  const { token, query, headers, ...init } = options;
+  try {
+    const response = await fetch(buildUrl(path, query), {
+      ...init,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...headers,
+      },
+    });
+    return parseEnvelope<T>(response);
+  } catch (error) {
+    // Convert browser network failures into the same typed API error components use for empty states.
+    if (error instanceof TypeError && error.message === 'Failed to fetch') {
+      throw new IcareApiError('API unreachable; backend content unavailable', 0);
+    }
+    throw error;
+  }
+};
+
+export const icareApi = {
+  isConfigured: () => Boolean(getIcareApiBaseUrl()),
+
+  products: {
+    list: (query?: Record<string, QueryValue>) =>
+      request<PaginatedData<BackendProduct> | BackendProduct[]>('/api/v1/products', { query }),
+    featured: (limit = 8) => request<BackendProduct[]>('/api/v1/products/featured', { query: { limit } }),
+    new: (limit = 8) => request<BackendProduct[]>('/api/v1/products/new', { query: { limit } }),
+    bestsellers: (limit = 8) => request<BackendProduct[]>('/api/v1/products/bestsellers', { query: { limit } }),
+    onSale: (limit = 8) => request<BackendProduct[]>('/api/v1/products/on-sale', { query: { limit } }),
+    detail: (slug: string) => request<BackendProduct>(`/api/v1/products/${slug}`),
+    reviews: (slug: string, query?: Record<string, QueryValue>) =>
+      request<PaginatedData<BackendProductReview> | BackendProductReview[]>(`/api/v1/products/${slug}/reviews`, { query }),
+    related: (slug: string) => request<BackendProduct[]>(`/api/v1/products/${slug}/related`),
+  },
+
+  categories: {
+    list: (query?: Record<string, QueryValue>) =>
+      request<PaginatedData<BackendCategory> | BackendCategory[]>('/api/v1/categories', { query }),
+    roots: () => request<PaginatedData<BackendCategory> | BackendCategory[]>('/api/v1/categories/roots'),
+    search: (query: string) => request<BackendCategory[]>('/api/v1/categories/search', { query: { q: query } }),
+    detail: (slug: string) => request<BackendCategory>(`/api/v1/categories/${slug}`),
+    children: (slug: string) => request<BackendCategory[]>(`/api/v1/categories/${slug}/children`),
+  },
+
+  brands: {
+    list: (query?: Record<string, QueryValue>) =>
+      request<PaginatedData<BackendBrand> | BackendBrand[]>('/api/v1/brands', { query }),
+    detail: (slug: string) => request<BackendBrand>(`/api/v1/brands/${slug}`),
+  },
+
+  faq: {
+    categories: (query?: Record<string, QueryValue>) =>
+      request<AdminListData<BackendFaqCategory> | BackendFaqCategory[]>('/admin/api/faq-categories', {
+        query,
+        credentials: 'include',
+      }),
+    list: (query?: Record<string, QueryValue>) =>
+      request<AdminListData<BackendFaq> | BackendFaq[]>('/admin/api/faqs', {
+        query,
+        credentials: 'include',
+      }),
+  },
+
+  auth: {
+    login: (email: string, password: string) =>
+      request<AuthSession>('/api/v1/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      }),
+    register: (name: string, email: string, password: string, phone?: string) =>
+      request<AuthSession>('/api/v1/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({ name, email, password, phone: phone || undefined }),
+      }),
+    refresh: (refreshToken: string) => request<AuthSession>('/api/v1/auth/refresh', { method: 'POST', token: refreshToken }),
+    me: (token: string) => request<AuthUser>('/api/v1/auth/me', { token }),
+    logout: (token: string) => request<{ message: string }>('/api/v1/auth/logout', { method: 'POST', token }),
+  },
+
+  cart: {
+    get: (token: string) => request<BackendCart>('/api/v1/cart', { token }),
+    add: (token: string, productId: number, variantId: number | null | undefined, quantity: number) =>
+      request<BackendCart>('/api/v1/cart', {
+        method: 'POST',
+        token,
+        body: JSON.stringify({ productId, variantId: variantId ?? null, quantity }),
+      }),
+    update: (token: string, cartItemId: number, quantity: number) =>
+      request<BackendCart>(`/api/v1/cart/${cartItemId}`, {
+        method: 'PUT',
+        token,
+        body: JSON.stringify({ quantity }),
+      }),
+    remove: (token: string, cartItemId: number) =>
+      request<BackendCart>(`/api/v1/cart/${cartItemId}`, { method: 'DELETE', token }),
+    clear: (token: string) => request<BackendCart>('/api/v1/cart/clear', { method: 'POST', token }),
+    syncPrices: (token: string) => request<BackendCart>('/api/v1/cart/sync-prices', { method: 'POST', token }),
+  },
+
+  orders: {
+    summary: (token: string) => request<OrderSummary>('/api/v1/orders/summary', { token }),
+    create: (order: CreateOrderInput, token?: string) =>
+      request<CreatedOrder>('/api/v1/orders', {
+        method: 'POST',
+        token,
+        body: JSON.stringify(order),
+      }),
+    list: (token: string, query?: Record<string, QueryValue>) =>
+      request<PaginatedData<OrderListItem> | OrderListItem[]>('/api/v1/orders', { token, query }),
+    detail: (token: string, orderNumber: string) => request<CreatedOrder>(`/api/v1/orders/${orderNumber}`, { token }),
+  },
+};
