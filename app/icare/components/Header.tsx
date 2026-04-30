@@ -1,43 +1,69 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import { Menu, Search, ShoppingBag, Globe, Heart } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { translations, Language } from '../translations';
 import { useShop } from '../context/ShopContext';
+import { Product } from '../types';
+import { icareApi, IcareApiError } from '../lib/api-client';
+import { mapBackendProductToProduct } from '../lib/mappers';
 
 interface HeaderProps {
   onOpenCart: () => void;
   onOpenSearch: () => void;
   onNavigate: (page: string) => void;
+  onProductSelect?: (product: Product) => void;
   onOpenMenu: () => void;
   isDrawerOpen?: boolean;
   lang: Language;
   onToggleLang: () => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const categoryProducts: Record<string, any[]> = {
-  'SHOP ALL': [
-    { id: 'sa1', title: 'BARRIER BUTTER', subtitle: 'The intensive moisture balm', badge: 'allure', image: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?q=80&w=400' },
-    { id: 'sa2', title: 'THE WINTER KIT', subtitle: 'Three cozy skin essentials', badge: 'limited edition', image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=400' },
-    { id: 'sa3', title: 'PEPTIDE LIP TINT', subtitle: 'Sheer but buildable color', image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=400' },
-    { id: 'sa4', title: 'POCKET CLEANSER', subtitle: 'Travel size hydration', image: 'https://images.unsplash.com/photo-1594125355977-903e303f4435?q=80&w=400' }
-  ],
-  'FACE CARE': [
-    { id: 'fc1', title: 'PEPTIDE GLAZE', subtitle: 'Dewy hydration fluid', badge: 'allure', image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=400' },
-    { id: 'fc2', title: 'BARRIER BUTTER', subtitle: 'The intensive moisture balm', image: 'https://images.unsplash.com/photo-1549127024-18ee7271c819?q=80&w=400' }
-  ]
-};
-
-export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavigate, onOpenMenu, isDrawerOpen, lang, onToggleLang }) => {
+export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavigate, onProductSelect, onOpenMenu, isDrawerOpen, lang, onToggleLang }) => {
   const t = translations[lang];
   const { cartCount, wishlistItems } = useShop();
-  const mainCategories = [t.categories.all, t.categories.face, t.categories.hair, t.categories.body, t.categories.makeup, t.categories.nails];
   const [isShopHovered, setIsShopHovered] = useState(false);
   const [activeCategory, setActiveCategory] = useState(t.categories.all);
   const [isVisible, setIsVisible] = useState(true);
   const [isPinkTheme, setIsPinkTheme] = useState(false);
+  const [previewProducts, setPreviewProducts] = useState<Product[]>([]);
   const { scrollY } = useScroll();
+
+  useEffect(() => {
+    const loadFeaturedProducts = async () => {
+      if (!icareApi.isConfigured()) return;
+      try {
+        const products = await icareApi.products.featured(4);
+        if (products.length > 0) {
+          setPreviewProducts(products.map((product) => mapBackendProductToProduct(product)));
+        }
+      } catch (error) {
+        if (!(error instanceof IcareApiError && error.status === 0)) {
+          console.error('Failed to load header previews', error);
+        }
+      }
+    };
+
+    loadFeaturedProducts();
+  }, []);
+
+  const previewCategories = useMemo(() => {
+    if (previewProducts.length === 0) return [];
+    const backendCategories = Array.from(new Set(previewProducts
+      .map((product) => product.category?.trim())
+      .filter((category): category is string => Boolean(category))));
+
+    return [t.categories.all, ...backendCategories];
+  }, [previewProducts, t.categories.all]);
+
+  const activePreviewCategory = previewCategories.some((category) => category.trim().toLowerCase() === activeCategory.trim().toLowerCase())
+    ? activeCategory
+    : t.categories.all;
+
+  const visiblePreviewProducts = useMemo(() => {
+    if (activePreviewCategory === t.categories.all) return previewProducts;
+    return previewProducts.filter((product) => product.category?.trim().toLowerCase() === activePreviewCategory.trim().toLowerCase());
+  }, [activePreviewCategory, previewProducts, t.categories.all]);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const previous = scrollY.getPrevious() ?? 0;
@@ -196,57 +222,65 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
               className="absolute top-full left-0 w-full mt-3 bg-[#FAF9F6]/80 backdrop-blur-3xl rounded-[16px] pt-12 pb-20 shadow-2xl overflow-hidden border border-white/40"
             >
               <div className="max-w-[1440px] mx-auto px-10">
-                <div className="flex justify-end gap-10 mb-16 px-10">
-                  {mainCategories.map((cat) => (
-                    <button
-                      key={cat}
-                      onMouseEnter={() => setActiveCategory(cat)}
-                      className={`text-[15px] font-bold uppercase tracking-tight relative transition-all duration-300 ${
-                        activeCategory === cat ? 'text-black' : 'text-[#9A9A9A]'
-                      }`}
-                    >
-                      {cat}
-                      {activeCategory === cat && (
-                        <motion.div 
-                          layoutId="activeCategoryUnderline"
-                          className="absolute -bottom-2 left-0 w-full h-[1px] bg-black"
-                        />
-                      )}
-                    </button>
-                  ))}
-                </div>
+                {previewCategories.length > 0 && (
+                  <div className="flex justify-end gap-10 mb-16 px-10">
+                    {previewCategories.map((cat) => (
+                      <button
+                        key={cat}
+                        onMouseEnter={() => setActiveCategory(cat)}
+                        className={`text-[15px] font-bold uppercase tracking-tight relative transition-all duration-300 ${
+                          activePreviewCategory.trim().toLowerCase() === cat.trim().toLowerCase() ? 'text-black' : 'text-[#9A9A9A]'
+                        }`}
+                      >
+                        {cat}
+                        {activePreviewCategory.trim().toLowerCase() === cat.trim().toLowerCase() && (
+                          <motion.div
+                            layoutId="activeCategoryUnderline"
+                            className="absolute -bottom-2 left-0 w-full h-[1px] bg-black"
+                          />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 px-10">
-                  {(categoryProducts['SHOP ALL']).map((product) => (
+                {visiblePreviewProducts.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 px-10">
+                    {visiblePreviewProducts.map((product) => (
                     <motion.div 
                       key={product.id}
                       layout
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       className="bg-white/50 backdrop-blur-md rounded-[12px] p-8 flex flex-col group cursor-pointer hover:bg-white/80 transition-all duration-500"
-                      onClick={() => { onNavigate('shop'); setIsShopHovered(false); }}
+                      onClick={() => { onProductSelect?.(product); setIsShopHovered(false); }}
                     >
                       <div className="relative aspect-square mb-10 flex items-center justify-center p-4">
                         <ImageWithFallback 
                           src={product.image} 
-                          alt={product.title} 
+                          alt={product.title ?? product.name}
                           className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700"
                         />
                       </div>
                       <div className="mt-auto">
                         <h4 className="text-[14px] font-bold uppercase tracking-tight text-black mb-1 italic">
-                          {product.title}
+                          {product.title ?? product.name}
                         </h4>
                         <p className="text-[14px] text-[#706E6A] font-medium leading-tight mb-4">
-                          {product.subtitle}
+                          {product.description ?? product.price}
                         </p>
                         <button className="text-[11px] font-black uppercase tracking-widest border-b border-black pb-0.5 self-start hover:opacity-50 transition-opacity">
                           {t.shopNow}
                         </button>
                       </div>
-                    </motion.div>
-                  ))}
-                </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="px-10 py-16 text-center text-[13px] font-bold uppercase tracking-[0.2em] text-black/40">
+                    product previews unavailable
+                  </div>
+                )}
               </div>
             </motion.div>
           )}

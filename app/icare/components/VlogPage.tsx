@@ -1,18 +1,21 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Language } from '../translations';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Play } from 'lucide-react';
+import { fetchProductMediaVlogs } from '../lib/catalog-client';
+import { VlogContentItem } from '../types';
 
 interface VlogPageProps {
   lang: Language;
 }
 
-const VlogItem = ({ title, subtitle, image }: { title: string, subtitle: string, image: string }) => (
+const VlogItem = ({ title, subtitle, image, videoUrl }: { title: string, subtitle: string, image: string, videoUrl?: string | null }) => (
   <motion.div 
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
+    onClick={() => videoUrl && window.open(videoUrl, '_blank', 'noopener,noreferrer')}
     className="group cursor-pointer"
   >
     <div className="relative aspect-video rounded-2xl overflow-hidden bg-[#F2F1ED] mb-6">
@@ -36,49 +39,29 @@ const VlogItem = ({ title, subtitle, image }: { title: string, subtitle: string,
 
 export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
   const [filter, setFilter] = useState('ALL');
+  const [remoteVlogs, setRemoteVlogs] = useState<VlogContentItem[] | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const t = {
     filterBy: lang === 'en' ? 'FILTER BY:' : 'تصفية حسب:',
     all: lang === 'en' ? 'ALL' : 'الكل',
     products: lang === 'en' ? 'PRODUCTS' : 'المنتجات',
     tutorials: lang === 'en' ? 'TUTORIALS' : 'الدروس',
-    heroTitle: lang === 'en' ? 'GET TO KNOW GLAZING MIST.' : 'تعرفي على رذاذ التوهج.',
+    heroTitle: lang === 'en' ? 'PRODUCT STORIES' : 'قصص المنتجات',
   };
 
-  const vlogs = [
-    {
-      title: lang === 'en' ? 'POCKET-SIZED POP-UP' : 'متجر متنقل بحجم الجيب',
-      subtitle: lang === 'en' ? 'rhode pops up in NYC.' : 'رود تفتتح متجرها في نيويورك.',
-      image: 'https://images.unsplash.com/photo-1760621393386-3906922b0b78?q=80&w=1200'
-    },
-    {
-      title: lang === 'en' ? 'GET TO KNOW PINEAPPLE REFRESH' : 'تعرفي على انتعاش الأناناس',
-      subtitle: lang === 'en' ? 'Your cleanser for every day, every month and every season.' : 'منظفك اليومي لكل شهر ولكل موسم.',
-      image: 'https://images.unsplash.com/photo-1734599895291-d25a27e4cb45?q=80&w=1200'
-    },
-    {
-      title: lang === 'en' ? 'SEE THE RHODE ROUTINE' : 'شاهدي روتين رود',
-      subtitle: lang === 'en' ? 'Hailey&#39;s skincare edit, starring Rhode&#39;s newest product: Pineapple Refresh.' : 'مختارات هايلي للعناية بالبشرة، ببطولة منتج رود الجديد.',
-      image: 'https://images.unsplash.com/photo-1715702129041-ff31d547e498?q=80&w=1200'
-    },
-    {
-      title: lang === 'en' ? 'THE MAKING OF RHODE: YEAR ONE' : 'صناعة رود: العام الأول',
-      subtitle: lang === 'en' ? 'Watch our journey since launch.' : 'شاهدي رحلتنا منذ الانطلاق.',
-      image: 'https://images.unsplash.com/photo-1734690201845-25322ab2be89?q=80&w=1200'
-    },
-    {
-      title: lang === 'en' ? 'GET TO KNOW LIP TINT' : 'تعرفي على ملمع الشفاه',
-      subtitle: lang === 'en' ? 'Four new day&#45;to&#45;night lip essentials.' : 'أربعة أساسيات جديدة للشفاه من النهار إلى الليل.',
-      image: 'https://images.unsplash.com/photo-1636715940394-493e67594b1b?q=80&w=1200'
-    },
-    {
-      title: lang === 'en' ? 'GET TO KNOW GLAZING MILK' : 'تعرفي على حليب التوهج',
-      subtitle: lang === 'en' ? 'The essential prep step in your rhode routine.' : 'خطوة التحضير الأساسية في روتين رود الخاص بك.',
-      image: 'https://images.unsplash.com/photo-1703218039342-779a2487f176?q=80&w=1200'
-    }
-  ];
+  useEffect(() => {
+    const loadVlogs = async () => {
+      setLoading(true);
+      const items = await fetchProductMediaVlogs(6);
+      setRemoteVlogs(items ?? []);
+      setLoading(false);
+    };
+    loadVlogs();
+  }, []);
 
-  const filteredVlogs = vlogs;
+  const vlogs = remoteVlogs ?? [];
+  const filteredVlogs = filter === 'ALL' ? vlogs : vlogs.filter((item) => item.category === filter || item.category === 'ALL');
 
   return (
     <div className="min-h-screen bg-[#FFFFFF] pb-32">
@@ -120,10 +103,25 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
       </section>
 
       {/* 3. Vlog Grid - 2 columns even on mobile to match desktop layout */}
-      <section className="max-w-[1400px] mx-auto px-4 md:px-6 grid grid-cols-2 gap-x-4 md:gap-x-8 gap-y-8 md:gap-y-16">
-        {filteredVlogs.map((vlog, idx) => (
-          <VlogItem key={idx} {...vlog} />
-        ))}
+      <section className="max-w-[1400px] mx-auto px-4 md:px-6">
+        {loading ? (
+          <div className="py-20 text-center text-[12px] font-black uppercase tracking-[0.2em] text-black/40">Loading stories...</div>
+        ) : filteredVlogs.length > 0 ? (
+          <div className="grid grid-cols-2 gap-x-4 md:gap-x-8 gap-y-8 md:gap-y-16">
+            {filteredVlogs.map((vlog) => (
+              <VlogItem key={vlog.id} {...vlog} />
+            ))}
+          </div>
+        ) : (
+          <div className="py-20 text-center space-y-3">
+            <h2 className="text-[18px] font-black uppercase tracking-tight text-black/60">
+              {lang === 'en' ? 'Vlog content unavailable' : 'محتوى الفلوج غير متاح'}
+            </h2>
+            <p className="text-[13px] text-black/40 font-medium">
+              {lang === 'en' ? 'Product media will appear here when the backend provides it.' : 'سيظهر محتوى المنتجات هنا عند توفره من الخادم.'}
+            </p>
+          </div>
+        )}
       </section>
     </div>
   );

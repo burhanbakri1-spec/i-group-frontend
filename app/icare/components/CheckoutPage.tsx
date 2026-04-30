@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, ShoppingBag, Check, ChevronRight, ArrowLeft, CreditCard, Lock } from 'lucide-react';
 import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';
+import { icareApi } from '../lib/api-client';
+import { CreatedOrder, CreateOrderInput, OrderSummary } from '../types';
+import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface CheckoutPageProps {
   lang: Language;
@@ -10,10 +13,24 @@ interface CheckoutPageProps {
 }
 
 export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) => {
-  const { cartItems, cartTotal, clearCart } = useShop();
+  const { cartItems, cartTotal, clearCart, accessToken, isAuthenticated, user } = useShop();
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [orderComplete, setOrderComplete] = useState(false);
+  const [order, setOrder] = useState<CreatedOrder | null>(null);
+  const [orderSummary, setOrderSummary] = useState<OrderSummary | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [shippingForm, setShippingForm] = useState({
+    firstName: user?.name?.split(' ')[0] ?? '',
+    lastName: user?.name?.split(' ').slice(1).join(' ') ?? '',
+    email: user?.email ?? '',
+    phone: user?.phone ?? '',
+    address: user?.address ?? '',
+    city: user?.city ?? '',
+    postalCode: '',
+    country: user?.country ?? 'Egypt',
+  });
 
   const t = {
     en: {
@@ -68,6 +85,116 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
 
   const text = t[lang];
 
+  const fallbackOrderSummary = useMemo<OrderSummary>(() => {
+    const tax = cartTotal * 0.08;
+    return {
+      items: cartItems.map((item) => ({
+        productId: item.backendId ?? Number(item.id),
+        variantId: item.variantId,
+        productName: item.name,
+        variantName: item.type,
+        quantity: item.quantity,
+        unitPrice: item.rawPrice ?? Number(item.price.replace(/[^0-9.]/g, '')),
+        totalPrice: (item.rawPrice ?? Number(item.price.replace(/[^0-9.]/g, ''))) * item.quantity,
+      })),
+      subtotal: cartTotal,
+      shipping: 0,
+      tax,
+      discount: 0,
+      total: cartTotal + tax,
+    };
+  }, [cartItems, cartTotal]);
+
+  const displayOrderSummary = orderSummary ?? fallbackOrderSummary;
+
+  useEffect(() => {
+    if (!isAuthenticated || !accessToken || !icareApi.isConfigured() || cartItems.length === 0) {
+      setOrderSummary(null);
+      return;
+    }
+
+    const loadOrderSummary = async () => {
+      try {
+        const summary = await icareApi.orders.summary(accessToken);
+        setOrderSummary(summary);
+      } catch (error) {
+        setOrderSummary(null);
+        setCheckoutError(error instanceof Error ? error.message : 'Unable to refresh order summary.');
+      }
+    };
+
+    loadOrderSummary();
+  }, [accessToken, cartItems.length, isAuthenticated]);
+
+  const updateShippingField = (field: keyof typeof shippingForm, value: string) => {
+    setShippingForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const buildOrderInput = (): CreateOrderInput => {
+    const shippingName = `${shippingForm.firstName} ${shippingForm.lastName}`.trim();
+    const baseOrder: CreateOrderInput = {
+      paymentMethod: paymentMethod === 'cod' ? 'cash_on_delivery' : 'online',
+      paymentGateway: paymentMethod === 'cod' ? undefined : 'paymob',
+      shippingName,
+      shippingEmail: shippingForm.email,
+      shippingPhone: shippingForm.phone,
+      shippingAddress: shippingForm.address,
+      shippingCity: shippingForm.city,
+      shippingPostalCode: shippingForm.postalCode,
+      shippingCountry: shippingForm.country || 'Egypt',
+      billingSameAsShipping: true,
+    };
+
+    if (isAuthenticated) return baseOrder;
+
+    const items = cartItems
+      .filter((item) => item.backendId)
+      .map((item) => ({ productId: item.backendId as number, variantId: item.variantId, quantity: item.quantity }));
+
+    return {
+      ...baseOrder,
+      guestEmail: shippingForm.email,
+      guestPhone: shippingForm.phone,
+      items,
+    };
+  };
+
+  const validateCheckout = () => {
+    if (!icareApi.isConfigured()) return 'Checkout is unavailable because NEXT_PUBLIC_ICARE_API_URL is not configured.';
+    if (cartItems.length === 0) return 'Your cart is empty.';
+    if (!shippingForm.firstName || !shippingForm.email || !shippingForm.phone || !shippingForm.address || !shippingForm.city) {
+      return 'Please complete the required shipping fields.';
+    }
+    if (!isAuthenticated && cartItems.some((item) => !item.backendId)) {
+      return 'Some guest cart items are local-only demo products. Please add backend catalog products before checkout.';
+    }
+    return null;
+  };
+
+  const placeOrder = async () => {
+    const validationError = validateCheckout();
+    if (validationError) {
+      setCheckoutError(validationError);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setCheckoutError(null);
+    try {
+      if (isAuthenticated && accessToken && icareApi.isConfigured()) {
+        await icareApi.cart.syncPrices(accessToken).catch(() => undefined);
+      }
+      const createdOrder = await icareApi.orders.create(buildOrderInput(), accessToken ?? undefined);
+      setOrder(createdOrder);
+      setOrderComplete(true);
+      clearCart();
+    } catch (error) {
+      setCheckoutError(error instanceof Error ? error.message : 'Failed to place order.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const steps = [
     { number: 1, title: text.shippingInfo, icon: MapPin },
     { number: 2, title: text.paymentMethod, icon: CreditCard },
@@ -120,16 +247,16 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                 <div className="space-y-6">
                   <h2 className="text-2xl font-light mb-6">{text.shippingInfo}</h2>
                   <div className="grid md:grid-cols-2 gap-4">
-                    <input type="text" placeholder={text.firstName} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
-                    <input type="text" placeholder={text.lastName} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
+                    <input type="text" value={shippingForm.firstName} onChange={(event) => updateShippingField('firstName', event.target.value)} placeholder={text.firstName} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
+                    <input type="text" value={shippingForm.lastName} onChange={(event) => updateShippingField('lastName', event.target.value)} placeholder={text.lastName} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
                   </div>
-                  <input type="email" placeholder={text.email} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
-                  <input type="tel" placeholder={text.phone} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
-                  <input type="text" placeholder={text.address} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
+                  <input type="email" value={shippingForm.email} onChange={(event) => updateShippingField('email', event.target.value)} placeholder={text.email} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
+                  <input type="tel" value={shippingForm.phone} onChange={(event) => updateShippingField('phone', event.target.value)} placeholder={text.phone} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
+                  <input type="text" value={shippingForm.address} onChange={(event) => updateShippingField('address', event.target.value)} placeholder={text.address} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
                   <div className="grid md:grid-cols-3 gap-4">
-                    <input type="text" placeholder={text.city} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
-                    <input type="text" placeholder={text.postalCode} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
-                    <input type="text" placeholder={text.country} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
+                    <input type="text" value={shippingForm.city} onChange={(event) => updateShippingField('city', event.target.value)} placeholder={text.city} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
+                    <input type="text" value={shippingForm.postalCode} onChange={(event) => updateShippingField('postalCode', event.target.value)} placeholder={text.postalCode} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
+                    <input type="text" value={shippingForm.country} onChange={(event) => updateShippingField('country', event.target.value)} placeholder={text.country} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
                   </div>
                 </div>
               )}
@@ -215,7 +342,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                     </h2>
                     <p className="text-[#666] mb-8">
                       {lang === 'en' 
-                        ? "Thank you for your purchase. We&#39;ll send you a confirmation email shortly." 
+                        ? `Thank you for your purchase. Order ${order?.orderNumber ?? ''} has been created.` 
                         : 'شكراً لشرائك. سنرسل لك رسالة تأكيد قريباً.'}
                     </p>
                     <button
@@ -236,15 +363,16 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                           ? 'By clicking "Place Order", you agree to our terms and conditions.' 
                           : 'بالنقر على "تأكيد الطلب"، فإنك توافق على الشروط والأحكام الخاصة بنا.'}
                       </p>
+                      {checkoutError && (
+                        <p className="text-sm text-red-600 mb-4">{checkoutError}</p>
+                      )}
                       <button
-                        onClick={() => {
-                          setOrderComplete(true);
-                          clearCart();
-                        }}
-                        className="w-full px-6 py-4 bg-black text-white rounded-full hover:bg-[#333] transition-colors flex items-center justify-center gap-2 text-lg font-medium"
+                        onClick={placeOrder}
+                        disabled={isSubmitting}
+                        className="w-full px-6 py-4 bg-black text-white rounded-full hover:bg-[#333] transition-colors flex items-center justify-center gap-2 text-lg font-medium disabled:opacity-50"
                       >
                         <Lock size={20} />
-                        {text.placeOrder}
+                        {isSubmitting ? 'Placing order...' : text.placeOrder}
                       </button>
                     </div>
                   </div>
@@ -283,7 +411,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                 {cartItems.map((item) => (
                   <div key={item.id} className="flex items-center gap-4 pb-4 border-b border-[#EEE]">
                     <div className="w-20 h-20 bg-[#F5F5F5] rounded overflow-hidden">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      <ImageWithFallback src={item.image} alt={item.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1">
                       <p className="font-medium text-sm">{item.title}</p>
@@ -297,19 +425,27 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
               <div className="space-y-3 text-sm border-t border-[#EEE] pt-4">
                 <div className="flex justify-between">
                   <span className="text-[#666]">{text.subtotal}</span>
-                  <span>${cartTotal.toFixed(2)}</span>
+                  <span>${displayOrderSummary.subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#666]">{text.shipping}</span>
-                  <span className="text-green-600">{text.free}</span>
+                  <span className={displayOrderSummary.shipping === 0 ? 'text-green-600' : ''}>
+                    {displayOrderSummary.shipping === 0 ? text.free : `$${displayOrderSummary.shipping.toFixed(2)}`}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#666]">{text.tax}</span>
-                  <span>${(cartTotal * 0.08).toFixed(2)}</span>
+                  <span>${displayOrderSummary.tax.toFixed(2)}</span>
                 </div>
+                {displayOrderSummary.discount > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-[#666]">Discount</span>
+                    <span>-${displayOrderSummary.discount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between font-medium text-lg pt-3 border-t border-[#EEE]">
                   <span>{text.total}</span>
-                  <span>${(cartTotal * 1.08).toFixed(2)}</span>
+                  <span>${displayOrderSummary.total.toFixed(2)}</span>
                 </div>
               </div>
             </div>

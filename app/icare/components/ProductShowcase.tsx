@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { Language, translations } from '../translations';
+import { Language } from '../translations';
 import { Product } from '../types';
+import { fetchProductShortcut } from '../lib/catalog-client';
 
 interface ProductShowcaseProps {
   products: Product[];
@@ -12,40 +13,39 @@ interface ProductShowcaseProps {
 }
 
 export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang, onProductSelect }) => {
-  // products prop is required by interface but component uses internal showcaseProducts
   void products;
-  const t = translations[lang];
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [remoteProducts, setRemoteProducts] = useState<Product[] | null>(null);
 
-  const showcaseProducts = [
-    {
-      id: 1,
-      title: lang === 'en' ? 'PINEAPPLE REFRESH' : 'منظف الأناناس المنعش',
-      description: lang === 'en' ? 'PGA daily cleanser' : 'منظف يومي PGA',
-      price: '$30.00',
-      reviews: '1,932',
-      productImage: 'https://images.unsplash.com/photo-1549127024-18ee7271c819?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800',
-      lifestyleImage: 'https://images.unsplash.com/photo-1692318569136-f63bf5dfbedf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200'
-    },
-    {
-      id: 2,
-      title: t.products.barrierButter.title,
-      description: t.products.barrierButter.subtitle,
-      price: '$36.00',
-      reviews: '2,213',
-      productImage: 'https://images.unsplash.com/photo-1634055769490-dc0a9f22826a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800',
-      lifestyleImage: 'https://images.unsplash.com/photo-1738684033377-eb02299c1d6c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200'
-    },
-    {
-      id: 3,
-      title: t.products.peptideLip.title,
-      description: t.products.peptideLip.subtitle,
-      price: '$16.00',
-      reviews: '5,402',
-      productImage: 'https://images.unsplash.com/photo-1761095870661-c4ae15cac605?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800',
-      lifestyleImage: 'https://images.unsplash.com/photo-1600664534138-f8910b0adc63?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200'
-    }
-  ];
+  useEffect(() => {
+    const loadShowcaseProducts = async () => {
+      const featuredProducts = await fetchProductShortcut('featured', 4);
+      setRemoteProducts(featuredProducts ?? []);
+    };
+    loadShowcaseProducts();
+  }, []);
+
+  const showcaseProducts = remoteProducts ?? [];
+
+  if (remoteProducts === null) {
+    return (
+      <section className="px-2 md:px-8 py-8 bg-white">
+        <div className="max-w-[1600px] mx-auto rounded-[16px] bg-[#F2F2F0] p-12 text-center text-[12px] font-bold uppercase tracking-[0.2em] text-black/40">
+          loading featured products
+        </div>
+      </section>
+    );
+  }
+
+  if (showcaseProducts.length === 0) {
+    return (
+      <section className="px-2 md:px-8 py-8 bg-white">
+        <div className="max-w-[1600px] mx-auto rounded-[16px] bg-[#F2F2F0] p-12 text-center text-[12px] font-bold uppercase tracking-[0.2em] text-black/40">
+          no featured products are available yet
+        </div>
+      </section>
+    );
+  }
 
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % showcaseProducts.length);
@@ -72,9 +72,9 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               className="w-full h-full"
             >
-              <img 
-                src={current.lifestyleImage} 
-                alt={current.title} 
+              <ImageWithFallback 
+                src={current.images?.[1] ?? current.images?.[0] ?? current.image}
+                alt={current.title ?? current.name}
                 className="w-full h-full object-cover"
               />
             </motion.div>
@@ -148,8 +148,8 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
                 className="w-full max-w-[140px] sm:max-w-[260px] md:max-w-[380px]"
               >
                 <ImageWithFallback 
-                  src={current.productImage} 
-                  alt={current.title}
+                  src={current.image}
+                  alt={current.title ?? current.name}
                   className="w-full h-full object-contain mix-blend-multiply drop-shadow-lg md:drop-shadow-2xl"
                 />
               </motion.div>
@@ -181,7 +181,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
                   <div className="flex items-center gap-2">
                     <img src="/icare-logo.png" alt="icare" className="h-3 md:h-5 w-auto object-contain hidden sm:block" />
                     <h3 className="text-[14px] sm:text-[20px] md:text-[28px] font-[900] tracking-tight text-[#222] uppercase leading-tight">
-                      {current.title}
+                      {current.title ?? current.name}
                     </h3>
                   </div>
                   <p className="text-[10px] sm:text-[14px] md:text-[16px] text-[#666] font-medium lowercase tracking-tight leading-none">
@@ -192,14 +192,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => onProductSelect({
-                    id: String(current.id),
-                    name: current.title,
-                    description: current.description,
-                    price: current.price,
-                    image: current.productImage,
-                    reviews: current.reviews
-                  })}
+                  onClick={() => onProductSelect(current)}
                   className="bg-black text-white rounded-full w-full py-2.5 md:py-4 text-[9px] md:text-[11px] font-black tracking-[0.1em] md:tracking-[0.2em] uppercase hover:bg-[#333] transition-all duration-300 shadow-lg"
                 >
                   {lang === 'en' ? 'VIEW' : 'عرض'} — {current.price}

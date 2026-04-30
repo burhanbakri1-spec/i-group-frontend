@@ -2,12 +2,12 @@ import React from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 const products = [
-  { id: 1, title: 'BARRIER BUTTER', price: '$28', subtitle: 'The intensive moisture balm', image: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?q=80&w=400' },
-  { id: 2, title: 'PEPTIDE GLAZE', price: '$32', subtitle: 'Dewy hydration fluid', image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=400' },
-  { id: 3, title: 'DAILY CLEANSING', price: '$24', subtitle: 'Creamy milk wash', image: 'https://images.unsplash.com/photo-1559539751-030138c2955e?q=80&w=400' },
-  { id: 4, title: 'POCKET CLEANSER', price: '$12', subtitle: 'Travel size hydration', image: 'https://images.unsplash.com/photo-1594125355977-903e303f4435?q=80&w=400' },
-  { id: 5, title: 'REPAIR SERUM', price: '$40', subtitle: 'Deep barrier support', image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=400' },
-  { id: 6, title: 'LIP TINT', price: '$16', subtitle: 'Sheer peptide gloss', image: 'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?q=80&w=400' }
+  { id: 1, title: 'BARRIER BUTTER', price: '$28', subtitle: 'The intensive moisture balm', image: '' },
+  { id: 2, title: 'PEPTIDE GLAZE', price: '$32', subtitle: 'Dewy hydration fluid', image: '' },
+  { id: 3, title: 'DAILY CLEANSING', price: '$24', subtitle: 'Creamy milk wash', image: '' },
+  { id: 4, title: 'POCKET CLEANSER', price: '$12', subtitle: 'Travel size hydration', image: '' },
+  { id: 5, title: 'REPAIR SERUM', price: '$40', subtitle: 'Deep barrier support', image: '' },
+  { id: 6, title: 'LIP TINT', price: '$16', subtitle: 'Sheer peptide gloss', image: '' }
 ];
 
 export const Shop: React.FC = () => {

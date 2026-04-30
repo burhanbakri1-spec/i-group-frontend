@@ -4,23 +4,8 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Star, Plus, Heart } from 'lucide-react';
 import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';
-
-interface Product {
-  id: string;
-  title?: string;
-  name: string;
-  category?: string;
-  price: string;
-  image: string;
-  description?: string;
-  rating: string;
-  reviews?: string;
-  badge?: string;
-  main?: string;
-  sub?: string;
-  type?: string;
-  brand?: string;
-}
+import { Product } from '../types';
+import { isPurchasableStock } from '../lib/mappers';
 
 interface ProductCardProps {
   product: Product;
@@ -32,13 +17,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, lang, onSelec
   const [isHovered, setIsHovered] = useState(false);
   const { addToCart, addToWishlist, isInWishlist, removeFromWishlist } = useShop();
   const inWishlist = isInWishlist(product.id);
+  const isPurchasable = isPurchasableStock(product.stockStatus, product.stock);
 
   const displayTitle = (product.title || product.type || product.main || '').split(' ')[0];
   const reviewsCount = product.reviews || '0';
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
-    addToCart(product);
+    if (isPurchasable) {
+      addToCart(product);
+    }
   };
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
@@ -99,6 +87,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, lang, onSelec
                 transition={{ delay: 0.2, type: "spring", bounce: 0.5 }}
               >
                 {product.badge}
+              </motion.span>
+            )}
+            {!isPurchasable && (
+              <motion.span
+                className="bg-black/60 text-white px-1.5 md:px-3 py-0.5 md:py-1 rounded-full text-[7px] md:text-[10px] font-bold uppercase tracking-wider"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+              >
+                sold out
               </motion.span>
             )}
             <motion.button
@@ -190,14 +187,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, lang, onSelec
           {/* Add to Cart Button - Inside Card */}
           <motion.button
             onClick={handleAddToCart}
-            className="w-full py-2 md:py-2.5 border border-[#999] bg-transparent rounded-full text-[9px] md:text-[11px] font-black uppercase tracking-wider text-[#666] hover:bg-black hover:text-white hover:border-black transition-all duration-300"
+            disabled={!isPurchasable}
+            className="w-full py-2 md:py-2.5 border border-[#999] bg-transparent rounded-full text-[9px] md:text-[11px] font-black uppercase tracking-wider text-[#666] hover:bg-black hover:text-white hover:border-black transition-all duration-300 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-[#666] disabled:cursor-not-allowed"
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25, duration: 0.4 }}
           >
-            {lang === 'en' ? 'Add to Cart' : 'أضف للسلة'}
+            {isPurchasable ? (lang === 'en' ? 'Add to Cart' : 'أضف للسلة') : (lang === 'en' ? 'Sold Out' : 'نفد المخزون')}
           </motion.button>
         </motion.div>
 
@@ -210,7 +208,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, lang, onSelec
         >
           <motion.button 
             onClick={handleAddToCart}
-            className="bg-black text-white px-10 py-4 rounded-full text-[12px] font-black uppercase tracking-widest shadow-2xl flex items-center gap-2"
+            disabled={!isPurchasable}
+            className="bg-black text-white px-10 py-4 rounded-full text-[12px] font-black uppercase tracking-widest shadow-2xl flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={isHovered ? { scale: 1, opacity: 1 } : { scale: 0.8, opacity: 0 }}
             transition={{ duration: 0.3, type: "spring", bounce: 0.4 }}
@@ -223,7 +222,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, lang, onSelec
             >
               <Plus size={18} strokeWidth={3} />
             </motion.div>
-            {lang === 'en' ? 'Add to Cart' : 'أضف للسلة'}
+            {isPurchasable ? (lang === 'en' ? 'Add to Cart' : 'أضف للسلة') : (lang === 'en' ? 'Sold Out' : 'نفد المخزون')}
           </motion.button>
         </motion.div>
       </motion.div>

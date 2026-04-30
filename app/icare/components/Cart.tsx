@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 import { Language, translations } from '../translations';
 import { useShop } from '../context/ShopContext';
+import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface CartProps {
   isOpen: boolean;
@@ -94,7 +95,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                     {cartItems.map((item) => (
                       <div key={item.id} className="flex gap-6 relative group pb-4 border-b border-black/5">
                         <div className="w-20 h-24 bg-white/40 rounded-[8px] overflow-hidden flex-shrink-0">
-                          <img 
+                          <ImageWithFallback 
                             src={item.image} 
                             alt={item.name} 
                             className="w-full h-full object-cover"

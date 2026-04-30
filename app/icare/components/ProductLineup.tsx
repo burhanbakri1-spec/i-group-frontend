@@ -1,15 +1,19 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, Star, Plus } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Product } from '../types';
+import { fetchProductShortcut } from '../lib/catalog-client';
 
 interface ProductLineupProps {
   lang?: string;
   onProductSelect?: (product: Product) => void;
+  products?: Product[] | null;
+  useShortcutFallback?: boolean;
 }
 
 interface LineupItemProps {
+  product?: Product;
   category: string;
   badge?: string;
   name: string;
@@ -17,15 +21,17 @@ interface LineupItemProps {
   price: string;
   image: string;
   reviews: string;
+  onSelect?: (product: Product) => void;
 }
 
-const LineupCard: React.FC<LineupItemProps> = ({ category, badge, name, description, price, image, reviews }) => {
+const LineupCard: React.FC<LineupItemProps> = ({ product, category, badge, name, description, price, image, reviews, onSelect }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
     <motion.div 
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
+      onClick={() => product && onSelect?.(product)}
       className="min-w-[320px] md:min-w-[420px] bg-[#F6F6F6] rounded-[24px] md:rounded-[32px] p-6 md:p-8 flex flex-col justify-between group cursor-pointer relative overflow-hidden h-[460px] md:h-[520px] transition-all duration-500 hover:shadow-xl hover:shadow-black/5"
     >
       {/* Top Section: Category and Badge */}
@@ -109,8 +115,9 @@ const LineupCard: React.FC<LineupItemProps> = ({ category, badge, name, descript
   );
 };
 
-export const ProductLineup: React.FC<ProductLineupProps> = () => {
+export const ProductLineup: React.FC<ProductLineupProps> = ({ onProductSelect, products, useShortcutFallback = true }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [remoteProducts, setRemoteProducts] = useState<Product[] | null>(null);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
@@ -121,43 +128,47 @@ export const ProductLineup: React.FC<ProductLineupProps> = () => {
     }
   };
 
-  const items = [
-    {
-      category: "skin",
-      badge: "LIMITED EDITION",
-      name: "THE SCENTED PEPTIDE LIP KIT",
-      description: "Limited edition boxed set",
-      price: "$72.00",
-      image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=800",
-      reviews: "15,787"
-    },
-    {
-      category: "eye",
-      badge: "ONLY AT ICARE",
-      name: "THE PEPTIDE EYE PREP SET",
-      description: "Depuffing eye patches",
-      price: "$47.00",
-      image: "https://images.unsplash.com/photo-1599305090598-fe179d501227?q=80&w=800",
-      reviews: "241"
-    },
-    {
-      category: "tint",
-      name: "PEPTIDE LIP TINT",
-      description: "The tinted lip layer",
-      price: "$20.00",
-      image: "https://images.unsplash.com/photo-1601049541289-9b1b7abcfe19?q=80&w=800",
-      reviews: "15,787"
-    },
-    {
-        category: "prep",
-        badge: "BEST SELLER",
-        name: "GLAZING MILK",
-        description: "Ceramide facial essence",
-        price: "$32.00",
-        image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=800",
-        reviews: "10,240"
+  useEffect(() => {
+    const loadLineupProducts = async () => {
+      if (products) {
+        setRemoteProducts(products);
+        return;
       }
-  ];
+      if (!useShortcutFallback) {
+        setRemoteProducts([]);
+        return;
+      }
+      const bestsellers = await fetchProductShortcut('bestsellers', 8);
+      setRemoteProducts(bestsellers ?? []);
+    };
+    loadLineupProducts();
+  }, [products, useShortcutFallback]);
+
+  const items = remoteProducts ?? [];
+
+  if (remoteProducts === null) {
+    return (
+      <section className="bg-white pt-12 pb-24 lg:pb-32 overflow-hidden">
+        <div className="max-w-[1600px] mx-auto px-4 lg:px-12">
+          <div className="rounded-[24px] bg-[#F6F6F6] p-12 text-center text-[12px] font-bold uppercase tracking-[0.2em] text-black/40">
+            loading products
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <section className="bg-white pt-12 pb-24 lg:pb-32 overflow-hidden">
+        <div className="max-w-[1600px] mx-auto px-4 lg:px-12">
+          <div className="rounded-[24px] bg-[#F6F6F6] p-12 text-center text-[12px] font-bold uppercase tracking-[0.2em] text-black/40">
+            no related products are available yet
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="bg-white pt-12 pb-24 lg:pb-32 overflow-hidden">
@@ -166,9 +177,19 @@ export const ProductLineup: React.FC<ProductLineupProps> = () => {
           ref={scrollRef}
           className="flex gap-5 md:gap-8 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-8"
         >
-          {items.map((item, idx) => (
-            <div key={idx} className="snap-start first:pl-2 last:pr-2">
-               <LineupCard {...item} />
+          {items.map((item) => (
+            <div key={item.id} className="snap-start first:pl-2 last:pr-2">
+               <LineupCard
+                 product={item}
+                 category={item.title ?? item.category ?? 'icare'}
+                 badge={item.badge}
+                 name={item.name}
+                 description={item.description ?? item.category ?? 'iCare product'}
+                 price={item.price}
+                 image={item.image}
+                 reviews={item.reviews ?? '0'}
+                 onSelect={onProductSelect}
+               />
             </div>
           ))}
         </div>

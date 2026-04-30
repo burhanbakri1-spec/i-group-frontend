@@ -46,7 +46,7 @@ const AccordionItem = ({ title, content, isOpen, onClick }: { title: string, con
   );
 };
 
-export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
+export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const valuesData = [

@@ -1,57 +1,55 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShoppingBag, Heart, Globe, Instagram, Music2, Youtube, Facebook } from 'lucide-react';
 import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { fetchCatalogProducts } from '../lib/catalog-client';
+import { Product } from '../types';
 
 interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
   onNavigate: (page: string) => void;
+  onProductSelect?: (product: Product) => void;
   onOpenCart: () => void;
   onOpenSearch?: () => void;
   lang: Language;
   onToggleLang: () => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mobileCategoryProducts: Record<string, any[]> = {
-  'SHOP ALL': [
-    { id: 'm-sa1', title: 'BARRIER BUTTER', subtitle: 'The intensive moisture balm', badge: 'new', image: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?q=80&w=200' },
-    { id: 'm-sa2', title: 'THE WINTER KIT', subtitle: 'Three cozy skin essentials', badge: 'limited edition', image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=200' },
-    { id: 'm-sa3', title: 'PEPTIDE LIP TINT', subtitle: 'Sheer but buildable color', image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=200' }
-  ],
-  'FACE CARE': [
-    { id: 'm-fc1', title: 'PEPTIDE GLAZE', subtitle: 'Dewy hydration fluid', badge: 'new', image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=200' },
-    { id: 'm-fc2', title: 'BARRIER BUTTER', subtitle: 'The intensive moisture balm', image: 'https://images.unsplash.com/photo-1549127024-18ee7271c819?q=80&w=200' },
-    { id: 'm-fc3', title: 'DAILY CLEANSING', subtitle: 'Creamy milk wash', image: 'https://images.unsplash.com/photo-1559539751-030138c2955e?q=80&w=200' }
-  ],
-  'HAIR CARE': [
-    { id: 'm-hc1', title: 'SCALP SERUM', subtitle: 'Root revitalization oil', image: 'https://images.unsplash.com/photo-1527799822367-a2886701f252?q=80&w=200' },
-    { id: 'm-hc2', title: 'GLOSS RINSE', subtitle: 'Liquid shine treatment', image: 'https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?q=80&w=200' }
-  ],
-  'BODY CARE': [
-    { id: 'm-bc1', title: 'BODY GLAZE', subtitle: 'Full body hydration', image: 'https://images.unsplash.com/photo-1552046122-03184de85e08?q=80&w=200' },
-    { id: 'm-bc2', title: 'CREAM WASH', subtitle: 'Scentless nutrition', image: 'https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?q=80&w=200' }
-  ],
-  'MAKEUP': [
-    { id: 'm-mu1', title: 'LIP TINT', subtitle: 'Sheer peptide gloss', image: 'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?q=80&w=200' },
-    { id: 'm-mu2', title: 'CHEEK FLUSH', subtitle: 'Natural dewy blush', image: 'https://images.unsplash.com/photo-1596704017254-9b121068fb31?q=80&w=200' }
-  ],
-  'NAILS': [
-    { id: 'm-n1', title: 'PEARL POLISH', subtitle: 'Glazed donut finish', image: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?q=80&w=200' },
-    { id: 'm-n2', title: 'STRENGTH BASE', subtitle: 'Keratin infused coat', image: 'https://images.unsplash.com/photo-1632345031435-8727f6897d53?q=80&w=200' }
-  ]
-};
+const SHOP_ALL_CATEGORY = 'SHOP ALL';
 
-const mobileCategories = ['SHOP ALL', 'FACE CARE', 'HAIR CARE', 'BODY CARE', 'MAKEUP', 'NAILS'];
-
-export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavigate, onOpenCart, onOpenSearch, lang, onToggleLang }) => {
+export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavigate, onProductSelect, onOpenCart, onOpenSearch, lang, onToggleLang }) => {
   // onOpenSearch is passed from parent but not currently used in this component
   void onOpenSearch;
-  const [activeCategory, setActiveCategory] = useState('SHOP ALL');
+  const [activeCategory, setActiveCategory] = useState(SHOP_ALL_CATEGORY);
+  const [remoteProducts, setRemoteProducts] = useState<Product[]>([]);
   const { cartCount, wishlistItems } = useShop();
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const loadProducts = async () => {
+      const products = await fetchCatalogProducts();
+      setRemoteProducts(products ?? []);
+    };
+    loadProducts();
+  }, [isOpen]);
+
+  const mobileCategories = useMemo(() => {
+    if (remoteProducts.length === 0) return [];
+    const backendCategories = Array.from(new Set(remoteProducts
+      .map((product) => product.category?.trim().toUpperCase())
+      .filter((category): category is string => Boolean(category))));
+
+    return [SHOP_ALL_CATEGORY, ...backendCategories];
+  }, [remoteProducts]);
+
+  const activeMobileCategory = mobileCategories.includes(activeCategory) ? activeCategory : SHOP_ALL_CATEGORY;
+
+  const displayProducts = remoteProducts
+    .filter((product) => activeMobileCategory === SHOP_ALL_CATEGORY || product.category?.trim().toUpperCase() === activeMobileCategory)
+    .slice(0, 4);
 
   return (
     <AnimatePresence>
@@ -103,23 +101,27 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
           {/* Horizontal Category Scroll */}
           <div className="px-6 border-b border-[#D9D7D2] overflow-x-auto no-scrollbar">
             <div className="flex gap-8 min-w-max py-4">
-              {mobileCategories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={`text-[13px] font-bold uppercase tracking-tight relative pb-2 transition-colors ${
-                    activeCategory === cat ? 'text-black' : 'text-[#9A9A9A]'
-                  }`}
-                >
-                  {cat}
-                  {activeCategory === cat && (
-                    <motion.div 
-                      layoutId="mobileActiveTab"
-                      className="absolute bottom-0 left-0 w-full h-[1.5px] bg-black"
-                    />
-                  )}
-                </button>
-              ))}
+              {mobileCategories.length > 0 ? mobileCategories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveCategory(cat)}
+                    className={`text-[13px] font-bold uppercase tracking-tight relative pb-2 transition-colors ${
+                      activeMobileCategory === cat ? 'text-black' : 'text-[#9A9A9A]'
+                    }`}
+                  >
+                    {cat}
+                    {activeMobileCategory === cat && (
+                      <motion.div
+                        layoutId="mobileActiveTab"
+                        className="absolute bottom-0 left-0 w-full h-[1.5px] bg-black"
+                      />
+                    )}
+                  </button>
+                )) : (
+                  <span className="text-[12px] font-bold uppercase tracking-[0.15em] text-[#9A9A9A] pb-2">
+                    no categories available
+                  </span>
+                )}
             </div>
           </div>
 
@@ -127,23 +129,23 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
           <div className="flex-1 overflow-y-auto px-6 py-6 space-y-3">
             <AnimatePresence mode="wait">
               <motion.div
-                key={activeCategory}
+                key={activeMobileCategory}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
                 className="space-y-3"
               >
-                {mobileCategoryProducts[activeCategory]?.map((product) => (
+                {displayProducts.length > 0 ? displayProducts.map((product) => (
                   <div 
                     key={product.id}
-                    onClick={() => { onNavigate('shop'); onClose(); }}
+                    onClick={() => { onProductSelect?.(product); onClose(); }}
                     className="bg-white rounded-[16px] p-4 flex items-center gap-5 relative group active:scale-[0.98] transition-transform"
                   >
                     <div className="w-20 h-20 bg-[#F9F9F8] rounded-[12px] flex items-center justify-center p-2">
                       <ImageWithFallback 
                         src={product.image} 
-                        alt={product.title} 
+                        alt={product.title ?? product.name}
                         className="w-full h-full object-contain"
                       />
                     </div>
@@ -151,7 +153,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
                     <div className="flex-1">
                       <div className="flex items-start justify-between">
                         <h4 className="text-[13px] font-bold uppercase tracking-tight text-[#444] leading-tight">
-                          {product.title}
+                          {product.title ?? product.name}
                         </h4>
                         {product.badge && (
                           <span className="text-[8px] font-bold uppercase tracking-widest bg-[#6E6E6E] text-white px-2 py-0.5 rounded-full">
@@ -160,11 +162,15 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
                         )}
                       </div>
                       <p className="text-[12px] text-[#706E6A] font-medium leading-tight mt-1">
-                        {product.subtitle}
+                        {product.description ?? product.price}
                       </p>
                     </div>
                   </div>
-                ))}
+                )) : (
+                  <div className="bg-white/70 rounded-[16px] p-6 text-center text-[12px] font-bold uppercase tracking-[0.15em] text-[#706E6A]">
+                    no products available
+                  </div>
+                )}
               </motion.div>
             </AnimatePresence>
           </div>

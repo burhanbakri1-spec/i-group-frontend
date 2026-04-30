@@ -3,69 +3,27 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { ProductCard } from './ProductCard';
 import { ChevronDown, Grid2X2, LayoutGrid, X } from 'lucide-react';
-import { fetchWixProducts } from '../lib/wix-client';
+import { fetchCatalogProducts } from '../lib/catalog-client';
 import { Language } from '../translations';
-import { Product } from '../types';
+import { Product, BackendBrand } from '../types';
+import { icareApi } from '../lib/api-client';
+import { unwrapListData } from '../lib/mappers';
 
 interface ShopPageProps {
   lang: Language;
   onProductSelect: (product: Product) => void;
 }
 
-const brandHierarchy: Record<string, string[]> = {
-  'usa': ['ACURE', 'Advanced Clinicals', 'Benefit', 'CeraVe', 'Cetaphil', 'Clinique', 'COACH', 'Dermalogica', 'Dove', 'Elf', 'Estée Lauder', 'First Aid Beauty', 'Glossier', 'Gold Bond', 'Hero Cosmetics', 'Kiehl\'s', 'Laneige', 'M.A.C', 'Mario Badescu', 'Neutrogena', 'Old Spice', 'Origins', 'Oxy', 'Pacifica', 'Palmers', 'Paula\'s Choice', 'Peter Thomas Roth', 'Physicians Formula', 'Rare Beauty', 'Remington', 'SheaMoisture', 'Skinceuticals', 'Sol de Janeiro', 'Stridex', 'The Ordinary', 'Tree Hut', 'Vaseline', 'Victoria\'s Secret'],
-  'korea (k-beauty)': ['Abib', 'Anua', 'AXIS-Y', 'Beauty of Joseon', 'Biodance', 'Celimax', 'COSRX', 'Dr.Althea', 'Farmstay', 'Heimish', 'KSecret', 'Mary&May', 'Medi-Peel', 'Mixsoon', 'Numbuzin', 'Purito', 'Round Lab', 'Skin1004', 'Some By Mi', 'Tocobo', 'Torriden'],
-  'france': ['Bioderma', 'Dior', 'Embryolisse', 'Franck Olivier', 'Garnier', 'Givenchy', 'Jean Paul Gaultier', 'L\'Oréal', 'La Roche-Posay', 'Sephora', 'Vichy'],
-  'italy': ['Dolce & Gabbana', 'Giorgio Armani', 'Kiko', 'Marvis', 'Moschino', 'Prada', 'Versace'],
-  'united kingdom': ['Beauty Formulas', 'Charlotte Tilbury', 'Dyson', 'Perfekt'],
-  'germany': ['Essence', 'Eucerin', 'Nivea'],
-  'china': ['Bioaqua', 'Dr. Davey', 'Dr. Rashel', '8xp', 'ENZO', 'Iconsign', 'Kads', 'Karwell', 'Lanbena', 'New Jole', 'Sheglam', 'Ustar', 'Veralba'],
-  'japan': ['&-Honey', 'Ouo', 'Fino'],
-  'turkey': ['Gabrini', 'Golden Rose', 'Nascita'],
-  'poland': ['Novaclear', 'Paese'],
-  'uae': ['Huda Beauty', 'Zimaya'],
-  'canada': ['The Ordinary'],
-  'brazil': ['Skala'],
-  'netherlands': ['Gisou'],
-  'switzerland': ['Mavala'],
-  'saudi arabia': ['LAVERNE', 'Areej'],
-};
+type CategoryFilterHierarchy = Record<string, Record<string, string[]>>;
 
-const categoryHierarchy = {
-  'face care': {
-    'cleansing & toning': ['cleansers (gel/cream)', 'toners', 'micellar water'],
-    'moisturizers & treatments': ['face serums', 'face moisturizers', 'eye creams'],
-    'masks & exfoliation': ['sheet masks', 'exfoliators & scrubs'],
-    'sun protection': ['sunscreen']
-  },
-  'hair care': {
-    'washing & routine': ['shampoo', 'conditioner', 'curly hair care'],
-    'treatments & growth': ['hair oils', 'ampoules', 'hair vitamins'],
-    'hair tools': ['hair dryers', 'curlers', 'hair brushes']
-  },
-  'body care': {
-    'bath & body': ['shower gel', 'body lotion', 'body scrubs'],
-    'fragrance & deo': ['body mist', 'perfumes', 'deodorants'],
-    'hair removal': ['razors', 'laser devices']
-  },
-  'makeup': {
-    'face & cheek': ['foundation', 'concealer', 'blush'],
-    'eyes & lips': ['mascara', 'eyeliner', 'lipsticks']
-  },
-  'nails': {
-    'polish & care': ['nail polish', 'nail treatments']
-  },
-  'brands': brandHierarchy,
-  'trends': {
-    'new arrivals': ['new in', 'limited edition'],
-    'best sellers': ['allure winners', 'tiktok viral'],
-    'gifted': ['sets', 'travel size']
-  }
-};
+const normalizeFilterValue = (value?: string | null) => value?.trim().toLowerCase() ?? '';
+
+const uniqueValues = (values: string[]) => Array.from(new Set(values.filter(Boolean)));
+
+const EMPTY_PRODUCTS: Product[] = [];
 
 export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [wixProducts, setWixProducts] = useState<any[] | null>(null);
+  const [catalogProducts, setCatalogProducts] = useState<Product[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeMain, setActiveMain] = useState<string | null>(null);
   const [activeSub, setActiveSub] = useState<string | null>(null);
@@ -74,17 +32,25 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
   const [activeSort, setActiveSort] = useState('featured');
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(12);
+  const [remoteBrands, setRemoteBrands] = useState<BackendBrand[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       try {
-        const data = await fetchWixProducts();
-        if (data && Array.isArray(data) && data.length > 0) {
-          setWixProducts(data);
+        const [data, brandsPayload] = await Promise.allSettled([
+          fetchCatalogProducts(),
+          icareApi.brands.list({ page: 1, limit: 100, isActive: true }),
+        ]);
+        if (data.status === 'fulfilled') {
+          setCatalogProducts(data.value ?? []);
+        }
+        if (brandsPayload.status === 'fulfilled') {
+          const brands = unwrapListData(brandsPayload.value);
+          setRemoteBrands(Array.isArray(brands) ? brands : []);
         }
       } catch (err) {
-        console.error("Failed to load Wix products", err);
+          console.error("Failed to load iCare products", err);
       } finally {
         setLoading(false);
       }
@@ -92,79 +58,70 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
     loadData();
   }, []);
 
-  const mockProducts = useMemo(() => [
-    // FACE CARE
-    { id: '1', main: 'face care', sub: 'cleansing & toning', type: 'cleansers (gel/cream)', brand: 'CeraVe', name: 'hydrating facial cleanser', price: '$18.00', rawPrice: 18, image: 'https://images.unsplash.com/photo-1714176774596-45946a7325fd?q=80&w=800', description: 'daily hydrating cleanser for normal to dry skin.', rating: '4.8', reviews: '1.2k', date: '2025-08-01' },
-    { id: '4', main: 'face care', sub: 'moisturizers & treatments', type: 'face serums', brand: 'The Ordinary', name: 'niacinamide 10% + zinc 1%', price: '$12.00', rawPrice: 12, image: 'https://images.unsplash.com/photo-1714176774596-45946a7325fd?q=80&w=800', description: 'high-strength vitamin and mineral blemish formula.', rating: '4.7', reviews: '5k', date: '2025-06-20' },
-    { id: '7', main: 'face care', sub: 'masks & exfoliation', type: 'sheet masks', brand: 'Laneige', name: 'water sleeping mask', price: '$32.00', rawPrice: 32, image: 'https://images.unsplash.com/photo-1762827990160-9f2d35fb0fd5?q=80&w=800', description: 'overnight mask for intensive hydration.', rating: '4.8', reviews: '3.1k', date: '2025-05-30' },
-    { id: '9', main: 'face care', sub: 'sun protection', type: 'sunscreen', brand: 'La Roche-Posay', name: 'anthelios melt-in milk', price: '$36.00', rawPrice: 36, image: 'https://images.unsplash.com/photo-1661347243240-5ce7c9992369?q=80&w=800', description: 'broad spectrum spf 60 sunscreen for face and body.', rating: '4.7', reviews: '4.2k', date: '2025-03-25' },
-    { id: '16', main: 'face care', sub: 'moisturizers & treatments', type: 'eye creams', brand: 'Kiehl\'s', name: 'creamy eye treatment with avocado', price: '$54.00', rawPrice: 54, image: 'https://images.unsplash.com/photo-1594813591867-02e797aa4581?q=80&w=800', description: 'nourishing under-eye cream with avocado oil.', rating: '4.6', reviews: '2.8k', date: '2025-10-10' },
-    { id: '17', main: 'face care', sub: 'cleansing & toning', type: 'toners', brand: 'Paula\'s Choice', name: 'skin perfecting 2% bha liquid exfoliant', price: '$34.00', rawPrice: 34, image: 'https://images.unsplash.com/photo-1714176774596-45946a7325fd?q=80&w=800', description: 'cult-favorite liquid exfoliant for radiant skin.', rating: '4.9', reviews: '15k', date: '2025-11-05' },
+  const allProducts = catalogProducts ?? EMPTY_PRODUCTS;
+  const backendCategoryHierarchy = useMemo<CategoryFilterHierarchy>(() => {
+    const hierarchy: CategoryFilterHierarchy = {};
+    const remoteBrandCountryByName = new Map(
+      remoteBrands.map((brand) => [normalizeFilterValue(brand.name), normalizeFilterValue(brand.country) || 'all brands'])
+    );
 
-    // HAIR CARE
-    { id: '6', main: 'hair care', sub: 'hair tools', type: 'hair dryers', brand: 'Dyson', name: 'supersonic hair dryer', price: '$429.00', rawPrice: 429, image: 'https://images.unsplash.com/photo-1681837163667-2af19d19e413?q=80&w=800', description: 'engineered for different hair types.', rating: '4.9', reviews: '1.8k', date: '2025-11-12' },
-    { id: '11', main: 'hair care', sub: 'washing & routine', type: 'shampoo', brand: 'SheaMoisture', name: 'raw shea butter shampoo', price: '$13.00', rawPrice: 13, image: 'https://images.unsplash.com/photo-1766142167641-507c80e35eb9?q=80&w=800', description: 'gentle cleansing for dry, damaged hair.', rating: '4.5', reviews: '2.1k', date: '2025-01-08' },
-    { id: '18', main: 'hair care', sub: 'treatments & growth', type: 'hair oils', brand: 'Gisou', name: 'honey infused hair oil', price: '$46.00', rawPrice: 46, image: 'https://images.unsplash.com/photo-1766101293873-41ef9c5f32b5?q=80&w=800', description: 'enriched with honey from the mirsalehi bee garden.', rating: '4.7', reviews: '3.5k', date: '2025-09-22' },
-    { id: '19', main: 'hair care', sub: 'washing & routine', type: 'curly hair care', brand: 'Olaplex', name: 'no. 3 hair perfector', price: '$30.00', rawPrice: 30, image: 'https://images.unsplash.com/photo-1766142167641-507c80e35eb9?q=80&w=800', description: 'strengthens and repairs damaged hair.', rating: '4.8', reviews: '25k', date: '2025-08-14' },
+    uniqueValues(allProducts.map((product) => normalizeFilterValue(product.category ?? product.main))).forEach((categoryName) => {
+      if (!categoryName) return;
+      const categoryProducts = allProducts.filter((product) => normalizeFilterValue(product.category ?? product.main) === categoryName);
+      const subFilters = uniqueValues(categoryProducts.map((product) => normalizeFilterValue(product.sub ?? product.brand ?? categoryName)));
+      hierarchy[categoryName] = Object.fromEntries(
+        (subFilters.length > 0 ? subFilters : [categoryName]).map((subFilter) => {
+          const typeFilters = uniqueValues(categoryProducts
+            .filter((product) => normalizeFilterValue(product.sub ?? product.brand ?? categoryName) === subFilter)
+            .map((product) => normalizeFilterValue(product.type ?? product.name)));
+          return [subFilter, typeFilters.length > 0 ? typeFilters : [subFilter]];
+        })
+      );
+    });
 
-    // BODY CARE
-    { id: '8', main: 'body care', sub: 'bath & body', type: 'body lotion', brand: 'Sol de Janeiro', name: 'brazilian bum bum cream', price: '$48.00', rawPrice: 48, image: 'https://images.unsplash.com/photo-1714176774596-45946a7325fd?q=80&w=800', description: 'fast-absorbing body cream with caffeine.', rating: '4.9', reviews: '12k', date: '2025-04-18' },
-    { id: '2', main: 'body care', sub: 'fragrance & deo', type: 'perfumes', brand: 'LAVERNE', name: 'musk lavers perfume', price: '$85.00', rawPrice: 85, image: 'https://images.unsplash.com/photo-1737920459846-2d0318700658?q=80&w=800', description: 'luxury signature scent from saudi arabia.', rating: '5.0', reviews: '450', date: '2025-09-01' },
-    { id: '20', main: 'body care', sub: 'bath & body', type: 'body scrubs', brand: 'Tree Hut', name: 'shea sugar scrub vitamin c', price: '$10.50', rawPrice: 10.5, image: 'https://images.unsplash.com/photo-1714176774596-45946a7325fd?q=80&w=800', description: 'exfoliates and brightens skin.', rating: '4.8', reviews: '18k', date: '2025-07-07' },
-    { id: '21', main: 'body care', sub: 'fragrance & deo', type: 'body mist', brand: 'Victoria\'s Secret', name: 'bare vanilla mist', price: '$19.00', rawPrice: 19, image: 'https://images.unsplash.com/photo-1737920459846-2d0318700658?q=80&w=800', description: 'warm and cozy vanilla scent.', rating: '4.7', reviews: '6.2k', date: '2025-06-12' },
+    const productsWithBrands = allProducts.filter((product) => normalizeFilterValue(product.brand));
+    if (productsWithBrands.length > 0) {
+      hierarchy.brands = productsWithBrands.reduce<Record<string, string[]>>((groups, product) => {
+        const brandName = normalizeFilterValue(product.brand);
+        if (!brandName) return groups;
+        const country = remoteBrandCountryByName.get(brandName) ?? 'all brands';
+        groups[country] = uniqueValues([...(groups[country] ?? []), brandName]);
+        return groups;
+      }, {});
+    }
 
-    // MAKEUP
-    { id: '3', main: 'makeup', sub: 'face & cheek', type: 'blush', brand: 'Rare Beauty', name: 'soft pinch liquid blush', price: '$23.00', rawPrice: 23, image: 'https://images.unsplash.com/photo-1764333746618-6285bf70db23?q=80&w=800', description: 'weightless, long-lasting liquid blush.', rating: '4.9', reviews: '2.5k', date: '2025-07-15' },
-    { id: '13', main: 'makeup', sub: 'eyes & lips', type: 'mascara', brand: 'Glossier', name: 'lash slick', price: '$18.00', rawPrice: 18, image: 'https://images.unsplash.com/photo-1764333746618-6285bf70db23?q=80&w=800', description: 'everyday mascara for length and lift.', rating: '4.6', reviews: '4.5k', date: '2024-11-15' },
-    { id: '22', main: 'makeup', sub: 'face & cheek', type: 'foundation', brand: 'Giorgio Armani', name: 'luminous silk foundation', price: '$69.00', rawPrice: 69, image: 'https://images.unsplash.com/photo-1538489281439-336a8b1ccb2c?q=80&w=800', description: 'award-winning oil-free foundation.', rating: '4.9', reviews: '8k', date: '2025-12-05' },
-    { id: '23', main: 'makeup', sub: 'eyes & lips', type: 'lipsticks', brand: 'Dior', name: 'rouge dior lipstick', price: '$45.00', rawPrice: 45, image: 'https://images.unsplash.com/photo-1709095458638-08cef2b85cc0?q=80&w=800', description: 'long-wear couture color lipstick.', rating: '4.8', reviews: '1.5k', date: '2025-10-20' },
-
-    // NAILS
-    { id: '12', main: 'nails', sub: 'polish & care', type: 'nail polish', brand: 'Essie', name: 'ballet slippers pink', price: '$10.00', rawPrice: 10, image: 'https://images.unsplash.com/photo-1698308233758-d55c98fd7444?q=80&w=800', description: 'classic sheer pink nail polish.', rating: '4.7', reviews: '6k', date: '2024-12-20' },
-    { id: '24', main: 'nails', sub: 'polish & care', type: 'nail treatments', brand: 'Mavala', name: 'scientifique k+ nail hardener', price: '$22.00', rawPrice: 22, image: 'https://images.unsplash.com/photo-1616247380767-5ebadc9b869e?q=80&w=800', description: 'pro-keratin hardener for split nails.', rating: '4.8', reviews: '950', date: '2025-05-15' },
-
-    // TRENDS & BRANDS
-    { id: '5', main: 'brands', sub: 'korea (k-beauty)', type: 'COSRX', brand: 'COSRX', name: 'advanced snail 96 mucin', price: '$25.00', rawPrice: 25, image: 'https://images.unsplash.com/photo-1762827990160-9f2d35fb0fd5?q=80&w=800', description: 'hydrating essence with 96% snail secretion filtrate.', rating: '4.9', reviews: '8.2k', date: '2025-10-05' },
-    { id: '10', main: 'brands', sub: 'france', type: 'Bioderma', brand: 'Bioderma', name: 'sensibio h2o micellar water', price: '$17.00', rawPrice: 17, image: 'https://images.unsplash.com/photo-1714176774596-45946a7325fd?q=80&w=800', description: 'original micellar water for sensitive skin.', rating: '4.8', reviews: '9k', date: '2025-02-14' },
-    { id: '14', main: 'brands', sub: 'usa', type: 'Glossier', brand: 'Glossier', name: 'cloud paint blush', price: '$20.00', rawPrice: 20, image: 'https://images.unsplash.com/photo-1764333746618-6285bf70db23?q=80&w=800', description: 'seamless cheek color.', rating: '4.8', reviews: '7.2k', date: '2024-10-30' },
-    { id: '25', main: 'brands', sub: 'saudi arabia', type: 'Areej', brand: 'Areej', name: 'oud wood fragrance', price: '$120.00', rawPrice: 120, image: 'https://images.unsplash.com/photo-1737920459846-2d0318700658?q=80&w=800', description: 'premium saudi oud fragrance.', rating: '5.0', reviews: '120', date: '2025-12-25' },
-    { id: '15', main: 'trends', sub: 'new arrivals', type: 'new in', brand: 'rhode', name: 'peptide lip treatment', price: '$16.00', rawPrice: 16, image: 'https://images.unsplash.com/photo-1714176774596-45946a7325fd?q=80&w=800', description: 'restorative lip treatment for naturally plump lips.', rating: '4.9', reviews: '15k', date: '2025-12-01' },
-    { id: '26', main: 'trends', sub: 'best sellers', type: 'tiktok viral', brand: 'Glow Recipe', name: 'watermelon glow dew drops', price: '$35.00', rawPrice: 35, image: 'https://images.unsplash.com/photo-1714176774596-45946a7325fd?q=80&w=800', description: 'viral niacinamide serum for glowing skin.', rating: '4.8', reviews: '10k', date: '2025-08-10' },
-    { id: '27', main: 'face care', sub: 'moisturizers & treatments', type: 'face moisturizers', brand: 'Clinique', name: 'moisture surge 100h', price: '$46.00', rawPrice: 46, image: 'https://images.unsplash.com/photo-1714176774596-45946a7325fd?q=80&w=800', description: 'auto-replenishing hydrator.', rating: '4.7', reviews: '4k', date: '2025-07-28' },
-    { id: '28', main: 'makeup', sub: 'eyes & lips', type: 'eyeliner', brand: 'Benefit', name: 'roller liner liquid eyeliner', price: '$22.00', rawPrice: 22, image: 'https://images.unsplash.com/photo-1764333746618-6285bf70db23?q=80&w=800', description: 'matte liquid eyeliner with precision felt tip.', rating: '4.6', reviews: '2.1k', date: '2025-09-15' },
-    { id: '29', main: 'brands', sub: 'italy', type: 'Kiko', brand: 'Kiko', name: '3d hydra lip gloss', price: '$12.00', rawPrice: 12, image: 'https://images.unsplash.com/photo-1709095458638-08cef2b85cc0?q=80&w=800', description: 'softening lip gloss for a 3d look.', rating: '4.7', reviews: '5.5k', date: '2025-11-20' },
-    { id: '30', main: 'hair care', sub: 'washing & routine', type: 'conditioner', brand: 'Nivea', name: 'pure color conditioner', price: '$8.00', rawPrice: 8, image: 'https://images.unsplash.com/photo-1766142167641-507c80e35eb9?q=80&w=800', description: 'protects color-treated hair.', rating: '4.4', reviews: '1.2k', date: '2025-03-10' }
-  ], []);
-
-  const allProducts = wixProducts || mockProducts;
+    return hierarchy;
+  }, [allProducts, remoteBrands]);
 
   const filteredProducts = useMemo(() => {
-    let result = [...allProducts];
+    let result: Product[] = [...allProducts];
 
     if (activeMain) {
       if (activeMain === 'brands') {
         if (activeSub) {
-          result = result.filter(p => p.sub?.toLowerCase() === activeSub.toLowerCase());
-          if (activeType) {
-            result = result.filter(p => p.brand?.toLowerCase() === activeType.toLowerCase());
-          }
+          const activeBrandNames = backendCategoryHierarchy.brands?.[activeSub] ?? [];
+            result = result.filter(p => activeBrandNames.includes(normalizeFilterValue(p.brand)));
+            if (activeType) {
+              result = result.filter(p => normalizeFilterValue(p.brand) === normalizeFilterValue(activeType));
+            }
         } else {
-          result = result.filter(p => p.main?.toLowerCase() === 'brands');
+          const backendBrandNames = Object.values(backendCategoryHierarchy.brands ?? {}).flat();
+          result = result.filter(p => backendBrandNames.includes(normalizeFilterValue(p.brand)));
         }
       } else {
-        result = result.filter(p => p.main?.toLowerCase() === activeMain.toLowerCase());
+        result = result.filter(p => normalizeFilterValue(p.main ?? p.category) === normalizeFilterValue(activeMain));
         if (activeSub) {
-          result = result.filter(p => p.sub?.toLowerCase() === activeSub.toLowerCase());
+          result = result.filter(p => normalizeFilterValue(p.sub ?? p.brand) === normalizeFilterValue(activeSub));
         }
         if (activeType) {
-          result = result.filter(p => p.type?.toLowerCase() === activeType.toLowerCase());
+          result = result.filter(p => normalizeFilterValue(p.type) === normalizeFilterValue(activeType));
         }
       }
     }
 
     switch (activeSort) {
       case 'newest':
-        result.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        result.sort((a, b) => new Date(b.date ?? '').getTime() - new Date(a.date ?? '').getTime());
         break;
       case 'price: low to high':
         result.sort((a, b) => (a.rawPrice || 0) - (b.rawPrice || 0));
@@ -178,7 +135,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
     }
 
     return result;
-  }, [allProducts, activeMain, activeSub, activeType, activeSort]);
+  }, [allProducts, backendCategoryHierarchy, activeMain, activeSub, activeType, activeSort]);
 
   const resetFilters = () => {
     setActiveMain(null);
@@ -197,7 +154,31 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
     setVisibleCount(12);
   }, [activeMain, activeSub, activeType, activeSort]);
 
-  if (loading && !wixProducts) {
+  useEffect(() => {
+    if (!activeMain) return;
+
+    const mainFilters = Object.keys(backendCategoryHierarchy);
+    if (!mainFilters.includes(activeMain)) {
+      resetFilters();
+      return;
+    }
+
+    const subFilters = Object.keys(backendCategoryHierarchy[activeMain] ?? {});
+    if (activeSub && !subFilters.includes(activeSub)) {
+      setActiveSub(null);
+      setActiveType(null);
+      return;
+    }
+
+    const typeFilters = activeSub ? backendCategoryHierarchy[activeMain]?.[activeSub] ?? [] : [];
+    if (activeType && !typeFilters.includes(activeType)) {
+      setActiveType(null);
+    }
+  }, [activeMain, activeSub, activeType, backendCategoryHierarchy]);
+
+  const activeHierarchy = activeMain ? backendCategoryHierarchy[activeMain] : undefined;
+
+  if (loading && !catalogProducts) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FFFFFF]">
         <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin" />
@@ -240,7 +221,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
             >
               {lang === 'en' ? 'shop all' : 'تسوق الكل'}
             </button>
-            {Object.keys(categoryHierarchy).map((main) => (
+            {Object.keys(backendCategoryHierarchy).map((main) => (
               <button
                 key={main}
                 onClick={() => { setActiveMain(main); setActiveSub(null); setActiveType(null); }}
@@ -255,7 +236,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
 
         {/* Level 2: Sub / Country */}
         <AnimatePresence mode="wait">
-          {activeMain && (
+          {activeMain && activeHierarchy && (
             <motion.div
               key={activeMain}
               initial={{ opacity: 0, y: -10 }}
@@ -264,8 +245,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
               className="overflow-x-auto no-scrollbar border-b border-black/5 pb-4"
             >
               <div className="flex md:justify-center justify-start gap-3 px-4 min-w-max">
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                {Object.keys((categoryHierarchy as any)[activeMain]).map((sub) => (
+                {Object.keys(activeHierarchy).map((sub) => (
                   <button
                     key={sub}
                     onClick={() => { setActiveSub(sub); setActiveType(null); }}
@@ -282,7 +262,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
 
         {/* Level 3: Types / Brands (Logo Circles) */}
         <AnimatePresence mode="wait">
-          {activeMain && activeSub && (
+          {activeMain && activeSub && activeHierarchy?.[activeSub] && (
             <motion.div
               key={`${activeMain}-${activeSub}`}
               initial={{ opacity: 0, scale: 0.98 }}
@@ -292,8 +272,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
             >
               <div className="overflow-x-auto no-scrollbar">
                 <div className={`flex ${activeMain === 'brands' ? 'gap-8' : 'gap-3 flex-wrap justify-center'} min-w-max`}>
-                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                  {(categoryHierarchy as any)[activeMain][activeSub].map((item: string) => (
+                  {activeHierarchy[activeSub].map((item: string) => (
                     <button
                       key={item}
                       onClick={() => setActiveType(item)}
@@ -409,8 +388,14 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
 
         {filteredProducts.length === 0 && (
           <div className="py-32 text-center">
-            <h3 className="text-[24px] font-brand lowercase italic text-black/40">no products found in this selection.</h3>
-            <button onClick={resetFilters} className="mt-6 text-[12px] font-black uppercase tracking-widest underline underline-offset-8">back to all products</button>
+            <h3 className="text-[24px] font-brand lowercase italic text-black/40">
+              {allProducts.length === 0 && !activeMain && !activeSub && !activeType
+                ? 'No products are available yet.'
+                : 'No products found in this selection.'}
+            </h3>
+            {(activeMain || activeSub || activeType) && (
+              <button onClick={resetFilters} className="mt-6 text-[12px] font-black uppercase tracking-widest underline underline-offset-8">back to all products</button>
+            )}
           </div>
         )}
       </div>

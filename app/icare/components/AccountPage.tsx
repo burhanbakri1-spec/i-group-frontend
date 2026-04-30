@@ -1,15 +1,42 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
+import { useShop } from '../context/ShopContext';
 
 interface AccountPageProps {
   onNavigate?: (page: string) => void;
   lang?: Language;
 }
 
-export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) => {
+export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate }) => {
   const loginImage = "https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=1200&auto=format&fit=crop";
+  const { user, isAuthenticated, login, register, logout, authError } = useShop();
+  const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('');
+  const [formError, setFormError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+    setFormError(null);
+    try {
+      if (mode === 'register') {
+        await register(name, email, password, phone);
+      } else {
+        await login(email, password);
+      }
+      onNavigate?.('shop');
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : 'Authentication failed.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen md:h-screen bg-white p-4 md:p-6 lg:p-12 mb-12 md:mb-0 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 lg:gap-8 overflow-y-auto md:overflow-hidden">
@@ -37,39 +64,88 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
           className="w-full max-w-[400px] flex flex-col items-center"
         >
           <h1 className="text-[36px] md:text-[48px] font-bold text-[#5C5A56] mb-12 lowercase">
-            Login
+            {isAuthenticated ? 'Account' : mode === 'login' ? 'Login' : 'Sign up'}
           </h1>
 
-          <form className="w-full space-y-4 flex flex-col items-center" onSubmit={(e) => e.preventDefault()}>
-            <div className="w-full">
-              <input 
-                type="email" 
-                placeholder="Email"
-                className="w-full bg-white border-none rounded-[12px] px-6 py-4 text-[14px] text-[#5C5A56] placeholder:text-[#9A9A9A] focus:ring-1 focus:ring-black/10 transition-shadow outline-none"
-              />
+          {isAuthenticated ? (
+            <div className="w-full space-y-5 text-center">
+              <div className="bg-white rounded-[16px] p-6 text-[#5C5A56]">
+                <p className="text-[11px] font-black uppercase tracking-[0.2em] opacity-50 mb-2">signed in as</p>
+                <p className="text-[20px] font-bold">{user?.name}</p>
+                <p className="text-[13px] opacity-70">{user?.email}</p>
+              </div>
+              {authError && <p className="text-sm text-red-600">{authError}</p>}
+              <button
+                onClick={() => logout()}
+                className="border border-[#5C5A56] text-[#5C5A56] px-14 py-3 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all duration-300 active:scale-95"
+              >
+                SIGN OUT
+              </button>
             </div>
-            
-            <div className="w-full">
-              <input 
-                type="password" 
-                placeholder="Password"
-                className="w-full bg-white border-none rounded-[12px] px-6 py-4 text-[14px] text-[#5C5A56] placeholder:text-[#9A9A9A] focus:ring-1 focus:ring-black/10 transition-shadow outline-none"
-              />
-            </div>
+          ) : (
+            <form className="w-full space-y-4 flex flex-col items-center" onSubmit={handleSubmit}>
+              {mode === 'register' && (
+                <div className="w-full">
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                    placeholder="Name"
+                    className="w-full bg-white border-none rounded-[12px] px-6 py-4 text-[14px] text-[#5C5A56] placeholder:text-[#9A9A9A] focus:ring-1 focus:ring-black/10 transition-shadow outline-none"
+                  />
+                </div>
+              )}
+              <div className="w-full">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="Email"
+                  className="w-full bg-white border-none rounded-[12px] px-6 py-4 text-[14px] text-[#5C5A56] placeholder:text-[#9A9A9A] focus:ring-1 focus:ring-black/10 transition-shadow outline-none"
+                />
+              </div>
+              
+              <div className="w-full">
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="Password"
+                  className="w-full bg-white border-none rounded-[12px] px-6 py-4 text-[14px] text-[#5C5A56] placeholder:text-[#9A9A9A] focus:ring-1 focus:ring-black/10 transition-shadow outline-none"
+                />
+              </div>
 
-            <button className="mt-8 border border-[#5C5A56] text-[#5C5A56] px-14 py-3 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all duration-300 active:scale-95">
-              SIGN IN
-            </button>
-          </form>
+              {mode === 'register' && (
+                <div className="w-full">
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(event) => setPhone(event.target.value)}
+                    placeholder="Phone (optional)"
+                    className="w-full bg-white border-none rounded-[12px] px-6 py-4 text-[14px] text-[#5C5A56] placeholder:text-[#9A9A9A] focus:ring-1 focus:ring-black/10 transition-shadow outline-none"
+                  />
+                </div>
+              )}
 
-          <div className="mt-8 flex flex-col items-center gap-3">
+              {(formError || authError) && <p className="text-sm text-red-600">{formError ?? authError}</p>}
+
+              <button disabled={isSubmitting} className="mt-8 border border-[#5C5A56] text-[#5C5A56] px-14 py-3 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all duration-300 active:scale-95 disabled:opacity-50">
+                {isSubmitting ? 'PLEASE WAIT' : mode === 'login' ? 'SIGN IN' : 'CREATE ACCOUNT'}
+              </button>
+            </form>
+          )}
+
+          {!isAuthenticated && <div className="mt-8 flex flex-col items-center gap-3">
             <button className="text-[12px] text-[#706E6A] underline underline-offset-4 hover:text-black transition-colors font-medium">
               Forgot your password?
             </button>
             <div className="text-[12px] text-[#706E6A] font-medium">
-              Don&#39;t have an account? <button className="underline underline-offset-4 hover:text-black transition-colors">Sign up!</button>
+              {mode === 'login' ? 'Don\'t have an account?' : 'Already have an account?'}{' '}
+              <button onClick={() => setMode(mode === 'login' ? 'register' : 'login')} className="underline underline-offset-4 hover:text-black transition-colors">
+                {mode === 'login' ? 'Sign up!' : 'Sign in!'}
+              </button>
             </div>
-          </div>
+          </div>}
         </motion.div>
       </div>
     </div>

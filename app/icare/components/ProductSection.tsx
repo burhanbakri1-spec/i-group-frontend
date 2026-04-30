@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ProductCard } from './ProductCard';
 import { Language } from '../translations';
-import { fetchWixProducts } from '../lib/wix-client';
+import { fetchCatalogProducts } from '../lib/catalog-client';
 import { Product } from '../types';
 
 interface ProductGridProps {
@@ -11,63 +11,35 @@ interface ProductGridProps {
 }
 
 export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect }) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [products, setProducts] = useState<any[] | null>(null);
+  const [products, setProducts] = useState<Product[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      const data = await fetchWixProducts();
-      if (data) {
-        setProducts(data);
-      }
+      const data = await fetchCatalogProducts();
+      setProducts(data ?? []);
       setLoading(false);
     };
     loadData();
   }, []);
 
-  const mockProducts = [
-    {
-      id: '1',
-      title: lang === 'en' ? 'skin sets' : 'مجموعات البشرة',
-      name: lang === 'en' ? 'THE SCENTED PEPTIDE LIP TINT SET' : 'مجموعة مرطب الشفاه المعطر بالببتيد',
-      price: '$72.00',
-      description: lang === 'en' ? 'Limited edition boxed set' : 'إصدار محدود في صندوق هدايا',
-      image: 'https://images.unsplash.com/photo-1549127024-18ee7271c819?q=80&w=800',
-      rating: '5',
-      reviews: '15,787',
-      badge: lang === 'en' ? 'limited edition' : 'إصدار محدود'
-    },
-    {
-      id: '2',
-      title: lang === 'en' ? 'eye preps' : 'تجهيز العين',
-      name: lang === 'en' ? 'THE PEPTIDE EYE PREP SET' : 'مجموعة تحضير العين بالببتيد',
-      price: '$47.00',
-      description: lang === 'en' ? 'Depuffing eye patches' : 'لصقات العين لتقليل الانتفاخ',
-      image: 'https://images.unsplash.com/photo-1738684033377-eb02299c1d6c?q=80&w=800',
-      rating: '5',
-      reviews: '241',
-      badge: lang === 'en' ? 'only at icare' : 'حصرياً في آي كير'
-    },
-    {
-      id: '3',
-      title: lang === 'en' ? 'tint' : 'تلوين',
-      name: lang === 'en' ? 'PEPTIDE LIP TINT' : 'مرطب الشفاه الملون بالببتيد',
-      price: '$20.00',
-      description: lang === 'en' ? 'The tinted lip layer' : 'طبقة ملونة للشفاه',
-      image: 'https://images.unsplash.com/photo-1600664534138-f8910b0adc63?q=80&w=800',
-      rating: '5',
-      reviews: '15,787'
-    }
-  ];
-
-  const displayProducts = products || mockProducts;
+  const displayProducts = products ?? [];
 
   if (loading && !products) {
     return (
       <div className="w-full flex justify-center py-20">
         <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (displayProducts.length === 0) {
+    return (
+      <div className="bg-[#FFFFFF] py-16 text-center">
+        <p className="text-[14px] font-bold uppercase tracking-[0.2em] text-black/40">
+          {lang === 'en' ? 'No products available' : 'لا توجد منتجات متاحة'}
+        </p>
       </div>
     );
   }

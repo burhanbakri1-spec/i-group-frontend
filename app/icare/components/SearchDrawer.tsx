@@ -1,9 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
 import { Product } from '../types';
+import { icareApi } from '../lib/api-client';
+import { mapBackendProductToProduct, mapBrandNames, mapCategoryNames, unwrapListData } from '../lib/mappers';
 
 interface SearchDrawerProps {
   isOpen: boolean;
@@ -12,28 +14,60 @@ interface SearchDrawerProps {
   onProductSelect?: (product: Product) => void;
 }
 
-export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose }) => {
+export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onProductSelect }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [remoteCollections, setRemoteCollections] = useState<string[]>([]);
+  const [remoteProducts, setRemoteProducts] = useState<Product[]>([]);
+  const [remoteBrands, setRemoteBrands] = useState<string[]>([]);
 
-  // Define our dataset based on the site's groups and products
-  const collections = useMemo(() => [
-    'shop all',
-    'face care',
-    'hair care',
-    'body care',
-    'makeup',
-    'nails'
-  ], []);
+  useEffect(() => {
+    if (!isOpen) return;
+    if (!icareApi.isConfigured()) {
+      const clearTimer = window.setTimeout(() => {
+        setRemoteProducts([]);
+        setRemoteCollections([]);
+        setRemoteBrands([]);
+      }, 0);
+      return () => window.clearTimeout(clearTimer);
+    }
 
-  const products = useMemo(() => [
-    { id: '1', name: 'BARRIER BUTTER', category: 'face care', image: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?q=80&w=200' },
-    { id: '2', name: 'THE WINTER KIT', category: 'shop all', image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=200' },
-    { id: '3', name: 'PEPTIDE LIP TINT', category: 'makeup', image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=200' },
-    { id: '4', name: 'POCKET CLEANSER', category: 'face care', image: 'https://images.unsplash.com/photo-1594125355977-903e303f4435?q=80&w=200' },
-    { id: '5', name: 'PEPTIDE GLAZE', category: 'face care', image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=200' }
-  ], []);
+    const loadSearchData = async () => {
+      try {
+        const [productPayload, categoriesPayload, brandPayload] = await Promise.allSettled([
+          icareApi.products.list({ search: searchQuery || undefined, page: 1, limit: 8, active: true }),
+          searchQuery ? icareApi.categories.search(searchQuery) : icareApi.categories.roots(),
+          icareApi.brands.list({ search: searchQuery || undefined, page: 1, limit: 12, isActive: true }),
+        ]);
+        if (productPayload.status === 'fulfilled') {
+          setRemoteProducts(unwrapListData(productPayload.value).map((product) => mapBackendProductToProduct(product)));
+        } else {
+          setRemoteProducts([]);
+        }
+        if (categoriesPayload.status === 'fulfilled') {
+          setRemoteCollections(mapCategoryNames(unwrapListData(categoriesPayload.value)));
+        } else {
+          setRemoteCollections([]);
+        }
+        if (brandPayload.status === 'fulfilled') {
+          setRemoteBrands(mapBrandNames(unwrapListData(brandPayload.value)));
+        } else {
+          setRemoteBrands([]);
+        }
+      } catch (error) {
+        console.error('Failed to load search data', error);
+        setRemoteProducts([]);
+        setRemoteCollections([]);
+        setRemoteBrands([]);
+      }
+    };
 
-  const brands = useMemo(() => ['icare', 'rhode aesthetics', 'minimal beauty'], []);
+    const searchTimer = window.setTimeout(loadSearchData, 250);
+    return () => window.clearTimeout(searchTimer);
+  }, [isOpen, searchQuery]);
+
+  const searchableCollections = remoteCollections;
+  const searchableProducts = remoteProducts;
+  const searchableBrands = remoteBrands;
 
   // Filtering Logic
   const filteredResults = useMemo(() => {
@@ -42,17 +76,22 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose }) =
     const query = searchQuery.toLowerCase();
 
     return {
-      collections: collections.filter(c => c.toLowerCase().includes(query)),
-      products: products.filter(p => p.name.toLowerCase().includes(query) || p.category.toLowerCase().includes(query)),
-      brands: brands.filter(b => b.toLowerCase().includes(query))
+      collections: searchableCollections.filter(c => c.toLowerCase().includes(query)),
+      products: searchableProducts.filter(p => p.name.toLowerCase().includes(query) || (p.category ?? '').toLowerCase().includes(query)),
+      brands: searchableBrands.filter(b => b.toLowerCase().includes(query))
     };
-  }, [searchQuery, collections, products, brands]);
+  }, [searchQuery, searchableCollections, searchableProducts, searchableBrands]);
 
   const hasResults = filteredResults && (
     filteredResults.collections.length > 0 || 
     filteredResults.products.length > 0 || 
     filteredResults.brands.length > 0
   );
+
+  const handleProductSelect = (product: Product) => {
+    onProductSelect?.(product);
+    onClose();
+  };
 
   return (
     <AnimatePresence>
@@ -136,7 +175,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose }) =
                           <h3 className="text-[12px] font-black text-[#9A9A9A] mb-6 uppercase tracking-[0.1em]">Products</h3>
                           <div className="space-y-6">
                             {filteredResults.products.map((product) => (
-                              <div key={product.id} className="flex items-center gap-5 group cursor-pointer">
+                              <button key={product.id} onClick={() => handleProductSelect(product)} className="flex items-center gap-5 group cursor-pointer text-left w-full">
                                 <div className="w-14 h-16 bg-white/40 rounded-[8px] overflow-hidden flex-shrink-0 flex items-center justify-center">
                                   <ImageWithFallback 
                                     src={product.image} 
@@ -146,9 +185,9 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose }) =
                                 </div>
                                 <div className="flex flex-col">
                                   <span className="text-[14px] font-black text-[#333] tracking-widest uppercase">{product.name}</span>
-                                  <span className="text-[12px] text-[#706E6A] lowercase">{product.category}</span>
+                                  <span className="text-[12px] text-[#706E6A] lowercase">{product.category ?? product.price}</span>
                                 </div>
-                              </div>
+                              </button>
                             ))}
                           </div>
                         </div>
@@ -175,29 +214,36 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose }) =
                   )}
                 </div>
               ) : (
-                /* Static Default Content (Old View) */
                 <div className="space-y-12">
                   <div>
                     <h3 className="text-[14px] font-black text-[#333] mb-5 lowercase">collections:</h3>
-                    <div className="flex flex-col gap-3">
-                      {collections.map((item) => (
-                        <button key={`default-collection-${item}`} className="text-left text-[15px] text-[#706E6A] font-medium hover:text-black transition-colors lowercase">{item}</button>
-                      ))}
-                    </div>
+                    {searchableCollections.length > 0 ? (
+                      <div className="flex flex-col gap-3">
+                        {searchableCollections.map((item) => (
+                          <button key={`default-collection-${item}`} className="text-left text-[15px] text-[#706E6A] font-medium hover:text-black transition-colors lowercase">{item}</button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-[13px] text-[#706E6A] font-medium italic">collections unavailable</p>
+                    )}
                   </div>
 
                   <div className="border-t border-black/10 pt-8">
                     <h3 className="text-[14px] font-black text-[#333] mb-6 lowercase">recommended:</h3>
-                    <div className="space-y-8">
-                      {products.slice(0, 2).map((product) => (
-                        <div key={product.id} className="flex items-center gap-6 group cursor-pointer">
-                          <div className="w-16 h-20 bg-white/40 rounded-[8px] overflow-hidden flex items-center justify-center">
-                            <ImageWithFallback src={product.image} alt={product.name} className="w-full h-full object-contain mix-blend-multiply p-2 group-hover:scale-105 transition-transform" />
-                          </div>
-                          <span className="text-[14px] font-black text-[#333] tracking-widest uppercase">{product.name}</span>
-                        </div>
-                      ))}
-                    </div>
+                    {searchableProducts.length > 0 ? (
+                      <div className="space-y-8">
+                        {searchableProducts.slice(0, 2).map((product) => (
+                          <button key={product.id} onClick={() => handleProductSelect(product)} className="flex items-center gap-6 group cursor-pointer text-left w-full">
+                            <div className="w-16 h-20 bg-white/40 rounded-[8px] overflow-hidden flex items-center justify-center">
+                              <ImageWithFallback src={product.image} alt={product.name} className="w-full h-full object-contain mix-blend-multiply p-2 group-hover:scale-105 transition-transform" />
+                            </div>
+                            <span className="text-[14px] font-black text-[#333] tracking-widest uppercase">{product.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-[13px] text-[#706E6A] font-medium italic">recommendations unavailable</p>
+                    )}
                   </div>
                 </div>
               )}

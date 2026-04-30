@@ -1,17 +1,22 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Heart, ShoppingBag, X, Share2 } from 'lucide-react';
 import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';
 import { Product } from '../types';
+import { fetchProductShortcut } from '../lib/catalog-client';
+import { ProductCard } from './ProductCard';
+import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface WishlistPageProps {
   lang: Language;
   onProductSelect: (product: Product) => void;
+  onNavigate?: (page: string) => void;
 }
 
-export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelect }) => {
+export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelect, onNavigate }) => {
   const { wishlistItems, removeFromWishlist, addToCart } = useShop();
+  const [recommendations, setRecommendations] = useState<Product[]>([]);
 
   const t = {
     en: {
@@ -39,6 +44,13 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
   };
 
   const text = t[lang];
+  useEffect(() => {
+    const loadRecommendations = async () => {
+      const bestsellers = await fetchProductShortcut('bestsellers', 4);
+      if (bestsellers && bestsellers.length > 0) setRecommendations(bestsellers);
+    };
+    loadRecommendations();
+  }, []);
 
   const handleAddToBag = (product: Product, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -78,7 +90,7 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
             </div>
             <h2 className="text-xl md:text-2xl font-light mb-2">{text.empty}</h2>
             <p className="text-sm md:text-base text-[#888] mb-8">{text.emptyDesc}</p>
-            <button className="px-6 md:px-8 py-3 bg-black text-white text-sm md:text-base rounded-full hover:bg-[#333] transition-colors">
+            <button onClick={() => onNavigate?.('shop')} className="px-6 md:px-8 py-3 bg-black text-white text-sm md:text-base rounded-full hover:bg-[#333] transition-colors">
               {text.shopNow}
             </button>
           </motion.div>
@@ -106,7 +118,7 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
                   className="aspect-square bg-[#F5F5F5] cursor-pointer relative overflow-hidden"
                   onClick={() => onProductSelect(product)}
                 >
-                  <img
+                  <ImageWithFallback
                     src={product.image}
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -146,18 +158,12 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
         )}
 
         {/* Recommendations */}
-        {wishlistItems.length > 0 && (
+        {wishlistItems.length > 0 && recommendations.length > 0 && (
           <div className="mt-20">
             <h2 className="text-3xl font-light text-center mb-12">You Might Also Like</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="bg-white rounded-lg overflow-hidden shadow-sm">
-                  <div className="aspect-square bg-[#F5F5F5]"></div>
-                  <div className="p-4">
-                    <p className="text-xs text-[#888] uppercase">Product {i}</p>
-                    <p className="font-medium">$30.00</p>
-                  </div>
-                </div>
+              {recommendations.map((product) => (
+                <ProductCard key={product.id} product={product} lang={lang} onSelect={() => onProductSelect(product)} />
               ))}
             </div>
           </div>

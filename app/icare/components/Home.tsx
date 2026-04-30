@@ -7,12 +7,12 @@ import { CommitmentSection } from './CommitmentSection';
 import { SocialGrid } from './SocialGrid';
 import { Language, translations } from '../translations';
 import { Hero } from './Hero';
+import { Product } from '../types';
 
 interface HomeProps {
   onNavigate: (page: string) => void;
   lang: Language;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onProductSelect: (product: any) => void;
+  onProductSelect: (product: Product) => void;
 }
 
 export const Home: React.FC<HomeProps> = ({ onNavigate, lang, onProductSelect }) => {

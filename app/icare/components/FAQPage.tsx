@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Language } from '../translations';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Plus, Minus } from 'lucide-react';
+import { fetchFaqGroups } from '../lib/catalog-client';
+import { FAQCategoryGroup } from '../types';
 
 interface FAQPageProps {
   lang: Language;
@@ -45,36 +47,20 @@ const FAQAccordion = ({ question, answer, isOpen, onClick }: { question: string,
 
 export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
   const [openId, setOpenId] = useState<string | null>(null);
+  const [remoteGroups, setRemoteGroups] = useState<FAQCategoryGroup[] | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const categories = [
-    { id: 'products', name: lang === 'en' ? 'PRODUCTS' : 'المنتجات' },
-    { id: 'shipping', name: lang === 'en' ? 'SHIPPING' : 'الشحن' },
-    { id: 'orders', name: lang === 'en' ? 'ORDERS AND PAYMENT' : 'الطلبات والدفع' },
-    { id: 'returns', name: lang === 'en' ? 'RETURNS AND REFUNDS' : 'الإرجاع والاسترداد' },
-    { id: 'contact', name: lang === 'en' ? 'CONTACT US' : 'اتصلي بنا' },
-  ];
+  useEffect(() => {
+    const loadFaqs = async () => {
+      setLoading(true);
+      const groups = await fetchFaqGroups();
+      setRemoteGroups(groups ?? []);
+      setLoading(false);
+    };
+    loadFaqs();
+  }, []);
 
-  const faqData = {
-    products: [
-      { q: lang === 'en' ? 'WHICH SKIN TYPES ARE ICARE PRODUCTS SUITABLE FOR?' : 'لأي أنواع البشرة تناسب منتجات آيكير؟', a: lang === 'en' ? 'Our products are formulated to be gentle yet effective for all skin types, including sensitive skin.' : 'تم تصميم منتجاتنا لتكون لطيفة وفعالة لجميع أنواع البشرة، ��ما في ذلك البشرة الحساسة.' },
-      { q: lang === 'en' ? 'ARE ICARE SKINCARE PRODUCTS VEGAN OR CRUELTY-FREE?' : 'هل منتجات آيكير نباتية ولم يتم اختبارها على الحيوانات؟', a: lang === 'en' ? 'Yes, we are 100% vegan and cruelty-free. We do not test on animals at any stage.' : 'نعم، منتجاتنا نباتية 100% ولم يتم اختبارها على الحيوانات في أي مرحلة.' },
-      { q: lang === 'en' ? 'ARE ICARE SKINCARE PRODUCTS NUT-FREE?' : 'هل منتجات آيكير خالية من المكسرات؟', a: lang === 'en' ? 'Most of our products are nut-free, however we recommend checking individual ingredient lists.' : 'معظم منتجاتنا خالية من المكسرات، ومع ذلك نوصي بالتحقق من قائمة المكونات لكل منتج.' },
-      { q: lang === 'en' ? 'ARE ALL ICARE SKINCARE PRODUCTS FRAGRANCE-FREE?' : 'هل جميع منتجات آيكير خالية من العطور؟', a: lang === 'en' ? 'Yes, we prioritize fragrance-free formulas to minimize potential irritation.' : 'نعم، نحن نعطي الأولوية للتركيبات الخالية من العطور لتقليل التهيج المحتمل.' },
-      { q: lang === 'en' ? 'ARE ICARE SKINCARE PRODUCTS PREGNANCY SAFE?' : 'هل منتجات آيكير آمنة أثناء الحمل؟', a: lang === 'en' ? 'Yes, our core line is designed to be pregnancy safe, but always consult with your doctor.' : 'نعم، مجموعتنا الأساسية مصممة لتكون آمنة أثناء الحمل، ولكن استشيري طبيبك دائماً.' },
-    ],
-    shipping: [
-      { q: lang === 'en' ? 'HOW LONG WILL MY ORDER TAKE TO ARRIVE?' : 'كم من الوقت سيستغرق وصول طلبي؟', a: lang === 'en' ? 'Orders typically ship within 1-2 business days.' : 'يتم شحن الطلبات عادةً خلال 1-2 أيام عمل.' },
-    ],
-    orders: [
-      { q: lang === 'en' ? 'WHICH PAYMENT METHODS DO YOU ACCEPT?' : 'ما هي طرق الدفع التي تقبلونها؟', a: lang === 'en' ? 'We accept credit cards, Apple Pay, and Mada.' : 'نقبل البطاقات الائتمانية، Apple Pay، ومدى.' },
-    ],
-    returns: [
-      { q: lang === 'en' ? 'WHAT IS YOUR RETURN POLICY?' : 'ما هي سياسة الإرجاع الخاصة بكم؟', a: lang === 'en' ? 'We accept returns on unused products within 14 days.' : 'نقبل إرجاع المنتجات غير المستخدمة خلال 14 يوماً.' },
-    ],
-    contact: [
-      { q: lang === 'en' ? 'HOW CAN I CONTACT THE ICARE TEAM?' : 'كيف يمكنني التواصل مع فريق آيكير؟', a: lang === 'en' ? 'Email us at hello@icare.com.' : 'راسلينا على hello@icare.com.' },
-    ]
-  };
+  const faqGroups = remoteGroups ?? [];
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -114,30 +100,39 @@ export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
         <aside className="col-span-4 md:col-span-3">
           <div className="bg-[#F2F1ED] p-4 md:p-10 rounded-[20px] sticky top-32">
             <h1 className="text-[14px] md:text-[20px] font-[900] text-[#5C5A56] mb-4 md:mb-8 tracking-tight">FAQ</h1>
-            <nav className="flex flex-col space-y-3 md:space-y-4">
-              {categories.map((cat) => (
+            {faqGroups.length > 0 ? (
+              <nav className="flex flex-col space-y-3 md:space-y-4">
+                {faqGroups.map((cat) => (
                 <button
                   key={cat.id}
                   onClick={() => scrollToSection(cat.id)}
                   className="text-[9px] md:text-[11px] font-[800] text-[#5C5A56]/60 hover:text-black transition-colors text-left uppercase tracking-widest leading-tight"
                 >
                   {cat.name}
-                </button>
-              ))}
-            </nav>
+                  </button>
+                ))}
+              </nav>
+            ) : (
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#5C5A56]/50">
+                {loading ? 'Loading FAQ...' : 'FAQ unavailable'}
+              </p>
+            )}
           </div>
         </aside>
 
         {/* Content Area */}
         <main className="col-span-8 md:col-span-9 bg-[#F2F1ED] p-5 md:p-12 rounded-[20px]">
-          <div className="space-y-16">
-            {categories.map((cat) => (
+          {loading ? (
+            <div className="py-20 text-center text-[12px] font-black uppercase tracking-[0.2em] text-[#5C5A56]/50">Loading FAQ...</div>
+          ) : faqGroups.length > 0 ? (
+            <div className="space-y-16">
+              {faqGroups.map((cat) => (
               <section key={cat.id} id={cat.id} className="space-y-6">
                 <h2 className="text-[18px] md:text-[20px] font-[900] uppercase tracking-tight text-[#5C5A56]">
                   {cat.name}
                 </h2>
                 <div className="border-t border-black/10">
-                  {faqData[cat.id as keyof typeof faqData]?.map((item, idx) => (
+                  {cat.items.map((item, idx) => (
                     <FAQAccordion 
                       key={`${cat.id}-${idx}`}
                       question={item.q}
@@ -147,9 +142,19 @@ export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
                     />
                   ))}
                 </div>
-              </section>
-            ))}
-          </div>
+                </section>
+              ))}
+            </div>
+          ) : (
+            <div className="py-20 text-center space-y-3">
+              <h2 className="text-[18px] md:text-[20px] font-[900] uppercase tracking-tight text-[#5C5A56]">
+                {lang === 'en' ? 'FAQ unavailable' : 'الأسئلة الشائعة غير متاحة'}
+              </h2>
+              <p className="text-[13px] text-[#5C5B57] font-medium">
+                {lang === 'en' ? 'Questions will appear here when the backend provides them.' : 'ستظهر الأسئلة هنا عند توفرها من الخادم.'}
+              </p>
+            </div>
+          )}
         </main>
 
       </div>
