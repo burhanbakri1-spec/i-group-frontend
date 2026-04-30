@@ -20,7 +20,7 @@ import {
 const companies = [
   {
     id: 1,
-    name: 'iCare Beauty',
+    name: 'i care beauty',
     subtitle: 'PREMIUM SKINCARE',
     description: 'Elevate your skincare routine with our luxurious, science-backed products.',
     icon: Sparkles,
@@ -30,7 +30,7 @@ const companies = [
   },
   {
     id: 2,
-    name: 'Healthy Food Co',
+    name: 'y',
     subtitle: 'NUTRITION & WELLNESS',
     description: 'Fuel your performance with nutritious meal plans designed for athletes.',
     icon: Utensils,
@@ -39,7 +39,7 @@ const companies = [
   },
   {
     id: 3,
-    name: 'Luxury Perfumes',
+    name: 'i perfumes',
     subtitle: 'FRAGRANCES & WATCHES',
     description: 'Define your essence with exquisite fragrances and premium timepieces.',
     icon: Watch,
@@ -48,25 +48,27 @@ const companies = [
   },
   {
     id: 4,
-    name: 'Imkan Palestine',
+    name: 'i design',
     subtitle: 'DESIGN & CONSTRUCTION',
     description: 'Transform spaces with world-class interior design and construction.',
     icon: HomeIcon,
     color: '#3B82F6',
+    link: '/idesign',
     image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=1200'
   },
   {
     id: 5,
-    name: 'Bio-Tech',
+    name: 'i bio',
     subtitle: 'BIOMETRIC TRACKING',
     description: 'Optimize your health with advanced biometric monitoring technology.',
     icon: Activity,
-    color: '#EF4444',
+    color: '#22D3EE',
+    link: '/ibio',
     image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1200'
   },
   {
     id: 6,
-    name: 'Marketing Agency',
+    name: 'i marketing',
     subtitle: 'BRAND AMPLIFICATION',
     description: 'Strategic marketing solutions for beauty and wellness brands.',
     icon: TrendingUp,
@@ -75,16 +77,17 @@ const companies = [
   },
   {
     id: 7,
-    name: 'Training & Nutrition',
+    name: 'i fit',
     subtitle: 'FITNESS COACHING',
     description: 'Transform your body with personalized remote training programs.',
     icon: Dumbbell,
     color: '#F97316',
+    link: '/ifit',
     image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1200'
   },
   {
     id: 8,
-    name: 'Software House',
+    name: 'i software',
     subtitle: 'DIGITAL INNOVATION',
     description: 'Engineer tomorrow with cutting-edge software solutions.',
     icon: Code2,
@@ -93,7 +96,7 @@ const companies = [
   },
   {
     id: 9,
-    name: 'BA Supplements',
+    name: 'i supplements',
     subtitle: 'SUPPLEMENTS & PERFORMANCE',
     description: 'Premium nutritional supplements designed for strength, recovery, and long-term wellness.',
     icon: Heart,
@@ -217,7 +220,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.2 }}
             >
               <div className="text-3xl font-black tracking-tighter bg-linear-to-r from-white via-gray-200 to-white bg-clip-text text-transparent">
-                BA GROUP
+                IGROUP
               </div>
               <motion.div 
                 className="h-0.5 bg-linear-to-r from-[#D4AF37] to-transparent"
@@ -876,7 +879,7 @@ export default function Home() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.8, delay: 0.1, ease: [0.33, 1, 0.68, 1] }}
                 >
-                  BA GROUP
+                  IGROUP
                 </motion.span>
               </span>
             </motion.h2>
@@ -1466,7 +1469,7 @@ export default function Home() {
               className="text-2xl font-black tracking-tighter bg-linear-to-r from-[#D4AF37] to-[#FFD700] bg-clip-text text-transparent"
               whileHover={{ scale: 1.05 }}
             >
-              BA GROUP
+              IGROUP
             </motion.div>
             <div className="flex gap-8">
               {['HOME', 'COMPANIES', 'ABOUT', 'PARTNERS', 'CONTACT'].map((item) => (
@@ -1482,7 +1485,7 @@ export default function Home() {
             </div>
           </div>
           <div className="text-center text-sm text-gray-500 border-t border-white/5 pt-8">
-            © 2026 BA Group. Building the future, one company at a time.
+            © 2026 IGroup. Building the future, one company at a time.
           </div>
         </div>
       </footer>

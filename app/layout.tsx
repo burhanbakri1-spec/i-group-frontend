@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BA Group - Building The Digital Future",
+  title: "IGroup - Building The Digital Future",
   description: "An integrated ecosystem of 8 innovative companies shaping the future of beauty, health, luxury, technology, and wellness.",
 };
 
