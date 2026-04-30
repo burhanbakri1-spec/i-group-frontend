@@ -1,0 +1,152 @@
+{
+  "baseUrl": "https://backend.igroup.website",
+  "generatedAt": "2026-04-30T02:22:58.563Z",
+  "requests": [
+    {
+      "method": "GET",
+      "route": "/admin/api/faq-categories",
+      "url": "https://backend.igroup.website/admin/api/faq-categories?page=1&limit=10&isActive=true",
+      "status": 401,
+      "ok": false,
+      "durationMs": 76,
+      "payload": {
+        "success": false,
+        "error": {
+          "code": "UNAUTHORIZED",
+          "message": "Authentication required",
+          "status": 401
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "route": "/admin/api/faqs",
+      "url": "https://backend.igroup.website/admin/api/faqs?page=1&limit=10&isActive=true",
+      "status": 401,
+      "ok": false,
+      "durationMs": 77,
+      "payload": {
+        "success": false,
+        "error": {
+          "code": "UNAUTHORIZED",
+          "message": "Authentication required",
+          "status": 401
+        }
+      }
+    },
+    {
+      "method": "GET",
+      "route": "/api/v1/products/featured",
+      "url": "https://backend.igroup.website/api/v1/products/featured?limit=6",
+      "status": 200,
+      "ok": true,
+      "durationMs": 77,
+      "payload": {
+        "success": true,
+        "message": "Success",
+        "data": [
+          {
+            "id": 1,
+            "name": "test product",
+            "slug": "test-product",
+            "sku": "PRD-1777304538058",
+            "categoryId": 2,
+            "brandId": 2,
+            "shortDescription": null,
+            "description": null,
+            "howToUse": null,
+            "ingredients": null,
+            "price": "12",
+            "priceCurrency": "USD",
+            "salePrice": "10",
+            "salePriceCurrency": "USD",
+            "costPrice": null,
+            "costPriceCurrency": "USD",
+            "stockQuantity": 12,
+            "trackInventory": true,
+            "stockStatus": "in_stock",
+            "lowStockThreshold": 10,
+            "size": "12",
+            "benefits": null,
+            "skinTypes": null,
+            "concerns": null,
+            "featuredImage": null,
+            "videoUrl": null,
+            "isActive": true,
+            "isFeatured": true,
+            "isNew": false,
+            "isBestseller": false,
+            "ratingAverage": "0",
+            "ratingCount": 0,
+            "viewsCount": 130,
+            "salesCount": 0,
+            "metaTitle": null,
+            "metaDescription": null,
+            "metaKeywords": null,
+            "sortOrder": 0,
+            "version": 4,
+            "createdAt": "2026-04-27T15:42:18.080Z",
+            "updatedAt": "2026-04-30T02:16:45.698Z",
+            "deletedAt": null,
+            "category": {
+              "id": 2,
+              "name": "test category ",
+              "slug": "test-category"
+            },
+            "brand": {
+              "id": 2,
+              "name": "test brand",
+              "slug": "test-brand"
+            },
+            "variants": [
+              {
+                "id": 7,
+                "productId": 1,
+                "name": "v1",
+                "sku": "PRD-1777304538058-V12",
+                "colorCode": null,
+                "image": null,
+                "price": "12",
+                "salePrice": null,
+                "stockQuantity": 12,
+                "stockStatus": "in_stock",
+                "isActive": true,
+                "isDefault": false,
+                "sortOrder": 12,
+                "version": 0,
+                "createdAt": "2026-04-27T17:11:40.375Z",
+                "updatedAt": "2026-04-27T19:14:03.376Z"
+              }
+            ]
+          }
+        ],
+        "timestamp": "2026-04-30T02:22:58.747Z"
+      }
+    }
+  ],
+  "results": [
+    {
+      "name": "FAQ categories admin read",
+      "status": "EXPECTED_FAILURE",
+      "route": "/admin/api/faq-categories",
+      "message": "Protected content endpoint returned HTTP 401; storefront fallback is expected."
+    },
+    {
+      "name": "FAQ admin read",
+      "status": "EXPECTED_FAILURE",
+      "route": "/admin/api/faqs",
+      "message": "Protected content endpoint returned HTTP 401; storefront fallback is expected."
+    },
+    {
+      "name": "Product media source",
+      "status": "PASS",
+      "route": "/api/v1/products/featured",
+      "message": "Endpoint readable."
+    },
+    {
+      "name": "Dedicated public vlog endpoint",
+      "status": "SKIP",
+      "message": "No dedicated public vlog/video/content endpoint is documented; product media fields are used where available."
+    }
+  ]
+}

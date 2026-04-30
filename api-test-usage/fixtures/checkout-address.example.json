@@ -1,0 +1,13 @@
+{
+  "paymentMethod": "cash_on_delivery",
+  "shippingName": "iCare Test User",
+  "shippingEmail": "icare.test.user@example.com",
+  "shippingPhone": "+201000000001",
+  "shippingAddress": "123 Safe Verification Street",
+  "shippingCity": "Cairo",
+  "shippingState": "Cairo Governorate",
+  "shippingPostalCode": "11511",
+  "shippingCountry": "Egypt",
+  "billingSameAsShipping": true,
+  "notes": "Safe API verification order. Create only when API_TEST_ALLOW_ORDER_CREATE=true."
+}

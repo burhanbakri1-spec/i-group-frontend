@@ -1,0 +1,205 @@
+{
+  "baseUrl": "https://backend.igroup.website",
+  "generatedAt": "2026-04-30T02:22:56.829Z",
+  "productSlug": null,
+  "categorySlug": "test",
+  "brandSlug": null,
+  "cartCandidate": null,
+  "counts": {
+    "products": 0,
+    "categories": 0,
+    "roots": 3,
+    "brands": 0
+  },
+  "requests": [
+    {
+      "method": "GET",
+      "route": "/api/v1/products",
+      "url": "https://backend.igroup.website/api/v1/products?page=1&limit=10&active=true",
+      "status": 200,
+      "ok": true,
+      "durationMs": 298,
+      "payload": {
+        "success": true,
+        "message": "Success",
+        "data": {
+          "data": [],
+          "total": 0,
+          "page": 1,
+          "limit": 10,
+          "totalPages": 0
+        },
+        "timestamp": "2026-04-30T02:22:56.613Z"
+      }
+    },
+    {
+      "method": "GET",
+      "route": "/api/v1/categories",
+      "url": "https://backend.igroup.website/api/v1/categories?page=1&limit=10&isActive=true",
+      "status": 200,
+      "ok": true,
+      "durationMs": 237,
+      "payload": {
+        "success": true,
+        "message": "Success",
+        "data": {
+          "data": [],
+          "total": 0,
+          "page": 1,
+          "limit": 10,
+          "totalPages": 0
+        },
+        "timestamp": "2026-04-30T02:22:56.856Z"
+      }
+    },
+    {
+      "method": "GET",
+      "route": "/api/v1/categories/roots",
+      "url": "https://backend.igroup.website/api/v1/categories/roots",
+      "status": 200,
+      "ok": true,
+      "durationMs": 80,
+      "payload": {
+        "success": true,
+        "message": "Success",
+        "data": {
+          "data": [
+            {
+              "id": 1,
+              "name": "test",
+              "slug": "test",
+              "description": null,
+              "image": null,
+              "isActive": true,
+              "sortOrder": 0,
+              "parentId": null,
+              "path": "/1",
+              "parentCategory": null,
+              "subCategory": null,
+              "productType": null,
+              "metaTitle": null,
+              "metaDescription": null,
+              "metaKeywords": null,
+              "createdAt": "2026-04-27T15:41:51.634Z",
+              "updatedAt": "2026-04-27T15:41:51.651Z",
+              "deletedAt": null,
+              "parent": null,
+              "children": [],
+              "_count": {
+                "products": 0,
+                "children": 0
+              }
+            },
+            {
+              "id": 2,
+              "name": "test category ",
+              "slug": "test-category",
+              "description": null,
+              "image": null,
+              "isActive": true,
+              "sortOrder": 1,
+              "parentId": null,
+              "path": "/2",
+              "parentCategory": null,
+              "subCategory": null,
+              "productType": null,
+              "metaTitle": null,
+              "metaDescription": null,
+              "metaKeywords": null,
+              "createdAt": "2026-04-27T18:34:03.380Z",
+              "updatedAt": "2026-04-27T18:34:03.402Z",
+              "deletedAt": null,
+              "parent": null,
+              "children": [],
+              "_count": {
+                "products": 1,
+                "children": 0
+              }
+            },
+            {
+              "id": 3,
+              "name": "new",
+              "slug": "new",
+              "description": null,
+              "image": null,
+              "isActive": true,
+              "sortOrder": 3,
+              "parentId": null,
+              "path": "/3",
+              "parentCategory": null,
+              "subCategory": null,
+              "productType": null,
+              "metaTitle": null,
+              "metaDescription": null,
+              "metaKeywords": null,
+              "createdAt": "2026-04-27T21:21:05.862Z",
+              "updatedAt": "2026-04-27T21:21:05.876Z",
+              "deletedAt": null,
+              "parent": null,
+              "children": [],
+              "_count": {
+                "products": 0,
+                "children": 0
+              }
+            }
+          ],
+          "total": 3,
+          "page": 1,
+          "limit": 100,
+          "totalPages": 1
+        },
+        "timestamp": "2026-04-30T02:22:56.933Z"
+      }
+    },
+    {
+      "method": "GET",
+      "route": "/api/v1/brands",
+      "url": "https://backend.igroup.website/api/v1/brands?page=1&limit=10&isActive=true",
+      "status": 200,
+      "ok": true,
+      "durationMs": 78,
+      "payload": {
+        "success": true,
+        "message": "Success",
+        "data": {
+          "data": [],
+          "total": 0,
+          "page": 1,
+          "limit": 10
+        },
+        "timestamp": "2026-04-30T02:22:57.012Z"
+      }
+    }
+  ],
+  "results": [
+    {
+      "name": "Discover products list",
+      "status": "PASS",
+      "route": "/api/v1/products",
+      "statusCode": 200
+    },
+    {
+      "name": "Discover categories list",
+      "status": "PASS",
+      "route": "/api/v1/categories",
+      "statusCode": 200
+    },
+    {
+      "name": "Discover root categories",
+      "status": "PASS",
+      "route": "/api/v1/categories/roots",
+      "statusCode": 200
+    },
+    {
+      "name": "Discover brands list",
+      "status": "PASS",
+      "route": "/api/v1/brands",
+      "statusCode": 200
+    },
+    {
+      "name": "Discovered product data",
+      "status": "SKIP",
+      "message": "No products returned from live catalog."
+    }
+  ]
+}

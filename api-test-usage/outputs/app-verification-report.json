@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-04-30T02:22:58.571Z",
+  "projectRoot": "C:\\Users\\mohmm\\OneDrive\\Desktop\\work\\i-group",
+  "results": [
+    {
+      "name": "Env override remains supported",
+      "status": "PASS",
+      "message": "NEXT_PUBLIC_ICARE_API_URL is used by API client."
+    },
+    {
+      "name": "Approved backend fallback configured",
+      "status": "PASS",
+      "message": "https://backend.igroup.website"
+    },
+    {
+      "name": "Core endpoint families present",
+      "status": "PASS",
+      "message": "Products/auth/cart/orders are represented in frontend client."
+    },
+    {
+      "name": "No obvious hardcoded frontend secrets",
+      "status": "PASS"
+    },
+    {
+      "name": "Frontend API client is referenced",
+      "status": "PASS",
+      "message": "icareApi usage found in app source."
+    }
+  ]
+}

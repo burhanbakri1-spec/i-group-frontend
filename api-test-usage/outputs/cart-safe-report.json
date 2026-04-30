@@ -1,0 +1,23 @@
+{
+  "baseUrl": "https://backend.igroup.website",
+  "generatedAt": "2026-04-30T02:22:58.249Z",
+  "results": [
+    {
+      "name": "Example credential login",
+      "status": "EXPECTED_FAILURE",
+      "route": "/api/v1/auth/login",
+      "message": "Example credentials are not seeded (HTTP 401)."
+    },
+    {
+      "name": "Disposable register",
+      "status": "SKIP",
+      "route": "/api/v1/auth/register",
+      "message": "Skipped because API_TEST_ALLOW_REGISTER is not true."
+    },
+    {
+      "name": "Cart safe flow",
+      "status": "SKIP",
+      "message": "No authenticated session; cart endpoints require JWT."
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "baseUrl": "https://backend.igroup.website/",
+  "safeMode": true,
+  "allowRegister": false,
+  "allowOrderCreate": false,
+  "allowOrderCancel": false,
+  "exampleCredentials": {
+    "email": "icare.test.user@example.com",
+    "password": "ExamplePass123!"
+  }
+}
