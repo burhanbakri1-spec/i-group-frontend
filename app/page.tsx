@@ -196,7 +196,7 @@ export default function Home() {
               }}
               transition={{ duration: 0.5 }}
             >
-              <span className="text-black font-black text-2xl">BA</span>
+              <span className="text-black font-black text-2xl">IG</span>
               
               {/* Animated Ring */}
               <motion.div
