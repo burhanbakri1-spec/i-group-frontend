@@ -20,6 +20,9 @@ type NumericInput = string | number | null | undefined;
 
 const normalizeFilterName = (value?: string | null) => value?.trim().toLowerCase() ?? '';
 
+// Fallback placeholder image for products without images
+const FALLBACK_PRODUCT_IMAGE = 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&q=80&auto=format&fit=crop';
+
 export const coerceNumber = (value: NumericInput) => {
   if (typeof value === 'number') return Number.isFinite(value) ? value : null;
   if (typeof value === 'string') {
@@ -70,9 +73,20 @@ const getUniqueProductImages = (product: BackendProduct, variant?: ProductVarian
     ...(product.images?.map((image) => image.imageUrl) ?? []),
   ];
 
-  return backendImages
+  // Convert relative paths to absolute URLs
+  const normalizedImages = backendImages.map(image => {
+    if (!image?.trim()) return null;
+    if (image.startsWith('http')) return image;
+    if (image.startsWith('/')) return `https://backend.igroup.website${image}`;
+    return image;
+  });
+
+  const uniqueImages = normalizedImages
     .filter((image): image is string => Boolean(image?.trim()))
     .filter((image, index, images) => images.indexOf(image) === index);
+
+  // Return fallback image if no images are available
+  return uniqueImages.length > 0 ? uniqueImages : [FALLBACK_PRODUCT_IMAGE];
 };
 
 export const mapBackendProductToProduct = (product: BackendProduct, selectedVariant?: ProductVariant | null): Product => {
