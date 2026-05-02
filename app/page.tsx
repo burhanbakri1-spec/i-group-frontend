@@ -30,7 +30,7 @@ const companies = [
   },
   {
     id: 2,
-    name: 'y',
+    name: 'i healthy',
     subtitle: 'NUTRITION & WELLNESS',
     description: 'Fuel your performance with nutritious meal plans designed for athletes.',
     icon: Utensils,
