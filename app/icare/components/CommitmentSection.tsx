@@ -2,14 +2,18 @@ import React from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
+import { useSiteContent } from '../hooks/useSiteContent';
 
 interface CommitmentSectionProps {
   lang: Language;
 }
 
+const DEFAULT_COMMITMENT_IMAGE = 'https://images.unsplash.com/photo-1603189777895-1dcbe39ec57e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200';
+
 export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang }) => {
   const { scrollY } = useScroll();
   const imageScale = useTransform(scrollY, [0, 1000], [1, 1.1]);
+  const { commitmentHeadline, commitmentCta, commitmentImage } = useSiteContent();
   
   const listItems = lang === 'en' 
     ? ['mission', 'philanthropy', 'sustainability']
@@ -29,17 +33,20 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang }) =>
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             >
               <h2 className="text-[22px] md:text-[36px] font-[500] leading-[1.25] text-[#5C5A56] mb-10 max-w-lg">
-                {lang === 'en' 
-                  ? <>From consciously-sourced ingredients to packaging made with post-consumer recycled materials, we&apos;re committed to <span className="text-black font-[900]">MINDFUL SKINCARE.</span></>
-                  : <>من المكونات المختارة بوعي إلى التغليف المصنوع من مواد معاد تدويرها، نحن ملتزمون بـ<span className="text-black font-[900]">العناية الواعية بالبشرة.</span></>
-                }
+                {commitmentHeadline ? (
+                  <span>{commitmentHeadline}</span>
+                ) : (
+                  lang === 'en' 
+                    ? <>From consciously-sourced ingredients to packaging made with post-consumer recycled materials, we&apos;re committed to <span className="text-black font-[900]">MINDFUL SKINCARE.</span></>
+                    : <>من المكونات المختارة بوعي إلى التغليف المصنوع من مواد معاد تدويرها، نحن ملتزمون بـ<span className="text-black font-[900]">العناية الواعية بالبشرة.</span></>
+                )}
               </h2>
               
               <motion.button 
                 whileHover={{ scale: 1.05 }}
                 className="border border-black/10 bg-white/50 backdrop-blur-sm rounded-full px-8 py-3 text-[10px] font-black tracking-[0.2em] uppercase text-black hover:bg-black hover:text-white transition-all duration-500 shadow-sm"
               >
-                {lang === 'en' ? 'OUR FOOTPRINT' : 'بصمتنا'}
+                {commitmentCta || (lang === 'en' ? 'OUR FOOTPRINT' : 'بصمتنا')}
               </motion.button>
             </motion.div>
           </div>
@@ -112,7 +119,7 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang }) =>
             style={{ scale: imageScale }}
           >
             <ImageWithFallback 
-              src="https://images.unsplash.com/photo-1603189777895-1dcbe39ec57e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200" 
+              src={commitmentImage || DEFAULT_COMMITMENT_IMAGE} 
               alt="icare texture" 
               className="w-full h-full object-cover"
             />
