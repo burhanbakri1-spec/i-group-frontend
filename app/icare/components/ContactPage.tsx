@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Language } from '../translations';
 import { ChevronDown } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { useSiteContent } from '../hooks/useSiteContent';
 
 interface ContactPageProps {
   lang: Language;
@@ -10,6 +11,28 @@ interface ContactPageProps {
 
 export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
   const isEn = lang === 'en';
+  const {
+    contactHeroHeading,
+    contactHeroImage,
+    contactInfoTitle,
+    contactSupportInfo,
+    contactEmail,
+    contactEmailLabel,
+    contactWholesaleEmail,
+    contactWholesaleLabel,
+    contactFaqTitle,
+    contactFaqText,
+    contactFaqCta,
+    contactFormNameLabel,
+    contactFormEmailLabel,
+    contactFormTopicLabel,
+    contactFormTopicPlaceholder,
+    contactFormOptionOrder,
+    contactFormOptionProduct,
+    contactFormOptionPress,
+    contactFormMessageLabel,
+    contactFormSubmit,
+  } = useSiteContent();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -28,7 +51,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
       {/* Hero Banner - More minimal and cleaner */}
       <section className="relative w-full h-[35vh] md:h-[50vh] overflow-hidden bg-[#F8F7F4]">
         <ImageWithFallback 
-          src="https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=2000" 
+          src={contactHeroImage || "https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=2000"} 
           alt="Contact Hero" 
           className="w-full h-full object-cover opacity-90"
         />
@@ -39,7 +62,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
             className="space-y-4"
           >
             <h1 className="text-[48px] md:text-[84px] font-black lowercase tracking-tighter leading-none text-white drop-shadow-sm">
-              {isEn ? 'get in touch' : 'ابقي على تواصل'}
+              {isEn ? contactHeroHeading : 'ابقي على تواصل'}
             </h1>
             <p className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.4em] text-white/90">
               {isEn ? 'customer experience' : 'تجربة العملاء'}
@@ -60,22 +83,22 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
           >
             <div className="space-y-4 md:space-y-6 px-2 md:px-0">
               <h2 className="text-[28px] md:text-[42px] font-black lowercase tracking-tight text-[#222] leading-tight">
-                {isEn ? "we're here to help." : "نحن هنا للمساعدة."}
+                {isEn ? contactInfoTitle : "نحن هنا للمساعدة."}
               </h2>
               <div className="space-y-4 md:space-y-6 text-[13px] md:text-[16px] text-[#5C5A56] leading-relaxed font-medium">
                 <p className="opacity-80">
                   {isEn 
-                    ? "Our customer experience team is available Monday through Friday, 9am — 5pm PT. We aim to respond to all inquiries within 24-48 business hours."
+                    ? contactSupportInfo
                     : "فريق تجربة العملاء متاح من الاثنين إلى الجمعة، من 9 صباحاً حتى 5 مساءً. نهدف للرد على جميع الاستفسارات خلال 24-48 ساعة عمل."}
                 </p>
                 <div className="pt-4 md:pt-6 border-t border-black/5 space-y-4 md:space-y-6">
                   <div>
-                    <span className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/40 mb-1">email</span>
-                    <a href="mailto:hello@icare.com" className="text-[14px] md:text-[18px] text-black font-black hover:opacity-50 transition-opacity lowercase">hello@icare.com</a>
+                    <span className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/40 mb-1">{contactEmailLabel}</span>
+                    <a href={`mailto:${contactEmail}`} className="text-[14px] md:text-[18px] text-black font-black hover:opacity-50 transition-opacity lowercase">{contactEmail}</a>
                   </div>
                   <div>
-                    <span className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/40 mb-1">wholesale</span>
-                    <a href="mailto:wholesale@icare.com" className="text-[14px] md:text-[18px] text-black font-black hover:opacity-50 transition-opacity lowercase">wholesale@icare.com</a>
+                    <span className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/40 mb-1">{contactWholesaleLabel}</span>
+                    <a href={`mailto:${contactWholesaleEmail}`} className="text-[14px] md:text-[18px] text-black font-black hover:opacity-50 transition-opacity lowercase">{contactWholesaleEmail}</a>
                   </div>
                 </div>
               </div>
@@ -83,12 +106,12 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
 
             {/* Social / Extra Info */}
             <div className="bg-[#F2F1ED] p-6 md:p-10 rounded-[24px] md:rounded-[40px] space-y-4 border border-black/[0.03]">
-              <h3 className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em]">frequently asked questions</h3>
+              <h3 className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em]">{contactFaqTitle}</h3>
               <p className="text-[12px] md:text-[14px] text-[#5C5A56] leading-relaxed opacity-70">
-                {isEn ? "Chances are, your question has been answered." : "على الأرجح، تمت الإجابة على سؤالك بالفعل."}
+                {isEn ? contactFaqText : "على الأرجح، تمت الإجابة على سؤالك بالفعل."}
               </p>
               <button className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.2em] border-b-2 border-black pb-1 hover:opacity-50 transition-all inline-block">
-                {isEn ? "visit faq" : "زيارة الأسئلة الشائعة"}
+                {isEn ? contactFaqCta : "زيارة الأسئلة الشائعة"}
               </button>
             </div>
           </motion.div>
@@ -102,7 +125,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
             <form onSubmit={handleSubmit} className="space-y-6 md:space-y-10">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8">
                 <div className="space-y-1.5 md:space-y-3">
-                  <label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/30 ml-4">{isEn ? "Full Name" : "الاسم الكامل"}</label>
+                  <label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/30 ml-4">{isEn ? contactFormNameLabel : "الاسم الكامل"}</label>
                   <input
                     type="text"
                     required
@@ -111,7 +134,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
                   />
                 </div>
                 <div className="space-y-1.5 md:space-y-3">
-                  <label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/30 ml-4">{isEn ? "Email" : "البريد الإلكتروني"}</label>
+                  <label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/30 ml-4">{isEn ? contactFormEmailLabel : "البريد الإلكتروني"}</label>
                   <input
                     type="email"
                     required
@@ -122,24 +145,24 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
               </div>
 
               <div className="space-y-1.5 md:space-y-3">
-                <label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/30 ml-4">{isEn ? "What's on your mind?" : "بماذا تفكرين؟"}</label>
+                <label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/30 ml-4">{isEn ? contactFormTopicLabel : "بماذا تفكرين؟"}</label>
                 <div className="relative">
                   <select
                     required
                     className="w-full bg-[#F8F7F4] rounded-full px-5 md:px-8 py-3.5 md:py-5 text-[13px] md:text-[15px] font-bold outline-none appearance-none cursor-pointer focus:bg-white transition-all text-black/60"
                     onChange={(e) => setFormData({...formData, reason: e.target.value})}
                   >
-                    <option value="" disabled selected>{isEn ? "Select a topic" : "اختر موضوعاً"}</option>
-                    <option value="order">{isEn ? "Order Status" : "حالة الطلب"}</option>
-                    <option value="product">{isEn ? "Product Inquiry" : "استفسار عن منتج"}</option>
-                    <option value="press">{isEn ? "Press & Media" : "الصحافة والإعلام"}</option>
+                    <option value="" disabled selected>{isEn ? contactFormTopicPlaceholder : "اختر موضوعاً"}</option>
+                    <option value="order">{isEn ? contactFormOptionOrder : "حالة الطلب"}</option>
+                    <option value="product">{isEn ? contactFormOptionProduct : "استفسار عن منتج"}</option>
+                    <option value="press">{isEn ? contactFormOptionPress : "الصحافة والإعلام"}</option>
                   </select>
                   <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-black/20 pointer-events-none" size={16} />
                 </div>
               </div>
 
               <div className="space-y-1.5 md:space-y-3">
-                <label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/30 ml-4">{isEn ? "Message" : "الرسالة"}</label>
+                <label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/30 ml-4">{isEn ? contactFormMessageLabel : "الرسالة"}</label>
                 <textarea
                   required
                   rows={4}
@@ -153,7 +176,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
                   type="submit"
                   className="w-full bg-black text-white rounded-full py-4 md:py-6 text-[10px] md:text-[12px] font-black uppercase tracking-[0.3em] hover:opacity-80 transition-all shadow-xl shadow-black/10 active:scale-[0.98]"
                 >
-                  {isEn ? 'send inquiry' : 'إرسال الاستفسار'}
+                  {isEn ? contactFormSubmit : 'إرسال الاستفسار'}
                 </button>
               </div>
             </form>

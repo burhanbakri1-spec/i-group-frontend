@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Heart, ShoppingBag, X, Share2 } from 'lucide-react';
 import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';
+import { useSiteContent } from '../hooks/useSiteContent';
 import { Product } from '../types';
 import { fetchProductShortcut } from '../lib/catalog-client';
 import { ProductCard } from './ProductCard';
@@ -16,6 +17,7 @@ interface WishlistPageProps {
 
 export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelect, onNavigate }) => {
   const { wishlistItems, removeFromWishlist, addToCart } = useShop();
+  const { wishlistEmpty, wishlistEmptySubtext, wishlistRecommendationsTitle } = useSiteContent();
   const [recommendations, setRecommendations] = useState<Product[]>([]);
 
   const t = {
@@ -88,8 +90,8 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
             <div className="w-24 h-24 md:w-32 md:h-32 mx-auto mb-6 rounded-full bg-[#F5F5F5] flex items-center justify-center">
               <Heart size={48} className="text-[#DDD] md:w-16 md:h-16" />
             </div>
-            <h2 className="text-xl md:text-2xl font-light mb-2">{text.empty}</h2>
-            <p className="text-sm md:text-base text-[#888] mb-8">{text.emptyDesc}</p>
+            <h2 className="text-xl md:text-2xl font-light mb-2">{wishlistEmpty}</h2>
+            <p className="text-sm md:text-base text-[#888] mb-8">{wishlistEmptySubtext}</p>
             <button onClick={() => onNavigate?.('shop')} className="px-6 md:px-8 py-3 bg-black text-white text-sm md:text-base rounded-full hover:bg-[#333] transition-colors">
               {text.shopNow}
             </button>
@@ -160,7 +162,7 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
         {/* Recommendations */}
         {wishlistItems.length > 0 && recommendations.length > 0 && (
           <div className="mt-20">
-            <h2 className="text-3xl font-light text-center mb-12">You Might Also Like</h2>
+            <h2 className="text-3xl font-light text-center mb-12">{wishlistRecommendationsTitle}</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               {recommendations.map((product) => (
                 <ProductCard key={product.id} product={product} lang={lang} onSelect={() => onProductSelect(product)} />

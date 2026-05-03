@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Search, Navigation, ExternalLink } from 'lucide-react';
 import { Language } from '../translations';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { useSiteContent } from '../hooks/useSiteContent';
 
 interface Store {
   id: string;
@@ -68,6 +69,7 @@ interface StoreLocatorProps {
 }
 
 export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
+  const { storeLocatorTagline } = useSiteContent();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'sephora' | 'boutique'>('all');
 
@@ -99,7 +101,7 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
             <header>
               <h1 className="text-[24px] lg:text-[42px] font-brand lowercase italic leading-none mb-1 lg:mb-2">{t.title}</h1>
               <p className="text-[9px] lg:text-[11px] font-bold uppercase tracking-widest text-black/40">
-                {lang === 'en' ? 'find icare near you' : 'ابحث عن آي كير بالقرب منك'}
+                {lang === 'en' ? storeLocatorTagline : 'ابحث عن آي كير بالقرب منك'}
               </p>
             </header>
 

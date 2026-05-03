@@ -5,6 +5,7 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Play } from 'lucide-react';
 import { fetchProductMediaVlogs } from '../lib/catalog-client';
 import { VlogContentItem } from '../types';
+import { useSiteContent } from '../hooks/useSiteContent';
 
 interface VlogPageProps {
   lang: Language;
@@ -38,6 +39,7 @@ const VlogItem = ({ title, subtitle, image, videoUrl }: { title: string, subtitl
 );
 
 export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
+  const { vlogHeroTitle, vlogFilterLabel, vlogLoading, vlogEmptyHeading, vlogEmptyDescription } = useSiteContent();
   const [filter, setFilter] = useState('ALL');
   const [remoteVlogs, setRemoteVlogs] = useState<VlogContentItem[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -75,7 +77,7 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
         <div className="absolute inset-0 bg-black/10 flex flex-col items-center justify-center text-white p-4">
           <div className="space-y-4 md:space-y-6 text-center">
             <h1 className="text-[16px] md:text-[24px] font-black uppercase tracking-tighter">
-              {t.heroTitle}
+              {vlogHeroTitle}
             </h1>
             <button className="mx-auto w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:scale-110 transition-transform">
               <Play size={20} className="md:w-6 md:h-6 ml-1 fill-white text-white" />
@@ -86,7 +88,7 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
 
       {/* 2. Filter Bar - Desktop Layout Maintained on Mobile */}
       <section className="max-w-[1400px] mx-auto px-4 md:px-6 py-8 md:py-12 flex flex-row items-center justify-center md:justify-start gap-4 md:gap-6 overflow-x-auto no-scrollbar">
-        <span className="text-[10px] md:text-[11px] font-bold text-black/40 uppercase tracking-widest whitespace-nowrap">{t.filterBy}</span>
+        <span className="text-[10px] md:text-[11px] font-bold text-black/40 uppercase tracking-widest whitespace-nowrap">{vlogFilterLabel}</span>
         <div className="flex gap-2 shrink-0">
           {['ALL', 'PRODUCTS', 'TUTORIALS'].map((cat) => (
             <button
@@ -105,7 +107,7 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
       {/* 3. Vlog Grid - 2 columns even on mobile to match desktop layout */}
       <section className="max-w-[1400px] mx-auto px-4 md:px-6">
         {loading ? (
-          <div className="py-20 text-center text-[12px] font-black uppercase tracking-[0.2em] text-black/40">Loading stories...</div>
+          <div className="py-20 text-center text-[12px] font-black uppercase tracking-[0.2em] text-black/40">{vlogLoading}</div>
         ) : filteredVlogs.length > 0 ? (
           <div className="grid grid-cols-2 gap-x-4 md:gap-x-8 gap-y-8 md:gap-y-16">
             {filteredVlogs.map((vlog) => (
@@ -115,10 +117,10 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
         ) : (
           <div className="py-20 text-center space-y-3">
             <h2 className="text-[18px] font-black uppercase tracking-tight text-black/60">
-              {lang === 'en' ? 'Vlog content unavailable' : 'محتوى الفلوج غير متاح'}
+              {vlogEmptyHeading}
             </h2>
             <p className="text-[13px] text-black/40 font-medium">
-              {lang === 'en' ? 'Product media will appear here when the backend provides it.' : 'سيظهر محتوى المنتجات هنا عند توفره من الخادم.'}
+              {vlogEmptyDescription}
             </p>
           </div>
         )}

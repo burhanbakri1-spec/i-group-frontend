@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { MapPin, ShoppingBag, Check, ChevronRight, ArrowLeft, CreditCard, Lock } from 'lucide-react';
 import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';
+import { useSiteContent } from '../hooks/useSiteContent';
 import { icareApi } from '../lib/api-client';
 import { CreatedOrder, CreateOrderInput, OrderSummary } from '../types';
 import { ImageWithFallback } from './figma/ImageWithFallback';
@@ -14,6 +15,24 @@ interface CheckoutPageProps {
 
 export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) => {
   const { cartItems, cartTotal, clearCart, accessToken, isAuthenticated, user } = useShop();
+  const {
+    checkoutHeading,
+    checkoutShippingHeading,
+    checkoutPaymentHeading,
+    checkoutPlaceOrder,
+    checkoutTaxRate,
+    checkoutCardLabel,
+    checkoutPaypalLabel,
+    checkoutCodLabel,
+    checkoutReviewHeading,
+    checkoutTermsText,
+    checkoutConfirmedHeading,
+    checkoutConfirmedMessage,
+    checkoutNavBack,
+    checkoutNavContinue,
+    checkoutSubmittingText,
+    checkoutBackToShop,
+  } = useSiteContent();
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [orderComplete, setOrderComplete] = useState(false);
@@ -86,7 +105,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
   const text = t[lang];
 
   const fallbackOrderSummary = useMemo<OrderSummary>(() => {
-    const tax = cartTotal * 0.08;
+    const tax = cartTotal * checkoutTaxRate;
     return {
       items: cartItems.map((item) => ({
         productId: item.backendId ?? Number(item.id),
@@ -196,9 +215,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
   };
 
   const steps = [
-    { number: 1, title: text.shippingInfo, icon: MapPin },
-    { number: 2, title: text.paymentMethod, icon: CreditCard },
-    { number: 3, title: text.orderSummary, icon: ShoppingBag }
+    { number: 1, title: lang === 'en' ? checkoutShippingHeading : 'معلومات الشحن', icon: MapPin },
+    { number: 2, title: lang === 'en' ? checkoutPaymentHeading : 'طريقة الدفع', icon: CreditCard },
+    { number: 3, title: lang === 'en' ? checkoutReviewHeading : 'ملخص الطلب', icon: ShoppingBag }
   ];
 
   return (
@@ -211,9 +230,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
             className="inline-flex items-center gap-2 text-xs md:text-sm text-[#666] hover:text-black mb-4 transition-colors"
           >
             <ArrowLeft size={16} />
-            {lang === 'en' ? 'Back to Shop' : 'العودة للمتجر'}
+            {checkoutBackToShop}
           </button>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-4">{text.checkout}</h1>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-4">{checkoutHeading}</h1>
         </div>
 
         {/* Progress Steps */}
@@ -245,7 +264,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
             >
               {step === 1 && (
                 <div className="space-y-6">
-                  <h2 className="text-2xl font-light mb-6">{text.shippingInfo}</h2>
+                  <h2 className="text-2xl font-light mb-6">{lang === 'en' ? checkoutShippingHeading : 'معلومات الشحن'}</h2>
                   <div className="grid md:grid-cols-2 gap-4">
                     <input type="text" value={shippingForm.firstName} onChange={(event) => updateShippingField('firstName', event.target.value)} placeholder={text.firstName} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
                     <input type="text" value={shippingForm.lastName} onChange={(event) => updateShippingField('lastName', event.target.value)} placeholder={text.lastName} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
@@ -263,7 +282,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
 
               {step === 2 && (
                 <div className="space-y-6">
-                  <h2 className="text-2xl font-light mb-6">{text.paymentMethod}</h2>
+                  <h2 className="text-2xl font-light mb-6">{lang === 'en' ? checkoutPaymentHeading : 'طريقة الدفع'}</h2>
                   
                   {/* Payment Methods */}
                   <div className="space-y-3">
@@ -275,7 +294,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                     >
                       <div className="flex items-center gap-3">
                         <CreditCard size={24} />
-                        <span>Credit / Debit Card</span>
+                        <span>{checkoutCardLabel}</span>
                       </div>
                       {paymentMethod === 'card' && <Check size={20} />}
                     </button>
@@ -288,7 +307,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                     >
                       <div className="flex items-center gap-3">
                         <div className="text-2xl">💳</div>
-                        <span>PayPal</span>
+                        <span>{checkoutPaypalLabel}</span>
                       </div>
                       {paymentMethod === 'paypal' && <Check size={20} />}
                     </button>
@@ -301,7 +320,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                     >
                       <div className="flex items-center gap-3">
                         <div className="text-2xl">💵</div>
-                        <span>Cash on Delivery</span>
+                        <span>{checkoutCodLabel}</span>
                       </div>
                       {paymentMethod === 'cod' && <Check size={20} />}
                     </button>
@@ -338,11 +357,11 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                       <Check size={40} className="text-white" />
                     </motion.div>
                     <h2 className="text-3xl font-light mb-4">
-                      {lang === 'en' ? 'Order Confirmed!' : 'تم تأكيد الطلب!'}
+                      {lang === 'en' ? checkoutConfirmedHeading : 'تم تأكيد الطلب!'}
                     </h2>
                     <p className="text-[#666] mb-8">
                       {lang === 'en' 
-                        ? `Thank you for your purchase. Order ${order?.orderNumber ?? ''} has been created.` 
+                        ? `${checkoutConfirmedMessage} Order ${order?.orderNumber ?? ''} has been created.` 
                         : 'شكراً لشرائك. سنرسل لك رسالة تأكيد قريباً.'}
                     </p>
                     <button
@@ -355,12 +374,12 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                 ) : (
                   <div className="space-y-6">
                     <h3 className="text-2xl font-light mb-6">
-                      {lang === 'en' ? 'Review Your Order' : 'مراجعة طلبك'}
+                      {lang === 'en' ? checkoutReviewHeading : 'مراجعة طلبك'}
                     </h3>
                     <div className="bg-[#F5F5F5] p-6 rounded-lg">
                       <p className="text-sm text-[#666] mb-4">
                         {lang === 'en' 
-                          ? 'By clicking "Place Order", you agree to our terms and conditions.' 
+                          ? checkoutTermsText
                           : 'بالنقر على "تأكيد الطلب"، فإنك توافق على الشروط والأحكام الخاصة بنا.'}
                       </p>
                       {checkoutError && (
@@ -372,7 +391,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                         className="w-full px-6 py-4 bg-black text-white rounded-full hover:bg-[#333] transition-colors flex items-center justify-center gap-2 text-lg font-medium disabled:opacity-50"
                       >
                         <Lock size={20} />
-                        {isSubmitting ? 'Placing order...' : text.placeOrder}
+                        {isSubmitting ? checkoutSubmittingText : checkoutPlaceOrder}
                       </button>
                     </div>
                   </div>
@@ -387,14 +406,14 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                       onClick={() => setStep(step - 1)}
                       className="flex-1 px-6 py-3 border border-black rounded-full hover:bg-[#FAFAFA] transition-colors"
                     >
-                      {lang === 'en' ? 'Back' : 'رجوع'}
+                      {lang === 'en' ? checkoutNavBack : 'رجوع'}
                     </button>
                   )}
                   <button
                     onClick={() => setStep(step + 1)}
                     className="flex-1 px-6 py-3 bg-black text-white rounded-full hover:bg-[#333] transition-colors flex items-center justify-center gap-2"
                   >
-                    {lang === 'en' ? 'Continue' : 'متابعة'}
+                    {lang === 'en' ? checkoutNavContinue : 'متابعة'}
                     <ChevronRight size={18} />
                   </button>
                 </div>

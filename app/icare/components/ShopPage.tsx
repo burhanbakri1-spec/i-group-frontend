@@ -5,6 +5,7 @@ import { ProductCard } from './ProductCard';
 import { ChevronDown, Grid2X2, LayoutGrid, X } from 'lucide-react';
 import { fetchCatalogProducts } from '../lib/catalog-client';
 import { Language } from '../translations';
+import { useSiteContent } from '../hooks/useSiteContent';
 import { Product, BackendBrand } from '../types';
 import { icareApi } from '../lib/api-client';
 import { unwrapListData } from '../lib/mappers';
@@ -23,6 +24,7 @@ const uniqueValues = (values: string[]) => Array.from(new Set(values.filter(Bool
 const EMPTY_PRODUCTS: Product[] = [];
 
 export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => {
+  const { shopEmptyAll, shopEmptyFiltered, shopBackToAll, shopShowMore, shopActiveFilters, shopClearAll, shopSortLabel, itemsPerPage } = useSiteContent();
   const [catalogProducts, setCatalogProducts] = useState<Product[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeMain, setActiveMain] = useState<string | null>(null);
@@ -307,7 +309,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
         {/* Active Filter Badges */}
         {(activeMain || activeSub || activeType) && (
           <div className="flex flex-wrap items-center gap-3 px-4">
-            <span className="text-[11px] font-bold text-black/40 uppercase tracking-widest">{lang === 'en' ? 'active filters:' : 'الفلاتر النشطة:'}</span>
+            <span className="text-[11px] font-bold text-black/40 uppercase tracking-widest">{shopActiveFilters}</span>
             {activeMain && (
               <div className="flex items-center gap-2 bg-black text-white px-3 py-1 rounded-full text-[10px] font-black uppercase">
                 {activeMain} <X size={12} className="cursor-pointer" onClick={() => removeFilter(1)} />
@@ -324,7 +326,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
               </div>
             )}
             <button onClick={resetFilters} className="text-[10px] font-bold text-black/40 underline underline-offset-4 hover:text-black transition-colors uppercase">
-              {lang === 'en' ? 'clear all' : 'مسح الكل'}
+              {shopClearAll}
             </button>
           </div>
         )}
@@ -334,7 +336,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
       <div className="max-w-[1600px] mx-auto px-6 py-6 flex justify-between items-center border-b border-black/5 mb-10 sticky top-0 bg-[#FFFFFF]/80 backdrop-blur-md z-40">
         <div className="relative">
           <div className="flex items-center gap-2 cursor-pointer group" onClick={() => setIsSortOpen(!isSortOpen)}>
-            <span className="text-[14px] text-black/50 lowercase font-medium">sort:</span>
+            <span className="text-[14px] text-black/50 lowercase font-medium">{shopSortLabel}</span>
             <span className="text-[14px] text-black font-black lowercase">{activeSort}</span>
             <ChevronDown size={16} className={`transition-transform duration-300 ${isSortOpen ? 'rotate-180' : ''}`} />
           </div>
@@ -381,7 +383,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
               onClick={() => setVisibleCount(prev => prev + 12)}
               className="px-12 py-4 bg-black text-white text-[12px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-black/90 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 active:scale-95"
             >
-              {lang === 'en' ? 'show more' : 'عرض المزيد'}
+              {shopShowMore}
             </button>
           </div>
         )}
@@ -389,12 +391,12 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
         {filteredProducts.length === 0 && (
           <div className="py-32 text-center">
             <h3 className="text-[24px] font-brand lowercase italic text-black/40">
-              {allProducts.length === 0 && !activeMain && !activeSub && !activeType
-                ? 'No products are available yet.'
-                : 'No products found in this selection.'}
+                {allProducts.length === 0 && !activeMain && !activeSub && !activeType
+                  ? shopEmptyAll
+                  : shopEmptyFiltered}
             </h3>
             {(activeMain || activeSub || activeType) && (
-              <button onClick={resetFilters} className="mt-6 text-[12px] font-black uppercase tracking-widest underline underline-offset-8">back to all products</button>
+              <button onClick={resetFilters} className="mt-6 text-[12px] font-black uppercase tracking-widest underline underline-offset-8">{shopBackToAll}</button>
             )}
           </div>
         )}

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';
+import { useSiteContent } from '../hooks/useSiteContent';
 
 interface AccountPageProps {
   onNavigate?: (page: string) => void;
@@ -10,7 +11,25 @@ interface AccountPageProps {
 }
 
 export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate }) => {
-  const loginImage = "https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=1200&auto=format&fit=crop";
+  const {
+    authLoginImage,
+    authLoginTagline,
+    authHeadingLogin,
+    authHeadingSignup,
+    authHeadingAccount,
+    authSignedInAs,
+    authSignOut,
+    authPlaceholderName,
+    authPlaceholderEmail,
+    authPlaceholderPassword,
+    authPlaceholderPhone,
+    authSubmitLogin,
+    authSubmitSignup,
+    authForgotPassword,
+    authToggleToRegister,
+    authToggleToLogin,
+  } = useSiteContent();
+  const loginImage = authLoginImage || "https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=1200&auto=format&fit=crop";
   const { user, isAuthenticated, login, register, logout, authError } = useShop();
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [name, setName] = useState('');
@@ -50,7 +69,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate }) => {
         {/* Overlay Text - Matching the image exactly */}
         <div className="absolute inset-0 flex items-center justify-center p-8 md:p-12 bg-black/10">
           <h2 className="text-white text-[28px] md:text-[36px] lg:text-[42px] font-medium leading-tight text-center md:text-left md:max-w-xl tracking-tight drop-shadow-lg">
-            It&apos;s time to invest in your SKIN.
+            {authLoginTagline}
           </h2>
         </div>
       </div>
@@ -64,13 +83,13 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate }) => {
           className="w-full max-w-[400px] flex flex-col items-center"
         >
           <h1 className="text-[36px] md:text-[48px] font-bold text-[#5C5A56] mb-12 lowercase">
-            {isAuthenticated ? 'Account' : mode === 'login' ? 'Login' : 'Sign up'}
+            {isAuthenticated ? authHeadingAccount : mode === 'login' ? authHeadingLogin : authHeadingSignup}
           </h1>
 
           {isAuthenticated ? (
             <div className="w-full space-y-5 text-center">
               <div className="bg-white rounded-[16px] p-6 text-[#5C5A56]">
-                <p className="text-[11px] font-black uppercase tracking-[0.2em] opacity-50 mb-2">signed in as</p>
+                <p className="text-[11px] font-black uppercase tracking-[0.2em] opacity-50 mb-2">{authSignedInAs}</p>
                 <p className="text-[20px] font-bold">{user?.name}</p>
                 <p className="text-[13px] opacity-70">{user?.email}</p>
               </div>
@@ -79,7 +98,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate }) => {
                 onClick={() => logout()}
                 className="border border-[#5C5A56] text-[#5C5A56] px-14 py-3 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all duration-300 active:scale-95"
               >
-                SIGN OUT
+                {authSignOut}
               </button>
             </div>
           ) : (
@@ -90,7 +109,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate }) => {
                     type="text"
                     value={name}
                     onChange={(event) => setName(event.target.value)}
-                    placeholder="Name"
+                    placeholder={authPlaceholderName}
                     className="w-full bg-white border-none rounded-[12px] px-6 py-4 text-[14px] text-[#5C5A56] placeholder:text-[#9A9A9A] focus:ring-1 focus:ring-black/10 transition-shadow outline-none"
                   />
                 </div>
@@ -100,7 +119,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate }) => {
                   type="email"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
-                  placeholder="Email"
+                  placeholder={authPlaceholderEmail}
                   className="w-full bg-white border-none rounded-[12px] px-6 py-4 text-[14px] text-[#5C5A56] placeholder:text-[#9A9A9A] focus:ring-1 focus:ring-black/10 transition-shadow outline-none"
                 />
               </div>
@@ -110,7 +129,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate }) => {
                   type="password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  placeholder="Password"
+                  placeholder={authPlaceholderPassword}
                   className="w-full bg-white border-none rounded-[12px] px-6 py-4 text-[14px] text-[#5C5A56] placeholder:text-[#9A9A9A] focus:ring-1 focus:ring-black/10 transition-shadow outline-none"
                 />
               </div>
@@ -121,7 +140,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate }) => {
                     type="tel"
                     value={phone}
                     onChange={(event) => setPhone(event.target.value)}
-                    placeholder="Phone (optional)"
+                    placeholder={authPlaceholderPhone}
                     className="w-full bg-white border-none rounded-[12px] px-6 py-4 text-[14px] text-[#5C5A56] placeholder:text-[#9A9A9A] focus:ring-1 focus:ring-black/10 transition-shadow outline-none"
                   />
                 </div>
@@ -130,17 +149,17 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate }) => {
               {(formError || authError) && <p className="text-sm text-red-600">{formError ?? authError}</p>}
 
               <button disabled={isSubmitting} className="mt-8 border border-[#5C5A56] text-[#5C5A56] px-14 py-3 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all duration-300 active:scale-95 disabled:opacity-50">
-                {isSubmitting ? 'PLEASE WAIT' : mode === 'login' ? 'SIGN IN' : 'CREATE ACCOUNT'}
+                {isSubmitting ? 'PLEASE WAIT' : mode === 'login' ? authSubmitLogin : authSubmitSignup}
               </button>
             </form>
           )}
 
           {!isAuthenticated && <div className="mt-8 flex flex-col items-center gap-3">
             <button className="text-[12px] text-[#706E6A] underline underline-offset-4 hover:text-black transition-colors font-medium">
-              Forgot your password?
+              {authForgotPassword}
             </button>
             <div className="text-[12px] text-[#706E6A] font-medium">
-              {mode === 'login' ? 'Don\'t have an account?' : 'Already have an account?'}{' '}
+              {mode === 'login' ? authToggleToRegister : authToggleToLogin}{' '}
               <button onClick={() => setMode(mode === 'login' ? 'register' : 'login')} className="underline underline-offset-4 hover:text-black transition-colors">
                 {mode === 'login' ? 'Sign up!' : 'Sign in!'}
               </button>

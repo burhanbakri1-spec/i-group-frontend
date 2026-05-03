@@ -5,6 +5,7 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
 import { ProductLineup } from './ProductLineup';
 import { useShop } from '../context/ShopContext';
+import { useSiteContent } from '../hooks/useSiteContent';
 import { Product, ProductReview, ProductVariant } from '../types';
 import { icareApi } from '../lib/api-client';
 import { getDefaultVariant, isPurchasableStock, mapBackendProductToProduct, mapBackendReviewToProductReview } from '../lib/mappers';
@@ -17,7 +18,7 @@ interface ProductPageProps {
   onProductSelect?: (product: Product) => void;
 }
 
-const ReviewItem = ({ review }: { review: ProductReview }) => (
+const ReviewItem = ({ review, content }: { review: ProductReview; content: { verifiedLabel: string; hydrationQuestion: string; hydrationLow: string; hydrationHigh: string; helpfulQuestion: string } }) => (
   <div className="py-12 border-b border-black/5 grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12">
     {/* Left Sidebar */}
     <div className="space-y-6">
@@ -26,7 +27,7 @@ const ReviewItem = ({ review }: { review: ProductReview }) => (
           <span className="text-[14px] font-bold text-[#333]">{review.name}</span>
           {review.verified && (
             <div className="flex items-center gap-1 text-[11px] font-bold text-[#333] opacity-60">
-              Verified Buyer <CheckCircle2 size={12} className="fill-black text-white" />
+              {content.verifiedLabel} <CheckCircle2 size={12} className="fill-black text-white" />
             </div>
           )}
         </div>
@@ -65,7 +66,7 @@ const ReviewItem = ({ review }: { review: ProductReview }) => (
         </div>
 
         <div className="space-y-4 max-w-sm pt-4">
-          <p className="text-[11px] font-bold text-[#333]">How hydrated did your skin feel?</p>
+          <p className="text-[11px] font-bold text-[#333]">{content.hydrationQuestion}</p>
           <div className="relative pt-2">
             <div className="h-0.5 w-full bg-black/10 rounded-full">
               <div 
@@ -74,8 +75,8 @@ const ReviewItem = ({ review }: { review: ProductReview }) => (
               />
             </div>
             <div className="flex justify-between pt-3 text-[10px] font-bold opacity-40 uppercase tracking-widest">
-              <span>Not very hydrated</span>
-              <span>Super hydrated</span>
+              <span>{content.hydrationLow}</span>
+              <span>{content.hydrationHigh}</span>
             </div>
           </div>
         </div>
@@ -83,7 +84,7 @@ const ReviewItem = ({ review }: { review: ProductReview }) => (
 
       <div className="flex justify-end gap-6 pt-8">
         <div className="flex items-center gap-4 text-[11px] font-bold opacity-40">
-          <span>Was this helpful?</span>
+          <span>{content.helpfulQuestion}</span>
           <button className="flex items-center gap-1.5 hover:opacity-100 transition-opacity">
             <ThumbsUp size={14} /> 0
           </button>
@@ -98,6 +99,25 @@ const ReviewItem = ({ review }: { review: ProductReview }) => (
 
 export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProductSelect }) => {
   const { addToCart } = useShop();
+  const {
+    productDetailsFallback,
+    productNoReviews,
+    productAddToBag,
+    productSoldOut,
+    productAfterpayText,
+    productSelectOption,
+    productRatingLabel,
+    productBuyNow,
+    reviewVerifiedLabel,
+    reviewFilterButton,
+    reviewSortRecent,
+    reviewShowMore,
+    reviewShowLess,
+    reviewHelpfulQuestion,
+    reviewHydrationQuestion,
+    reviewHydrationLow,
+    reviewHydrationHigh,
+  } = useSiteContent();
   const [displayProduct, setDisplayProduct] = useState<Product>(product);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(product.variants?.find((variant) => variant.id === product.variantId) ?? null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -258,7 +278,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
 
           <div className="space-y-4 md:space-y-6">
             <p className="text-[14px] md:text-[15px] leading-relaxed text-[#444] font-medium opacity-80">
-              {displayProduct.description ?? 'Product details are unavailable from the backend.'}
+              {displayProduct.description ?? productDetailsFallback}
             </p>
             
             <div className="space-y-3 text-[13px] md:text-[14px] border-t border-black/5 pt-6">
@@ -273,7 +293,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
           <div className="pt-4 space-y-6 md:space-y-8">
               {displayProduct.variants && displayProduct.variants.length > 0 && (
                 <div className="flex flex-wrap items-center gap-2 text-[12px] md:text-[13px]">
-                  <span className="opacity-40 lowercase">select option:</span>
+                  <span className="opacity-40 lowercase">{productSelectOption}</span>
                   {displayProduct.variants.map((variant) => (
                     <button
                       key={variant.id}
@@ -297,12 +317,12 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                   className="w-full bg-black text-white py-5 rounded-full text-[12px] md:text-[13px] font-black uppercase tracking-[0.2em] hover:bg-black/90 transition-all duration-300 shadow-xl shadow-black/10 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ShoppingBag size={16} />
-                   {isSelectedVariantPurchasable
-                     ? (lang === 'en' ? `add to bag — ${purchasableProduct.price}` : `أضف للسلة — ${purchasableProduct.price}`)
-                     : (lang === 'en' ? 'sold out' : 'نفد المخزون')}
+                    {isSelectedVariantPurchasable
+                      ? (lang === 'en' ? `${productAddToBag} — ${purchasableProduct.price}` : `أضف للسلة — ${purchasableProduct.price}`)
+                      : (lang === 'en' ? productSoldOut : 'نفد المخزون')}
                 </motion.button>
                <div className="flex items-center justify-center gap-2 text-[9px] md:text-[10px] font-bold opacity-30">
-                 {lang === 'en' ? 'or 4 interest-free payments with' : 'أو 4 دفعات بدون فوائد مع'} <span className="text-black font-black bg-[#ACEBFF] px-1.5 py-0.5 rounded italic">Afterpay</span>
+                  {lang === 'en' ? productAfterpayText : 'أو 4 دفعات بدون فوائد مع'} <span className="text-black font-black bg-[#ACEBFF] px-1.5 py-0.5 rounded italic">Afterpay</span>
                </div>
              </div>
           </div>
@@ -323,18 +343,18 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[12px] font-black uppercase tracking-widest text-[#333]">AVERAGE RATING</p>
+                  <p className="text-[12px] font-black uppercase tracking-widest text-[#333]">{productRatingLabel}</p>
                   <p className="text-[12px] text-[#333] opacity-40">Based on {reviewCount} reviews</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-4">
                 <button className="flex items-center gap-2 px-6 py-2.5 rounded-full border border-black/10 text-[10px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all">
-                  FILTERS
+                  {reviewFilterButton}
                 </button>
                 <div className="relative group">
                   <button className="flex items-center gap-6 px-6 py-2.5 rounded-full border border-black/10 text-[10px] font-black uppercase tracking-widest hover:border-black transition-all">
-                    MOST RECENT <ChevronDown size={14} />
+                    {reviewSortRecent} <ChevronDown size={14} />
                   </button>
                 </div>
               </div>
@@ -345,12 +365,12 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
             {hasReviews ? (
               <div className="divide-y divide-black/5">
                 {displayReviews.map((review, idx) => (
-                  <ReviewItem key={review.id ?? idx} review={review} />
+                  <ReviewItem key={review.id ?? idx} review={review} content={{ verifiedLabel: reviewVerifiedLabel, hydrationQuestion: reviewHydrationQuestion, hydrationLow: reviewHydrationLow, hydrationHigh: reviewHydrationHigh, helpfulQuestion: reviewHelpfulQuestion }} />
                 ))}
               </div>
             ) : (
               <div className="py-16 text-center text-[14px] font-bold uppercase tracking-[0.2em] text-[#333]/40">
-                No reviews yet
+                {productNoReviews}
               </div>
             )}
             
@@ -366,7 +386,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
               onClick={() => setIsReviewsExpanded(!isReviewsExpanded)}
               className="px-12 py-3 rounded-full border border-black/10 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all duration-500 bg-white"
             >
-              {isReviewsExpanded ? 'SHOW LESS' : 'SHOW MORE'}
+              {isReviewsExpanded ? reviewShowLess : reviewShowMore}
             </button>
             </div>
           )}
@@ -403,8 +423,8 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
           >
             <ShoppingBag size={14} />
             {isSelectedVariantPurchasable
-              ? (lang === 'en' ? `BUY NOW - ${purchasableProduct.price}` : `اشتر الآن - ${purchasableProduct.price}`)
-              : (lang === 'en' ? 'SOLD OUT' : 'نفد المخزون')}
+              ? (lang === 'en' ? `${productBuyNow} - ${purchasableProduct.price}` : `اشتر الآن - ${purchasableProduct.price}`)
+              : (lang === 'en' ? productSoldOut.toUpperCase() : 'نفد المخزون')}
           </motion.button>
         </motion.div>
       </AnimatePresence>

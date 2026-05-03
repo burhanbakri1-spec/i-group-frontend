@@ -5,6 +5,7 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Plus, Minus } from 'lucide-react';
 import { fetchFaqGroups } from '../lib/catalog-client';
 import { FAQCategoryGroup } from '../types';
+import { useSiteContent } from '../hooks/useSiteContent';
 
 interface FAQPageProps {
   lang: Language;
@@ -46,6 +47,7 @@ const FAQAccordion = ({ question, answer, isOpen, onClick }: { question: string,
 );
 
 export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
+  const { faqLoading, faqUnavailable, faqEmptyHeading, faqEmptyDescription } = useSiteContent();
   const [openId, setOpenId] = useState<string | null>(null);
   const [remoteGroups, setRemoteGroups] = useState<FAQCategoryGroup[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -114,7 +116,7 @@ export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
               </nav>
             ) : (
               <p className="text-[10px] font-bold uppercase tracking-widest text-[#5C5A56]/50">
-                {loading ? 'Loading FAQ...' : 'FAQ unavailable'}
+                {loading ? faqLoading : faqUnavailable}
               </p>
             )}
           </div>
@@ -123,7 +125,7 @@ export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
         {/* Content Area */}
         <main className="col-span-8 md:col-span-9 bg-[#F2F1ED] p-5 md:p-12 rounded-[20px]">
           {loading ? (
-            <div className="py-20 text-center text-[12px] font-black uppercase tracking-[0.2em] text-[#5C5A56]/50">Loading FAQ...</div>
+            <div className="py-20 text-center text-[12px] font-black uppercase tracking-[0.2em] text-[#5C5A56]/50">{faqLoading}</div>
           ) : faqGroups.length > 0 ? (
             <div className="space-y-16">
               {faqGroups.map((cat) => (
@@ -148,10 +150,10 @@ export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
           ) : (
             <div className="py-20 text-center space-y-3">
               <h2 className="text-[18px] md:text-[20px] font-[900] uppercase tracking-tight text-[#5C5A56]">
-                {lang === 'en' ? 'FAQ unavailable' : 'الأسئلة الشائعة غير متاحة'}
+                {faqEmptyHeading}
               </h2>
               <p className="text-[13px] text-[#5C5B57] font-medium">
-                {lang === 'en' ? 'Questions will appear here when the backend provides them.' : 'ستظهر الأسئلة هنا عند توفرها من الخادم.'}
+                {faqEmptyDescription}
               </p>
             </div>
           )}

@@ -4,6 +4,7 @@ import { Menu, Search, ShoppingBag, Globe, Heart } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { translations, Language } from '../translations';
 import { useShop } from '../context/ShopContext';
+import { useSiteContent } from '../hooks/useSiteContent';
 import { Product } from '../types';
 import { icareApi, IcareApiError } from '../lib/api-client';
 import { mapBackendProductToProduct } from '../lib/mappers';
@@ -22,6 +23,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavigate, onProductSelect, onOpenMenu, isDrawerOpen, lang, onToggleLang }) => {
   const t = translations[lang];
   const { cartCount, wishlistItems } = useShop();
+  const { announcementText, shopEmptyAll } = useSiteContent();
   const [isShopHovered, setIsShopHovered] = useState(false);
   const [activeCategory, setActiveCategory] = useState(t.categories.all);
   const [isVisible, setIsVisible] = useState(true);
@@ -96,7 +98,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
       {/* Announcement Bar */}
       <div className="bg-[#FAF9F6]/60 backdrop-blur-xl text-[#706E6A] py-3 text-center border-b border-black/5">
         <span className="text-[10px] font-bold uppercase tracking-[0.1em]">
-          {lang === 'en' ? 'FREE US SHIPPING ON ORDERS OVER $45' : 'شحن مجاني للطلبات التي تزيد عن 45 دولاراً'}
+          {announcementText}
         </span>
       </div>
 
