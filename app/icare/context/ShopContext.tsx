@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState, ReactNode } from 'react';
-import { AuthSession, BackendCart, CartItem, Product, WishlistItem, ShopContextType } from '../types';
+import { AuthSession, AppSettings, BackendCart, CartItem, Product, WishlistItem, ShopContextType } from '../types';
 import { IcareApiError, icareApi } from '../lib/api-client';
 import { mapBackendCartToCartItems } from '../lib/mappers';
 
@@ -61,6 +61,7 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>(() => readStoredArray<WishlistItem>(WISHLIST_STORAGE_KEY));
   const [session, setSession] = useState<AuthSession | null>(() => readStoredSession());
   const [authError, setAuthError] = useState<string | null>(null);
+  const [settings, setSettings] = useState<AppSettings | null>(null);
 
   const accessToken = session?.accessToken ?? null;
   const user = session?.user ?? null;
@@ -126,6 +127,22 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
     return undefined;
   }, [accessToken, refreshCart]);
+
+  // Load public settings from backend on mount
+  useEffect(() => {
+    const loadSettings = async () => {
+      if (!icareApi.isConfigured()) return;
+      try {
+        const data = await icareApi.settings.all();
+        if (data?.settings) {
+          setSettings(data.settings as unknown as AppSettings);
+        }
+      } catch {
+        // Non-critical — silently ignore failures
+      }
+    };
+    loadSettings();
+  }, []);
 
   const addGuestCartItem = (product: Product, quantity: number) => {
     setCartItems((prev) => {
@@ -270,6 +287,7 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         register,
         logout,
         refreshCart,
+        settings,
       }}
     >
       {children}

@@ -1,4 +1,4 @@
-import { BackendProduct, FAQCategoryGroup, Product, ProductReview, VlogContentItem } from '../types';
+import { BackendProduct, BackendVideo, BackendVideoCategory, FAQCategoryGroup, Product, ProductReview, VlogContentItem } from '../types';
 import { icareApi, IcareApiError } from './api-client';
 import {
   mapBackendFaqsToGroups,
@@ -8,6 +8,8 @@ import {
   unwrapAdminListData,
   unwrapListData,
 } from './mappers';
+
+const FALLBACK_PRODUCT_IMAGE_FOR_VLOGS = 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&q=80&auto=format&fit=crop';
 
 const dedupeBackendProducts = (products: BackendProduct[]) => {
   const seenProductKeys = new Set<string>();
@@ -123,7 +125,7 @@ export const fetchFaqGroups = async (): Promise<FAQCategoryGroup[] | null> => {
       icareApi.faq.categories({ page: 1, limit: 50, isActive: true }),
       icareApi.faq.list({ page: 1, limit: 100, isActive: true }),
     ]);
-    const groups = mapBackendFaqsToGroups(unwrapAdminListData(faqPayload), unwrapAdminListData(categoryPayload));
+    const groups = mapBackendFaqsToGroups(unwrapListData(faqPayload), unwrapListData(categoryPayload));
     return groups.length > 0 ? groups : null;
   } catch (error) {
     // Suppress offline network noise; components render backend-empty states.
@@ -137,6 +139,36 @@ export const fetchFaqGroups = async (): Promise<FAQCategoryGroup[] | null> => {
 export const fetchProductMediaVlogs = async (limit = 6): Promise<VlogContentItem[] | null> => {
   try {
     if (!icareApi.isConfigured()) return null;
+    // Try real video endpoints first, fallback to product-based vlogs
+    const categories = await icareApi.videoCategories.list({ isActive: true, page: 1, limit: 20 });
+    const categoryData = unwrapListData(categories);
+
+    if (categoryData.length > 0) {
+      const allVideos = await Promise.all(
+        categoryData.slice(0, 4).map(async (cat) => {
+          const videos = await icareApi.videos.list({ categoryId: cat.id, isActive: true, page: 1, limit: 10 });
+          return { category: cat, videos: unwrapListData(videos) as BackendVideo[] };
+        })
+      );
+
+      // Flatten and map to VlogContentItem format
+      const vlogItems: VlogContentItem[] = [];
+      for (const group of allVideos) {
+        for (const video of group.videos) {
+          vlogItems.push({
+            id: String(video.id),
+            title: video.title,
+            subtitle: group.category.name,
+            image: video.thumbnailUrl || FALLBACK_PRODUCT_IMAGE_FOR_VLOGS,
+            videoUrl: video.videoUrl || null,
+            category: 'TUTORIALS' as const,
+          });
+        }
+      }
+      return vlogItems.length > 0 ? vlogItems.slice(0, limit) : null;
+    }
+
+    // Fallback: use product data as vlogs
     const products = await icareApi.products.featured(limit);
     const mediaItems = products.map((product) => mapBackendProductToVlogItem(product));
     return mediaItems.length > 0 ? mediaItems : null;

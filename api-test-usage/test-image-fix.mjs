@@ -1,5 +1,8 @@
 import https from 'https';
 
+const BASE_URL = process.env.ICARE_API_BASE_URL || 'http://localhost:3000';
+const IMAGE_BASE = process.env.NEXT_PUBLIC_IMAGE_BASE_URL || BASE_URL;
+
 // Copy the getUniqueProductImages function logic directly
 const FALLBACK_PRODUCT_IMAGE = 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&q=80&auto=format&fit=crop';
 
@@ -11,11 +14,11 @@ const getUniqueProductImages = (product, variant = null) => {
     ...(product.images?.map((image) => image.imageUrl) ?? []),
   ];
 
-  // Convert relative paths to absolute URLs
+  // Convert relative paths to absolute URLs using localhost
   const normalizedImages = backendImages.map(image => {
     if (!image?.trim()) return null;
     if (image.startsWith('http')) return image;
-    if (image.startsWith('/')) return `https://backend.igroup.website${image}`;
+    if (image.startsWith('/')) return `${IMAGE_BASE}${image}`;
     return image;
   });
 
@@ -29,7 +32,7 @@ const getUniqueProductImages = (product, variant = null) => {
 
 const getProductData = async () => {
   return new Promise((resolve, reject) => {
-    https.get('https://backend.igroup.website/api/v1/products/featured?limit=8', (res) => {
+    https.get(`${BASE_URL}/api/v1/products/featured?limit=8`, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {

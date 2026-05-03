@@ -10,6 +10,10 @@ import {
   BackendFaqCategory,
   BackendProduct,
   BackendProductReview,
+  BackendVideo,
+  BackendVideoCategory,
+  SettingsGroupResponse,
+  AllSettingsResponse,
   CreateOrderInput,
   CreatedOrder,
   OrderListItem,
@@ -154,14 +158,12 @@ export const icareApi = {
 
   faq: {
     categories: (query?: Record<string, QueryValue>) =>
-      request<AdminListData<BackendFaqCategory> | BackendFaqCategory[]>('/admin/api/faq-categories', {
-        query,
-        credentials: 'include',
-      }),
+      request<PaginatedData<BackendFaqCategory> | BackendFaqCategory[]>('/api/v1/faq-categories', { query }),
     list: (query?: Record<string, QueryValue>) =>
-      request<AdminListData<BackendFaq> | BackendFaq[]>('/admin/api/faqs', {
-        query,
-        credentials: 'include',
+      request<PaginatedData<BackendFaq> | BackendFaq[]>('/api/v1/faqs', { query }),
+    byCategory: (categoryId: number, query?: Record<string, QueryValue>) =>
+      request<PaginatedData<BackendFaq> | BackendFaq[]>('/api/v1/faqs', {
+        query: { ...query, categoryId },
       }),
   },
 
@@ -199,6 +201,36 @@ export const icareApi = {
       request<BackendCart>(`/api/v1/cart/${cartItemId}`, { method: 'DELETE', token }),
     clear: (token: string) => request<BackendCart>('/api/v1/cart/clear', { method: 'POST', token }),
     syncPrices: (token: string) => request<BackendCart>('/api/v1/cart/sync-prices', { method: 'POST', token }),
+  },
+
+  videos: {
+    list: (query?: Record<string, QueryValue>) =>
+      request<PaginatedData<BackendVideo> | BackendVideo[]>('/api/v1/videos', { query }),
+    featured: (limit?: number) =>
+      request<BackendVideo[]>('/api/v1/videos/featured', { query: { limit } }),
+    detail: (id: number) =>
+      request<BackendVideo>(`/api/v1/videos/${id}`),
+  },
+
+  videoCategories: {
+    list: (query?: Record<string, QueryValue>) =>
+      request<PaginatedData<BackendVideoCategory> | BackendVideoCategory[]>('/api/v1/video-categories', { query }),
+    detail: (id: number) =>
+      request<BackendVideoCategory>(`/api/v1/video-categories/${id}`),
+  },
+
+  settings: {
+    group: (group: string) =>
+      request<SettingsGroupResponse>(`/api/v1/settings/${group}`),
+    all: () =>
+      request<AllSettingsResponse>('/api/v1/settings'),
+  },
+
+  pages: {
+    list: (query?: Record<string, QueryValue>) =>
+      request<PaginatedData<Record<string, unknown>> | Record<string, unknown>[]>('/api/v1/pages', { query }),
+    bySlug: (slug: string) =>
+      request<Record<string, unknown>>(`/api/v1/pages/${slug}`),
   },
 
   orders: {

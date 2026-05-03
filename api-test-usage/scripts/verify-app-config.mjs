@@ -6,7 +6,7 @@ import { hasFailures, makeResult, summarizeResults, writeJson, writeMarkdown } f
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const apiClientPath = path.join(projectRoot, 'app', 'icare', 'lib', 'api-client.ts');
 const appDir = path.join(projectRoot, 'app', 'icare');
-const approvedBackendUrl = 'https://backend.igroup.website';
+const approvedBackendUrl = process.env.ICARE_API_BASE_URL || 'http://localhost:3000';
 
 const listSourceFiles = async (dir) => {
   const entries = await readdir(dir, { withFileTypes: true });

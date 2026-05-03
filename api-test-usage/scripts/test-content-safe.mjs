@@ -26,7 +26,12 @@ export const testContentSafe = async ({ baseUrl = normalizeBaseUrl() } = {}) => 
   await checkReadable(client, results, 'FAQ categories admin read', '/admin/api/faq-categories', { query: { page: 1, limit: 10, isActive: true } });
   await checkReadable(client, results, 'FAQ admin read', '/admin/api/faqs', { query: { page: 1, limit: 10, isActive: true } });
   await checkReadable(client, results, 'Product media source', '/api/v1/products/featured', { query: { limit: 6 } });
-  results.push(makeResult('Dedicated public vlog endpoint', 'SKIP', { message: 'No dedicated public vlog/video/content endpoint is documented; product media fields are used where available.' }));
+  await checkReadable(client, results, 'Public FAQs', '/api/v1/faqs');
+  await checkReadable(client, results, 'Public FAQ categories', '/api/v1/faq-categories');
+  await checkReadable(client, results, 'Public active videos', '/api/v1/videos', { query: { isActive: true } });
+  await checkReadable(client, results, 'Public active video categories', '/api/v1/video-categories', { query: { isActive: true } });
+  await checkReadable(client, results, 'Public settings', '/api/v1/settings');
+  await checkReadable(client, results, 'Public footer settings', '/api/v1/settings/footer');
 
   const report = { baseUrl, generatedAt: new Date().toISOString(), requests: recorder.entries(), results };
   await writeJson('content-safe-report.json', report);

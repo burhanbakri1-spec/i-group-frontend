@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export const DEFAULT_BASE_URL = 'https://backend.igroup.website/';
+export const DEFAULT_BASE_URL = process.env.ICARE_API_BASE_URL || 'http://localhost:3000/';
 export const OUTPUT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'outputs');
 
 export class ApiTestError extends Error {

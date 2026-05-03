@@ -122,6 +122,14 @@ export interface ShopContextType {
   register: (name: string, email: string, password: string, phone?: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshCart: () => Promise<void>;
+  settings: AppSettings | null;
+}
+
+export interface AppSettings {
+  general?: Record<string, string>;
+  social?: Record<string, string>;
+  contact?: Record<string, string>;
+  footer?: Record<string, string>;
 }
 
 export interface ApiEnvelope<T> {
@@ -270,6 +278,41 @@ export interface BackendFaq {
   isFeatured?: boolean;
   sortOrder?: number;
   category?: Pick<BackendFaqCategory, 'id' | 'name' | 'slug'> | null;
+}
+
+export interface BackendVideo {
+  id: number;
+  title: string;
+  slug: string;
+  description?: string | null;
+  videoUrl: string;
+  thumbnailUrl?: string | null;
+  duration?: number | null;
+  categoryId?: number | null;
+  isFeatured?: boolean;
+  viewsCount?: number;
+  likesCount?: number;
+  sortOrder?: number;
+  isActive?: boolean;
+  category?: Pick<BackendVideoCategory, 'id' | 'name' | 'slug'> | null;
+}
+
+export interface BackendVideoCategory {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string | null;
+  isActive?: boolean;
+  sortOrder?: number;
+}
+
+export interface SettingsGroupResponse {
+  group: string;
+  settings: Record<string, string>;
+}
+
+export interface AllSettingsResponse {
+  settings: Record<string, Record<string, string>>;
 }
 
 export interface AdminListData<T> {

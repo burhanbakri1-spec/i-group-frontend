@@ -1,8 +1,10 @@
 import https from 'https';
 
+const BASE_URL = process.env.ICARE_API_BASE_URL || 'http://localhost:3000';
+
 const getProductData = async () => {
   return new Promise((resolve, reject) => {
-    https.get('https://backend.igroup.website/api/v1/products/featured?limit=8', (res) => {
+    https.get(`${BASE_URL}/api/v1/products/featured?limit=8`, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
