@@ -23,6 +23,9 @@ const normalizeFilterName = (value?: string | null) => value?.trim().toLowerCase
 // Fallback placeholder image for products without images
 const FALLBACK_PRODUCT_IMAGE = 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&q=80&auto=format&fit=crop';
 
+// Configurable image base URL — when empty, images remain as relative paths handled by the Next.js proxy
+const IMAGE_BASE_URL = (process.env.NEXT_PUBLIC_IMAGE_BASE_URL || '').replace(/\/$/, '');
+
 export const coerceNumber = (value: NumericInput) => {
   if (typeof value === 'number') return Number.isFinite(value) ? value : null;
   if (typeof value === 'string') {
@@ -77,7 +80,7 @@ const getUniqueProductImages = (product: BackendProduct, variant?: ProductVarian
   const normalizedImages = backendImages.map(image => {
     if (!image?.trim()) return null;
     if (image.startsWith('http')) return image;
-    if (image.startsWith('/')) return `https://backend.igroup.website${image}`;
+    if (image.startsWith('/')) return `${IMAGE_BASE_URL}${image}`;
     return image;
   });
 

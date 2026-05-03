@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_API_URL = 'https://backend.igroup.website';
+const BACKEND_API_URL = (process.env.ICARE_API_BASE_URL ?? 'https://backend.igroup.website').replace(/\/$/, '');
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   const { path } = await params;
@@ -14,7 +14,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const response = await fetch(url.toString(), {
       headers: {
-        'Content-Type': 'application/json',
+        ...(request.headers.get('authorization') && { Authorization: request.headers.get('authorization')! }),
+        ...(request.headers.get('content-type') && { 'Content-Type': request.headers.get('content-type')! }),
       },
     });
 
@@ -53,7 +54,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const response = await fetch(url.toString(), {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        ...(request.headers.get('authorization') && { Authorization: request.headers.get('authorization')! }),
+        ...(request.headers.get('content-type') && { 'Content-Type': request.headers.get('content-type')! }),
       },
       body,
     });

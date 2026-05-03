@@ -46,3 +46,6 @@ lint-*.json
 
 # api reference docs
 **.md
+
+.env.local
+.env.test.local
