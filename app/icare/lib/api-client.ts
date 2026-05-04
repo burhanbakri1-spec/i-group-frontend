@@ -226,6 +226,16 @@ export const icareApi = {
       request<AllSettingsResponse>('/api/v1/settings'),
   },
 
+  announcements: {
+    active: () =>
+      request<Record<string, unknown>[]>('/api/v1/announcements'),
+  },
+
+  stores: {
+    list: (query?: Record<string, QueryValue>) =>
+      request<Record<string, unknown>[]>('/api/v1/stores', { query }),
+  },
+
   pages: {
     list: (query?: Record<string, QueryValue>) =>
       request<PaginatedData<Record<string, unknown>> | Record<string, unknown>[]>('/api/v1/pages', { query }),
