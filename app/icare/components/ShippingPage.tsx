@@ -226,7 +226,7 @@ export const ShippingPage: React.FC<ShippingPageProps> = ({ lang }) => {
       <div className="bg-black text-white py-16 text-center">
         <h3 className="text-2xl font-light mb-4">Still Have Questions?</h3>
         <p className="text-[#CCC] mb-8">Our customer service team is here to help</p>
-        <button className="px-8 py-3 bg-white text-black rounded-full hover:bg-[#EEE] transition-colors">
+        <button onClick={() => window.location.href = '/icare/contact'} className="px-8 py-3 bg-white text-black rounded-full hover:bg-[#EEE] transition-colors">
           Contact Support
         </button>
       </div>

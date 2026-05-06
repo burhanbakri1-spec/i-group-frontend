@@ -14,6 +14,7 @@ export type IcarePageKey =
   | 'privacy'
   | 'terms'
   | 'accessibility'
+  | 'cart'
   | 'shipping';
 
 export const ICARE_PAGE_PATHS: Record<IcarePageKey, string> = {
@@ -31,6 +32,7 @@ export const ICARE_PAGE_PATHS: Record<IcarePageKey, string> = {
   terms: '/icare/terms',
   accessibility: '/icare/accessibility',
   shipping: '/icare/shipping',
+  cart: '/icare/cart',
 };
 
 export const getIcarePagePath = (page: string) => {

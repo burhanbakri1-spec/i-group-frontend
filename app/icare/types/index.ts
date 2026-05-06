@@ -123,9 +123,11 @@ export interface ShopContextType {
   logout: () => Promise<void>;
   refreshCart: () => Promise<void>;
   settings: AppSettings | null;
+  socialLinks: Record<string, string>;
 }
 
 export interface AppSettings {
+  [group: string]: Record<string, string> | undefined;
   general?: Record<string, string>;
   social?: Record<string, string>;
   contact?: Record<string, string>;
@@ -312,7 +314,26 @@ export interface SettingsGroupResponse {
 }
 
 export interface AllSettingsResponse {
-  settings: Record<string, Record<string, string>>;
+  settings?: Record<string, Record<string, string>>;
+  groups?: Record<string, Record<string, string>> | SettingsGroupResponse[];
+}
+
+export interface BackendStore {
+  id?: string | number;
+  name?: string | null;
+  title?: string | null;
+  address?: string | null;
+  city?: string | null;
+  country?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  latitude?: string | number | null;
+  longitude?: string | number | null;
+  lat?: string | number | null;
+  lng?: string | number | null;
+  openingHours?: string | string[] | null;
+  hours?: string | string[] | null;
+  isActive?: boolean | string | number | null;
 }
 
 export interface AdminListData<T> {
@@ -438,5 +459,7 @@ export interface CreatedOrder {
   shippingCountry?: string;
   items?: Array<OrderSummaryItem & { id: number }>;
   statusHistory?: Array<{ status: string; comment?: string | null; createdAt: string }>;
+  /** Gateway transaction reference — available after payment gateway processes the transaction. Null for COD orders. */
+  transactionId?: string | null;
   createdAt?: string;
 }

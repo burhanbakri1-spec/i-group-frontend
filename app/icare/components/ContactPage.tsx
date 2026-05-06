@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Language } from '../translations';
-import { ChevronDown } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useSiteContent } from '../hooks/useSiteContent';
 
@@ -10,6 +10,7 @@ interface ContactPageProps {
 }
 
 export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
+  const router = useRouter();
   const isEn = lang === 'en';
   const {
     contactHeroHeading,
@@ -23,28 +24,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
     contactFaqTitle,
     contactFaqText,
     contactFaqCta,
-    contactFormNameLabel,
-    contactFormEmailLabel,
-    contactFormTopicLabel,
-    contactFormTopicPlaceholder,
-    contactFormOptionOrder,
-    contactFormOptionProduct,
-    contactFormOptionPress,
-    contactFormMessageLabel,
-    contactFormSubmit,
   } = useSiteContent();
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    reason: '',
-    topic: '',
-    details: ''
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Form submitted:', formData);
-  };
 
   return (
     <div className="min-h-screen bg-white pb-32">
@@ -73,13 +53,13 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
 
       {/* Main Content Layout */}
       <div className="max-w-[1200px] mx-auto px-4 md:px-12 -mt-20 md:-mt-32 relative z-10 pb-20">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-16 items-start">
+        <div className="max-w-[600px] mx-auto space-y-12">
           
-          {/* Left Side: Info & Guidelines */}
+          {/* Info & Guidelines */}
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="md:col-span-5 space-y-8 md:space-y-16 pt-8 md:pt-24 order-2 md:order-1"
+            className="space-y-8 md:space-y-16 pt-8 md:pt-24"
           >
             <div className="space-y-4 md:space-y-6 px-2 md:px-0">
               <h2 className="text-[28px] md:text-[42px] font-black lowercase tracking-tight text-[#222] leading-tight">
@@ -104,82 +84,19 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
               </div>
             </div>
 
-            {/* Social / Extra Info */}
+            {/* FAQ Link */}
             <div className="bg-[#F2F1ED] p-6 md:p-10 rounded-[24px] md:rounded-[40px] space-y-4 border border-black/[0.03]">
               <h3 className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em]">{contactFaqTitle}</h3>
               <p className="text-[12px] md:text-[14px] text-[#5C5A56] leading-relaxed opacity-70">
                 {isEn ? contactFaqText : "على الأرجح، تمت الإجابة على سؤالك بالفعل."}
               </p>
-              <button className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.2em] border-b-2 border-black pb-1 hover:opacity-50 transition-all inline-block">
+              <button
+                onClick={() => router.push('/icare/faq')}
+                className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.2em] border-b-2 border-black pb-1 hover:opacity-50 transition-all inline-block"
+              >
                 {isEn ? contactFaqCta : "زيارة الأسئلة الشائعة"}
               </button>
             </div>
-          </motion.div>
-
-          {/* Right Side: Professional Form */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="md:col-span-7 bg-white p-6 md:p-16 rounded-[32px] md:rounded-[48px] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.12)] border border-black/5 order-1 md:order-2"
-          >
-            <form onSubmit={handleSubmit} className="space-y-6 md:space-y-10">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8">
-                <div className="space-y-1.5 md:space-y-3">
-                  <label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/30 ml-4">{isEn ? contactFormNameLabel : "الاسم الكامل"}</label>
-                  <input
-                    type="text"
-                    required
-                    className="w-full bg-[#F8F7F4] rounded-full px-5 md:px-8 py-3.5 md:py-5 text-[13px] md:text-[15px] font-bold outline-none focus:bg-white focus:ring-2 ring-black/5 transition-all placeholder:opacity-30"
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-1.5 md:space-y-3">
-                  <label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/30 ml-4">{isEn ? contactFormEmailLabel : "البريد الإلكتروني"}</label>
-                  <input
-                    type="email"
-                    required
-                    className="w-full bg-[#F8F7F4] rounded-full px-5 md:px-8 py-3.5 md:py-5 text-[13px] md:text-[15px] font-bold outline-none focus:bg-white focus:ring-2 ring-black/5 transition-all"
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1.5 md:space-y-3">
-                <label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/30 ml-4">{isEn ? contactFormTopicLabel : "بماذا تفكرين؟"}</label>
-                <div className="relative">
-                  <select
-                    required
-                    className="w-full bg-[#F8F7F4] rounded-full px-5 md:px-8 py-3.5 md:py-5 text-[13px] md:text-[15px] font-bold outline-none appearance-none cursor-pointer focus:bg-white transition-all text-black/60"
-                    onChange={(e) => setFormData({...formData, reason: e.target.value})}
-                  >
-                    <option value="" disabled selected>{isEn ? contactFormTopicPlaceholder : "اختر موضوعاً"}</option>
-                    <option value="order">{isEn ? contactFormOptionOrder : "حالة الطلب"}</option>
-                    <option value="product">{isEn ? contactFormOptionProduct : "استفسار عن منتج"}</option>
-                    <option value="press">{isEn ? contactFormOptionPress : "الصحافة والإعلام"}</option>
-                  </select>
-                  <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-black/20 pointer-events-none" size={16} />
-                </div>
-              </div>
-
-              <div className="space-y-1.5 md:space-y-3">
-                <label className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/30 ml-4">{isEn ? contactFormMessageLabel : "الرسالة"}</label>
-                <textarea
-                  required
-                  rows={4}
-                  className="w-full bg-[#F8F7F4] rounded-[24px] md:rounded-[32px] px-5 md:px-8 py-4 md:py-6 text-[13px] md:text-[15px] font-bold outline-none focus:bg-white focus:ring-2 ring-black/5 transition-all resize-none"
-                  onChange={(e) => setFormData({...formData, details: e.target.value})}
-                />
-              </div>
-
-              <div className="pt-2 md:pt-4">
-                <button
-                  type="submit"
-                  className="w-full bg-black text-white rounded-full py-4 md:py-6 text-[10px] md:text-[12px] font-black uppercase tracking-[0.3em] hover:opacity-80 transition-all shadow-xl shadow-black/10 active:scale-[0.98]"
-                >
-                  {isEn ? contactFormSubmit : 'إرسال الاستفسار'}
-                </button>
-              </div>
-            </form>
           </motion.div>
         </div>
       </div>
