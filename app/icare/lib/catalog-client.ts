@@ -1,4 +1,4 @@
-import { BackendProduct, BackendVideo, BackendVideoCategory, FAQCategoryGroup, Product, ProductReview, VlogContentItem } from '../types';
+import { BackendCategory, BackendProduct, BackendVideo, BackendVideoCategory, FAQCategoryGroup, Product, ProductReview, VlogContentItem } from '../types';
 import { icareApi, IcareApiError } from './api-client';
 import {
   mapBackendFaqsToGroups,
@@ -33,13 +33,15 @@ const fetchCatalogShortcutProducts = async () => {
   return shortcutResults.flatMap((result) => result.status === 'fulfilled' ? result.value : []);
 };
 
-export const fetchCatalogProducts = async (): Promise<Product[] | null> => {
+export const fetchCatalogProducts = async (categoryId?: number): Promise<Product[] | null> => {
   try {
     if (!icareApi.isConfigured()) {
       return null;
     }
 
-    const payload = await icareApi.products.list({ page: 1, limit: 60, active: true });
+    const query: Record<string, string | number | boolean> = { page: 1, limit: 100, active: true };
+    if (categoryId !== undefined && categoryId > 0) query.category = categoryId;
+    const payload = await icareApi.products.list(query);
     const primaryProducts = unwrapListData(payload);
     const backendProducts = primaryProducts.length > 0 ? primaryProducts : await fetchCatalogShortcutProducts();
 
@@ -50,6 +52,31 @@ export const fetchCatalogProducts = async (): Promise<Product[] | null> => {
       console.error('Error fetching iCare products:', error);
     }
     return null;
+  }
+};
+
+export const fetchCategoryRoots = async () => {
+  try {
+    if (!icareApi.isConfigured()) return [];
+    const payload = await icareApi.categories.roots();
+    return unwrapListData(payload);
+  } catch (error) {
+    if (!(error instanceof IcareApiError && error.status === 0)) {
+      console.error('Error fetching iCare category roots:', error);
+    }
+    return [];
+  }
+};
+
+export const fetchCategoryChildren = async (slug: string) => {
+  try {
+    if (!icareApi.isConfigured()) return [];
+    return await icareApi.categories.children(slug);
+  } catch (error) {
+    if (!(error instanceof IcareApiError && error.status === 0)) {
+      console.error('Error fetching iCare category children:', error);
+    }
+    return [];
   }
 };
 
@@ -121,12 +148,24 @@ export const fetchProductReviews = async (slug: string, limit = 10): Promise<Pro
 export const fetchFaqGroups = async (): Promise<FAQCategoryGroup[] | null> => {
   try {
     if (!icareApi.isConfigured()) return null;
-    const [categoryPayload, faqPayload] = await Promise.all([
+    const [categoryResult, faqResult] = await Promise.allSettled([
       icareApi.faq.categories({ page: 1, limit: 50, isActive: true }),
       icareApi.faq.list({ page: 1, limit: 100, isActive: true }),
     ]);
-    const groups = mapBackendFaqsToGroups(unwrapListData(faqPayload), unwrapListData(categoryPayload));
-    return groups.length > 0 ? groups : null;
+
+    if (faqResult.status === 'rejected') {
+      if (!(faqResult.reason instanceof IcareApiError && faqResult.reason.status === 0)) {
+        console.error('Error fetching iCare FAQ list:', faqResult.reason);
+      }
+      return null;
+    }
+
+    const categories = categoryResult.status === 'fulfilled' ? unwrapListData(categoryResult.value) : [];
+    if (categoryResult.status === 'rejected' && !(categoryResult.reason instanceof IcareApiError && categoryResult.reason.status === 0)) {
+      console.error('Error fetching iCare FAQ categories:', categoryResult.reason);
+    }
+
+    return mapBackendFaqsToGroups(unwrapListData(faqResult.value), categories);
   } catch (error) {
     // Suppress offline network noise; components render backend-empty states.
     if (!(error instanceof IcareApiError && error.status === 0)) {
