@@ -32,6 +32,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
     checkoutNavContinue,
     checkoutSubmittingText,
     checkoutBackToShop,
+    freeShippingThreshold,
+    defaultShippingCost,
+    shippingRates,
   } = useSiteContent();
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState('card');
@@ -112,6 +115,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
   const text = t[lang];
 
   const fallbackOrderSummary = useMemo<OrderSummary>(() => {
+    const shipping = cartTotal >= freeShippingThreshold ? 0 : defaultShippingCost;
     const tax = cartTotal * checkoutTaxRate;
     return {
       items: cartItems.map((item) => ({
@@ -124,12 +128,12 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
         totalPrice: (item.rawPrice ?? Number(item.price.replace(/[^0-9.]/g, ''))) * item.quantity,
       })),
       subtotal: cartTotal,
-      shipping: 0,
+      shipping,
       tax,
       discount: 0,
-      total: cartTotal + tax,
+      total: cartTotal + shipping + tax,
     };
-  }, [cartItems, cartTotal]);
+  }, [cartItems, cartTotal, checkoutTaxRate, freeShippingThreshold, defaultShippingCost]);
 
   const displayOrderSummary = orderSummary ?? fallbackOrderSummary;
 
