@@ -49,3 +49,6 @@ lint-*.json
 
 .env.local
 .env.test.local
+
+.auto-verify/
+.repo-indexer/
