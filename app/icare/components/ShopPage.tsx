@@ -3,56 +3,47 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { ProductCard } from './ProductCard';
 import { ChevronDown, Grid2X2, LayoutGrid, X } from 'lucide-react';
-import { fetchCatalogProducts } from '../lib/catalog-client';
+import { fetchCatalogProducts, fetchCategoryRoots, fetchCategoryChildren } from '../lib/catalog-client';
 import { Language } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
-import { Product, BackendBrand } from '../types';
-import { icareApi } from '../lib/api-client';
-import { unwrapListData } from '../lib/mappers';
+import { Product, BackendCategory } from '../types';
 
 interface ShopPageProps {
   lang: Language;
   onProductSelect: (product: Product) => void;
 }
 
-type CategoryFilterHierarchy = Record<string, Record<string, string[]>>;
-
-const normalizeFilterValue = (value?: string | null) => value?.trim().toLowerCase() ?? '';
-
-const uniqueValues = (values: string[]) => Array.from(new Set(values.filter(Boolean)));
-
-const EMPTY_PRODUCTS: Product[] = [];
-
 export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => {
-  const { shopEmptyAll, shopEmptyFiltered, shopBackToAll, shopShowMore, shopActiveFilters, shopClearAll, shopSortLabel, itemsPerPage } = useSiteContent();
+  const { shopEmptyAll, shopEmptyFiltered, shopBackToAll, shopShowMore, shopActiveFilters, shopClearAll, shopSortLabel } = useSiteContent();
   const [catalogProducts, setCatalogProducts] = useState<Product[] | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchingCategory, setFetchingCategory] = useState(false);
+  const [rootCategories, setRootCategories] = useState<BackendCategory[]>([]);
+  const [childCategories, setChildCategories] = useState<BackendCategory[]>([]);
   const [activeMain, setActiveMain] = useState<string | null>(null);
-  const [activeSub, setActiveSub] = useState<string | null>(null);
-  const [activeType, setActiveType] = useState<string | null>(null);
+  const [activeChild, setActiveChild] = useState<string | null>(null);
+  const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null);
   const [cols, setCols] = useState(3);
   const [activeSort, setActiveSort] = useState('featured');
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(12);
-  const [remoteBrands, setRemoteBrands] = useState<BackendBrand[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       try {
-        const [data, brandsPayload] = await Promise.allSettled([
+        const [data, roots] = await Promise.allSettled([
           fetchCatalogProducts(),
-          icareApi.brands.list({ page: 1, limit: 100, isActive: true }),
+          fetchCategoryRoots(),
         ]);
         if (data.status === 'fulfilled') {
           setCatalogProducts(data.value ?? []);
         }
-        if (brandsPayload.status === 'fulfilled') {
-          const brands = unwrapListData(brandsPayload.value);
-          setRemoteBrands(Array.isArray(brands) ? brands : []);
+        if (roots.status === 'fulfilled') {
+          setRootCategories(Array.isArray(roots.value) ? roots.value : []);
         }
       } catch (err) {
-          console.error("Failed to load iCare products", err);
+        console.error("Failed to load iCare products", err);
       } finally {
         setLoading(false);
       }
@@ -60,66 +51,49 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
     loadData();
   }, []);
 
-  const allProducts = catalogProducts ?? EMPTY_PRODUCTS;
-  const backendCategoryHierarchy = useMemo<CategoryFilterHierarchy>(() => {
-    const hierarchy: CategoryFilterHierarchy = {};
-    const remoteBrandCountryByName = new Map(
-      remoteBrands.map((brand) => [normalizeFilterValue(brand.name), normalizeFilterValue(brand.country) || 'all brands'])
-    );
-
-    uniqueValues(allProducts.map((product) => normalizeFilterValue(product.category ?? product.main))).forEach((categoryName) => {
-      if (!categoryName) return;
-      const categoryProducts = allProducts.filter((product) => normalizeFilterValue(product.category ?? product.main) === categoryName);
-      const subFilters = uniqueValues(categoryProducts.map((product) => normalizeFilterValue(product.sub ?? product.brand ?? categoryName)));
-      hierarchy[categoryName] = Object.fromEntries(
-        (subFilters.length > 0 ? subFilters : [categoryName]).map((subFilter) => {
-          const typeFilters = uniqueValues(categoryProducts
-            .filter((product) => normalizeFilterValue(product.sub ?? product.brand ?? categoryName) === subFilter)
-            .map((product) => normalizeFilterValue(product.type ?? product.name)));
-          return [subFilter, typeFilters.length > 0 ? typeFilters : [subFilter]];
-        })
-      );
-    });
-
-    const productsWithBrands = allProducts.filter((product) => normalizeFilterValue(product.brand));
-    if (productsWithBrands.length > 0) {
-      hierarchy.brands = productsWithBrands.reduce<Record<string, string[]>>((groups, product) => {
-        const brandName = normalizeFilterValue(product.brand);
-        if (!brandName) return groups;
-        const country = remoteBrandCountryByName.get(brandName) ?? 'all brands';
-        groups[country] = uniqueValues([...(groups[country] ?? []), brandName]);
-        return groups;
-      }, {});
+  // When activeMain changes, fetch its children
+  useEffect(() => {
+    if (!activeMain) {
+      setChildCategories([]);
+      setActiveChild(null);
+      setActiveCategoryId(null);
+      return;
     }
+    const root = rootCategories.find(c => c.slug === activeMain);
+    if (!root) {
+      setChildCategories([]);
+      setActiveCategoryId(null);
+      return;
+    }
+    setActiveCategoryId(root.id);
+    fetchCategoryChildren(root.slug).then(children => {
+      setChildCategories(Array.isArray(children) ? children : []);
+    });
+  }, [activeMain, rootCategories]);
 
-    return hierarchy;
-  }, [allProducts, remoteBrands]);
+  useEffect(() => {
+    if (catalogProducts === null) return;
+
+    const fetchForCategory = async () => {
+      setFetchingCategory(true);
+      try {
+        const targetId = activeChild
+          ? childCategories.find(c => c.slug === activeChild)?.id
+          : activeCategoryId;
+        const data = await fetchCatalogProducts(targetId ?? undefined);
+        setCatalogProducts(data ?? []);
+      } finally {
+        setFetchingCategory(false);
+      }
+    };
+
+    fetchForCategory();
+  }, [activeCategoryId, activeChild, childCategories]);
+
+  const allProducts = catalogProducts ?? [];
 
   const filteredProducts = useMemo(() => {
     let result: Product[] = [...allProducts];
-
-    if (activeMain) {
-      if (activeMain === 'brands') {
-        if (activeSub) {
-          const activeBrandNames = backendCategoryHierarchy.brands?.[activeSub] ?? [];
-            result = result.filter(p => activeBrandNames.includes(normalizeFilterValue(p.brand)));
-            if (activeType) {
-              result = result.filter(p => normalizeFilterValue(p.brand) === normalizeFilterValue(activeType));
-            }
-        } else {
-          const backendBrandNames = Object.values(backendCategoryHierarchy.brands ?? {}).flat();
-          result = result.filter(p => backendBrandNames.includes(normalizeFilterValue(p.brand)));
-        }
-      } else {
-        result = result.filter(p => normalizeFilterValue(p.main ?? p.category) === normalizeFilterValue(activeMain));
-        if (activeSub) {
-          result = result.filter(p => normalizeFilterValue(p.sub ?? p.brand) === normalizeFilterValue(activeSub));
-        }
-        if (activeType) {
-          result = result.filter(p => normalizeFilterValue(p.type) === normalizeFilterValue(activeType));
-        }
-      }
-    }
 
     switch (activeSort) {
       case 'newest':
@@ -137,56 +111,54 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
     }
 
     return result;
-  }, [allProducts, backendCategoryHierarchy, activeMain, activeSub, activeType, activeSort]);
+  }, [allProducts, activeSort]);
 
   const resetFilters = () => {
     setActiveMain(null);
-    setActiveSub(null);
-    setActiveType(null);
+    setActiveChild(null);
+    setActiveCategoryId(null);
+    setChildCategories([]);
     setVisibleCount(12);
   };
 
   const removeFilter = (level: number) => {
     if (level === 1) resetFilters();
-    if (level === 2) { setActiveSub(null); setActiveType(null); setVisibleCount(12); }
-    if (level === 3) { setActiveType(null); setVisibleCount(12); }
+    if (level === 2) { setActiveChild(null); setVisibleCount(12); }
+  };
+
+  const selectRoot = (slug: string | null) => {
+    if (!slug) { resetFilters(); return; }
+    setActiveMain(slug);
+    setActiveChild(null);
+  };
+
+  const selectChild = (slug: string) => {
+    setActiveChild(slug);
   };
 
   useEffect(() => {
     setVisibleCount(12);
-  }, [activeMain, activeSub, activeType, activeSort]);
+  }, [activeMain, activeChild, activeSort]);
 
-  useEffect(() => {
-    if (!activeMain) return;
-
-    const mainFilters = Object.keys(backendCategoryHierarchy);
-    if (!mainFilters.includes(activeMain)) {
-      resetFilters();
-      return;
-    }
-
-    const subFilters = Object.keys(backendCategoryHierarchy[activeMain] ?? {});
-    if (activeSub && !subFilters.includes(activeSub)) {
-      setActiveSub(null);
-      setActiveType(null);
-      return;
-    }
-
-    const typeFilters = activeSub ? backendCategoryHierarchy[activeMain]?.[activeSub] ?? [] : [];
-    if (activeType && !typeFilters.includes(activeType)) {
-      setActiveType(null);
-    }
-  }, [activeMain, activeSub, activeType, backendCategoryHierarchy]);
-
-  const activeHierarchy = activeMain ? backendCategoryHierarchy[activeMain] : undefined;
-
-  if (loading && !catalogProducts) {
+  if ((loading || fetchingCategory) && !catalogProducts) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FFFFFF]">
         <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
+
+  const getSelectedCategoryName = () => {
+    if (activeChild) {
+      const child = childCategories.find(c => c.slug === activeChild);
+      return child?.name;
+    }
+    if (activeMain) {
+      const root = rootCategories.find(c => c.slug === activeMain);
+      return root?.name;
+    }
+    return null;
+  };
 
   return (
     <div className="min-h-screen bg-[#FFFFFF]">
@@ -213,32 +185,30 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
       {/* Navigation & Hierarchy */}
       <div className="max-w-[1600px] mx-auto px-6 py-10 flex flex-col gap-8">
 
-        {/* Level 1: Main */}
+        {/* Level 1: Root Categories */}
         <div className="overflow-x-auto no-scrollbar border-b border-black/5 pb-4">
           <div className="flex md:justify-center justify-start gap-4 px-4 min-w-max">
             <button
-              onClick={resetFilters}
-              className={`px-8 py-2.5 rounded-full text-[12px] font-black uppercase tracking-widest transition-all ${!activeMain ? 'bg-black text-white shadow-lg' : 'bg-white text-black/40 border border-black/5 hover:text-black'
-                }`}
+              onClick={() => selectRoot(null)}
+              className={`px-8 py-2.5 rounded-full text-[12px] font-black uppercase tracking-widest transition-all ${!activeMain ? 'bg-black text-white shadow-lg' : 'bg-white text-black/40 border border-black/5 hover:text-black'}`}
             >
               {lang === 'en' ? 'shop all' : 'تسوق الكل'}
             </button>
-            {Object.keys(backendCategoryHierarchy).map((main) => (
+            {rootCategories.map((cat) => (
               <button
-                key={main}
-                onClick={() => { setActiveMain(main); setActiveSub(null); setActiveType(null); }}
-                className={`px-8 py-2.5 rounded-full text-[12px] font-black uppercase tracking-widest transition-all ${activeMain === main ? 'bg-black text-white shadow-lg' : 'bg-white text-black/40 border border-black/5 hover:text-black'
-                  }`}
+                key={cat.slug}
+                onClick={() => selectRoot(cat.slug)}
+                className={`px-8 py-2.5 rounded-full text-[12px] font-black uppercase tracking-widest transition-all ${activeMain === cat.slug ? 'bg-black text-white shadow-lg' : 'bg-white text-black/40 border border-black/5 hover:text-black'}`}
               >
-                {main}
+                {cat.name}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Level 2: Sub / Country */}
+        {/* Level 2: Child Categories */}
         <AnimatePresence mode="wait">
-          {activeMain && activeHierarchy && (
+          {activeMain && childCategories.length > 0 && (
             <motion.div
               key={activeMain}
               initial={{ opacity: 0, y: -10 }}
@@ -247,14 +217,19 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
               className="overflow-x-auto no-scrollbar border-b border-black/5 pb-4"
             >
               <div className="flex md:justify-center justify-start gap-3 px-4 min-w-max">
-                {Object.keys(activeHierarchy).map((sub) => (
+                <button
+                  onClick={() => setActiveChild(null)}
+                  className={`px-6 py-2 rounded-full text-[11px] font-bold uppercase transition-all ${!activeChild ? 'bg-black text-white shadow-sm' : 'bg-[#EFEEEC]/50 text-black/60 hover:bg-[#EFEEEC]'}`}
+                >
+                  {lang === 'en' ? 'all' : 'الكل'}
+                </button>
+                {childCategories.map((child) => (
                   <button
-                    key={sub}
-                    onClick={() => { setActiveSub(sub); setActiveType(null); }}
-                    className={`px-6 py-2 rounded-full text-[11px] font-bold uppercase transition-all ${activeSub === sub ? 'bg-white text-black border border-black shadow-sm' : 'bg-[#EFEEEC]/50 text-black/60 hover:bg-[#EFEEEC]'
-                      }`}
+                    key={child.slug}
+                    onClick={() => selectChild(child.slug)}
+                    className={`px-6 py-2 rounded-full text-[11px] font-bold uppercase transition-all ${activeChild === child.slug ? 'bg-black text-white shadow-sm' : 'bg-[#EFEEEC]/50 text-black/60 hover:bg-[#EFEEEC]'}`}
                   >
-                    {sub}
+                    {child.name}
                   </button>
                 ))}
               </div>
@@ -262,67 +237,13 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
           )}
         </AnimatePresence>
 
-        {/* Level 3: Types / Brands (Logo Circles) */}
-        <AnimatePresence mode="wait">
-          {activeMain && activeSub && activeHierarchy?.[activeSub] && (
-            <motion.div
-              key={`${activeMain}-${activeSub}`}
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              className="bg-white/40 rounded-[24px] p-6"
-            >
-              <div className="overflow-x-auto no-scrollbar">
-                <div className={`flex ${activeMain === 'brands' ? 'gap-8' : 'gap-3 flex-wrap justify-center'} min-w-max`}>
-                  {activeHierarchy[activeSub].map((item: string) => (
-                    <button
-                      key={item}
-                      onClick={() => setActiveType(item)}
-                      className="group flex flex-col items-center gap-3 transition-all"
-                    >
-                      {activeMain === 'brands' ? (
-                        <div className={`w-20 h-20 lg:w-24 lg:h-24 rounded-full flex items-center justify-center transition-all ${activeType === item ? 'ring-2 ring-black ring-offset-4 bg-black text-white' : 'bg-white border border-black/5 shadow-sm group-hover:shadow-md'
-                          }`}>
-                          <span className="text-[10px] font-black uppercase text-center px-2 leading-tight">
-                            {item}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className={`px-5 py-2 text-[11px] font-bold lowercase border rounded-full transition-all ${activeType === item ? 'bg-black text-white border-black' : 'bg-white/50 text-black/70 border-black/10 hover:border-black/30'
-                          }`}>
-                          {item}
-                        </span>
-                      )}
-                      {activeMain === 'brands' && (
-                        <span className={`text-[10px] font-bold lowercase ${activeType === item ? 'text-black' : 'text-black/50'}`}>
-                          {item}
-                        </span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
         {/* Active Filter Badges */}
-        {(activeMain || activeSub || activeType) && (
+        {activeMain && getSelectedCategoryName() && (
           <div className="flex flex-wrap items-center gap-3 px-4">
             <span className="text-[11px] font-bold text-black/40 uppercase tracking-widest">{shopActiveFilters}</span>
             {activeMain && (
               <div className="flex items-center gap-2 bg-black text-white px-3 py-1 rounded-full text-[10px] font-black uppercase">
-                {activeMain} <X size={12} className="cursor-pointer" onClick={() => removeFilter(1)} />
-              </div>
-            )}
-            {activeSub && (
-              <div className="flex items-center gap-2 bg-white border border-black px-3 py-1 rounded-full text-[10px] font-black uppercase">
-                {activeSub} <X size={12} className="cursor-pointer" onClick={() => removeFilter(2)} />
-              </div>
-            )}
-            {activeType && (
-              <div className="flex items-center gap-2 bg-[#EFEEEC] text-black px-3 py-1 rounded-full text-[10px] font-black uppercase">
-                {activeType} <X size={12} className="cursor-pointer" onClick={() => removeFilter(3)} />
+                {getSelectedCategoryName()} <X size={12} className="cursor-pointer" onClick={() => removeFilter(1)} />
               </div>
             )}
             <button onClick={resetFilters} className="text-[10px] font-bold text-black/40 underline underline-offset-4 hover:text-black transition-colors uppercase">
@@ -370,7 +291,6 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
 
       {/* Grid */}
       <div className="max-w-[1600px] mx-auto px-3 md:px-6 pb-24">
-
         <div className={`grid grid-cols-2 ${cols === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} gap-x-3 gap-y-3 md:gap-x-8 md:gap-y-16`}>
           {filteredProducts.slice(0, visibleCount).map((p) => (
             <ProductCard key={p.id} product={p} lang={lang} onSelect={() => onProductSelect(p)} />
@@ -391,11 +311,11 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
         {filteredProducts.length === 0 && (
           <div className="py-32 text-center">
             <h3 className="text-[24px] font-brand lowercase italic text-black/40">
-                {allProducts.length === 0 && !activeMain && !activeSub && !activeType
-                  ? shopEmptyAll
-                  : shopEmptyFiltered}
+              {allProducts.length === 0 && !activeMain
+                ? shopEmptyAll
+                : shopEmptyFiltered}
             </h3>
-            {(activeMain || activeSub || activeType) && (
+            {(activeMain) && (
               <button onClick={resetFilters} className="mt-6 text-[12px] font-black uppercase tracking-widest underline underline-offset-8">{shopBackToAll}</button>
             )}
           </div>
