@@ -112,7 +112,7 @@ export const mapBackendProductToProduct = (product: BackendProduct, selectedVari
     backendId: product.id,
     slug: product.slug,
     variantId: variant?.id ?? null,
-    title: product.category?.name ?? product.brand?.name ?? 'icare',
+    title: product.name,
     name: product.name,
     price: formatUsdPrice(displayPrice),
     originalPrice,
@@ -197,29 +197,86 @@ export const mapBackendReviewToProductReview = (review: BackendProductReview): P
   hydration: coerceNumber(review.hydrationRating) ?? 75,
 });
 
-export const mapBackendFaqsToGroups = (faqs: BackendFaq[], categories: BackendFaqCategory[]): FAQCategoryGroup[] => {
+const GENERAL_FAQ_GROUP_ID = 'general';
+const GENERAL_FAQ_GROUP_NAME = 'GENERAL';
+
+const sortBySortOrder = <T extends { sortOrder?: number }>(first: T, second: T) => (first.sortOrder ?? 0) - (second.sortOrder ?? 0);
+
+const getFaqGroupKey = (faq: BackendFaq) => {
+  if (faq.category?.id) return String(faq.category.id);
+  if (faq.categoryId) return String(faq.categoryId);
+  if (faq.category?.slug) return faq.category.slug;
+  return GENERAL_FAQ_GROUP_ID;
+};
+
+const getFaqGroupId = (faq: BackendFaq) => faq.category?.slug || getFaqGroupKey(faq);
+
+const getFaqGroupName = (faq: BackendFaq) => faq.category?.name || (getFaqGroupKey(faq) === GENERAL_FAQ_GROUP_ID ? GENERAL_FAQ_GROUP_NAME : `CATEGORY ${getFaqGroupKey(faq)}`);
+
+const mapFaqItems = (faqs: BackendFaq[]) => faqs
+  .filter((faq) => faq.isActive !== false)
+  .sort(sortBySortOrder)
+  .map((faq) => ({ q: faq.question, a: faq.answer }));
+
+const mapFaqsWithExplicitCategories = (faqs: BackendFaq[], categories: BackendFaqCategory[]) => {
   const activeCategories = categories
     .filter((category) => category.isActive !== false)
-    .sort((first, second) => (first.sortOrder ?? 0) - (second.sortOrder ?? 0));
+    .sort(sortBySortOrder);
 
-  const categoryGroups = activeCategories.map((category) => ({
-    id: category.slug || String(category.id),
-    name: category.name,
-    items: faqs
-      .filter((faq) => faq.isActive !== false && faq.categoryId === category.id)
-      .sort((first, second) => (first.sortOrder ?? 0) - (second.sortOrder ?? 0))
-      .map((faq) => ({ q: faq.question, a: faq.answer })),
-  }));
+  const categoryIds = new Set<number>();
+  const categoryGroups = activeCategories.flatMap((category) => {
+    if (categoryIds.has(category.id)) return [];
+    categoryIds.add(category.id);
 
-  const uncategorizedItems = faqs
-    .filter((faq) => faq.isActive !== false && !faq.categoryId)
-    .sort((first, second) => (first.sortOrder ?? 0) - (second.sortOrder ?? 0))
-    .map((faq) => ({ q: faq.question, a: faq.answer }));
+    const items = mapFaqItems(faqs.filter((faq) => faq.categoryId === category.id || faq.category?.id === category.id));
+    if (items.length === 0) return [];
 
+    return [{
+      id: category.slug || String(category.id),
+      name: category.name,
+      items,
+    }];
+  });
+
+  const uncategorizedItems = mapFaqItems(faqs.filter((faq) => !faq.categoryId && !faq.category));
   return [
-    ...categoryGroups.filter((group) => group.items.length > 0),
-    ...(uncategorizedItems.length > 0 ? [{ id: 'general', name: 'GENERAL', items: uncategorizedItems }] : []),
+    ...categoryGroups,
+    ...(uncategorizedItems.length > 0 ? [{ id: GENERAL_FAQ_GROUP_ID, name: GENERAL_FAQ_GROUP_NAME, items: uncategorizedItems }] : []),
   ];
+};
+
+const mapFaqsWithEmbeddedCategories = (faqs: BackendFaq[]) => {
+  const groupedFaqs = new Map<string, { id: string; name: string; sortOrder: number; faqs: BackendFaq[] }>();
+
+  faqs
+    .filter((faq) => faq.isActive !== false)
+    .sort(sortBySortOrder)
+    .forEach((faq) => {
+      const key = getFaqGroupKey(faq);
+      const existingGroup = groupedFaqs.get(key);
+      const group = existingGroup ?? {
+        id: getFaqGroupId(faq),
+        name: getFaqGroupName(faq),
+        sortOrder: faq.sortOrder ?? 0,
+        faqs: [],
+      };
+
+      group.sortOrder = Math.min(group.sortOrder, faq.sortOrder ?? group.sortOrder);
+      group.faqs.push(faq);
+      groupedFaqs.set(key, group);
+    });
+
+  return Array.from(groupedFaqs.values())
+    .sort(sortBySortOrder)
+    .map((group) => ({
+      id: group.id,
+      name: group.name,
+      items: mapFaqItems(group.faqs),
+    }));
+};
+
+export const mapBackendFaqsToGroups = (faqs: BackendFaq[], categories: BackendFaqCategory[]): FAQCategoryGroup[] => {
+  return categories.length > 0 ? mapFaqsWithExplicitCategories(faqs, categories) : mapFaqsWithEmbeddedCategories(faqs);
 };
 
 export const mapBackendProductToVlogItem = (product: BackendProduct): VlogContentItem => ({

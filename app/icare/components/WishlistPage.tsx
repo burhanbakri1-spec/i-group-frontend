@@ -134,7 +134,7 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
 
                 {/* Product Info */}
                 <div className="p-6">
-                  <p className="text-xs text-[#888] uppercase tracking-wider mb-1">{product.title}</p>
+                  <p className="text-xs text-[#888] uppercase tracking-wider mb-1">{product.category}</p>
                   <h3 className="font-medium mb-2">{product.name}</h3>
                   <div className="flex items-center justify-between mb-4">
                     <p className="text-lg font-medium">{product.price}</p>

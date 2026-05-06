@@ -109,7 +109,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                                 {item.title}
                               </h3>
                               <p className="text-[13px] text-[#706E6A] font-medium">
-                                {item.name}
+                                {item.category}
                               </p>
                             </div>
                             <span className="text-[14px] font-[900] text-[#333]">
@@ -158,7 +158,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                     {lang === 'en' ? 'Subtotal' : 'المجموع الفرعي'}
                   </span>
                   <span className="font-[900] text-[#333]">
-                    ${cartTotal.toFixed(2)}
+                    EGP {cartTotal.toFixed(2)}
                   </span>
                 </div>
                 

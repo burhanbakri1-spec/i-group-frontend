@@ -13,7 +13,7 @@ interface ProductCardProps {
   onSelect?: () => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product, lang, onSelect }) => {
+const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }) => {
   const [isHovered, setIsHovered] = useState(false);
   const { addToCart, addToWishlist, isInWishlist, removeFromWishlist } = useShop();
   const inWishlist = isInWishlist(product.id);
@@ -172,9 +172,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, lang, onSelec
           {/* Name and Price Row */}
           <div className="flex justify-between items-end gap-1 mb-2">
             <div className="flex flex-col min-w-0 flex-1">
-              <h2 className="text-[11px] md:text-[20px] font-black uppercase tracking-tight text-[#4D4D4D] leading-tight truncate">
-                {product.name}
-              </h2>
+               <h2 className="text-[11px] md:text-[20px] font-black uppercase tracking-tight text-[#4D4D4D] leading-tight truncate">
+                 {product.category}
+               </h2>
               <p className="text-[9px] md:text-[15px] text-[#666] font-medium leading-tight line-clamp-1">
                 {product.description}
               </p>
@@ -229,3 +229,5 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, lang, onSelec
     </motion.div>
   );
 };
+
+export const ProductCard = React.memo(ProductCardBase);
