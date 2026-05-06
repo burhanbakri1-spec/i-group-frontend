@@ -40,6 +40,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
   const [orderSummary, setOrderSummary] = useState<OrderSummary | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [verifyingPayment, setVerifyingPayment] = useState(false);
+  const [paymentVerified, setPaymentVerified] = useState(false);
   const [shippingForm, setShippingForm] = useState({
     firstName: user?.name?.split(' ')[0] ?? '',
     lastName: user?.name?.split(' ').slice(1).join(' ') ?? '',
@@ -68,6 +71,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
       cardNumber: 'Card Number',
       expiryDate: 'Expiry Date',
       cvv: 'CVV',
+      gatewayRedirect: 'You will be redirected to our secure payment gateway to complete your purchase.',
+      securePayment: 'Secure payment processed by our payment partner',
       placeOrder: 'PLACE ORDER',
       continueShopping: 'Continue Shopping',
       subtotal: 'Subtotal',
@@ -92,6 +97,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
       cardNumber: 'رقم البطاقة',
       expiryDate: 'تاريخ الانتهاء',
       cvv: 'رمز الأمان',
+      gatewayRedirect: 'سيتم توجيهك إلى بوابة الدفع الآمنة لإتمام عملية الشراء.',
+      securePayment: 'دفع آمن عبر شريك الدفع الخاص بنا',
       placeOrder: 'تأكيد الطلب',
       continueShopping: 'متابعة التسوق',
       subtotal: 'المجموع الفرعي',
@@ -129,16 +136,21 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
   useEffect(() => {
     if (!isAuthenticated || !accessToken || !icareApi.isConfigured() || cartItems.length === 0) {
       setOrderSummary(null);
+      setSummaryLoading(false);
       return;
     }
 
     const loadOrderSummary = async () => {
+      setSummaryLoading(true);
       try {
         const summary = await icareApi.orders.summary(accessToken);
         setOrderSummary(summary);
       } catch (error) {
+        console.error('Failed to load order summary', error);
         setOrderSummary(null);
         setCheckoutError(error instanceof Error ? error.message : 'Unable to refresh order summary.');
+      } finally {
+        setSummaryLoading(false);
       }
     };
 
@@ -207,6 +219,24 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
       setOrder(createdOrder);
       setOrderComplete(true);
       clearCart();
+
+      // Verify payment for online orders
+      // transactionId comes from the backend's response (see Section 12.4 of api-references.md).
+      // For COD orders or if the gateway hasn't processed yet, it remains undefined/null.
+      const transactionId = createdOrder.transactionId;
+      if (paymentMethod !== 'cod' && transactionId) {
+        setVerifyingPayment(true);
+        try {
+          const result = await icareApi.payment.verify(transactionId);
+          setPaymentVerified(result.status === 'success');
+        } catch {
+          setPaymentVerified(false);
+        } finally {
+          setVerifyingPayment(false);
+        }
+      } else {
+        setPaymentVerified(false);
+      }
     } catch (error) {
       setCheckoutError(error instanceof Error ? error.message : 'Failed to place order.');
     } finally {
@@ -330,16 +360,18 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
-                      className="space-y-4 pt-4"
+                      className="pt-4"
                     >
-                      <input type="text" placeholder={text.cardNumber} maxLength={19} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
-                      <div className="grid grid-cols-2 gap-4">
-                        <input type="text" placeholder={text.expiryDate} maxLength={5} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
-                        <input type="text" placeholder={text.cvv} maxLength={3} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-[#666]">
-                        <Lock size={16} />
-                        <span>Your payment information is secure</span>
+                      <div className="bg-[#F0F7FF] border border-[#B8D8FF] rounded-lg p-5 flex items-start gap-3">
+                        <Lock size={20} className="text-[#3A7BD5] mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium text-[#1A1A1A] mb-1">
+                            {text.gatewayRedirect}
+                          </p>
+                          <p className="text-xs text-[#666]">
+                            {text.securePayment}
+                          </p>
+                        </div>
                       </div>
                     </motion.div>
                   )}
@@ -352,18 +384,36 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6"
+                      className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${
+                        verifyingPayment ? 'bg-amber-500' : paymentVerified ? 'bg-green-500' : 'bg-green-500'
+                      }`}
                     >
-                      <Check size={40} className="text-white" />
+                      {verifyingPayment ? (
+                        <div className="w-10 h-10 border-[3px] border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Check size={40} className="text-white" />
+                      )}
                     </motion.div>
                     <h2 className="text-3xl font-light mb-4">
                       {lang === 'en' ? checkoutConfirmedHeading : 'تم تأكيد الطلب!'}
                     </h2>
-                    <p className="text-[#666] mb-8">
-                      {lang === 'en' 
-                        ? `${checkoutConfirmedMessage} Order ${order?.orderNumber ?? ''} has been created.` 
-                        : 'شكراً لشرائك. سنرسل لك رسالة تأكيد قريباً.'}
-                    </p>
+                    {verifyingPayment && (
+                      <p className="text-[#666] mb-4">
+                        {lang === 'en' ? 'Verifying your payment...' : 'جارٍ التحقق من الدفع...'}
+                      </p>
+                    )}
+                    {!verifyingPayment && paymentVerified && (
+                      <p className="text-green-600 text-sm font-medium mb-4">
+                        {lang === 'en' ? 'Payment confirmed.' : 'تم تأكيد الدفع.'}
+                      </p>
+                    )}
+                    {!verifyingPayment && !paymentVerified && (
+                      <p className="text-[#666] mb-8">
+                        {lang === 'en' 
+                          ? `${checkoutConfirmedMessage} Order ${order?.orderNumber ?? ''} has been created.` 
+                          : 'شكراً لشرائك. سنرسل لك رسالة تأكيد قريباً.'}
+                      </p>
+                    )}
                     <button
                       onClick={() => onNavigate('shop')}
                       className="px-8 py-3 bg-black text-white rounded-full hover:bg-[#333] transition-colors"
@@ -441,32 +491,39 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                 ))}
               </div>
 
+              {summaryLoading ? (
+                <div className="flex justify-center py-4 border-t border-[#EEE] pt-4">
+                  <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : (
+
               <div className="space-y-3 text-sm border-t border-[#EEE] pt-4">
                 <div className="flex justify-between">
                   <span className="text-[#666]">{text.subtotal}</span>
-                  <span>${displayOrderSummary.subtotal.toFixed(2)}</span>
+                  <span>EGP {displayOrderSummary.subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#666]">{text.shipping}</span>
                   <span className={displayOrderSummary.shipping === 0 ? 'text-green-600' : ''}>
-                    {displayOrderSummary.shipping === 0 ? text.free : `$${displayOrderSummary.shipping.toFixed(2)}`}
+                    {displayOrderSummary.shipping === 0 ? text.free : `EGP ${displayOrderSummary.shipping.toFixed(2)}`}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#666]">{text.tax}</span>
-                  <span>${displayOrderSummary.tax.toFixed(2)}</span>
+                  <span>EGP {displayOrderSummary.tax.toFixed(2)}</span>
                 </div>
                 {displayOrderSummary.discount > 0 && (
                   <div className="flex justify-between">
                     <span className="text-[#666]">Discount</span>
-                    <span>-${displayOrderSummary.discount.toFixed(2)}</span>
+                    <span>-EGP {displayOrderSummary.discount.toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between font-medium text-lg pt-3 border-t border-[#EEE]">
                   <span>{text.total}</span>
-                  <span>${displayOrderSummary.total.toFixed(2)}</span>
+                  <span>EGP {displayOrderSummary.total.toFixed(2)}</span>
                 </div>
               </div>
+              )}
             </div>
           </div>
         </div>

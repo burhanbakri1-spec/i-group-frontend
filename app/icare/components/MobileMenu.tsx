@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ShoppingBag, Heart, Globe, Instagram, Music2, Youtube, Facebook } from 'lucide-react';
+import { X, ShoppingBag, Heart, Globe } from 'lucide-react';
 import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { fetchCatalogProducts } from '../lib/catalog-client';
 import { Product } from '../types';
+import { useSiteContent } from '../hooks/useSiteContent';
+import { getSocialPlatformIcon, getSocialPlatformLabel } from '../lib/social-links';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -26,6 +28,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
   const [activeCategory, setActiveCategory] = useState(SHOP_ALL_CATEGORY);
   const [remoteProducts, setRemoteProducts] = useState<Product[]>([]);
   const { cartCount, wishlistItems } = useShop();
+  const { socialLinks: rawSocialLinks } = useSiteContent();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -47,9 +50,17 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
 
   const activeMobileCategory = mobileCategories.includes(activeCategory) ? activeCategory : SHOP_ALL_CATEGORY;
 
-  const displayProducts = remoteProducts
-    .filter((product) => activeMobileCategory === SHOP_ALL_CATEGORY || product.category?.trim().toUpperCase() === activeMobileCategory)
-    .slice(0, 4);
+  const displayProducts = useMemo<Product[]>(() => {
+    return remoteProducts
+      .filter((product) => activeMobileCategory === SHOP_ALL_CATEGORY || product.category?.trim().toUpperCase() === activeMobileCategory)
+      .slice(0, 4);
+  }, [activeMobileCategory, remoteProducts]);
+
+  const socialLinks = rawSocialLinks.map(({ platform, url }) => {
+    const name = getSocialPlatformLabel(platform);
+    const Icon = getSocialPlatformIcon(platform);
+    return { name, url, Icon };
+  });
 
   return (
     <AnimatePresence>
@@ -189,21 +200,22 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
               </button>
             </div>
 
-            {/* Social Icons - Compact */}
-            <div className="flex gap-4">
-              <button className="p-2 bg-white rounded-full shadow-sm text-[#5C5A56]">
-                <Instagram size={18} strokeWidth={1.5} />
-              </button>
-              <button className="p-2 bg-white rounded-full shadow-sm text-[#5C5A56]">
-                <Music2 size={18} strokeWidth={1.5} />
-              </button>
-              <button className="p-2 bg-white rounded-full shadow-sm text-[#5C5A56]">
-                <Youtube size={18} strokeWidth={1.5} />
-              </button>
-              <button className="p-2 bg-white rounded-full shadow-sm text-[#5C5A56]">
-                <Facebook size={18} strokeWidth={1.5} />
-              </button>
-            </div>
+            {/* Social Icons - Only render if backend links exist */}
+            {rawSocialLinks.length > 0 && (
+              <div className="flex gap-4">
+                {socialLinks.map((social) => (
+                  <a
+                    key={social.name}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 bg-white rounded-full shadow-sm text-[#5C5A56] hover:text-black transition-colors"
+                  >
+                    <social.Icon size={18} strokeWidth={1.5} />
+                  </a>
+                ))}
+              </div>
+            )}
 
             <p className="text-[9px] text-[#9A9A9A] font-bold tracking-widest uppercase">
               © ICARE 2026

@@ -24,7 +24,7 @@ interface LineupItemProps {
   onSelect?: (product: Product) => void;
 }
 
-const LineupCard: React.FC<LineupItemProps> = ({ product, category, badge, name, description, price, image, reviews, onSelect }) => {
+const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, badge, name, description, price, image, reviews, onSelect }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -115,9 +115,36 @@ const LineupCard: React.FC<LineupItemProps> = ({ product, category, badge, name,
   );
 };
 
+const LineupCard = React.memo(LineupCardBase);
+
 export const ProductLineup: React.FC<ProductLineupProps> = ({ onProductSelect, products, useShortcutFallback = true }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [remoteProducts, setRemoteProducts] = useState<Product[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadProducts = async () => {
+    setError(null);
+    if (products) {
+      setRemoteProducts(products);
+      return;
+    }
+    if (!useShortcutFallback) {
+      setRemoteProducts([]);
+      return;
+    }
+    try {
+      const bestsellers = await fetchProductShortcut('bestsellers', 8);
+      setRemoteProducts(bestsellers ?? []);
+    } catch (err) {
+      console.error('Failed to load product lineup', err);
+      setError(err instanceof Error ? err.message : 'Failed to load products.');
+      setRemoteProducts([]);
+    }
+  };
+
+  useEffect(() => {
+    loadProducts();
+  }, [products, useShortcutFallback]);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
@@ -128,30 +155,32 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ onProductSelect, p
     }
   };
 
-  useEffect(() => {
-    const loadLineupProducts = async () => {
-      if (products) {
-        setRemoteProducts(products);
-        return;
-      }
-      if (!useShortcutFallback) {
-        setRemoteProducts([]);
-        return;
-      }
-      const bestsellers = await fetchProductShortcut('bestsellers', 8);
-      setRemoteProducts(bestsellers ?? []);
-    };
-    loadLineupProducts();
-  }, [products, useShortcutFallback]);
-
   const items = remoteProducts ?? [];
 
   if (remoteProducts === null) {
     return (
       <section className="bg-white pt-12 pb-24 lg:pb-32 overflow-hidden">
         <div className="max-w-[1600px] mx-auto px-4 lg:px-12">
-          <div className="rounded-[24px] bg-[#F6F6F6] p-12 text-center text-[12px] font-bold uppercase tracking-[0.2em] text-black/40">
-            loading products
+          <div className="rounded-[24px] bg-[#F6F6F6] p-12 flex items-center justify-center">
+            <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="bg-white pt-12 pb-24 lg:pb-32 overflow-hidden">
+        <div className="max-w-[1600px] mx-auto px-4 lg:px-12">
+          <div className="rounded-[24px] bg-[#F6F6F6] p-12 text-center space-y-4">
+            <p className="text-[13px] text-red-600 font-medium">{error}</p>
+            <button
+              onClick={loadProducts}
+              className="px-6 py-2 bg-black text-white rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black/90 transition-colors"
+            >
+              Retry
+            </button>
           </div>
         </div>
       </section>
@@ -179,7 +208,7 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ onProductSelect, p
         >
           {items.map((item) => (
             <div key={item.id} className="snap-start first:pl-2 last:pr-2">
-               <LineupCard
+               <LineupCardBase
                  product={item}
                  category={item.title ?? item.category ?? 'icare'}
                  badge={item.badge}

@@ -11,7 +11,7 @@ interface VlogPageProps {
   lang: Language;
 }
 
-const VlogItem = ({ title, subtitle, image, videoUrl }: { title: string, subtitle: string, image: string, videoUrl?: string | null }) => (
+const VlogItemBase = ({ title, subtitle, image, videoUrl }: { title: string, subtitle: string, image: string, videoUrl?: string | null }) => (
   <motion.div 
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
@@ -38,11 +38,36 @@ const VlogItem = ({ title, subtitle, image, videoUrl }: { title: string, subtitl
   </motion.div>
 );
 
+const VlogItem = React.memo(VlogItemBase);
+
 export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
   const { vlogHeroTitle, vlogFilterLabel, vlogLoading, vlogEmptyHeading, vlogEmptyDescription } = useSiteContent();
   const [filter, setFilter] = useState('ALL');
   const [remoteVlogs, setRemoteVlogs] = useState<VlogContentItem[] | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadVlogs = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const items = await fetchProductMediaVlogs(6);
+      setRemoteVlogs(items ?? []);
+    } catch (err) {
+      console.error('Failed to load vlogs', err);
+      setError(err instanceof Error ? err.message : 'Failed to load vlogs.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadVlogs();
+  }, []);
+
+  const vlogs = remoteVlogs ?? [];
+  const isLoading = loading || remoteVlogs === null;
+  const filteredVlogs = filter === 'ALL' ? vlogs : vlogs.filter((item) => item.category === filter || item.category === 'ALL');
 
   const t = {
     filterBy: lang === 'en' ? 'FILTER BY:' : 'تصفية حسب:',
@@ -51,19 +76,6 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
     tutorials: lang === 'en' ? 'TUTORIALS' : 'الدروس',
     heroTitle: lang === 'en' ? 'PRODUCT STORIES' : 'قصص المنتجات',
   };
-
-  useEffect(() => {
-    const loadVlogs = async () => {
-      setLoading(true);
-      const items = await fetchProductMediaVlogs(6);
-      setRemoteVlogs(items ?? []);
-      setLoading(false);
-    };
-    loadVlogs();
-  }, []);
-
-  const vlogs = remoteVlogs ?? [];
-  const filteredVlogs = filter === 'ALL' ? vlogs : vlogs.filter((item) => item.category === filter || item.category === 'ALL');
 
   return (
     <div className="min-h-screen bg-[#FFFFFF] pb-32">
@@ -106,8 +118,20 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
 
       {/* 3. Vlog Grid - 2 columns even on mobile to match desktop layout */}
       <section className="max-w-[1400px] mx-auto px-4 md:px-6">
-        {loading ? (
-          <div className="py-20 text-center text-[12px] font-black uppercase tracking-[0.2em] text-black/40">{vlogLoading}</div>
+        {isLoading ? (
+          <div className="py-20 flex items-center justify-center">
+            <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : error ? (
+          <div className="py-20 text-center space-y-4">
+            <p className="text-[13px] text-red-600 font-medium">{error}</p>
+            <button
+              onClick={loadVlogs}
+              className="px-6 py-2 bg-black text-white rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black/90 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
         ) : filteredVlogs.length > 0 ? (
           <div className="grid grid-cols-2 gap-x-4 md:gap-x-8 gap-y-8 md:gap-y-16">
             {filteredVlogs.map((vlog) => (

@@ -12,6 +12,7 @@ import {
   BackendProductReview,
   BackendVideo,
   BackendVideoCategory,
+  BackendStore,
   SettingsGroupResponse,
   AllSettingsResponse,
   CreateOrderInput,
@@ -119,7 +120,7 @@ const request = async <T>(
   } catch (error) {
     // Convert browser network failures into the same typed API error components use for empty states.
     if (error instanceof TypeError && error.message === 'Failed to fetch') {
-      throw new IcareApiError('API unreachable; backend content unavailable', 0);
+      throw new IcareApiError('Content is temporarily unavailable. Please try again later.', 0);
     }
     throw error;
   }
@@ -153,6 +154,7 @@ export const icareApi = {
   brands: {
     list: (query?: Record<string, QueryValue>) =>
       request<PaginatedData<BackendBrand> | BackendBrand[]>('/api/v1/brands', { query }),
+    // NOTE: wired but unused as of May 2026
     detail: (slug: string) => request<BackendBrand>(`/api/v1/brands/${slug}`),
   },
 
@@ -179,6 +181,7 @@ export const icareApi = {
         body: JSON.stringify({ name, email, password, phone: phone || undefined }),
       }),
     refresh: (refreshToken: string) => request<AuthSession>('/api/v1/auth/refresh', { method: 'POST', token: refreshToken }),
+    // NOTE: wired but unused as of May 2026
     me: (token: string) => request<AuthUser>('/api/v1/auth/me', { token }),
     logout: (token: string) => request<{ message: string }>('/api/v1/auth/logout', { method: 'POST', token }),
   },
@@ -206,8 +209,10 @@ export const icareApi = {
   videos: {
     list: (query?: Record<string, QueryValue>) =>
       request<PaginatedData<BackendVideo> | BackendVideo[]>('/api/v1/videos', { query }),
+    // NOTE: wired but unused as of May 2026
     featured: (limit?: number) =>
       request<BackendVideo[]>('/api/v1/videos/featured', { query: { limit } }),
+    // NOTE: wired but unused as of May 2026
     detail: (id: number) =>
       request<BackendVideo>(`/api/v1/videos/${id}`),
   },
@@ -215,11 +220,13 @@ export const icareApi = {
   videoCategories: {
     list: (query?: Record<string, QueryValue>) =>
       request<PaginatedData<BackendVideoCategory> | BackendVideoCategory[]>('/api/v1/video-categories', { query }),
+    // NOTE: wired but unused as of May 2026
     detail: (id: number) =>
       request<BackendVideoCategory>(`/api/v1/video-categories/${id}`),
   },
 
   settings: {
+    // NOTE: wired but unused as of May 2026
     group: (group: string) =>
       request<SettingsGroupResponse>(`/api/v1/settings/${group}`),
     all: () =>
@@ -227,18 +234,21 @@ export const icareApi = {
   },
 
   announcements: {
+    // NOTE: wired but unused as of May 2026
     active: () =>
       request<Record<string, unknown>[]>('/api/v1/announcements'),
   },
 
   stores: {
     list: (query?: Record<string, QueryValue>) =>
-      request<Record<string, unknown>[]>('/api/v1/stores', { query }),
+      request<PaginatedData<BackendStore> | BackendStore[]>('/api/v1/stores', { query }),
   },
 
   pages: {
+    // NOTE: wired but unused as of May 2026
     list: (query?: Record<string, QueryValue>) =>
       request<PaginatedData<Record<string, unknown>> | Record<string, unknown>[]>('/api/v1/pages', { query }),
+    // NOTE: wired but unused as of May 2026
     bySlug: (slug: string) =>
       request<Record<string, unknown>>(`/api/v1/pages/${slug}`),
   },
@@ -254,5 +264,45 @@ export const icareApi = {
     list: (token: string, query?: Record<string, QueryValue>) =>
       request<PaginatedData<OrderListItem> | OrderListItem[]>('/api/v1/orders', { token, query }),
     detail: (token: string, orderNumber: string) => request<CreatedOrder>(`/api/v1/orders/${orderNumber}`, { token }),
+    /**
+     * Cancel a cancellable order (status = 'pending' or 'processing').
+     * Backend restores stock and records cancellation in statusHistory.
+     * Requires authentication (access token).
+     */
+    cancel: (orderNumber: string, token: string) =>
+      request<{ orderNumber: string; status: string; cancelledAt: string; message: string }>(
+        `/api/v1/orders/${orderNumber}/cancel`,
+        { method: 'POST', token },
+      ),
+    /**
+     * Track an order by order number — no authentication required.
+     * Returns status, tracking number, carrier, and status timeline.
+     */
+    track: (orderNumber: string) =>
+      request<{
+        orderNumber: string;
+        status: string;
+        trackingNumber?: string | null;
+        carrier?: string | null;
+        shippedAt?: string | null;
+        estimatedDelivery?: string | null;
+        statusHistory?: Array<{ status: string; comment?: string | null; createdAt: string }>;
+      }>(`/api/v1/orders/${orderNumber}/track`, { method: 'POST' }),
+  },
+
+  payment: {
+    /**
+     * Verify a payment transaction via the payment gateway.
+     * No authentication required — called after user returns from gateway redirect.
+     */
+    verify: (transactionId: string) =>
+      request<{ transactionId: string; status: string; amount: number; currency: string; gateway: string; verifiedAt: string }>(
+        '/api/v1/payment/verify',
+        { method: 'POST', body: JSON.stringify({ transactionId }) },
+      ),
+  },
+
+  social: {
+    links: () => request<Record<string, string>>('/api/v1/social-links'),
   },
 };

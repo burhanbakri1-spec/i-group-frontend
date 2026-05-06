@@ -1,15 +1,17 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { ImageWithFallback } from './figma/ImageWithFallback';
 
 export const PhilosophySection = () => {
   return (
     <section className="relative w-full min-h-[80vh] flex flex-col items-center justify-center overflow-hidden px-6 py-24">
       {/* Background Image - Clean texture without text */}
       <div className="absolute inset-0 z-0">
-        <img 
+        <ImageWithFallback 
           src="https://images.unsplash.com/photo-1638609927040-8a7e97cd9d6a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1920" 
           alt="icare clean product texture" 
           className="w-full h-full object-cover object-center scale-110"
+          priority
         />
         {/* Soft overlay for clarity */}
         <div className="absolute inset-0 bg-white/20 backdrop-blur-[2px]" />

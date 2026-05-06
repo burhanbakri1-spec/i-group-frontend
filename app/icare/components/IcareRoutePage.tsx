@@ -12,6 +12,7 @@ import { ShippingPage } from './ShippingPage';
 import { ShopPage } from './ShopPage';
 import { StoreLocator } from './StoreLocator';
 import { VlogPage } from './VlogPage';
+import CartPage from './CartPage';
 import { WishlistPage } from './WishlistPage';
 import { IcarePageKey } from '../lib/routes';
 import { useIcareShell } from './IcareShell';
@@ -44,6 +45,8 @@ export const IcareRoutePage = ({ page }: { page: IcarePageKey }) => {
       return <CheckoutPage lang={lang} onNavigate={navigateToPage} />;
     case 'wishlist':
       return <WishlistPage lang={lang} onProductSelect={navigateToProduct} onNavigate={navigateToPage} />;
+    case 'cart':
+      return <CartPage />;
     case 'shipping':
       return <ShippingPage lang={lang} />;
     case 'home':

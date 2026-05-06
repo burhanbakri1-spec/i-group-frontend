@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import { AuthSession, AppSettings, BackendCart, CartItem, Product, WishlistItem, ShopContextType } from '../types';
 import { IcareApiError, icareApi } from '../lib/api-client';
 import { mapBackendCartToCartItems } from '../lib/mappers';
+import { normalizeSettingsGroups } from '../lib/settings';
 
 const GUEST_CART_STORAGE_KEY = 'icare_guest_cart';
 const WISHLIST_STORAGE_KEY = 'icare_wishlist';
@@ -62,6 +63,7 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [session, setSession] = useState<AuthSession | null>(() => readStoredSession());
   const [authError, setAuthError] = useState<string | null>(null);
   const [settings, setSettings] = useState<AppSettings | null>(null);
+  const [socialLinks, setSocialLinks] = useState<Record<string, string>>({});
 
   const accessToken = session?.accessToken ?? null;
   const user = session?.user ?? null;
@@ -134,14 +136,30 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       if (!icareApi.isConfigured()) return;
       try {
         const data = await icareApi.settings.all();
-        if (data?.settings) {
-          setSettings(data.settings as unknown as AppSettings);
+        const normalizedSettings = normalizeSettingsGroups(data);
+        if (normalizedSettings) {
+          setSettings(normalizedSettings);
         }
       } catch {
         // Non-critical — silently ignore failures
       }
     };
     loadSettings();
+  }, []);
+
+  // Load social links from dedicated endpoint on mount
+  useEffect(() => {
+    const loadSocialLinks = async () => {
+      if (!icareApi.isConfigured()) return;
+      try {
+        const data = await icareApi.social.links();
+        setSocialLinks(data || {});
+      } catch {
+        // Non-critical — set empty object, no fallbacks
+        setSocialLinks({});
+      }
+    };
+    loadSocialLinks();
   }, []);
 
   const addGuestCartItem = (product: Product, quantity: number) => {
@@ -288,6 +306,7 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         logout,
         refreshCart,
         settings,
+        socialLinks,
       }}
     >
       {children}

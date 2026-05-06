@@ -1,21 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Instagram, Youtube, Music2, Facebook, Ghost } from 'lucide-react';
 import { Language } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
+import { getSocialPlatformIcon, getSocialPlatformLabel } from '../lib/social-links';
 
 interface FooterProps {
   lang: Language;
   onNavigate?: (page: string) => void;
 }
-
-const SOCIAL_ICON_MAP: Record<string, React.ComponentType<{ size: number; strokeWidth: number }>> = {
-  instagram: Instagram,
-  youtube: Youtube,
-  tiktok: Music2,
-  facebook: Facebook,
-  snapchat: Ghost,
-};
 
 export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
   const {
@@ -46,9 +38,11 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
     socialLinks: rawSocialLinks,
   } = useSiteContent();
 
+  const [newsletterEmail, setNewsletterEmail] = React.useState('');
+
   const socialLinks = rawSocialLinks.map(({ platform, url }) => {
-    const name = platform.charAt(0).toUpperCase() + platform.slice(1);
-    const Icon = SOCIAL_ICON_MAP[platform.toLowerCase()] || Facebook;
+    const name = getSocialPlatformLabel(platform);
+    const Icon = getSocialPlatformIcon(platform);
     return { name, url, Icon };
   });
 
@@ -83,14 +77,16 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
           
           <div className="space-y-4">
             <div className="flex border border-black/10 bg-white">
-              <input 
-                type="email" 
-                placeholder={footerEmailPlaceholder} 
-                className="bg-transparent border-none outline-none flex-1 text-[13px] px-4 py-3 placeholder:text-[#BBB]"
-              />
-              <button className="text-[11px] font-bold uppercase tracking-widest px-6 py-3 border-l border-black/10 hover:bg-[#5C5A56] hover:text-white transition-all">
-                {footerSubscribeBtn}
-              </button>
+                <input 
+                  type="email" 
+                  placeholder={footerEmailPlaceholder} 
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  className="bg-transparent border-none outline-none flex-1 text-[13px] px-4 py-3 placeholder:text-[#BBB]"
+                />
+                <button onClick={() => { if (newsletterEmail.trim()) { alert(lang === 'en' ? 'Thank you for subscribing!' : 'شكراً لاشتراكك!'); setNewsletterEmail(''); } }} className="text-[11px] font-bold uppercase tracking-widest px-6 py-3 border-l border-black/10 hover:bg-[#5C5A56] hover:text-white transition-all">
+                  {footerSubscribeBtn}
+                </button>
             </div>
             <p className="text-[11px] text-[#999] leading-tight">
                 {footerPrivacyNotice}
@@ -112,28 +108,32 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
             </ul>
           </div>
 
-          {/* Social — dynamic from settings */}
+          {/* Social — dynamic from backend */}
           <div className="p-8 md:p-12 space-y-6">
             <h4 className="text-[12px] font-bold uppercase tracking-widest text-[#5C5A56]">{footerSocialTitle}</h4>
-            <ul className="space-y-3">
-              {socialLinks.map((social) => (
-                <li key={social.name}>
-                  <motion.a
-                    href={social.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-[14px] text-[#706E6A] hover:text-black transition-colors group"
-                    whileHover={{ x: 5 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <motion.div whileHover={{ rotate: 15, scale: 1.2 }}>
-                      <social.Icon size={14} strokeWidth={1.5} />
-                    </motion.div>
-                    <span>{social.name}</span>
-                  </motion.a>
-                </li>
-              ))}
-            </ul>
+            {socialLinks.length > 0 ? (
+              <ul className="space-y-3">
+                {socialLinks.map((social) => (
+                  <li key={social.name}>
+                    <motion.a
+                      href={social.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-[14px] text-[#706E6A] hover:text-black transition-colors group"
+                      whileHover={{ x: 5 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <motion.div whileHover={{ rotate: 15, scale: 1.2 }}>
+                        <social.Icon size={14} strokeWidth={1.5} />
+                      </motion.div>
+                      <span>{social.name}</span>
+                    </motion.a>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-[12px] text-[#999] italic">Social links coming soon</p>
+            )}
           </div>
 
           {/* Official */}
@@ -157,8 +157,7 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
                 <p className="text-[13px] text-[#706E6A]">{footerSupportSubtext}</p>
               </div>
               <ul className="space-y-3">
-                <li><button className="text-[13px] text-[#706E6A] hover:text-black transition-colors text-left leading-tight">{footerDnsLink}</button></li>
-                <li><button className="text-[14px] text-[#706E6A] hover:text-black transition-colors text-left">{footerCookieLink}</button></li>
+                <li><button onClick={() => onNavigate?.('privacy')} className="text-[14px] text-[#706E6A] hover:text-black transition-colors text-left">{footerCookieLink}</button></li>
               </ul>
               <div className="pt-4">
                 <p className="text-[13px] text-[#706E6A]">{footerCopyright}</p>
