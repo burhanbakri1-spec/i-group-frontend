@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_BASE_URL = (process.env.ICARE_API_BASE_URL ?? 'https://backend.igroup.website').replace(/\/$/, '');
+const BACKEND_BASE_URL = (process.env.ICARE_API_BASE_URL ?? process.env.NEXT_PUBLIC_ICARE_API_URL ?? 'https://backend.igroup.website').replace(/\/$/, '');
 
 export async function GET(
   request: NextRequest,
@@ -62,6 +62,7 @@ async function proxyRequest(
   }
 
   try {
+    console.log(`[iCare API Proxy] Forwarding ${request.method} ${backendUrl.toString()}`);
     const backendResponse = await fetch(backendUrl.toString(), {
       method: request.method,
       headers,
