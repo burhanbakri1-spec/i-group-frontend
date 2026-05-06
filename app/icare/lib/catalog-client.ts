@@ -200,7 +200,7 @@ export const fetchProductMediaVlogs = async (limit = 6): Promise<VlogContentItem
             subtitle: group.category.name,
             image: video.thumbnailUrl || FALLBACK_PRODUCT_IMAGE_FOR_VLOGS,
             videoUrl: video.videoUrl || null,
-            category: 'TUTORIALS' as const,
+            category: group.category.name.toLowerCase().includes('product') ? 'PRODUCTS' : 'TUTORIALS',
           });
         }
       }

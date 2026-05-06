@@ -41,7 +41,7 @@ const VlogItemBase = ({ title, subtitle, image, videoUrl }: { title: string, sub
 const VlogItem = React.memo(VlogItemBase);
 
 export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
-  const { vlogHeroTitle, vlogFilterLabel, vlogLoading, vlogEmptyHeading, vlogEmptyDescription } = useSiteContent();
+  const { vlogHeroTitle, vlogHeroImage, vlogFilterLabel, vlogLoading, vlogEmptyHeading, vlogEmptyDescription } = useSiteContent();
   const [filter, setFilter] = useState('ALL');
   const [remoteVlogs, setRemoteVlogs] = useState<VlogContentItem[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -69,20 +69,14 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
   const isLoading = loading || remoteVlogs === null;
   const filteredVlogs = filter === 'ALL' ? vlogs : vlogs.filter((item) => item.category === filter || item.category === 'ALL');
 
-  const t = {
-    filterBy: lang === 'en' ? 'FILTER BY:' : 'تصفية حسب:',
-    all: lang === 'en' ? 'ALL' : 'الكل',
-    products: lang === 'en' ? 'PRODUCTS' : 'المنتجات',
-    tutorials: lang === 'en' ? 'TUTORIALS' : 'الدروس',
-    heroTitle: lang === 'en' ? 'PRODUCT STORIES' : 'قصص المنتجات',
-  };
+  const isAr = lang === 'ar';
 
   return (
     <div className="min-h-screen bg-[#FFFFFF] pb-32">
       {/* 1. Hero Video Section - Fixed aspect on mobile */}
       <section className="relative h-[60vh] md:h-[70vh] w-full overflow-hidden">
         <ImageWithFallback 
-          src="https://images.unsplash.com/photo-1590439471364-192aa70c0b53?q=80&w=2000" 
+          src={vlogHeroImage || "https://images.unsplash.com/photo-1590439471364-192aa70c47b53?q=80&w=2000"} 
           alt="Hero Vlog" 
           className="w-full h-full object-cover"
         />
@@ -110,7 +104,7 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
                 filter === cat ? 'bg-black text-white' : 'bg-[#F2F1ED] text-black/60 hover:bg-[#E5E4E0]'
               }`}
             >
-              {lang === 'en' ? cat : (cat === 'ALL' ? t.all : cat === 'PRODUCTS' ? t.products : t.tutorials)}
+              {lang === 'en' ? cat : (cat === 'ALL' ? 'الكل' : cat === 'PRODUCTS' ? 'المنتجات' : 'الدروس')}
             </button>
           ))}
         </div>
