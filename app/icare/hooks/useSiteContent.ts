@@ -1,19 +1,32 @@
 import { useMemo } from 'react';
 import { useShop } from '../context/ShopContext';
+import { normalizeSocialPlatform } from '../lib/social-links';
 
 export const useSiteContent = () => {
-  const { settings } = useShop();
+  const { settings, socialLinks: contextSocialLinks } = useShop();
 
   return useMemo(() => {
     const g = settings?.general || {};
-    const s = settings?.social || {};
     const c = settings?.contact || {};
     const f = settings?.footer || {};
+
+    // Compute social links directly from dedicated context state (no fallbacks)
+    const socialLinks = Object.entries(contextSocialLinks || {})
+      .filter(([, url]) => url && url !== '#' && url !== '')
+      .map(([platform, url]) => ({
+        platform: normalizeSocialPlatform(platform),
+        url: url as string,
+      }));
 
     return {
       // ── Brand ──
       siteName: g.site_name || 'iCare Beauty',
       siteTagline: g.site_tagline || 'A NEW ERA OF COZINESS',
+      metaTitle: g.meta_title || g.site_name || 'iCare Beauty',
+      metaDescription: g.meta_description || g.site_description || 'iCare Beauty skincare essentials.',
+      siteDescription: g.site_description || 'iCare Beauty skincare essentials.',
+      siteUrl: g.site_url || '',
+      ogImage: g.og_image || '',
 
       // ── Announcement ──
       announcementText: g.announcement_text || 'FREE US SHIPPING ON ORDERS OVER $45',
@@ -223,12 +236,7 @@ export const useSiteContent = () => {
       returnPolicyDays: g.return_policy_days || '30 days',
 
       // ── Social ──
-      socialLinks: Object.entries(s)
-        .filter(([, url]) => url && url !== '#')
-        .map(([platform, url]) => ({
-          platform: platform.replace(/_url$/, ''),
-          url
-        })),
+      socialLinks: socialLinks,
 
       // ── Footer ──
       footerNewsletterText: f.newsletter_text || 'Join us on the icare to an effortless glow.',
