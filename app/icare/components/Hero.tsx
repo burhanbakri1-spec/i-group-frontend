@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language, translations } from '../translations';
+import { useSiteContent } from '../hooks/useSiteContent';
 
 interface HeroProps {
   onNavigate: (page: string) => void;
@@ -10,6 +11,7 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ onNavigate, lang }) => {
   const t = translations[lang];
+  const { heroHeadline, heroImage } = useSiteContent();
   const { scrollY } = useScroll();
   
   // Parallax effects
@@ -32,7 +34,7 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, lang }) => {
           className="absolute inset-0"
         >
           <ImageWithFallback 
-            src="https://images.unsplash.com/photo-1593231945511-9e141a85b017?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWF1dGlmdWwlMjBjYXVjYXNpYW4lMjB3b21hbiUyMHNraW5jYXJlJTIwYWVzdGhldGljJTIwY3JlYW0lMjBiYWNrZ3JvdW5kJTIwbWluaW1hbHxlbnwxfHx8fDE3Njk3MDk2Njl8MA&ixlib=rb-4.1.0&q=80&w=1600" 
+            src={heroImage} 
             alt="Beautiful woman skincare aesthetic" 
             className="w-full h-full object-cover object-center"
           />
@@ -64,7 +66,7 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, lang }) => {
                   ease: [0.22, 1, 0.36, 1] 
                 }}
               >
-                {lang === 'en' ? 'the barrier' : 'زبدة الحاجز'} <br /> {lang === 'en' ? 'butter.' : 'الواقي.'}
+                {lang === 'en' ? heroHeadline : 'زبدة الحاجز'} <br /> {lang === 'en' ? 'butter.' : 'الواقي.'}
               </motion.h1>
             </div>
             

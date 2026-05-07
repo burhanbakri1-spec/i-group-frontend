@@ -2,12 +2,14 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
+import { useSiteContent } from '../hooks/useSiteContent';
 
 interface PromoSectionProps {
   lang: Language;
 }
 
 export const PromoSection: React.FC<PromoSectionProps> = ({ lang }) => {
+  const { promoBadge, promoHeadline, promoDescription, promoCtaLabel, promoImage } = useSiteContent();
   return (
     <section className="px-4 md:px-6 py-4 md:py-8 bg-white">
       {/* Outer Container with reduced rounding */}
@@ -30,7 +32,7 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang }) => {
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
             >
-              {lang === 'en' ? 'New Arrival' : 'وصول جديد'}
+              {lang === 'en' ? promoBadge : 'وصول جديد'}
             </motion.span>
             
             {/* Main Title - Lowercase and Bold */}
@@ -47,7 +49,7 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang }) => {
                 }}
               >
                 {lang === 'en' ? (
-                  <>chilly little <br /> flush</>
+                  <>{promoHeadline}</>
                 ) : (
                   <>احمرار <br /> صغير بارد</>
                 )}
@@ -63,7 +65,7 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang }) => {
               transition={{ delay: 0.25, duration: 0.6 }}
             >
               {lang === 'en' 
-                ? 'Warm up your cheeks with Pocket Blush. A touch of creamy, long-wearing color that mimics the flush you get after stepping in from the cold.'
+                ? promoDescription
                 : 'دفئي خديك مع Pocket Blush. لمسة من اللون الكريمي طويل الأمد الذي يحاكي الاحمرار الذي تحصلين عليه بعد الدخول من البرد.'
               }
             </motion.p>
@@ -89,7 +91,7 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang }) => {
                   transition={{ duration: 0.5 }}
                 />
                 <span className="relative z-10 group-hover:text-white">
-                  {lang === 'en' ? 'POCKET BLUSH' : 'بوكيت بلاش'}
+                  {lang === 'en' ? promoCtaLabel : 'بوكيت بلاش'}
                 </span>
               </motion.button>
             </div>
@@ -111,7 +113,7 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang }) => {
             whileHover={{ scale: 1.05 }}
           >
             <ImageWithFallback 
-              src="https://images.unsplash.com/photo-1653784097013-786a8965ea3b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200" 
+              src={promoImage} 
               alt="icare Pocket Blush" 
               className="w-full h-full object-cover"
             />

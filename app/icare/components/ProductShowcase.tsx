@@ -5,6 +5,7 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
 import { Product } from '../types';
 import { fetchProductShortcut } from '../lib/catalog-client';
+import { useSiteContent } from '../hooks/useSiteContent';
 
 interface ProductShowcaseProps {
   products: Product[];
@@ -14,6 +15,7 @@ interface ProductShowcaseProps {
 
 export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang, onProductSelect }) => {
   void products;
+  const { productShowcaseLoading, productShowcaseEmpty } = useSiteContent();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [remoteProducts, setRemoteProducts] = useState<Product[] | null>(null);
 
@@ -31,7 +33,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
     return (
       <section className="px-2 md:px-8 py-8 bg-white">
         <div className="max-w-[1600px] mx-auto rounded-[16px] bg-[#F2F2F0] p-12 text-center text-[12px] font-bold uppercase tracking-[0.2em] text-black/40">
-          loading featured products
+          {productShowcaseLoading}
         </div>
       </section>
     );
@@ -41,7 +43,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
     return (
       <section className="px-2 md:px-8 py-8 bg-white">
         <div className="max-w-[1600px] mx-auto rounded-[16px] bg-[#F2F2F0] p-12 text-center text-[12px] font-bold uppercase tracking-[0.2em] text-black/40">
-          no featured products are available yet
+          {productShowcaseEmpty}
         </div>
       </section>
     );

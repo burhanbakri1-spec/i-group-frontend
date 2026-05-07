@@ -3,35 +3,22 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
+import { useSiteContent } from '../hooks/useSiteContent';
 
 interface SocialGridProps {
   lang: Language;
 }
 
-const lifestyleImages = [
-  {
-    id: 1,
-    src: "https://images.unsplash.com/photo-1679517354322-20fe85050b9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
-    alt: "icare lifestyle 1"
-  },
-  {
-    id: 2,
-    src: "https://images.unsplash.com/photo-1739980737820-b6bb1a9b8456?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
-    alt: "icare lifestyle 2"
-  },
-  {
-    id: 3,
-    src: "https://images.unsplash.com/photo-1635631414456-6a9dc5051a3d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
-    alt: "icare lifestyle 3"
-  },
-  {
-    id: 4,
-    src: "https://images.unsplash.com/photo-1627384113972-f4c0392fe5aa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800",
-    alt: "icare lifestyle 4"
-  }
-];
-
 export const SocialGrid: React.FC<SocialGridProps> = ({ lang }) => {
+  const { socialGridHeading, socialGridCta, socialGridImage1, socialGridImage2, socialGridImage3, socialGridImage4 } = useSiteContent();
+
+  const lifestyleImages = [
+    { id: 1, src: socialGridImage1, alt: "icare lifestyle 1" },
+    { id: 2, src: socialGridImage2, alt: "icare lifestyle 2" },
+    { id: 3, src: socialGridImage3, alt: "icare lifestyle 3" },
+    { id: 4, src: socialGridImage4, alt: "icare lifestyle 4" },
+  ];
+
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: 'left' | 'right') => {
@@ -55,7 +42,7 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang }) => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            icare + you
+            {socialGridHeading}
           </motion.h2>
           <motion.button 
             className="hidden md:block border border-[#222]/20 rounded-full px-8 py-2 text-[10px] font-bold tracking-[0.1em] uppercase text-[#222] hover:bg-[#222] hover:text-white transition-all duration-300 relative overflow-hidden group"
@@ -72,7 +59,7 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang }) => {
               whileHover={{ x: 0 }}
               transition={{ duration: 0.3 }}
             />
-            <span className="relative z-10">{lang === 'en' ? 'FIND US ON SOCIAL' : 'تابعنا على السوشيال'}</span>
+            <span className="relative z-10">{lang === 'en' ? socialGridCta : 'تابعنا على السوشيال'}</span>
           </motion.button>
         </div>
 
@@ -165,7 +152,7 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang }) => {
 
         {/* Mobile Social Button */}
         <button className="md:hidden w-full mt-8 border border-[#222]/20 rounded-full py-4 text-[10px] font-bold tracking-[0.1em] uppercase text-[#222]">
-          {lang === 'en' ? 'FIND US ON SOCIAL' : 'تابعنا على السوشيال'}
+          {lang === 'en' ? socialGridCta : 'تابعنا على السوشيال'}
         </button>
       </div>
     </section>
