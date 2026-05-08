@@ -57,6 +57,12 @@ const getVariantIdentity = (product: Product) => product.variantId ?? 'default';
 
 const getCartLineId = (product: Product) => `${getProductIdentity(product)}:${getVariantIdentity(product)}`;
 
+const warnInDevelopment = (message: string, error: unknown) => {
+  if (process.env.NODE_ENV !== 'production') {
+    console.warn(message, error);
+  }
+};
+
 export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>(() => readStoredArray<CartItem>(GUEST_CART_STORAGE_KEY));
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>(() => readStoredArray<WishlistItem>(WISHLIST_STORAGE_KEY));
@@ -140,8 +146,8 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (normalizedSettings) {
           setSettings(normalizedSettings);
         }
-      } catch {
-        // Non-critical — silently ignore failures
+      } catch (error) {
+        warnInDevelopment('Failed to load iCare public settings.', error);
       }
     };
     loadSettings();
@@ -154,8 +160,8 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       try {
         const data = await icareApi.social.links();
         setSocialLinks(data || {});
-      } catch {
-        // Non-critical — set empty object, no fallbacks
+      } catch (error) {
+        warnInDevelopment('Failed to load iCare social links.', error);
         setSocialLinks({});
       }
     };

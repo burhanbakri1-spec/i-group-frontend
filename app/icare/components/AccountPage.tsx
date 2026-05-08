@@ -27,7 +27,6 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate }) => {
     authPlaceholderPhone,
     authSubmitLogin,
     authSubmitSignup,
-    authForgotPassword,
     authToggleToRegister,
     authToggleToLogin,
   } = useSiteContent();

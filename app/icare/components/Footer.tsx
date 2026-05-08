@@ -23,7 +23,6 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
     footerOfficialTitle,
     footerSupportTitle,
     footerSupportSubtext,
-    footerDnsLink,
     footerCookieLink,
     footerLinkShop,
     footerLinkStory,

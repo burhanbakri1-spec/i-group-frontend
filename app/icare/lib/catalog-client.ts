@@ -1,23 +1,56 @@
-import { BackendCategory, BackendProduct, BackendVideo, BackendVideoCategory, FAQCategoryGroup, Product, ProductReview, ShowcaseUnit, VlogContentItem } from '../types';
+import { BackendCategory, BackendProduct, BackendVlog, FAQCategoryGroup, Product, ProductReview, ShowcaseUnit, VlogContentItem } from '../types';
 import { icareApi, IcareApiError } from './api-client';
 import {
   mapBackendFaqsToGroups,
   mapBackendProductToProduct,
-  mapBackendProductToVlogItem,
   mapBackendReviewToProductReview,
   unwrapAdminListData,
   unwrapListData,
 } from './mappers';
 
-const FALLBACK_PRODUCT_IMAGE_FOR_VLOGS = 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&q=80&auto=format&fit=crop';
 const IMAGE_BASE_URL = (process.env.NEXT_PUBLIC_IMAGE_BASE_URL || '').replace(/\/$/, '');
 const IMAGE_PROXY_BASE_URL = '/api/icare';
+const VIDEO_FILE_PATTERN = /\.(mp4|webm|ogv|ogg|mov|m4v)(?:$|[?#])/i;
 
 const normalizeShowcaseImageUrl = (image?: string | null) => {
   if (!image?.trim()) return '';
   if (image.startsWith('http')) return image;
   if (image.startsWith('/')) return `${IMAGE_BASE_URL || IMAGE_PROXY_BASE_URL}${image}`;
   return image;
+};
+
+const isDirectVideoUrl = (url: string) => VIDEO_FILE_PATTERN.test(url);
+
+const getYouTubeVideoId = (url: URL) => {
+  if (url.hostname.includes('youtu.be')) return url.pathname.split('/').filter(Boolean)[0] ?? '';
+  if (url.hostname.includes('youtube.com')) {
+    return url.searchParams.get('v')
+      || url.pathname.match(/\/(?:embed|shorts)\/([^/?#]+)/)?.[1]
+      || '';
+  }
+  return '';
+};
+
+const getVimeoVideoId = (url: URL) => {
+  if (!url.hostname.includes('vimeo.com')) return '';
+  return url.pathname.split('/').filter(Boolean).find((segment) => /^\d+$/.test(segment)) ?? '';
+};
+
+const getHostedVideoThumbnail = (videoUrl?: string | null) => {
+  if (!videoUrl?.trim()) return '';
+
+  try {
+    const parsedUrl = new URL(videoUrl);
+    const youTubeId = getYouTubeVideoId(parsedUrl);
+    if (youTubeId) return `https://img.youtube.com/vi/${youTubeId}/hqdefault.jpg`;
+
+    const vimeoId = getVimeoVideoId(parsedUrl);
+    if (vimeoId) return `https://vumbnail.com/${vimeoId}.jpg`;
+  } catch {
+    return '';
+  }
+
+  return '';
 };
 
 const dedupeBackendProducts = (products: BackendProduct[]) => {
@@ -184,50 +217,37 @@ export const fetchFaqGroups = async (): Promise<FAQCategoryGroup[] | null> => {
   }
 };
 
-export const fetchProductMediaVlogs = async (limit = 6): Promise<VlogContentItem[] | null> => {
+export async function fetchProductMediaVlogs(limit = 12): Promise<VlogContentItem[]> {
   try {
-    if (!icareApi.isConfigured()) return null;
-    // Try real video endpoints first, fallback to product-based vlogs
-    const categories = await icareApi.videoCategories.list({ isActive: true, page: 1, limit: 20 });
-    const categoryData = unwrapListData(categories);
+    if (!icareApi.isConfigured()) return [];
 
-    if (categoryData.length > 0) {
-      const allVideos = await Promise.all(
-        categoryData.slice(0, 4).map(async (cat) => {
-          const videos = await icareApi.videos.list({ categoryId: cat.id, isActive: true, page: 1, limit: 10 });
-          return { category: cat, videos: unwrapListData(videos) as BackendVideo[] };
-        })
-      );
+    const result = await icareApi.vlogs.list({ isActive: true, page: 1, limit });
+    const vlogs = unwrapListData(result);
 
-      // Flatten and map to VlogContentItem format
-      const vlogItems: VlogContentItem[] = [];
-      for (const group of allVideos) {
-        for (const video of group.videos) {
-          vlogItems.push({
-            id: String(video.id),
-            title: video.title,
-            subtitle: group.category.name,
-            image: video.thumbnailUrl || FALLBACK_PRODUCT_IMAGE_FOR_VLOGS,
-            videoUrl: video.videoUrl || null,
-            category: group.category.name.toLowerCase().includes('product') ? 'PRODUCTS' : 'TUTORIALS',
-          });
-        }
-      }
-      return vlogItems.length > 0 ? vlogItems.slice(0, limit) : null;
-    }
+    return vlogs.map((vlog: BackendVlog) => {
+      const normalizedThumbnail = normalizeShowcaseImageUrl(vlog.thumbnailUrl);
+      const normalizedVideoUrl = normalizeShowcaseImageUrl(vlog.videoUrl);
+      const hostedThumbnail = normalizedThumbnail ? '' : getHostedVideoThumbnail(normalizedVideoUrl);
+      const videoPreviewUrl = !normalizedThumbnail && !hostedThumbnail && isDirectVideoUrl(normalizedVideoUrl) ? normalizedVideoUrl : null;
+      const image = normalizedThumbnail || hostedThumbnail;
 
-    // Fallback: use product data as vlogs
-    const products = await icareApi.products.featured(limit);
-    const mediaItems = products.map((product) => mapBackendProductToVlogItem(product));
-    return mediaItems.length > 0 ? mediaItems : null;
+      return {
+        id: String(vlog.id),
+        title: vlog.title || 'Vlog',
+        subtitle: vlog.description || '',
+        image,
+        thumbnailType: image ? 'image' : videoPreviewUrl ? 'video' : 'fallback',
+        videoPreviewUrl,
+        videoUrl: normalizedVideoUrl || null,
+      };
+    });
   } catch (error) {
-    // Suppress offline network noise; components render backend-empty states.
     if (!(error instanceof IcareApiError && error.status === 0)) {
-      console.error('Error fetching iCare product media:', error);
+      console.error('Error fetching iCare vlogs:', error);
     }
-    return null;
+    return [];
   }
-};
+}
 
 export const fetchProductShowcase = async (slug: string): Promise<ShowcaseUnit[] | null> => {
   try {

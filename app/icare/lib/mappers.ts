@@ -13,7 +13,6 @@ import {
   Product,
   ProductReview,
   ProductVariant,
-  VlogContentItem,
 } from '../types';
 
 type NumericInput = string | number | null | undefined;
@@ -160,9 +159,16 @@ export const mapBackendCartToCartItems = (cart: BackendCart): CartItem[] => {
   return cart.items.map(mapBackendCartItem);
 };
 
-export const unwrapListData = <T>(payload: T[] | { data: T[] }) => {
+const isRecord = (value: unknown): value is Record<string, unknown> => (
+  Boolean(value) && typeof value === 'object' && !Array.isArray(value)
+);
+
+export const unwrapListData = <T>(payload: T[] | { data?: T[] | { data?: T[] } } | null | undefined): T[] => {
   if (Array.isArray(payload)) return payload;
-  return Array.isArray(payload.data) ? payload.data : [];
+  if (!isRecord(payload)) return [];
+  if (Array.isArray(payload.data)) return payload.data;
+  if (isRecord(payload.data) && Array.isArray(payload.data.data)) return payload.data.data;
+  return [];
 };
 
 export const unwrapAdminListData = <T>(payload: T[] | AdminListData<T>) => {
@@ -276,11 +282,3 @@ export const mapBackendFaqsToGroups = (faqs: BackendFaq[], categories: BackendFa
   return categories.length > 0 ? mapFaqsWithExplicitCategories(faqs, categories) : mapFaqsWithEmbeddedCategories(faqs);
 };
 
-export const mapBackendProductToVlogItem = (product: BackendProduct): VlogContentItem => ({
-  id: String(product.id),
-  title: product.name,
-  subtitle: product.shortDescription || product.description || product.brand?.name || 'Product story',
-  image: getUniqueProductImages(product)[0] ?? '',
-  videoUrl: product.videoUrl,
-  category: product.videoUrl ? 'TUTORIALS' : 'PRODUCTS',
-});

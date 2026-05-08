@@ -89,10 +89,11 @@ export interface FAQCategoryGroup {
 export interface VlogContentItem {
   id: string;
   title: string;
-  subtitle: string;
+  subtitle: string;  // description/details
   image: string;
+  thumbnailType?: 'image' | 'video' | 'fallback';
+  videoPreviewUrl?: string | null;
   videoUrl?: string | null;
-  category: 'ALL' | 'PRODUCTS' | 'TUTORIALS';
 }
 
 export interface FilterOptions {
@@ -307,6 +308,20 @@ export interface BackendVideoCategory {
   description?: string | null;
   isActive?: boolean;
   sortOrder?: number;
+}
+
+export interface BackendVlog {
+  id: number;
+  title: string;
+  slug: string;
+  description?: string | null;
+  videoUrl: string;
+  thumbnailUrl?: string | null;
+  isFeatured?: boolean;
+  isActive?: boolean;
+  sortOrder?: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface SettingsGroupResponse {

@@ -13,6 +13,7 @@ import {
   BackendShowcaseUnit,
   BackendVideo,
   BackendVideoCategory,
+  BackendVlog,
   BackendStore,
   SettingsGroupResponse,
   AllSettingsResponse,
@@ -225,6 +226,15 @@ export const icareApi = {
     // NOTE: wired but unused as of May 2026
     detail: (id: number) =>
       request<BackendVideoCategory>(`/api/v1/video-categories/${id}`),
+  },
+
+  vlogs: {
+    list: (query?: { isActive?: boolean; isFeatured?: boolean; search?: string; page?: number; limit?: number }) =>
+      request<PaginatedData<BackendVlog> | BackendVlog[]>('/api/v1/vlogs', { query }),
+    featured: (query?: { limit?: number }) =>
+      request<BackendVlog[]>('/api/v1/vlogs/featured', { query }),
+    detail: (id: number | string) =>
+      request<BackendVlog>(`/api/v1/vlogs/${id}`),
   },
 
   settings: {
