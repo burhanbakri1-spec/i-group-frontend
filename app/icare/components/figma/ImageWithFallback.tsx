@@ -12,6 +12,12 @@ interface ImageWithFallbackProps {
   height?: number
 }
 
+const isNativeImageSource = (src: string) => {
+  if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('//')) return true
+  if (src.startsWith('/api/icare/uploads/') || src.startsWith('/uploads/')) return true
+  return false
+}
+
 export function ImageWithFallback({
   src,
   alt,
@@ -41,6 +47,18 @@ export function ImageWithFallback({
   }
 
   const imageSrc: string = src
+
+  if (isNativeImageSource(imageSrc)) {
+    return (
+      <img
+        src={imageSrc}
+        alt={alt ?? ''}
+        className={className}
+        style={style}
+        onError={() => setDidError(true)}
+      />
+    )
+  }
 
   // Use explicit dimensions when both width and height are provided,
   // otherwise use fill mode which requires a positioned parent wrapper.

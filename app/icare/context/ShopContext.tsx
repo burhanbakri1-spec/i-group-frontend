@@ -63,7 +63,7 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [session, setSession] = useState<AuthSession | null>(() => readStoredSession());
   const [authError, setAuthError] = useState<string | null>(null);
   const [settings, setSettings] = useState<AppSettings | null>(null);
-  const [socialLinks, setSocialLinks] = useState<Record<string, string>>({});
+  const [socialLinks, setSocialLinks] = useState<unknown>({});
 
   const accessToken = session?.accessToken ?? null;
   const user = session?.user ?? null;

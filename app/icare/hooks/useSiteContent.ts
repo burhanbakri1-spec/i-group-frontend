@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useShop } from '../context/ShopContext';
-import { normalizeSocialPlatform } from '../lib/social-links';
+import { normalizeSocialLinksResponse } from '../lib/social-links';
 
 export const useSiteContent = () => {
   const { settings, socialLinks: contextSocialLinks } = useShop();
@@ -11,12 +11,7 @@ export const useSiteContent = () => {
     const f = settings?.footer || {};
 
     // Compute social links directly from dedicated context state (no fallbacks)
-    const socialLinks = Object.entries(contextSocialLinks || {})
-      .filter(([, url]) => url && url !== '#' && url !== '')
-      .map(([platform, url]) => ({
-        platform: normalizeSocialPlatform(platform),
-        url: url as string,
-      }));
+    const socialLinks = normalizeSocialLinksResponse(contextSocialLinks);
 
     return {
       // ── Brand ──
@@ -280,5 +275,5 @@ export const useSiteContent = () => {
       currencyCode: g.currency_code || 'USD',
       itemsPerPage: Number(g.items_per_page || '12'),
     };
-  }, [settings]);
+  }, [settings, contextSocialLinks]);
 };

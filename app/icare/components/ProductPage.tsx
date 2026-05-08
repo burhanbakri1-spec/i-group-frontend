@@ -4,6 +4,7 @@ import { Star, ChevronDown, ThumbsUp, ThumbsDown, CheckCircle2, ShoppingBag } fr
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
 import { ProductLineup } from './ProductLineup';
+import { ProductShowcaseBlock } from './ProductShowcaseBlock';
 import { useShop } from '../context/ShopContext';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { Product, ProductReview, ProductVariant } from '../types';
@@ -128,9 +129,20 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
   const lastScrollY = useRef(0);
   const isRtl = lang === 'ar';
 
-  const displayImages = (displayProduct.images && displayProduct.images.length > 0 ? displayProduct.images : [displayProduct.image]).filter(Boolean);
-  const safeActiveImageIndex = displayImages[activeImageIndex] ? activeImageIndex : 0;
-  const activeProductImage = displayImages[safeActiveImageIndex] ?? '';
+  // Use backendProduct.images for full metadata (including mediaType), fallback to string array
+  const backendImages = displayProduct.backendProduct?.images ?? [];
+  const mediaImages = backendImages.length > 0
+    ? backendImages
+    : (displayProduct.images && displayProduct.images.length > 0
+        ? displayProduct.images.map(url => ({ imageUrl: url, mediaType: 'IMAGE' as const }))
+        : [{ imageUrl: displayProduct.image, mediaType: 'IMAGE' as const }]);
+  const displayImages = mediaImages.filter(img => img.imageUrl).map(img => ({
+    url: img.imageUrl,
+    mediaType: (img as any).mediaType || 'IMAGE',
+  }));
+  const safeActiveImageIndex = displayImages[activeImageIndex]?.url ? activeImageIndex : 0;
+  const activeProduct = displayImages[safeActiveImageIndex];
+  const activeProductImage = activeProduct?.url ?? '';
   const purchasableProduct = displayProduct.backendProduct
     ? mapBackendProductToProduct(displayProduct.backendProduct, selectedVariant)
     : displayProduct;
@@ -220,12 +232,23 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                 transition={{ duration: 0.6 }}
                 className="absolute inset-0"
               >
-                {activeProductImage ? (
-                  <ImageWithFallback 
-                    src={activeProductImage}
-                    alt="Product View" 
-                    className="w-full h-full object-cover"
-                  />
+                {activeProduct?.url ? (
+                  (activeProduct.mediaType === 'VIDEO' || activeProduct.mediaType === 'video') ? (
+                    <video
+                      src={activeProduct.url}
+                      controls
+                      muted
+                      playsInline
+                      className="w-full h-full object-cover"
+                      poster={displayImages.find((_, i) => i !== safeActiveImageIndex && displayImages[i]?.mediaType === 'IMAGE')?.url}
+                    />
+                  ) : (
+                    <ImageWithFallback
+                      src={activeProduct.url}
+                      alt="Product View"
+                      className="w-full h-full object-cover"
+                    />
+                  )
                 ) : (
                   <div className="w-full h-full bg-[#F2F1ED] flex items-center justify-center text-[11px] font-black uppercase tracking-[0.2em] text-black/30">
                     no image
@@ -237,15 +260,25 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
 
           {/* Floating Navigation Thumbnails - Mobile Optimized */}
           <div className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 flex flex-col gap-2 md:gap-3 z-20">
-             {displayImages.slice(0, 4).map((img, idx) => (
+             {displayImages.slice(0, 4).map((img, idx) => {
+               const isVideo = img.mediaType === 'VIDEO' || img.mediaType === 'video';
+               return (
                <button 
                  key={idx}
                  onClick={() => setActiveImageIndex(idx)}
-                  className={`w-8 h-8 md:w-10 md:h-10 rounded-lg overflow-hidden border-2 transition-all scale-95 hover:scale-105 ${safeActiveImageIndex === idx ? 'border-white ring-2 ring-black/10 shadow-lg' : 'border-transparent opacity-40'}`}
+                   className={`w-8 h-8 md:w-10 md:h-10 rounded-lg overflow-hidden border-2 transition-all scale-95 hover:scale-105 relative ${safeActiveImageIndex === idx ? 'border-white ring-2 ring-black/10 shadow-lg' : 'border-transparent opacity-40'}`}
                >
-                  <ImageWithFallback src={img} alt="thumb" className="w-full h-full object-cover" />
+                   <img src={img.url} alt="thumb" className="w-full h-full object-cover" />
+                   {isVideo && (
+                     <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                       <svg className="w-3 h-3 md:w-4 md:h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                         <path d="M8 5v14l11-7z"/>
+                       </svg>
+                     </div>
+                   )}
                </button>
-             ))}
+               );
+             })}
            </div>
 
           {/* Mobile Bottom Indicator */}
@@ -328,6 +361,9 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
           </div>
         </div>
       </section>
+
+      {/* SHOWCASE SECTION */}
+      <ProductShowcaseBlock slug={product.slug} lang={lang} />
 
       {/* 2. REVIEWS SECTION */}
       <section className="px-4 lg:px-6 pb-32">

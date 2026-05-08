@@ -20,8 +20,6 @@ type NumericInput = string | number | null | undefined;
 
 const normalizeFilterName = (value?: string | null) => value?.trim().toLowerCase() ?? '';
 
-// Fallback placeholder image for products without images
-const FALLBACK_PRODUCT_IMAGE = 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&q=80&auto=format&fit=crop';
 
 // Configurable image base URL — when empty, images remain as relative paths handled by the Next.js proxy
 const IMAGE_BASE_URL = (process.env.NEXT_PUBLIC_IMAGE_BASE_URL || '').replace(/\/$/, '');
@@ -88,8 +86,7 @@ const getUniqueProductImages = (product: BackendProduct, variant?: ProductVarian
     .filter((image): image is string => Boolean(image?.trim()))
     .filter((image, index, images) => images.indexOf(image) === index);
 
-  // Return fallback image if no images are available
-  return uniqueImages.length > 0 ? uniqueImages : [FALLBACK_PRODUCT_IMAGE];
+  return uniqueImages;
 };
 
 export const mapBackendProductToProduct = (product: BackendProduct, selectedVariant?: ProductVariant | null): Product => {

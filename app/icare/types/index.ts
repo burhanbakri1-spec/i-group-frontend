@@ -123,7 +123,7 @@ export interface ShopContextType {
   logout: () => Promise<void>;
   refreshCart: () => Promise<void>;
   settings: AppSettings | null;
-  socialLinks: Record<string, string>;
+  socialLinks: unknown;
 }
 
 export interface AppSettings {
@@ -195,6 +195,7 @@ export interface BackendProductImage {
   altText?: string | null;
   sortOrder?: number;
   isPrimary?: boolean;
+  mediaType?: string;
 }
 
 export interface BackendProduct {
@@ -462,4 +463,23 @@ export interface CreatedOrder {
   /** Gateway transaction reference — available after payment gateway processes the transaction. Null for COD orders. */
   transactionId?: string | null;
   createdAt?: string;
+}
+
+export interface BackendShowcaseUnit {
+  id: number;
+  productId: number;
+  image: string;
+  title: string;
+  description?: string | null;
+  sortOrder: number;
+  layout?: string;
+  isActive: boolean;
+}
+
+export interface ShowcaseUnit {
+  id: number;
+  image: string;
+  title: string;
+  description: string;
+  layout?: string;
 }

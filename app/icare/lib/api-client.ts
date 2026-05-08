@@ -10,6 +10,7 @@ import {
   BackendFaqCategory,
   BackendProduct,
   BackendProductReview,
+  BackendShowcaseUnit,
   BackendVideo,
   BackendVideoCategory,
   BackendStore,
@@ -140,6 +141,7 @@ export const icareApi = {
     reviews: (slug: string, query?: Record<string, QueryValue>) =>
       request<PaginatedData<BackendProductReview> | BackendProductReview[]>(`/api/v1/products/${slug}/reviews`, { query }),
     related: (slug: string) => request<BackendProduct[]>(`/api/v1/products/${slug}/related`),
+    showcase: (slug: string) => request<BackendShowcaseUnit[]>(`/api/v1/products/${slug}/showcase`),
   },
 
   categories: {
@@ -303,6 +305,6 @@ export const icareApi = {
   },
 
   social: {
-    links: () => request<Record<string, string>>('/api/v1/social-links'),
+    links: () => request<unknown>('/api/v1/social-links'),
   },
 };

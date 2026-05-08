@@ -1,4 +1,4 @@
-import { BackendCategory, BackendProduct, BackendVideo, BackendVideoCategory, FAQCategoryGroup, Product, ProductReview, VlogContentItem } from '../types';
+import { BackendCategory, BackendProduct, BackendVideo, BackendVideoCategory, FAQCategoryGroup, Product, ProductReview, ShowcaseUnit, VlogContentItem } from '../types';
 import { icareApi, IcareApiError } from './api-client';
 import {
   mapBackendFaqsToGroups,
@@ -10,6 +10,15 @@ import {
 } from './mappers';
 
 const FALLBACK_PRODUCT_IMAGE_FOR_VLOGS = 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&q=80&auto=format&fit=crop';
+const IMAGE_BASE_URL = (process.env.NEXT_PUBLIC_IMAGE_BASE_URL || '').replace(/\/$/, '');
+const IMAGE_PROXY_BASE_URL = '/api/icare';
+
+const normalizeShowcaseImageUrl = (image?: string | null) => {
+  if (!image?.trim()) return '';
+  if (image.startsWith('http')) return image;
+  if (image.startsWith('/')) return `${IMAGE_BASE_URL || IMAGE_PROXY_BASE_URL}${image}`;
+  return image;
+};
 
 const dedupeBackendProducts = (products: BackendProduct[]) => {
   const seenProductKeys = new Set<string>();
@@ -215,6 +224,25 @@ export const fetchProductMediaVlogs = async (limit = 6): Promise<VlogContentItem
     // Suppress offline network noise; components render backend-empty states.
     if (!(error instanceof IcareApiError && error.status === 0)) {
       console.error('Error fetching iCare product media:', error);
+    }
+    return null;
+  }
+};
+
+export const fetchProductShowcase = async (slug: string): Promise<ShowcaseUnit[] | null> => {
+  try {
+    if (!icareApi.isConfigured()) return null;
+    const units = await icareApi.products.showcase(slug);
+    return units.map(u => ({
+      id: u.id,
+      image: normalizeShowcaseImageUrl(u.image),
+      title: u.title,
+      description: u.description ?? '',
+      layout: u.layout ?? 'stacked',
+    }));
+  } catch (error) {
+    if (!(error instanceof IcareApiError && error.status === 0)) {
+      console.error('Error fetching product showcase:', error);
     }
     return null;
   }
