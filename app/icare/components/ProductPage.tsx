@@ -8,9 +8,8 @@ import { ProductShowcaseBlock } from './ProductShowcaseBlock';
 import { useShop } from '../context/ShopContext';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { Product, ProductGalleryMedia, ProductReview, ProductVariant } from '../types';
-import { icareApi } from '../lib/api-client';
 import { getDefaultVariant, isPurchasableStock, mapBackendProductGalleryMedia, mapBackendProductToProduct, mapBackendReviewToProductReview, normalizeProductMediaUrl } from '../lib/mappers';
-import { fetchProductReviews, fetchRelatedProducts } from '../lib/catalog-client';
+import { fetchProductBySlug, fetchProductReviews, fetchRelatedProducts } from '../lib/catalog-client';
 
 interface ProductPageProps {
   product: Product;
@@ -104,6 +103,13 @@ const getProductImageGallery = (displayProduct: Product, selectedVariant: Produc
       .filter((media) => media.mediaType === 'IMAGE');
   }
 
+  const variantImages: ProductGalleryMedia[] = [
+    ...(selectedVariant?.image ? [{ url: selectedVariant.image, mediaType: 'IMAGE' as const, altText: selectedVariant.name, isPrimary: true }] : []),
+    ...(displayProduct.variants ?? [])
+      .filter((variant) => variant.id !== selectedVariant?.id && variant.image)
+      .map((variant) => ({ url: variant.image ?? '', mediaType: 'IMAGE' as const, altText: variant.name })),
+  ];
+
   const fallbackImages: ProductGalleryMedia[] = displayProduct.galleryMedia?.length
     ? displayProduct.galleryMedia
     : [
@@ -112,7 +118,7 @@ const getProductImageGallery = (displayProduct: Product, selectedVariant: Produc
       ];
 
   const seenUrls = new Set<string>();
-  return fallbackImages.flatMap((media) => {
+  return [...variantImages, ...fallbackImages].flatMap((media) => {
     const normalizedUrl = normalizeProductMediaUrl(media.url);
     if (!normalizedUrl || seenUrls.has(normalizedUrl) || media.mediaType !== 'IMAGE') return [];
     seenUrls.add(normalizedUrl);
@@ -170,22 +176,20 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
 
   useEffect(() => {
     const loadProductDetail = async () => {
-      if (!product.slug || !icareApi.isConfigured() || product.backendProduct) {
+      if (!product.slug || product.backendProduct) {
         setDisplayProduct(product);
         setSelectedVariant(product.variants?.find((variant) => variant.id === product.variantId) ?? null);
         setRemoteReviews(product.backendProduct?.reviews?.recent?.map(mapBackendReviewToProductReview) ?? []);
         return;
       }
 
-      try {
-        const backendProduct = await icareApi.products.detail(product.slug);
-        const defaultVariant = getDefaultVariant(backendProduct);
-        setDisplayProduct(mapBackendProductToProduct(backendProduct, defaultVariant));
+      const productDetail = await fetchProductBySlug(product.slug);
+      if (productDetail) {
+        const defaultVariant = productDetail.backendProduct ? getDefaultVariant(productDetail.backendProduct) : productDetail.variants?.find((variant) => variant.id === productDetail.variantId) ?? null;
+        setDisplayProduct(productDetail.backendProduct ? mapBackendProductToProduct(productDetail.backendProduct, defaultVariant) : productDetail);
         setSelectedVariant(defaultVariant);
-        const recentReviews = backendProduct.reviews?.recent?.map(mapBackendReviewToProductReview) ?? [];
-        setRemoteReviews(recentReviews);
-      } catch (error) {
-        console.error('Failed to load product detail', error);
+        setRemoteReviews(productDetail.backendProduct?.reviews?.recent?.map(mapBackendReviewToProductReview) ?? []);
+      } else {
         setDisplayProduct(product);
       }
     };

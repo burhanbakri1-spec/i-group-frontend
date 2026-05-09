@@ -1,10 +1,9 @@
-import { BackendCategory, BackendProduct, BackendVlog, FAQCategoryGroup, Product, ProductReview, ShowcaseUnit, VlogContentItem } from '../types';
+import { BackendProduct, BackendVlog, FAQCategoryGroup, Product, ProductReview, ShowcaseUnit, VlogContentItem } from '../types';
 import { icareApi, IcareApiError } from './api-client';
 import {
   mapBackendFaqsToGroups,
   mapBackendProductToProduct,
   mapBackendReviewToProductReview,
-  unwrapAdminListData,
   unwrapListData,
 } from './mappers';
 
@@ -75,6 +74,14 @@ const fetchCatalogShortcutProducts = async () => {
   return shortcutResults.flatMap((result) => result.status === 'fulfilled' ? result.value : []);
 };
 
+const fetchActiveProductBySlug = async (slug: string) => {
+  const payload = await icareApi.products.list({ page: 1, limit: 100, active: true });
+  const products = unwrapListData(payload);
+  const normalizedSlug = slug.trim().toLowerCase();
+
+  return products.find((product) => product.slug?.trim().toLowerCase() === normalizedSlug) ?? null;
+};
+
 export const fetchCatalogProducts = async (categoryId?: number): Promise<Product[] | null> => {
   try {
     if (!icareApi.isConfigured()) {
@@ -123,15 +130,26 @@ export const fetchCategoryChildren = async (slug: string) => {
 };
 
 export const fetchProductBySlug = async (slug: string): Promise<Product | null> => {
+  if (!icareApi.isConfigured()) return null;
+
   try {
-    if (!icareApi.isConfigured()) return null;
     const product = await icareApi.products.detail(slug);
-    return mapBackendProductToProduct(product);
-  } catch (error) {
-    // Suppress offline and not-found network noise; route components render unavailable states.
-    if (!(error instanceof IcareApiError && (error.status === 0 || error.status === 404))) {
-      console.error('Error fetching iCare product detail:', error);
+    if (product) return mapBackendProductToProduct(product);
+  } catch (detailError) {
+    if (!(detailError instanceof IcareApiError && (detailError.status === 0 || detailError.status === 404))) {
+      console.error('Error fetching iCare product detail; falling back to active product list:', detailError);
     }
+  }
+
+  try {
+    const fallbackProduct = await fetchActiveProductBySlug(slug);
+    return fallbackProduct ? mapBackendProductToProduct(fallbackProduct) : null;
+  } catch (fallbackError) {
+    // Suppress offline network noise; route components render unavailable states.
+    if (!(fallbackError instanceof IcareApiError && fallbackError.status === 0)) {
+      console.error('Error fetching iCare product detail fallback:', fallbackError);
+    }
+
     return null;
   }
 };

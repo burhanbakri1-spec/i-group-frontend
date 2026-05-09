@@ -100,10 +100,30 @@ const dedupeGalleryMedia = (media: ProductGalleryMedia[]) => {
   const seenUrls = new Set<string>();
 
   return media.filter((item) => {
-    if (!item.url || seenUrls.has(item.url)) return false;
-    seenUrls.add(item.url);
+    const normalizedUrl = normalizeProductMediaUrl(item.url);
+    if (!normalizedUrl || seenUrls.has(normalizedUrl)) return false;
+    seenUrls.add(normalizedUrl);
     return true;
   });
+};
+
+const mapVariantImagesToGalleryMedia = (product: BackendProduct, selectedVariant?: ProductVariant | null): ProductGalleryMedia[] => {
+  const variants = product.variants ?? [];
+  const selectedVariantMedia = selectedVariant?.image ? [{
+    url: normalizeProductMediaUrl(selectedVariant.image),
+    mediaType: 'IMAGE' as const,
+    altText: selectedVariant.name,
+    isPrimary: true,
+  }] : [];
+  const remainingVariantMedia = variants
+    .filter((variant) => variant.id !== selectedVariant?.id && variant.image)
+    .map<ProductGalleryMedia>((variant) => ({
+      url: normalizeProductMediaUrl(variant.image),
+      mediaType: 'IMAGE',
+      altText: variant.name,
+    }));
+
+  return [...selectedVariantMedia, ...remainingVariantMedia];
 };
 
 export const mapBackendProductGalleryMedia = (product: BackendProduct, variant?: ProductVariant | null): ProductGalleryMedia[] => {
@@ -118,13 +138,7 @@ export const mapBackendProductGalleryMedia = (product: BackendProduct, variant?:
   }));
   const primaryBackendMedia = hasBackendPrimary && backendMedia[0]?.isPrimary ? [backendMedia[0]] : [];
   const remainingBackendMedia = hasBackendPrimary ? backendMedia.slice(1) : backendMedia;
-
-  const variantMedia = variant?.image ? [{
-    url: normalizeProductMediaUrl(variant.image),
-    mediaType: 'IMAGE' as const,
-    altText: variant.name,
-    isPrimary: true,
-  }] : [];
+  const variantMedia = mapVariantImagesToGalleryMedia(product, variant);
 
   const featuredMedia = product.featuredImage ? [{
     url: normalizeProductMediaUrl(product.featuredImage),
