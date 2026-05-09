@@ -10,6 +10,10 @@ import {
 const IMAGE_BASE_URL = (process.env.NEXT_PUBLIC_IMAGE_BASE_URL || '').replace(/\/$/, '');
 const IMAGE_PROXY_BASE_URL = '/api/icare';
 const VIDEO_FILE_PATTERN = /\.(mp4|webm|ogv|ogg|mov|m4v)(?:$|[?#])/i;
+const CATALOG_PRODUCT_LIMIT = 100;
+const CATALOG_SHORTCUT_PRODUCT_LIMIT = 60;
+
+type BackendProductWithVisibility = BackendProduct & { isActive?: boolean };
 
 const normalizeShowcaseImageUrl = (image?: string | null) => {
   if (!image?.trim()) return '';
@@ -63,20 +67,30 @@ const dedupeBackendProducts = (products: BackendProduct[]) => {
   });
 };
 
+const isVisibleBackendProduct = (product: BackendProduct) => (
+  (product as BackendProductWithVisibility).isActive !== false
+);
+
+const getVisibleBackendProducts = (products: BackendProduct[]) => products.filter(isVisibleBackendProduct);
+
+const fetchVisibleProductList = async (query: Record<string, string | number | boolean>) => {
+  const payload = await icareApi.products.list(query);
+  return getVisibleBackendProducts(unwrapListData(payload));
+};
+
 const fetchCatalogShortcutProducts = async () => {
   const shortcutResults = await Promise.allSettled([
-    icareApi.products.featured(60),
-    icareApi.products.onSale(60),
-    icareApi.products.new(60),
-    icareApi.products.bestsellers(60),
+    icareApi.products.featured(CATALOG_SHORTCUT_PRODUCT_LIMIT),
+    icareApi.products.onSale(CATALOG_SHORTCUT_PRODUCT_LIMIT),
+    icareApi.products.new(CATALOG_SHORTCUT_PRODUCT_LIMIT),
+    icareApi.products.bestsellers(CATALOG_SHORTCUT_PRODUCT_LIMIT),
   ]);
 
-  return shortcutResults.flatMap((result) => result.status === 'fulfilled' ? result.value : []);
+  return getVisibleBackendProducts(shortcutResults.flatMap((result) => result.status === 'fulfilled' ? result.value : []));
 };
 
 const fetchActiveProductBySlug = async (slug: string) => {
-  const payload = await icareApi.products.list({ page: 1, limit: 100, active: true });
-  const products = unwrapListData(payload);
+  const products = await fetchVisibleProductList({ page: 1, limit: CATALOG_PRODUCT_LIMIT });
   const normalizedSlug = slug.trim().toLowerCase();
 
   return products.find((product) => product.slug?.trim().toLowerCase() === normalizedSlug) ?? null;
@@ -88,11 +102,16 @@ export const fetchCatalogProducts = async (categoryId?: number): Promise<Product
       return null;
     }
 
-    const query: Record<string, string | number | boolean> = { page: 1, limit: 100, active: true };
+    const query: Record<string, string | number | boolean> = { page: 1, limit: CATALOG_PRODUCT_LIMIT };
     if (categoryId !== undefined && categoryId > 0) query.category = categoryId;
-    const payload = await icareApi.products.list(query);
-    const primaryProducts = unwrapListData(payload);
-    const backendProducts = primaryProducts.length > 0 ? primaryProducts : await fetchCatalogShortcutProducts();
+    const primaryProducts = await fetchVisibleProductList(query);
+    const shortcutProducts = primaryProducts.length > 0 ? [] : await fetchCatalogShortcutProducts();
+    const fallbackProducts = primaryProducts.length > 0 || shortcutProducts.length > 0
+      ? []
+      : await fetchVisibleProductList({ page: 1, limit: CATALOG_PRODUCT_LIMIT });
+    const backendProducts = primaryProducts.length > 0
+      ? primaryProducts
+      : [...shortcutProducts, ...fallbackProducts];
 
     return dedupeBackendProducts(backendProducts).map((product) => mapBackendProductToProduct(product));
   } catch (error) {
