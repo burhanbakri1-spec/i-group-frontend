@@ -151,6 +151,12 @@ function renderFullBleedUnit(unit: ShowcaseUnit) {
 
 type LayoutType = 'stacked' | 'side-by-side' | 'side-by-side-alt' | 'two-column' | 'full-bleed';
 
+const VALID_LAYOUTS = new Set<LayoutType>(['stacked', 'side-by-side', 'side-by-side-alt', 'two-column', 'full-bleed']);
+
+const getUnitLayout = (layout?: string): LayoutType => (
+  VALID_LAYOUTS.has(layout as LayoutType) ? layout as LayoutType : 'stacked'
+);
+
 function renderUnit(layout: LayoutType, unit: ShowcaseUnit) {
   switch (layout) {
     case 'side-by-side':
@@ -165,6 +171,57 @@ function renderUnit(layout: LayoutType, unit: ShowcaseUnit) {
     default:
       return renderStackedUnit(unit);
   }
+}
+
+function renderMotionUnit(unit: ShowcaseUnit, idx: number, children: React.ReactNode, yOffset = 40) {
+  return (
+    <motion.div
+      key={unit.id}
+      initial={{ opacity: 0, y: yOffset }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-80px' }}
+      transition={{ duration: 0.6, delay: idx * 0.1 }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function renderMixedLayoutUnits(units: ShowcaseUnit[]) {
+  const renderedGroups: React.ReactNode[] = [];
+  let unitIndex = 0;
+
+  while (unitIndex < units.length) {
+    const currentUnit = units[unitIndex];
+    const currentLayout = getUnitLayout(currentUnit.layout);
+
+    if (currentLayout === 'two-column') {
+      const twoColumnUnits: ShowcaseUnit[] = [];
+      const groupStartIndex = unitIndex;
+
+      while (unitIndex < units.length && getUnitLayout(units[unitIndex].layout) === 'two-column') {
+        twoColumnUnits.push(units[unitIndex]);
+        unitIndex += 1;
+      }
+
+      renderedGroups.push(
+        <div key={`two-column-${groupStartIndex}`} className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10 md:gap-x-12 md:gap-y-14">
+          {twoColumnUnits.map((unit, relativeIndex) => renderMotionUnit(
+            unit,
+            groupStartIndex + relativeIndex,
+            renderTwoColumnCard(unit),
+            30,
+          ))}
+        </div>,
+      );
+      continue;
+    }
+
+    renderedGroups.push(renderMotionUnit(currentUnit, unitIndex, renderUnit(currentLayout, currentUnit)));
+    unitIndex += 1;
+  }
+
+  return renderedGroups;
 }
 
 /* ─── Skeleton loader ─────────────────────────────────────────────── */
@@ -199,10 +256,7 @@ export const ProductShowcaseBlock: React.FC<ProductShowcaseBlockProps> = ({ slug
   const [showcaseUnits, setShowcaseUnits] = useState<ShowcaseUnit[] | null>(null);
 
   useEffect(() => {
-    if (!slug) {
-      setShowcaseUnits(DUMMY_SHOWCASE);
-      return;
-    }
+    if (!slug) return;
     let cancelled = false;
     const load = async () => {
       const data = await fetchProductShowcase(slug);
@@ -213,49 +267,19 @@ export const ProductShowcaseBlock: React.FC<ProductShowcaseBlockProps> = ({ slug
     return () => { cancelled = true; };
   }, [slug]);
 
+  const unitsToRender = slug ? showcaseUnits : DUMMY_SHOWCASE;
+
   /* ── Loading state ────────────────────────────────────────────── */
-  if (showcaseUnits === null) {
+  if (unitsToRender === null) {
     return <SkeletonLoader />;
   }
-
-  /* ── Determine layout from first unit ─────────────────────────── */
-  const layout = (showcaseUnits[0]?.layout || 'stacked') as LayoutType;
 
   return (
     <section className="bg-white py-12 md:py-20">
       <div className="max-w-[1600px] mx-auto px-4 lg:px-12">
-        {/* Units — vertical stack */}
-        {layout === 'two-column' ? (
-          /* Two-column grid layout */
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10 md:gap-x-12 md:gap-y-14">
-            {showcaseUnits.map((unit, idx) => (
-              <motion.div
-                key={unit.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-              >
-                {renderTwoColumnCard(unit)}
-              </motion.div>
-            ))}
-          </div>
-        ) : (
-          /* All other layouts: stacked vertically */
-          <div className={`flex flex-col ${LAYOUT_GAP}`}>
-            {showcaseUnits.map((unit, idx) => (
-              <motion.div
-                key={unit.id}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-80px' }}
-                transition={{ duration: 0.6, delay: idx * 0.15 }}
-              >
-                {renderUnit(layout, unit)}
-              </motion.div>
-            ))}
-          </div>
-        )}
+        <div className={`flex flex-col ${LAYOUT_GAP}`}>
+          {renderMixedLayoutUnits(unitsToRender)}
+        </div>
       </div>
     </section>
   );

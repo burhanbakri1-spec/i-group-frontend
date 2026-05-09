@@ -14,6 +14,7 @@ export interface Product {
   description?: string;
   image: string;
   images?: string[];
+  galleryMedia?: ProductGalleryMedia[];
   rating?: string | undefined;
   reviews?: string;
   badge?: string;
@@ -32,6 +33,16 @@ export interface Product {
   backendProduct?: BackendProduct;
   cartLineId?: string;
   sourceProductId?: string;
+}
+
+export type ProductGalleryMediaType = 'IMAGE' | 'VIDEO';
+
+export interface ProductGalleryMedia {
+  url: string;
+  mediaType: ProductGalleryMediaType;
+  altText?: string | null;
+  isPrimary?: boolean;
+  sortOrder?: number;
 }
 
 export interface CartItem extends Product {

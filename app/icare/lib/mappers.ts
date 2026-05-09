@@ -11,6 +11,8 @@ import {
   CartItem,
   FAQCategoryGroup,
   Product,
+  ProductGalleryMedia,
+  ProductGalleryMediaType,
   ProductReview,
   ProductVariant,
 } from '../types';
@@ -20,8 +22,9 @@ type NumericInput = string | number | null | undefined;
 const normalizeFilterName = (value?: string | null) => value?.trim().toLowerCase() ?? '';
 
 
-// Configurable image base URL — when empty, images remain as relative paths handled by the Next.js proxy
+// Configurable image base URL — when empty, backend media is served through the Next.js proxy.
 const IMAGE_BASE_URL = (process.env.NEXT_PUBLIC_IMAGE_BASE_URL || '').replace(/\/$/, '');
+const IMAGE_PROXY_BASE_URL = '/api/icare';
 
 export const coerceNumber = (value: NumericInput) => {
   if (typeof value === 'number') return Number.isFinite(value) ? value : null;
@@ -65,27 +68,77 @@ const getProductBadge = (product: BackendProduct) => {
   return undefined;
 };
 
-const getUniqueProductImages = (product: BackendProduct, variant?: ProductVariant | null) => {
-  const backendImages = [
-    variant?.image,
-    product.featuredImage,
-    product.images?.find((image) => image.isPrimary)?.imageUrl,
-    ...(product.images?.map((image) => image.imageUrl) ?? []),
-  ];
+export const normalizeProductMediaUrl = (mediaUrl?: string | null) => {
+  const trimmedUrl = mediaUrl?.trim();
+  if (!trimmedUrl) return '';
+  if (/^(https?:|data:|blob:)/i.test(trimmedUrl)) return trimmedUrl;
 
-  // Convert relative paths to absolute URLs
-  const normalizedImages = backendImages.map(image => {
-    if (!image?.trim()) return null;
-    if (image.startsWith('http')) return image;
-    if (image.startsWith('/')) return `${IMAGE_BASE_URL}${image}`;
-    return image;
+  const relativePath = trimmedUrl.startsWith('/') ? trimmedUrl : `/${trimmedUrl}`;
+  return `${IMAGE_BASE_URL || IMAGE_PROXY_BASE_URL}${relativePath}`;
+};
+
+const normalizeProductMediaType = (mediaType?: string | null): ProductGalleryMediaType => (
+  mediaType?.toUpperCase() === 'VIDEO' ? 'VIDEO' : 'IMAGE'
+);
+
+const sortProductImagesByBackendPriority = (images: BackendProduct['images'] = []) => images
+  .map((image, originalIndex) => ({ image, originalIndex }))
+  .sort((first, second) => {
+    if (Boolean(first.image.isPrimary) !== Boolean(second.image.isPrimary)) {
+      return first.image.isPrimary ? -1 : 1;
+    }
+
+    const firstSortOrder = first.image.sortOrder ?? Number.MAX_SAFE_INTEGER;
+    const secondSortOrder = second.image.sortOrder ?? Number.MAX_SAFE_INTEGER;
+    if (firstSortOrder !== secondSortOrder) return firstSortOrder - secondSortOrder;
+
+    return first.originalIndex - second.originalIndex;
+  })
+  .map(({ image }) => image);
+
+const dedupeGalleryMedia = (media: ProductGalleryMedia[]) => {
+  const seenUrls = new Set<string>();
+
+  return media.filter((item) => {
+    if (!item.url || seenUrls.has(item.url)) return false;
+    seenUrls.add(item.url);
+    return true;
   });
+};
 
-  const uniqueImages = normalizedImages
-    .filter((image): image is string => Boolean(image?.trim()))
-    .filter((image, index, images) => images.indexOf(image) === index);
+export const mapBackendProductGalleryMedia = (product: BackendProduct, variant?: ProductVariant | null): ProductGalleryMedia[] => {
+  const sortedBackendImages = sortProductImagesByBackendPriority(product.images);
+  const hasBackendPrimary = sortedBackendImages.some((image) => image.isPrimary);
+  const backendMedia = sortedBackendImages.map<ProductGalleryMedia>((image) => ({
+    url: normalizeProductMediaUrl(image.imageUrl),
+    mediaType: normalizeProductMediaType(image.mediaType),
+    altText: image.altText,
+    isPrimary: image.isPrimary,
+    sortOrder: image.sortOrder,
+  }));
+  const primaryBackendMedia = hasBackendPrimary && backendMedia[0]?.isPrimary ? [backendMedia[0]] : [];
+  const remainingBackendMedia = hasBackendPrimary ? backendMedia.slice(1) : backendMedia;
 
-  return uniqueImages;
+  const variantMedia = variant?.image ? [{
+    url: normalizeProductMediaUrl(variant.image),
+    mediaType: 'IMAGE' as const,
+    altText: variant.name,
+    isPrimary: true,
+  }] : [];
+
+  const featuredMedia = product.featuredImage ? [{
+    url: normalizeProductMediaUrl(product.featuredImage),
+    mediaType: 'IMAGE' as const,
+    altText: product.name,
+    isPrimary: !hasBackendPrimary,
+  }] : [];
+
+  return dedupeGalleryMedia([
+    ...variantMedia,
+    ...primaryBackendMedia,
+    ...featuredMedia,
+    ...remainingBackendMedia,
+  ]);
 };
 
 export const mapBackendProductToProduct = (product: BackendProduct, selectedVariant?: ProductVariant | null): Product => {
@@ -96,7 +149,8 @@ export const mapBackendProductToProduct = (product: BackendProduct, selectedVari
   const originalPrice = salePrice !== null && productPrice !== null && salePrice < productPrice ? formatUsdPrice(productPrice) : undefined;
   const ratingAverage = coerceNumber(product.ratingAverage);
   const ratingCount = coerceNumber(product.ratingCount);
-  const backendImages = getUniqueProductImages(product, variant);
+  const galleryMedia = mapBackendProductGalleryMedia(product, variant);
+  const backendImages = galleryMedia.filter((media) => media.mediaType === 'IMAGE').map((media) => media.url);
   const primaryImage = backendImages[0] ?? '';
   const categoryName = product.category?.name?.trim() || 'shop all';
   const brandName = product.brand?.name?.trim();
@@ -115,6 +169,7 @@ export const mapBackendProductToProduct = (product: BackendProduct, selectedVari
     description: product.shortDescription ?? product.description ?? undefined,
     image: primaryImage,
     images: backendImages,
+    galleryMedia,
     rating: ratingAverage && ratingAverage > 0 ? ratingAverage.toFixed(1) : '0',
     reviews: ratingCount && ratingCount > 0 ? String(ratingCount) : '0',
     badge: getProductBadge(product),
@@ -281,4 +336,3 @@ const mapFaqsWithEmbeddedCategories = (faqs: BackendFaq[]) => {
 export const mapBackendFaqsToGroups = (faqs: BackendFaq[], categories: BackendFaqCategory[]): FAQCategoryGroup[] => {
   return categories.length > 0 ? mapFaqsWithExplicitCategories(faqs, categories) : mapFaqsWithEmbeddedCategories(faqs);
 };
-

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, ChevronDown, ThumbsUp, ThumbsDown, CheckCircle2, ShoppingBag } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
@@ -7,9 +7,9 @@ import { ProductLineup } from './ProductLineup';
 import { ProductShowcaseBlock } from './ProductShowcaseBlock';
 import { useShop } from '../context/ShopContext';
 import { useSiteContent } from '../hooks/useSiteContent';
-import { Product, ProductReview, ProductVariant } from '../types';
+import { Product, ProductGalleryMedia, ProductReview, ProductVariant } from '../types';
 import { icareApi } from '../lib/api-client';
-import { getDefaultVariant, isPurchasableStock, mapBackendProductToProduct, mapBackendReviewToProductReview } from '../lib/mappers';
+import { getDefaultVariant, isPurchasableStock, mapBackendProductGalleryMedia, mapBackendProductToProduct, mapBackendReviewToProductReview, normalizeProductMediaUrl } from '../lib/mappers';
 import { fetchProductReviews, fetchRelatedProducts } from '../lib/catalog-client';
 
 interface ProductPageProps {
@@ -98,6 +98,28 @@ const ReviewItem = ({ review, content }: { review: ProductReview; content: { ver
   </div>
 );
 
+const getProductImageGallery = (displayProduct: Product, selectedVariant: ProductVariant | null): ProductGalleryMedia[] => {
+  if (displayProduct.backendProduct) {
+    return mapBackendProductGalleryMedia(displayProduct.backendProduct, selectedVariant)
+      .filter((media) => media.mediaType === 'IMAGE');
+  }
+
+  const fallbackImages: ProductGalleryMedia[] = displayProduct.galleryMedia?.length
+    ? displayProduct.galleryMedia
+    : [
+        ...(displayProduct.images ?? []).map((url) => ({ url, mediaType: 'IMAGE' as const })),
+        { url: displayProduct.image, mediaType: 'IMAGE' as const },
+      ];
+
+  const seenUrls = new Set<string>();
+  return fallbackImages.flatMap((media) => {
+    const normalizedUrl = normalizeProductMediaUrl(media.url);
+    if (!normalizedUrl || seenUrls.has(normalizedUrl) || media.mediaType !== 'IMAGE') return [];
+    seenUrls.add(normalizedUrl);
+    return [{ ...media, url: normalizedUrl, mediaType: 'IMAGE' as const }];
+  });
+};
+
 export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProductSelect }) => {
   const { addToCart } = useShop();
   const {
@@ -121,7 +143,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
   } = useSiteContent();
   const [displayProduct, setDisplayProduct] = useState<Product>(product);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(product.variants?.find((variant) => variant.id === product.variantId) ?? null);
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [activeImageSelection, setActiveImageSelection] = useState({ index: 0, galleryKey: '', resetKey: '' });
   const [showBottomBar, setShowBottomBar] = useState(true);
   const [isReviewsExpanded, setIsReviewsExpanded] = useState(false);
   const [remoteReviews, setRemoteReviews] = useState<ProductReview[] | null>(null);
@@ -129,20 +151,18 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
   const lastScrollY = useRef(0);
   const isRtl = lang === 'ar';
 
-  // Use backendProduct.images for full metadata (including mediaType), fallback to string array
-  const backendImages = displayProduct.backendProduct?.images ?? [];
-  const mediaImages = backendImages.length > 0
-    ? backendImages
-    : (displayProduct.images && displayProduct.images.length > 0
-        ? displayProduct.images.map(url => ({ imageUrl: url, mediaType: 'IMAGE' as const }))
-        : [{ imageUrl: displayProduct.image, mediaType: 'IMAGE' as const }]);
-  const displayImages = mediaImages.filter(img => img.imageUrl).map(img => ({
-    url: img.imageUrl,
-    mediaType: (img as any).mediaType || 'IMAGE',
-  }));
-  const safeActiveImageIndex = displayImages[activeImageIndex]?.url ? activeImageIndex : 0;
+  const displayImages = useMemo(
+    () => getProductImageGallery(displayProduct, selectedVariant),
+    [displayProduct, selectedVariant],
+  );
+  const displayImagesKey = displayImages.map((image) => image.url).join('|');
+  const activeImageResetKey = `${product.id}|${product.slug ?? ''}|${selectedVariant?.id ?? ''}`;
+  const safeActiveImageIndex = activeImageSelection.galleryKey === displayImagesKey
+    && activeImageSelection.resetKey === activeImageResetKey
+    && displayImages[activeImageSelection.index]?.url
+    ? activeImageSelection.index
+    : 0;
   const activeProduct = displayImages[safeActiveImageIndex];
-  const activeProductImage = activeProduct?.url ?? '';
   const purchasableProduct = displayProduct.backendProduct
     ? mapBackendProductToProduct(displayProduct.backendProduct, selectedVariant)
     : displayProduct;
@@ -233,22 +253,11 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                 className="absolute inset-0"
               >
                 {activeProduct?.url ? (
-                  (activeProduct.mediaType === 'VIDEO' || activeProduct.mediaType === 'video') ? (
-                    <video
-                      src={activeProduct.url}
-                      controls
-                      muted
-                      playsInline
-                      className="w-full h-full object-cover"
-                      poster={displayImages.find((_, i) => i !== safeActiveImageIndex && displayImages[i]?.mediaType === 'IMAGE')?.url}
-                    />
-                  ) : (
-                    <ImageWithFallback
-                      src={activeProduct.url}
-                      alt="Product View"
-                      className="w-full h-full object-cover"
-                    />
-                  )
+                  <ImageWithFallback
+                    src={activeProduct.url}
+                    alt={activeProduct.altText || displayProduct.name}
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   <div className="w-full h-full bg-[#F2F1ED] flex items-center justify-center text-[11px] font-black uppercase tracking-[0.2em] text-black/30">
                     no image
@@ -260,32 +269,22 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
 
           {/* Floating Navigation Thumbnails - Mobile Optimized */}
           <div className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 flex flex-col gap-2 md:gap-3 z-20">
-             {displayImages.slice(0, 4).map((img, idx) => {
-               const isVideo = img.mediaType === 'VIDEO' || img.mediaType === 'video';
-               return (
-               <button 
-                 key={idx}
-                 onClick={() => setActiveImageIndex(idx)}
-                   className={`w-8 h-8 md:w-10 md:h-10 rounded-lg overflow-hidden border-2 transition-all scale-95 hover:scale-105 relative ${safeActiveImageIndex === idx ? 'border-white ring-2 ring-black/10 shadow-lg' : 'border-transparent opacity-40'}`}
-               >
-                   <img src={img.url} alt="thumb" className="w-full h-full object-cover" />
-                   {isVideo && (
-                     <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                       <svg className="w-3 h-3 md:w-4 md:h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                         <path d="M8 5v14l11-7z"/>
-                       </svg>
-                     </div>
-                   )}
-               </button>
-               );
-             })}
+             {displayImages.map((img, idx) => (
+                <button 
+                  key={img.url}
+                  onClick={() => setActiveImageSelection({ index: idx, galleryKey: displayImagesKey, resetKey: activeImageResetKey })}
+                    className={`w-8 h-8 md:w-10 md:h-10 rounded-lg overflow-hidden border-2 transition-all scale-95 hover:scale-105 relative ${safeActiveImageIndex === idx ? 'border-white ring-2 ring-black/10 shadow-lg' : 'border-transparent opacity-40'}`}
+                >
+                    <ImageWithFallback src={img.url} alt={img.altText || `${displayProduct.name} thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
+                </button>
+              ))}
            </div>
 
           {/* Mobile Bottom Indicator */}
           {displayImages.length > 0 && (
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 md:hidden">
-              {displayImages.slice(0, 4).map((_, idx) => (
-              <div key={idx} className={`h-1 rounded-full transition-all duration-300 ${safeActiveImageIndex === idx ? 'w-4 bg-white' : 'w-1.5 bg-white/30'}`} />
+              {displayImages.map((image, idx) => (
+              <div key={image.url} className={`h-1 rounded-full transition-all duration-300 ${safeActiveImageIndex === idx ? 'w-4 bg-white' : 'w-1.5 bg-white/30'}`} />
               ))}
             </div>
           )}
