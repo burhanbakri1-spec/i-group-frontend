@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { ProductCard } from './ProductCard';
@@ -13,6 +13,13 @@ interface ShopPageProps {
   onProductSelect: (product: Product) => void;
 }
 
+const SORT_OPTIONS = ['all', 'newest', 'price: low to high', 'price: high to low'];
+
+const getProductTimestamp = (product: Product) => {
+  const timestamp = new Date(product.date ?? '').getTime();
+  return Number.isFinite(timestamp) ? timestamp : 0;
+};
+
 export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => {
   const { shopEmptyAll, shopEmptyFiltered, shopBackToAll, shopShowMore, shopActiveFilters, shopClearAll, shopSortLabel } = useSiteContent();
   const [catalogProducts, setCatalogProducts] = useState<Product[] | null>(null);
@@ -22,30 +29,32 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
   const [childCategories, setChildCategories] = useState<BackendCategory[]>([]);
   const [activeMain, setActiveMain] = useState<string | null>(null);
   const [activeChild, setActiveChild] = useState<string | null>(null);
-  const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null);
   const [cols, setCols] = useState(3);
-  const [activeSort, setActiveSort] = useState('featured');
+  const [activeSort, setActiveSort] = useState('all');
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(12);
+  const childFetchSequence = useRef(0);
+  const productFetchSequence = useRef(0);
+
+  const selectedRoot = useMemo(
+    () => rootCategories.find((category) => category.slug === activeMain) ?? null,
+    [activeMain, rootCategories]
+  );
+
+  const selectedChild = useMemo(
+    () => childCategories.find((category) => category.slug === activeChild) ?? null,
+    [activeChild, childCategories]
+  );
+
+  const selectedCategoryId = selectedChild?.id ?? selectedRoot?.id;
 
   useEffect(() => {
     const loadData = async () => {
-      setLoading(true);
       try {
-        const [data, roots] = await Promise.allSettled([
-          fetchCatalogProducts(),
-          fetchCategoryRoots(),
-        ]);
-        if (data.status === 'fulfilled') {
-          setCatalogProducts(data.value ?? []);
-        }
-        if (roots.status === 'fulfilled') {
-          setRootCategories(Array.isArray(roots.value) ? roots.value : []);
-        }
+        const roots = await fetchCategoryRoots();
+        setRootCategories(Array.isArray(roots) ? roots : []);
       } catch (err) {
-        console.error("Failed to load iCare products", err);
-      } finally {
-        setLoading(false);
+        console.error("Failed to load iCare categories", err);
       }
     };
     loadData();
@@ -53,60 +62,64 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
 
   // When activeMain changes, fetch its children
   useEffect(() => {
+    childFetchSequence.current += 1;
+    const requestId = childFetchSequence.current;
+
     if (!activeMain) {
       setChildCategories([]);
       setActiveChild(null);
-      setActiveCategoryId(null);
       return;
     }
-    const root = rootCategories.find(c => c.slug === activeMain);
-    if (!root) {
+
+    if (!selectedRoot) {
       setChildCategories([]);
-      setActiveCategoryId(null);
       return;
     }
-    setActiveCategoryId(root.id);
-    fetchCategoryChildren(root.slug).then(children => {
+
+    setChildCategories([]);
+    fetchCategoryChildren(selectedRoot.slug).then(children => {
+      if (requestId !== childFetchSequence.current) return;
       setChildCategories(Array.isArray(children) ? children : []);
     });
-  }, [activeMain, rootCategories]);
+  }, [activeMain, selectedRoot]);
 
   useEffect(() => {
-    if (catalogProducts === null) return;
-
     const fetchForCategory = async () => {
+      productFetchSequence.current += 1;
+      const requestId = productFetchSequence.current;
+
       setFetchingCategory(true);
+
       try {
-        const targetId = activeChild
-          ? childCategories.find(c => c.slug === activeChild)?.id
-          : activeCategoryId;
-        const data = await fetchCatalogProducts(targetId ?? undefined);
+        const data = await fetchCatalogProducts(selectedCategoryId);
+        if (requestId !== productFetchSequence.current) return;
         setCatalogProducts(data ?? []);
       } finally {
+        if (requestId !== productFetchSequence.current) return;
+        setLoading(false);
         setFetchingCategory(false);
       }
     };
 
     fetchForCategory();
-  }, [activeCategoryId, activeChild, childCategories]);
+  }, [selectedCategoryId]);
 
-  const allProducts = catalogProducts ?? [];
+  const allProducts = useMemo(() => catalogProducts ?? [], [catalogProducts]);
 
   const filteredProducts = useMemo(() => {
-    let result: Product[] = [...allProducts];
+    const result: Product[] = [...allProducts];
 
     switch (activeSort) {
       case 'newest':
-        result.sort((a, b) => new Date(b.date ?? '').getTime() - new Date(a.date ?? '').getTime());
+        result.sort((a, b) => getProductTimestamp(b) - getProductTimestamp(a));
         break;
       case 'price: low to high':
-        result.sort((a, b) => (a.rawPrice || 0) - (b.rawPrice || 0));
+        result.sort((a, b) => (a.rawPrice ?? 0) - (b.rawPrice ?? 0));
         break;
       case 'price: high to low':
-        result.sort((a, b) => (b.rawPrice || 0) - (a.rawPrice || 0));
+        result.sort((a, b) => (b.rawPrice ?? 0) - (a.rawPrice ?? 0));
         break;
       default:
-        result.sort((a, b) => parseFloat(b.rating || '0') - parseFloat(a.rating || '0'));
         break;
     }
 
@@ -116,7 +129,6 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
   const resetFilters = () => {
     setActiveMain(null);
     setActiveChild(null);
-    setActiveCategoryId(null);
     setChildCategories([]);
     setVisibleCount(12);
   };
@@ -269,7 +281,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
                 exit={{ opacity: 0, y: 10 }}
                 className="absolute left-0 mt-4 w-56 bg-white rounded-[16px] shadow-2xl z-50 py-3 border border-black/5"
               >
-                {['featured', 'newest', 'price: low to high', 'price: high to low'].map((opt) => (
+                {SORT_OPTIONS.map((opt) => (
                   <button
                     key={opt}
                     onClick={() => { setActiveSort(opt); setIsSortOpen(false); }}
