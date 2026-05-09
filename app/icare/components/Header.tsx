@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
 import { Menu, Search, ShoppingBag, Globe, Heart } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
@@ -6,8 +6,7 @@ import { translations, Language } from '../translations';
 import { useShop } from '../context/ShopContext';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { Product } from '../types';
-import { icareApi, IcareApiError } from '../lib/api-client';
-import { mapBackendProductToProduct } from '../lib/mappers';
+import { fetchCatalogProducts } from '../lib/catalog-client';
 
 interface HeaderProps {
   onOpenCart: () => void;
@@ -30,23 +29,36 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
   const [isPinkTheme, setIsPinkTheme] = useState(false);
   const [previewProducts, setPreviewProducts] = useState<Product[]>([]);
   const { scrollY } = useScroll();
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const cancelHideTimer = () => {
+    if (hideTimerRef.current !== null) {
+      clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+  };
+
+  const showShop = () => {
+    cancelHideTimer();
+    setIsShopHovered(true);
+  };
+
+  const hideShop = () => {
+    cancelHideTimer();
+    hideTimerRef.current = setTimeout(() => setIsShopHovered(false), 200);
+  };
+
+  useEffect(() => () => { cancelHideTimer(); }, []);
 
   useEffect(() => {
-    const loadFeaturedProducts = async () => {
-      if (!icareApi.isConfigured()) return;
-      try {
-        const products = await icareApi.products.featured(4);
-        if (products.length > 0) {
-          setPreviewProducts(products.map((product) => mapBackendProductToProduct(product)));
-        }
-      } catch (error) {
-        if (!(error instanceof IcareApiError && error.status === 0)) {
-          console.error('Failed to load header previews', error);
-        }
-      }
+    let cancelled = false;
+    const loadPreviewProducts = async () => {
+      const products = await fetchCatalogProducts();
+      if (cancelled || products === null) return;
+      setPreviewProducts(products.slice(0, 16));
     };
-
-    loadFeaturedProducts();
+    loadPreviewProducts();
+    return () => { cancelled = true; };
   }, []);
 
   const previewCategories = useMemo(() => {
@@ -92,7 +104,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
       initial={{ y: 0, opacity: 1 }}
       animate={{ y: headerY, opacity: headerOpacity }}
       transition={{ duration: 0.5, ease: [0.33, 1, 0.68, 1] }}
-      onMouseLeave={() => setIsShopHovered(false)} 
+      onMouseLeave={hideShop}
       className="fixed top-0 left-0 right-0 z-[9999]"
     >
       {/* Announcement Bar */}
@@ -118,7 +130,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
             </button>
             <nav className="hidden lg:flex items-center gap-10">
               <button 
-                onMouseEnter={() => setIsShopHovered(true)}
+                onMouseEnter={showShop}
                 onClick={() => onNavigate('shop')}
                 className={`text-[14px] font-[800] uppercase tracking-normal transition-colors ${
                   isPinkTheme ? 'text-[#E11D48] hover:text-black' : 'text-[#706E6A] hover:text-black'
@@ -221,7 +233,8 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="absolute top-full left-0 w-full mt-3 bg-[#FAF9F6]/80 backdrop-blur-3xl rounded-[16px] pt-12 pb-20 shadow-2xl overflow-hidden border border-white/40"
+              className="absolute top-[calc(100%-12px)] left-0 w-full bg-[#FAF9F6]/80 backdrop-blur-3xl rounded-[16px] pt-12 pb-20 shadow-2xl overflow-hidden border border-white/40"
+              onMouseEnter={showShop}
             >
               <div className="max-w-[1440px] mx-auto px-10">
                 {previewCategories.length > 0 && (

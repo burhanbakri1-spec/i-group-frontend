@@ -24,7 +24,6 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
   const { shopEmptyAll, shopEmptyFiltered, shopBackToAll, shopShowMore, shopActiveFilters, shopClearAll, shopSortLabel } = useSiteContent();
   const [catalogProducts, setCatalogProducts] = useState<Product[] | null>(null);
   const [loading, setLoading] = useState(true);
-  const [fetchingCategory, setFetchingCategory] = useState(false);
   const [rootCategories, setRootCategories] = useState<BackendCategory[]>([]);
   const [childCategories, setChildCategories] = useState<BackendCategory[]>([]);
   const [activeMain, setActiveMain] = useState<string | null>(null);
@@ -34,7 +33,6 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(12);
   const childFetchSequence = useRef(0);
-  const productFetchSequence = useRef(0);
 
   const selectedRoot = useMemo(
     () => rootCategories.find((category) => category.slug === activeMain) ?? null,
@@ -46,21 +44,45 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
     [activeChild, childCategories]
   );
 
-  const selectedCategoryId = selectedChild?.id ?? selectedRoot?.id;
+  // Build a flat set of descendant IDs for the selected root category.
+  // Used for client-side filtering: when a root is selected without a child,
+  // products whose categoryId is the root's own id OR any descendant id are shown.
+  // Filter childCategories by parentId so stale children from a previous root
+  // do not temporarily pollute the descendant set during root transitions.
+  const descendantIds = useMemo(() => {
+    if (!selectedRoot) return new Set<number>();
+    const ids = new Set<number>();
+    ids.add(selectedRoot.id);
+    for (const child of childCategories) {
+      if (child.parentId === selectedRoot.id) {
+        ids.add(child.id);
+      }
+    }
+    return ids;
+  }, [selectedRoot, childCategories]);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const roots = await fetchCategoryRoots();
+        const [roots, products] = await Promise.all([
+          fetchCategoryRoots(),
+          fetchCatalogProducts(),
+        ]);
         setRootCategories(Array.isArray(roots) ? roots : []);
+        setCatalogProducts(products ?? []);
       } catch (err) {
-        console.error("Failed to load iCare categories", err);
+        console.error("Failed to load iCare shop data", err);
+        setCatalogProducts([]);
+      } finally {
+        setLoading(false);
       }
     };
     loadData();
   }, []);
 
-  // When activeMain changes, fetch its children
+  // When activeMain changes, fetch its children.
+  // Do NOT clear childCategories early — keep stale row visible until new children arrive
+  // to prevent the row from blinking out during root-category transitions.
   useEffect(() => {
     childFetchSequence.current += 1;
     const requestId = childFetchSequence.current;
@@ -72,42 +94,43 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
     }
 
     if (!selectedRoot) {
-      setChildCategories([]);
+      // selectedRoot is still building — do nothing, children stay stale
       return;
     }
 
-    setChildCategories([]);
     fetchCategoryChildren(selectedRoot.slug).then(children => {
       if (requestId !== childFetchSequence.current) return;
       setChildCategories(Array.isArray(children) ? children : []);
     });
   }, [activeMain, selectedRoot]);
 
-  useEffect(() => {
-    const fetchForCategory = async () => {
-      productFetchSequence.current += 1;
-      const requestId = productFetchSequence.current;
-
-      setFetchingCategory(true);
-
-      try {
-        const data = await fetchCatalogProducts(selectedCategoryId);
-        if (requestId !== productFetchSequence.current) return;
-        setCatalogProducts(data ?? []);
-      } finally {
-        if (requestId !== productFetchSequence.current) return;
-        setLoading(false);
-        setFetchingCategory(false);
-      }
-    };
-
-    fetchForCategory();
-  }, [selectedCategoryId]);
-
   const allProducts = useMemo(() => catalogProducts ?? [], [catalogProducts]);
 
   const filteredProducts = useMemo(() => {
-    const result: Product[] = [...allProducts];
+    let result: Product[] = [...allProducts];
+
+    // Client-side category filtering — no backend category filter is sent.
+    if (activeMain) {
+      if (activeChild && selectedChild) {
+        // Child category selected: show only products with matching categoryId.
+        result = result.filter((p) =>
+          p.categoryId === selectedChild.id ||
+          (p.categoryId === undefined && p.category?.trim().toLowerCase() === selectedChild.name.trim().toLowerCase())
+        );
+      } else {
+        // Root selected (no child picked): show products whose categoryId
+        // is the root id or any descendant (children) id.
+        result = result.filter((p) => {
+          if (p.categoryId !== undefined) return descendantIds.has(p.categoryId);
+          // Fallback: string match on category name against root or any child.
+          const cat = p.category?.trim().toLowerCase() ?? '';
+          if (!cat) return false;
+          if (selectedRoot && cat === selectedRoot.name.trim().toLowerCase()) return true;
+          return childCategories.some((c) => c.name.trim().toLowerCase() === cat);
+        });
+      }
+    }
+    // No activeMain → Shop All: show all products (no filter applied).
 
     switch (activeSort) {
       case 'newest':
@@ -124,18 +147,13 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
     }
 
     return result;
-  }, [allProducts, activeSort]);
+  }, [allProducts, activeSort, activeMain, activeChild, selectedRoot, selectedChild, descendantIds, childCategories]);
 
   const resetFilters = () => {
     setActiveMain(null);
     setActiveChild(null);
     setChildCategories([]);
     setVisibleCount(12);
-  };
-
-  const removeFilter = (level: number) => {
-    if (level === 1) resetFilters();
-    if (level === 2) { setActiveChild(null); setVisibleCount(12); }
   };
 
   const selectRoot = (slug: string | null) => {
@@ -152,25 +170,13 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
     setVisibleCount(12);
   }, [activeMain, activeChild, activeSort]);
 
-  if ((loading || fetchingCategory) && !catalogProducts) {
+  if (loading && !catalogProducts) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FFFFFF]">
         <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
-
-  const getSelectedCategoryName = () => {
-    if (activeChild) {
-      const child = childCategories.find(c => c.slug === activeChild);
-      return child?.name;
-    }
-    if (activeMain) {
-      const root = rootCategories.find(c => c.slug === activeMain);
-      return root?.name;
-    }
-    return null;
-  };
 
   return (
     <div className="min-h-screen bg-[#FFFFFF]">
@@ -249,15 +255,25 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
           )}
         </AnimatePresence>
 
-        {/* Active Filter Badges */}
-        {activeMain && getSelectedCategoryName() && (
+        {/* Active Filter Badges — multi-level with per-level dismiss */}
+        {activeMain && (
           <div className="flex flex-wrap items-center gap-3 px-4">
             <span className="text-[11px] font-bold text-black/40 uppercase tracking-widest">{shopActiveFilters}</span>
-            {activeMain && (
+
+            {/* Root badge — X dismisses to Shop All */}
+            <div className="flex items-center gap-2 bg-black text-white px-3 py-1 rounded-full text-[10px] font-black uppercase">
+              {selectedRoot?.name}
+              <X size={12} className="cursor-pointer" onClick={() => { resetFilters(); }} />
+            </div>
+
+            {/* Child badge — X dismisses only child level, keeping root active (drill-up) */}
+            {activeChild && (
               <div className="flex items-center gap-2 bg-black text-white px-3 py-1 rounded-full text-[10px] font-black uppercase">
-                {getSelectedCategoryName()} <X size={12} className="cursor-pointer" onClick={() => removeFilter(1)} />
+                {selectedChild?.name}
+                <X size={12} className="cursor-pointer" onClick={() => { setActiveChild(null); setVisibleCount(12); }} />
               </div>
             )}
+
             <button onClick={resetFilters} className="text-[10px] font-bold text-black/40 underline underline-offset-4 hover:text-black transition-colors uppercase">
               {shopClearAll}
             </button>
