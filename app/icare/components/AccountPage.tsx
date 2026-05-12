@@ -291,7 +291,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate }) => {
                                         </div>
                                         <div className="flex justify-between text-[11px] text-[#5C5A56]/60">
                                           <span>Shipping</span>
-                                          <span>EGP {orderDetail.shipping.toFixed(0)}</span>
+                                          <span>EGP {orderDetail.shippingCost.toFixed(0)}</span>
                                         </div>
                                         {orderDetail.tax > 0 && (
                                           <div className="flex justify-between text-[11px] text-[#5C5A56]/60">

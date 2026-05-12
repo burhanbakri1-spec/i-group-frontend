@@ -512,7 +512,7 @@ export interface CreatedOrder {
   paymentStatus?: string;
   paymentGateway?: 'paymob' | 'fawry' | 'bop' | 'lahza';
   subtotal: number;
-  shipping: number;
+  shippingCost: number;
   tax: number;
   discount: number;
   total: number;
