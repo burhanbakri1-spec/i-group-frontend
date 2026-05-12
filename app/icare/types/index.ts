@@ -422,7 +422,7 @@ export interface OrderItemInput {
 
 export interface CreateOrderInput {
   paymentMethod: 'cash_on_delivery' | 'online';
-  paymentGateway?: 'paymob' | 'fawry' | 'bop' | 'lahza';
+  paymentGateway?: 'paymob' | 'fawry' | 'bop' | 'lahza' | 'paypal';
   shippingName: string;
   shippingEmail: string;
   shippingPhone: string;

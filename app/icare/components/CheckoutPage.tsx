@@ -200,14 +200,14 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
 
   const buildOrderInput = (): CreateOrderInput => {
     const shippingName = `${shippingForm.firstName} ${shippingForm.lastName}`.trim();
-    const gatewayMap: Record<string, string | undefined> = {
+    const gatewayMap: Record<string, CreateOrderInput['paymentGateway']> = {
       card: 'paymob',
       paypal: 'paypal',
       cod: undefined,
     };
     const baseOrder: CreateOrderInput = {
       paymentMethod: paymentMethod === 'cod' ? 'cash_on_delivery' : 'online',
-      paymentGateway: gatewayMap[paymentMethod] as CreateOrderInput['paymentGateway'],
+      paymentGateway: gatewayMap[paymentMethod],
       shippingName,
       shippingEmail: shippingForm.email,
       shippingPhone: shippingForm.phone,
