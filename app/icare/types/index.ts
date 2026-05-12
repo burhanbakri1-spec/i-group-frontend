@@ -436,6 +436,42 @@ export interface CreateOrderInput {
   guestEmail?: string;
   guestPhone?: string;
   items?: OrderItemInput[];
+  addressId?: number;
+  shippingLatitude?: number;
+  shippingLongitude?: number;
+}
+
+export interface UserAddress {
+  id: number;
+  userId: number;
+  label: string;
+  street: string;
+  building?: string | null;
+  apartment?: string | null;
+  area?: string | null;
+  city: string;
+  governorate?: string | null;
+  country: string;
+  postalCode?: string | null;
+  latitude: number;
+  longitude: number;
+  isDefault: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateAddressInput {
+  label?: string;
+  street: string;
+  building?: string;
+  apartment?: string;
+  area?: string;
+  city: string;
+  governorate?: string;
+  postalCode?: string;
+  latitude: number;
+  longitude: number;
+  isDefault?: boolean;
 }
 
 export interface OrderSummaryItem {
