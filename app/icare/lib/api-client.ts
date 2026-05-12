@@ -17,11 +17,13 @@ import {
   BackendStore,
   SettingsGroupResponse,
   AllSettingsResponse,
+  CreateAddressInput,
   CreateOrderInput,
   CreatedOrder,
   OrderListItem,
   OrderSummary,
   PaginatedData,
+  UserAddress,
 } from '../types';
 
 type QueryValue = string | number | boolean | null | undefined;
@@ -300,6 +302,27 @@ export const icareApi = {
         estimatedDelivery?: string | null;
         statusHistory?: Array<{ status: string; comment?: string | null; createdAt: string }>;
       }>(`/api/v1/orders/${orderNumber}/track`, { method: 'POST' }),
+  },
+
+  addresses: {
+    list: async (token?: string) => {
+      const options: { token?: string } = {};
+      if (token) options.token = token;
+      return request<UserAddress[]>('/api/v1/addresses', options);
+    },
+    create: async (input: CreateAddressInput, token?: string) => {
+      const options: RequestInit & { token?: string } = {
+        method: 'POST',
+        body: JSON.stringify(input),
+      };
+      if (token) options.token = token;
+      return request<UserAddress>('/api/v1/addresses', options);
+    },
+    delete: async (id: number, token?: string) => {
+      const options: RequestInit & { token?: string } = { method: 'DELETE' };
+      if (token) options.token = token;
+      return request<{ message: string }>(`/api/v1/addresses/${id}`, options);
+    },
   },
 
   payment: {
