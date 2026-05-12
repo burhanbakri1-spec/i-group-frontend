@@ -12,7 +12,7 @@ interface AccountPageProps {
   lang?: Language;
 }
 
-export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate }) => {
+export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) => {
   const {
     authLoginImage,
     authLoginTagline,
@@ -100,7 +100,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate }) => {
 
   const formatDate = (iso?: string) => {
     if (!iso) return '—';
-    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(iso));
+    return new Intl.DateTimeFormat(lang === 'ar' ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(iso));
   };
 
   const isCancellable = (status: string) => {
@@ -167,7 +167,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate }) => {
               {/* ─── My Orders Section ─── */}
               <div className="w-full text-left bg-white rounded-[16px] overflow-hidden">
                 <h3 className="px-5 pt-5 text-[11px] font-black uppercase tracking-[0.2em] text-[#5C5A56]/50">
-                  My Orders
+                  {lang === 'ar' ? 'طلباتي' : 'My Orders'}
                 </h3>
 
                 {/* Loading */}
