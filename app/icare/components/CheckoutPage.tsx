@@ -1,12 +1,22 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { MapPin, ShoppingBag, Check, ChevronRight, ArrowLeft, CreditCard, Lock } from 'lucide-react';
 import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { icareApi } from '../lib/api-client';
-import { CreatedOrder, CreateOrderInput, OrderSummary } from '../types';
+import { CreatedOrder, CreateOrderInput, OrderSummary, UserAddress } from '../types';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+
+const MAP_PICKER_FRAME_CLASS = 'w-full h-64 md:h-80 rounded-lg overflow-hidden border border-gray-300 mb-4';
+
+const MapAddressPicker = dynamic(() => import('./MapAddressPicker'), {
+  ssr: false,
+  loading: () => (
+    <div className={`${MAP_PICKER_FRAME_CLASS} bg-gray-50 animate-pulse`} aria-hidden="true" />
+  ),
+});
 
 interface CheckoutPageProps {
   lang: Language;
@@ -57,6 +67,12 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
     country: user?.country ?? 'Egypt',
   });
 
+  // Map & address state
+  const [mapLat, setMapLat] = useState<number | null>(null);
+  const [mapLng, setMapLng] = useState<number | null>(null);
+  const [savedAddresses, setSavedAddresses] = useState<UserAddress[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState<UserAddress | null>(null);
+
   const t = {
     en: {
       checkout: 'CHECKOUT',
@@ -82,7 +98,10 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
       shipping: 'Shipping',
       tax: 'Tax',
       total: 'Total',
-      free: 'FREE'
+      free: 'FREE',
+      deliveryLocation: '📍 Select delivery location on the map',
+      clickMapToSetLocation: 'Click on the map to set your delivery location',
+      savedAddresses: 'Or select a saved address',
     },
     ar: {
       checkout: 'إتمام الطلب',
@@ -108,7 +127,10 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
       shipping: 'الشحن',
       tax: 'الضريبة',
       total: 'المجموع الكلي',
-      free: 'مجاني'
+      free: 'مجاني',
+      deliveryLocation: '📍 اختر موقع التوصيل على الخريطة',
+      clickMapToSetLocation: 'اضغط على الخريطة لتحديد موقع التوصيل',
+      savedAddresses: 'أو اختر عنوان محفوظ',
     }
   };
 
@@ -161,6 +183,17 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
     loadOrderSummary();
   }, [accessToken, cartItems.length, isAuthenticated]);
 
+  // Load saved addresses if authenticated
+  useEffect(() => {
+    if (user?.id && accessToken) {
+      icareApi.addresses.list(accessToken)
+        .then((addresses) => setSavedAddresses(addresses))
+        .catch((error) => {
+          console.error('Failed to load saved addresses', error);
+        });
+    }
+  }, [user?.id, accessToken]);
+
   const updateShippingField = (field: keyof typeof shippingForm, value: string) => {
     setShippingForm((prev) => ({ ...prev, [field]: value }));
   };
@@ -179,6 +212,15 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
       shippingCountry: shippingForm.country || 'Egypt',
       billingSameAsShipping: true,
     };
+
+    // Add location data
+    if (selectedAddress?.id) {
+      baseOrder.addressId = selectedAddress.id;
+    }
+    if (mapLat !== null && mapLng !== null) {
+      baseOrder.shippingLatitude = mapLat;
+      baseOrder.shippingLongitude = mapLng;
+    }
 
     if (isAuthenticated) return baseOrder;
 
@@ -299,6 +341,87 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
               {step === 1 && (
                 <div className="space-y-6">
                   <h2 className="text-2xl font-light mb-6">{lang === 'en' ? checkoutShippingHeading : 'معلومات الشحن'}</h2>
+
+                  {/* Map Section */}
+                  {mapLat !== null && mapLng !== null ? (
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {text.deliveryLocation}
+                      </label>
+                      <MapAddressPicker
+                        initialLat={mapLat}
+                        initialLng={mapLng}
+                        onLocationSelect={(lat: number, lng: number) => {
+                          setMapLat(lat);
+                          setMapLng(lng);
+                          setSelectedAddress(null);
+                        }}
+                        lang={lang}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Lat: {mapLat.toFixed(6)}, Lng: {mapLng.toFixed(6)}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {text.deliveryLocation}
+                      </label>
+                      <MapAddressPicker
+                        onLocationSelect={(lat: number, lng: number) => {
+                          setMapLat(lat);
+                          setMapLng(lng);
+                          setSelectedAddress(null);
+                        }}
+                        lang={lang}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        {text.clickMapToSetLocation}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Saved Addresses */}
+                  {savedAddresses.length > 0 && (
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {text.savedAddresses}
+                      </label>
+                      <div className="space-y-2">
+                        {savedAddresses.map((addr) => (
+                          <button
+                            key={addr.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedAddress(addr);
+                              setMapLat(addr.latitude);
+                              setMapLng(addr.longitude);
+                            }}
+                            className={`w-full p-3 border rounded-lg text-left transition-colors ${
+                              selectedAddress?.id === addr.id 
+                                ? 'border-blue-500 bg-blue-50' 
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium text-sm">{addr.label}</span>
+                              {addr.isDefault && (
+                                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
+                                  Default
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-500 mt-1">
+                              {[addr.street, addr.building, addr.apartment].filter(Boolean).join(', ')}
+                              {addr.area ? `, ${addr.area}` : ''}
+                            </p>
+                            <p className="text-xs text-gray-400">{addr.city}, {addr.governorate || addr.country}</p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="grid md:grid-cols-2 gap-4">
                     <input type="text" value={shippingForm.firstName} onChange={(event) => updateShippingField('firstName', event.target.value)} placeholder={text.firstName} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
                     <input type="text" value={shippingForm.lastName} onChange={(event) => updateShippingField('lastName', event.target.value)} placeholder={text.lastName} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
