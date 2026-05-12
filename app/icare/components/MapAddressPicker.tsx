@@ -2,31 +2,53 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import {
-  GoogleMap,
-  MarkerF,
-  Autocomplete,
-  useJsApiLoader,
-} from '@react-google-maps/api';
+  MapContainer,
+  TileLayer,
+  Marker,
+  useMapEvents,
+  useMap,
+} from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { Language } from '../translations';
 
 // --- Constants ---
-const MAP_FRAME_CLASS = 'w-full h-64 md:h-80 rounded-lg overflow-hidden border border-gray-300';
-const CAIRO_CENTER = { lat: 30.0444, lng: 31.2357 };
-const MAP_CONTAINER_STYLE = { width: '100%', height: '100%' };
-const LIBRARIES: 'places'[] = ['places'];
+const MAP_FRAME_CLASS =
+  'w-full h-64 md:h-80 rounded-lg overflow-hidden border border-gray-300';
+const CAIRO_CENTER: [number, number] = [30.0444, 31.2357];
+const TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-const mapLabels: Record<Language, {
-  ariaLabel: string;
-  searchPlaceholder: string;
-  loadingText: string;
-  errorText: string;
-  locationDenied: string;
-  autoLocated: string;
-  locatingText: string;
-}> = {
+// Fix Leaflet marker icon for Next.js/webpack — use CDN URLs
+const MARKER_ICON = L.icon({
+  iconUrl:
+    'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  iconRetinaUrl:
+    'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  shadowUrl:
+    'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+
+const mapLabels: Record<
+  Language,
+  {
+    ariaLabel: string;
+    searchPlaceholder: string;
+    searchButton: string;
+    loadingText: string;
+    errorText: string;
+    locationDenied: string;
+    autoLocated: string;
+    locatingText: string;
+  }
+> = {
   en: {
     ariaLabel: 'Delivery location map',
     searchPlaceholder: 'Search for an address or place…',
+    searchButton: 'Search',
     loadingText: 'Loading map…',
     errorText: 'Failed to load map',
     locationDenied: 'Location access denied. Showing default location.',
@@ -36,6 +58,7 @@ const mapLabels: Record<Language, {
   ar: {
     ariaLabel: 'خريطة موقع التوصيل',
     searchPlaceholder: 'ابحث عن عنوان أو مكان…',
+    searchButton: 'بحث',
     loadingText: 'جاري تحميل الخريطة…',
     errorText: 'فشل تحميل الخريطة',
     locationDenied: 'تم رفض الوصول إلى الموقع. جاري عرض الموقع الافتراضي.',
@@ -44,7 +67,7 @@ const mapLabels: Record<Language, {
   },
 };
 
-// --- Props (unchanged — exact same interface as Leaflet version) ---
+// --- Props (identical to Google Maps version) ---
 interface MapAddressPickerProps {
   initialLat?: number;
   initialLng?: number;
@@ -52,6 +75,82 @@ interface MapAddressPickerProps {
   readOnly?: boolean;
   lang?: Language;
 }
+
+// ─── Internal sub-components ────────────────────────────────────────────────
+
+/**
+ * Handles map click: places/updates the pin at the clicked location.
+ */
+function MapClickHandler({
+  readOnly,
+  onClick,
+}: {
+  readOnly: boolean;
+  onClick: (lat: number, lng: number) => void;
+}) {
+  useMapEvents({
+    click(e) {
+      if (readOnly) return;
+      onClick(e.latlng.lat, e.latlng.lng);
+    },
+  });
+  return null;
+}
+
+/**
+ * Receives pan instructions from the parent and flies the map.
+ * Only fires when `triggerPan` increments (auto-locate, search, parent sync).
+ */
+function MapFlyController({
+  position,
+  triggerPan,
+}: {
+  position: [number, number] | null;
+  triggerPan: number;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (triggerPan > 0 && position) {
+      map.flyTo(position, 15, { duration: 1 });
+    }
+  }, [triggerPan]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return null;
+}
+
+/**
+ * A single marker that is optionally draggable.
+ */
+function PickableMarker({
+  position,
+  readOnly,
+  onDragEnd,
+}: {
+  position: [number, number];
+  readOnly: boolean;
+  onDragEnd: (lat: number, lng: number) => void;
+}) {
+  const handleDragEnd = useCallback(
+    (e: L.LeafletEvent) => {
+      const marker = e.target as L.Marker;
+      const pos = marker.getLatLng();
+      onDragEnd(pos.lat, pos.lng);
+    },
+    [onDragEnd],
+  );
+
+  return (
+    <Marker
+      position={position}
+      icon={MARKER_ICON}
+      draggable={!readOnly}
+      eventHandlers={{ dragend: handleDragEnd }}
+    />
+  );
+}
+
+// ─── Main component ─────────────────────────────────────────────────────────
 
 export default function MapAddressPicker({
   initialLat,
@@ -61,59 +160,53 @@ export default function MapAddressPicker({
   lang,
 }: MapAddressPickerProps) {
   const labels = mapLabels[lang ?? 'en'];
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
-
-  // --- Load Google Maps script ---
-  const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: apiKey,
-    libraries: LIBRARIES,
-    language: lang === 'ar' ? 'ar' : 'en',
-  });
 
   // --- Refs ---
-  const mapRef = useRef<google.maps.Map | null>(null);
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
   const autoLocateCalledRef = useRef(false);
   const isCancelledRef = useRef(false);
   const onLocationSelectRef = useRef(onLocationSelect);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // --- Initial position ---
-  const initialPos: google.maps.LatLngLiteral | null =
-    initialLat != null && initialLng != null
-      ? { lat: initialLat, lng: initialLng }
-      : null;
+  // --- Derived ---
+  const hasInitialPos = initialLat != null && initialLng != null;
+  const initialPos: [number, number] = hasInitialPos
+    ? [initialLat!, initialLng!]
+    : CAIRO_CENTER;
 
   // --- State ---
-  const [center, setCenter] = useState<google.maps.LatLngLiteral>(
-    initialPos ?? CAIRO_CENTER,
+  const [markerPos, setMarkerPos] = useState<[number, number] | null>(
+    hasInitialPos ? [initialLat!, initialLng!] : null,
   );
-  const [markerPos, setMarkerPos] = useState<google.maps.LatLngLiteral | null>(
-    initialPos,
-  );
-  const [zoom, setZoom] = useState<number>(initialPos ? 15 : 12);
+  const [mapCenter, setMapCenter] = useState<[number, number]>(initialPos);
+  const [mounted, setMounted] = useState(false);
+  const [error, setError] = useState(false);
   const [autoLocating, setAutoLocating] = useState(false);
   const [autoLocated, setAutoLocated] = useState(false);
   const [locationDenied, setLocationDenied] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [panTrigger, setPanTrigger] = useState(0);
 
-  // --- Sync marker + center when parent provides new initialLat/initialLng ---
-  // (e.g. user selects a saved address → CheckoutPage updates state → re-render with new props)
+  // --- Mount detection ---
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // --- Sync when parent updates initialLat/initialLng ---
   useEffect(() => {
     if (initialLat != null && initialLng != null) {
-      const pos = { lat: initialLat, lng: initialLng };
+      const pos: [number, number] = [initialLat, initialLng];
       setMarkerPos(pos);
-      setCenter(pos);
-      setZoom(15);
-      mapRef.current?.panTo(pos);
+      setMapCenter(pos);
+      setPanTrigger((prev) => prev + 1);
     }
   }, [initialLat, initialLng]);
 
-  // --- Auto-locate on first mount (only when no initial position is given) ---
+  // --- Auto-locate: same guards as Google Maps version ---
   onLocationSelectRef.current = onLocationSelect;
 
   useEffect(() => {
-    if (!isLoaded || readOnly) return;
-    if (initialLat != null && initialLng != null) return;
+    if (!mounted || readOnly) return;
+    if (hasInitialPos) return;
     if (autoLocateCalledRef.current) return;
 
     autoLocateCalledRef.current = true;
@@ -125,20 +218,20 @@ export default function MapAddressPicker({
 
     isCancelledRef.current = false;
     setAutoLocating(true);
+
     navigator.geolocation.getCurrentPosition(
       (position) => {
         if (isCancelledRef.current) return;
-        const pos = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        };
-        setCenter(pos);
+        const pos: [number, number] = [
+          position.coords.latitude,
+          position.coords.longitude,
+        ];
+        setMapCenter(pos);
         setMarkerPos(pos);
-        setZoom(15);
         setAutoLocated(true);
         setAutoLocating(false);
-        onLocationSelectRef.current(pos.lat, pos.lng);
-        mapRef.current?.panTo(pos);
+        setPanTrigger((prev) => prev + 1);
+        onLocationSelectRef.current(pos[0], pos[1]);
       },
       () => {
         if (isCancelledRef.current) return;
@@ -151,70 +244,75 @@ export default function MapAddressPicker({
     return () => {
       isCancelledRef.current = true;
     };
-  }, [isLoaded]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mounted]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // --- Callbacks ---
-  const handleMapLoad = useCallback((map: google.maps.Map) => {
-    mapRef.current = map;
-  }, []);
+  // --- Address search via Nominatim ---
+  const handleSearch = useCallback(async () => {
+    const query = searchQuery.trim();
+    if (!query) return;
 
-  const handleMapClick = useCallback(
-    (e: google.maps.MapMouseEvent) => {
-      if (readOnly || !e.latLng) return;
-      const clickedPos = {
-        lat: e.latLng.lat(),
-        lng: e.latLng.lng(),
-      };
-      setMarkerPos(clickedPos);
-      onLocationSelect(clickedPos.lat, clickedPos.lng);
-    },
-    [readOnly, onLocationSelect],
-  );
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`,
+      );
+      const data: Array<{ lat: string; lon: string; display_name: string }> =
+        await res.json();
 
-  const handleMarkerDragEnd = useCallback(
-    (e: google.maps.MapMouseEvent) => {
-      if (readOnly || !e.latLng) return;
-      const newPos = {
-        lat: e.latLng.lat(),
-        lng: e.latLng.lng(),
-      };
-      setMarkerPos(newPos);
-      onLocationSelect(newPos.lat, newPos.lng);
-    },
-    [readOnly, onLocationSelect],
-  );
+      if (!res.ok || data.length === 0) return;
 
-  const handleAutocompleteLoad = useCallback(
-    (autocomplete: google.maps.places.Autocomplete) => {
-      autocompleteRef.current = autocomplete;
-    },
-    [],
-  );
+      const lat = parseFloat(data[0].lat);
+      const lng = parseFloat(data[0].lon);
+      const pos: [number, number] = [lat, lng];
 
-  const handlePlaceChanged = useCallback(() => {
-    const place = autocompleteRef.current?.getPlace();
-    if (!place?.geometry?.location) return;
+      setMarkerPos(pos);
+      setMapCenter(pos);
+      setPanTrigger((prev) => prev + 1);
+      onLocationSelect(lat, lng);
 
-    const pos = {
-      lat: place.geometry.location.lat(),
-      lng: place.geometry.location.lng(),
-    };
-    setCenter(pos);
-    setMarkerPos(pos);
-    setZoom(16);
-    onLocationSelect(pos.lat, pos.lng);
-    mapRef.current?.panTo(pos);
-
-    // Reflect the resolved address in the search input so the user sees
-    // the actual address instead of the raw typed text
-    if (searchInputRef.current) {
-      if (!place?.formatted_address && !place?.name) return;
-      searchInputRef.current.value = place.formatted_address ?? place.name ?? '';
+      // Show the resolved address in the input
+      if (searchInputRef.current) {
+        searchInputRef.current.value = data[0].display_name;
+      }
+    } catch {
+      // Silently ignore — user can still click the map
     }
-  }, [onLocationSelect]);
+  }, [searchQuery, onLocationSelect]);
 
-  // --- Error state: Maps script failed to load, or API key missing ---
-  if (loadError || !apiKey) {
+  const handleSearchKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        handleSearch();
+      }
+    },
+    [handleSearch],
+  );
+
+  // --- Click handler ---
+  const handleMapClick = useCallback(
+    (lat: number, lng: number) => {
+      if (readOnly) return;
+      setMarkerPos([lat, lng]);
+      onLocationSelect(lat, lng);
+    },
+    [readOnly, onLocationSelect],
+  );
+
+  // --- Drag handler ---
+  const handleMarkerDragEnd = useCallback(
+    (lat: number, lng: number) => {
+      if (readOnly) return;
+      setMarkerPos([lat, lng]);
+      onLocationSelect(lat, lng);
+    },
+    [readOnly, onLocationSelect],
+  );
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  //  RENDER
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // ── Error state ──
+  if (error) {
     return (
       <div className={MAP_FRAME_CLASS} role="region" aria-label={labels.ariaLabel}>
         <div className="w-full h-full flex items-center justify-center bg-red-50 text-red-600 text-sm px-4 text-center leading-relaxed">
@@ -224,10 +322,15 @@ export default function MapAddressPicker({
     );
   }
 
-  // --- Loading state: script is downloading ---
-  if (!isLoaded) {
+  // ── Loading state (before client-side mount) ──
+  if (!mounted) {
     return (
-      <div className={MAP_FRAME_CLASS} role="region" aria-label={labels.ariaLabel} aria-busy="true">
+      <div
+        className={MAP_FRAME_CLASS}
+        role="region"
+        aria-label={labels.ariaLabel}
+        aria-busy="true"
+      >
         <div className="w-full h-full bg-gray-100 animate-pulse flex items-center justify-center text-gray-400 text-sm">
           {labels.loadingText}
         </div>
@@ -235,32 +338,38 @@ export default function MapAddressPicker({
     );
   }
 
-  // --- Loaded + ready ---
+  // ── Ready ──
   return (
     <div role="region" aria-label={labels.ariaLabel}>
-      {/* Search Bar (hidden in readOnly mode) */}
+      {/* ── Search Bar (hidden in readOnly) ── */}
       {!readOnly && (
-        <div className="mb-3">
-          <Autocomplete
-            onLoad={handleAutocompleteLoad}
-            onPlaceChanged={handlePlaceChanged}
-            options={{
-              fields: ['geometry', 'formatted_address', 'name'],
-            }}
+        <div className="mb-3 flex gap-2">
+          <input
+            ref={searchInputRef}
+            type="text"
+            placeholder={labels.searchPlaceholder}
+            aria-label={
+              lang === 'ar'
+                ? 'ابحث عن عنوان'
+                : 'Search for an address'
+            }
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleSearchKeyDown}
+            className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            dir={lang === 'ar' ? 'rtl' : 'ltr'}
+          />
+          <button
+            type="button"
+            onClick={handleSearch}
+            className="px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors whitespace-nowrap"
           >
-            <input
-              ref={searchInputRef}
-              type="text"
-              placeholder={labels.searchPlaceholder}
-              aria-label="Search for an address"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              dir={lang === 'ar' ? 'rtl' : 'ltr'}
-            />
-          </Autocomplete>
+            {labels.searchButton}
+          </button>
         </div>
       )}
 
-      {/* Location status banners */}
+      {/* ── Location status banners ── */}
       {autoLocating && (
         <div className="mb-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700 flex items-center gap-2">
           <span className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin inline-block" />
@@ -278,35 +387,36 @@ export default function MapAddressPicker({
         </div>
       )}
 
-      {/* Map */}
+      {/* ── Map ── */}
       <div className={MAP_FRAME_CLASS}>
-        <GoogleMap
-          mapContainerStyle={MAP_CONTAINER_STYLE}
-          center={center}
-          zoom={zoom}
-          onLoad={handleMapLoad}
-          onClick={handleMapClick}
-          options={{
-            streetViewControl: false,
-            mapTypeControl: false,
-            fullscreenControl: false,
-            zoomControl: true,
-            scrollwheel: true,
-            clickableIcons: !readOnly,
-            draggableCursor: readOnly ? 'default' : 'grab',
-            draggingCursor: readOnly ? 'default' : 'grabbing',
-            gestureHandling: readOnly ? 'none' : 'auto',
-          }}
+        <MapContainer
+          center={mapCenter}
+          zoom={hasInitialPos ? 15 : 12}
+          scrollWheelZoom={!readOnly}
+          dragging={!readOnly}
+          zoomControl={true}
+          doubleClickZoom={!readOnly}
+          touchZoom={!readOnly}
+          attributionControl={true}
+          style={{ width: '100%', height: '100%' }}
         >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url={TILE_URL}
+          />
+
+          <MapClickHandler readOnly={readOnly} onClick={handleMapClick} />
+
+          <MapFlyController position={markerPos} triggerPan={panTrigger} />
+
           {markerPos && (
-            <MarkerF
+            <PickableMarker
               position={markerPos}
-              draggable={!readOnly}
+              readOnly={readOnly}
               onDragEnd={handleMarkerDragEnd}
-              animation={1}
             />
           )}
-        </GoogleMap>
+        </MapContainer>
       </div>
     </div>
   );
