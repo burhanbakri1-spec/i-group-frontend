@@ -278,7 +278,7 @@ export default function MapAddressPicker({
   const [resolvingAddress, setResolvingAddress] = useState(false);
   const [panTrigger, setPanTrigger] = useState(0);
   const [tileLayerFailed, setTileLayerFailed] = useState(false);
-  const [satelliteView, setSatelliteView] = useState(false);
+  const [satelliteView, setSatelliteView] = useState(true);
 
   // Google Maps paste flow
   const [googleMapsOpen, setGoogleMapsOpen] = useState(false);
