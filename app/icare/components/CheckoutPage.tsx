@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { MapPin, ShoppingBag, Check, ChevronRight, ArrowLeft, CreditCard, Lock } from 'lucide-react';
 import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';
@@ -10,6 +10,10 @@ import { CreatedOrder, CreateOrderInput, OrderSummary, UserAddress } from '../ty
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 const MAP_PICKER_FRAME_CLASS = 'w-full h-64 md:h-80 rounded-lg overflow-hidden border border-gray-300 mb-4';
+const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+const INPUT_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:border-black focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+const CHECKOUT_INPUT_CLASS = `w-full px-4 py-3 border border-[#C9C6BF] rounded text-[#222] placeholder:text-[#666] transition-[border-color,box-shadow] duration-200 ${INPUT_FOCUS_CLASS}`;
+const SHORT_TWEEN = { duration: 0.18, ease: 'easeOut' as const };
 
 const MapAddressPicker = dynamic(() => import('./MapAddressPicker'), {
   ssr: false,
@@ -66,6 +70,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
     postalCode: '',
     country: user?.country ?? 'Egypt',
   });
+  const shouldReduceMotion = useReducedMotion();
 
   // Map & address state
   const [mapLat, setMapLat] = useState<number | null>(null);
@@ -263,10 +268,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
     setIsSubmitting(true);
     setCheckoutError(null);
     try {
-      if (isAuthenticated && accessToken && icareApi.isConfigured()) {
-        await icareApi.cart.syncPrices(accessToken).catch(() => undefined);
-      }
-      const createdOrder = await icareApi.orders.create(buildOrderInput(), accessToken ?? undefined);
+      const orderInput = buildOrderInput();
+      console.log('[CheckoutPage] Sending order payload:', JSON.stringify(orderInput, null, 2));
+      const createdOrder = await icareApi.orders.create(orderInput, accessToken ?? undefined);
       setOrder(createdOrder);
       setOrderComplete(true);
       clearCart();
@@ -289,6 +293,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
         setPaymentVerified(false);
       }
     } catch (error) {
+      console.error('[CheckoutPage] Order creation failed:', error);
       setCheckoutError(error instanceof Error ? error.message : 'Failed to place order.');
     } finally {
       setIsSubmitting(false);
@@ -308,7 +313,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
         <div className="text-center mb-8 md:mb-12">
           <button
             onClick={() => onNavigate('shop')}
-            className="inline-flex items-center gap-2 text-xs md:text-sm text-[#666] hover:text-black mb-4 transition-colors"
+            className={`inline-flex items-center gap-2 text-xs md:text-sm text-[#5F5D59] hover:text-black mb-4 transition-colors ${CONTROL_FOCUS_CLASS}`}
           >
             <ArrowLeft size={16} />
             {checkoutBackToShop}
@@ -326,7 +331,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                 }`}>
                   {step > s.number ? <Check size={20} /> : <s.icon size={20} />}
                 </div>
-                <span className="text-xs mt-2 text-[#666] hidden md:block">{s.title}</span>
+                <span className="text-xs mt-2 text-[#5F5D59] hidden md:block">{s.title}</span>
               </div>
               {idx < steps.length - 1 && (
                 <div className={`w-20 h-[2px] ${step > s.number ? 'bg-black' : 'bg-[#DDD]'}`} />
@@ -339,8 +344,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
           {/* Form Section */}
           <div className="lg:col-span-2">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
+              animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+              transition={SHORT_TWEEN}
               className="bg-white p-8 rounded-lg shadow-sm"
             >
               {step === 1 && (
@@ -402,7 +408,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                               setMapLat(addr.latitude);
                               setMapLng(addr.longitude);
                             }}
-                            className={`w-full p-3 border rounded-lg text-left transition-colors ${
+                          className={`w-full p-3 border rounded-lg text-left transition-colors ${CONTROL_FOCUS_CLASS} ${
                               selectedAddress?.id === addr.id 
                                 ? 'border-blue-500 bg-blue-50' 
                                 : 'border-gray-200 hover:border-gray-300'
@@ -416,11 +422,11 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm text-gray-500 mt-1">
+                            <p className="text-sm text-gray-600 mt-1">
                               {[addr.street, addr.building, addr.apartment].filter(Boolean).join(', ')}
                               {addr.area ? `, ${addr.area}` : ''}
                             </p>
-                            <p className="text-xs text-gray-400">{addr.city}, {addr.governorate || addr.country}</p>
+                            <p className="text-xs text-gray-600">{addr.city}, {addr.governorate || addr.country}</p>
                           </button>
                         ))}
                       </div>
@@ -428,16 +434,16 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                   )}
 
                   <div className="grid md:grid-cols-2 gap-4">
-                    <input type="text" value={shippingForm.firstName} onChange={(event) => updateShippingField('firstName', event.target.value)} placeholder={text.firstName} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
-                    <input type="text" value={shippingForm.lastName} onChange={(event) => updateShippingField('lastName', event.target.value)} placeholder={text.lastName} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
+                    <input type="text" value={shippingForm.firstName} onChange={(event) => updateShippingField('firstName', event.target.value)} placeholder={text.firstName} className={CHECKOUT_INPUT_CLASS} />
+                    <input type="text" value={shippingForm.lastName} onChange={(event) => updateShippingField('lastName', event.target.value)} placeholder={text.lastName} className={CHECKOUT_INPUT_CLASS} />
                   </div>
-                  <input type="email" value={shippingForm.email} onChange={(event) => updateShippingField('email', event.target.value)} placeholder={text.email} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
-                  <input type="tel" value={shippingForm.phone} onChange={(event) => updateShippingField('phone', event.target.value)} placeholder={text.phone} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
-                  <input type="text" value={shippingForm.address} onChange={(event) => updateShippingField('address', event.target.value)} placeholder={text.address} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
+                  <input type="email" value={shippingForm.email} onChange={(event) => updateShippingField('email', event.target.value)} placeholder={text.email} className={CHECKOUT_INPUT_CLASS} />
+                  <input type="tel" value={shippingForm.phone} onChange={(event) => updateShippingField('phone', event.target.value)} placeholder={text.phone} className={CHECKOUT_INPUT_CLASS} />
+                  <input type="text" value={shippingForm.address} onChange={(event) => updateShippingField('address', event.target.value)} placeholder={text.address} className={CHECKOUT_INPUT_CLASS} />
                   <div className="grid md:grid-cols-3 gap-4">
-                    <input type="text" value={shippingForm.city} onChange={(event) => updateShippingField('city', event.target.value)} placeholder={text.city} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
-                    <input type="text" value={shippingForm.postalCode} onChange={(event) => updateShippingField('postalCode', event.target.value)} placeholder={text.postalCode} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
-                    <input type="text" value={shippingForm.country} onChange={(event) => updateShippingField('country', event.target.value)} placeholder={text.country} className="w-full px-4 py-3 border border-[#DDD] rounded focus:border-black focus:outline-none" />
+                    <input type="text" value={shippingForm.city} onChange={(event) => updateShippingField('city', event.target.value)} placeholder={text.city} className={CHECKOUT_INPUT_CLASS} />
+                    <input type="text" value={shippingForm.postalCode} onChange={(event) => updateShippingField('postalCode', event.target.value)} placeholder={text.postalCode} className={CHECKOUT_INPUT_CLASS} />
+                    <input type="text" value={shippingForm.country} onChange={(event) => updateShippingField('country', event.target.value)} placeholder={text.country} className={CHECKOUT_INPUT_CLASS} />
                   </div>
                 </div>
               )}
@@ -450,7 +456,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                   <div className="space-y-3">
                     <button
                       onClick={() => setPaymentMethod('card')}
-                      className={`w-full p-4 border-2 rounded-lg flex items-center justify-between transition-all ${
+                      className={`w-full p-4 border-2 rounded-lg flex items-center justify-between transition-colors duration-200 ${CONTROL_FOCUS_CLASS} ${
                         paymentMethod === 'card' ? 'border-black bg-[#FAFAFA]' : 'border-[#DDD]'
                       }`}
                     >
@@ -463,7 +469,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                     
                     <button
                       onClick={() => setPaymentMethod('paypal')}
-                      className={`w-full p-4 border-2 rounded-lg flex items-center justify-between transition-all ${
+                      className={`w-full p-4 border-2 rounded-lg flex items-center justify-between transition-colors duration-200 ${CONTROL_FOCUS_CLASS} ${
                         paymentMethod === 'paypal' ? 'border-black bg-[#FAFAFA]' : 'border-[#DDD]'
                       }`}
                     >
@@ -476,7 +482,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
 
                     <button
                       onClick={() => setPaymentMethod('cod')}
-                      className={`w-full p-4 border-2 rounded-lg flex items-center justify-between transition-all ${
+                      className={`w-full p-4 border-2 rounded-lg flex items-center justify-between transition-colors duration-200 ${CONTROL_FOCUS_CLASS} ${
                         paymentMethod === 'cod' ? 'border-black bg-[#FAFAFA]' : 'border-[#DDD]'
                       }`}
                     >
@@ -490,8 +496,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
 
                   {paymentMethod === 'card' && (
                     <motion.div
-                      initial={{ opacity: 0, height: 0 }}
+                      initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
+                      transition={SHORT_TWEEN}
                       className="pt-4"
                     >
                       <div className="bg-[#F0F7FF] border border-[#B8D8FF] rounded-lg p-5 flex items-start gap-3">
@@ -514,8 +521,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                 orderComplete ? (
                   <div className="text-center py-12">
                     <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
+                      initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={SHORT_TWEEN}
                       className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${
                         verifyingPayment ? 'bg-amber-500' : paymentVerified ? 'bg-green-500' : 'bg-green-500'
                       }`}
@@ -530,7 +538,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                       {lang === 'en' ? checkoutConfirmedHeading : 'تم تأكيد الطلب!'}
                     </h2>
                     {verifyingPayment && (
-                      <p className="text-[#666] mb-4">
+                      <p className="text-[#5F5D59] mb-4">
                         {lang === 'en' ? 'Verifying your payment...' : 'جارٍ التحقق من الدفع...'}
                       </p>
                     )}
@@ -540,7 +548,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                       </p>
                     )}
                     {!verifyingPayment && !paymentVerified && (
-                      <p className="text-[#666] mb-8">
+                      <p className="text-[#5F5D59] mb-8">
                         {lang === 'en' 
                           ? `${checkoutConfirmedMessage} Order ${order?.orderNumber ?? ''} has been created.` 
                           : 'شكراً لشرائك. سنرسل لك رسالة تأكيد قريباً.'}
@@ -548,7 +556,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                     )}
                     <button
                       onClick={() => onNavigate('shop')}
-                      className="px-8 py-3 bg-black text-white rounded-full hover:bg-[#333] transition-colors"
+                      className={`px-8 py-3 bg-black text-white rounded-full hover:bg-[#333] transition-colors ${CONTROL_FOCUS_CLASS}`}
                     >
                       {text.continueShopping}
                     </button>
@@ -559,7 +567,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                       {lang === 'en' ? checkoutReviewHeading : 'مراجعة طلبك'}
                     </h3>
                     <div className="bg-[#F5F5F5] p-6 rounded-lg">
-                      <p className="text-sm text-[#666] mb-4">
+                      <p className="text-sm text-[#5F5D59] mb-4">
                         {lang === 'en' 
                           ? checkoutTermsText
                           : 'بالنقر على "تأكيد الطلب"، فإنك توافق على الشروط والأحكام الخاصة بنا.'}
@@ -570,7 +578,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                       <button
                         onClick={placeOrder}
                         disabled={isSubmitting}
-                        className="w-full px-6 py-4 bg-black text-white rounded-full hover:bg-[#333] transition-colors flex items-center justify-center gap-2 text-lg font-medium disabled:opacity-50"
+                        className={`w-full px-6 py-4 bg-black text-white rounded-full hover:bg-[#333] transition-colors flex items-center justify-center gap-2 text-lg font-medium disabled:opacity-50 ${CONTROL_FOCUS_CLASS}`}
                       >
                         <Lock size={20} />
                         {isSubmitting ? checkoutSubmittingText : checkoutPlaceOrder}
@@ -586,14 +594,14 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                   {step > 1 && (
                     <button
                       onClick={() => setStep(step - 1)}
-                      className="flex-1 px-6 py-3 border border-black rounded-full hover:bg-[#FAFAFA] transition-colors"
+                      className={`flex-1 px-6 py-3 border border-black rounded-full hover:bg-[#FAFAFA] transition-colors ${CONTROL_FOCUS_CLASS}`}
                     >
                       {lang === 'en' ? checkoutNavBack : 'رجوع'}
                     </button>
                   )}
                   <button
                     onClick={() => setStep(step + 1)}
-                    className="flex-1 px-6 py-3 bg-black text-white rounded-full hover:bg-[#333] transition-colors flex items-center justify-center gap-2"
+                    className={`flex-1 px-6 py-3 bg-black text-white rounded-full hover:bg-[#333] transition-colors flex items-center justify-center gap-2 ${CONTROL_FOCUS_CLASS}`}
                   >
                     {lang === 'en' ? checkoutNavContinue : 'متابعة'}
                     <ChevronRight size={18} />
@@ -616,7 +624,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                     </div>
                     <div className="flex-1">
                       <p className="font-medium text-sm">{item.title}</p>
-                      <p className="text-xs text-[#888]">Qty: {item.quantity}</p>
+                      <p className="text-xs text-[#5F5D59]">Qty: {item.quantity}</p>
                       <p className="text-sm font-medium mt-1">{item.price}</p>
                     </div>
                   </div>
@@ -631,22 +639,22 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
 
               <div className="space-y-3 text-sm border-t border-[#EEE] pt-4">
                 <div className="flex justify-between">
-                  <span className="text-[#666]">{text.subtotal}</span>
+                  <span className="text-[#5F5D59]">{text.subtotal}</span>
                   <span>EGP {displayOrderSummary.subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#666]">{text.shipping}</span>
+                  <span className="text-[#5F5D59]">{text.shipping}</span>
                   <span className={displayOrderSummary.shipping === 0 ? 'text-green-600' : ''}>
                     {displayOrderSummary.shipping === 0 ? text.free : `EGP ${displayOrderSummary.shipping.toFixed(2)}`}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[#666]">{text.tax}</span>
+                  <span className="text-[#5F5D59]">{text.tax}</span>
                   <span>EGP {displayOrderSummary.tax.toFixed(2)}</span>
                 </div>
                 {displayOrderSummary.discount > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-[#666]">Discount</span>
+                    <span className="text-[#5F5D59]">Discount</span>
                     <span>-EGP {displayOrderSummary.discount.toFixed(2)}</span>
                   </div>
                 )}

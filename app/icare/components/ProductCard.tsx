@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Star, Plus, Heart } from 'lucide-react';
 import { Language } from '../translations';
@@ -15,6 +15,7 @@ interface ProductCardProps {
 
 const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
   const { addToCart, addToWishlist, isInWishlist, removeFromWishlist } = useShop();
   const inWishlist = isInWishlist(product.id);
   const isPurchasable = isPurchasableStock(product.stockStatus, product.stock);
@@ -38,133 +39,112 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
     }
   };
 
+  const handleCardKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.target !== e.currentTarget || !onSelect || (e.key !== 'Enter' && e.key !== ' ')) {
+      return;
+    }
+
+    e.preventDefault();
+    onSelect();
+  };
+
+  const cardMotion = shouldReduceMotion
+    ? {}
+    : {
+        initial: { opacity: 0, y: 12 },
+        animate: { opacity: 1, y: 0 },
+        whileInView: { opacity: 1, y: 0 },
+      };
+
   return (
     <motion.div 
       className="group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      {...cardMotion}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ 
-        duration: 0.6, 
+        duration: 0.35,
         ease: [0.22, 1, 0.36, 1]
       }}
     >
-      {/* Main Container - Taller for mobile like Rhode Skin */}
       <motion.div 
-        className="relative aspect-[2/3] md:aspect-[4/5] bg-[#F2F2F2] rounded-[8px] md:rounded-[20px] overflow-hidden p-2 md:p-8 flex flex-col justify-between border border-transparent hover:border-[#E5E5E5] transition-all duration-500 cursor-pointer"
+        className="relative aspect-[4/5] bg-[#F2F2F2] rounded-[14px] md:rounded-[20px] overflow-hidden p-4 md:p-7 flex flex-col justify-between border border-black/5 hover:border-black/10 transition-[border-color,box-shadow] duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
         onClick={onSelect}
+        onKeyDown={handleCardKeyDown}
+        role={onSelect ? 'button' : undefined}
+        tabIndex={onSelect ? 0 : undefined}
         whileHover={{ 
-          y: -8, 
-          boxShadow: "0 20px 40px rgba(0,0,0,0.08)",
-          scale: 1.02,
-          transition: { duration: 0.3 }
+          y: shouldReduceMotion ? 0 : -4,
+          boxShadow: "0 14px 28px rgba(0,0,0,0.07)",
+          transition: { duration: 0.22 }
         }}
-        whileTap={{ scale: 0.98 }}
+        whileTap={shouldReduceMotion ? undefined : { scale: 0.995 }}
       >
         
         {/* Top Section: Category Title and Badge */}
-        <motion.div 
+        <div
           className="flex justify-between items-start w-full relative z-10"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.4 }}
         >
-          <motion.h3 
-            className="text-[20px] md:text-[48px] font-black tracking-tighter text-[#4D4D4D] lowercase leading-[0.8] font-sans"
-            whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
+          <h3
+            className="text-[24px] sm:text-[28px] md:text-[42px] font-black tracking-tighter text-[#3F3F3F] lowercase leading-[0.84] font-sans"
           >
             {displayTitle}
-          </motion.h3>
+          </h3>
           <div className="flex items-center gap-1 md:gap-2">
             {product.badge && (
-              <motion.span 
-                className="bg-[#666666] text-white px-1.5 md:px-3 py-0.5 md:py-1 rounded-full text-[7px] md:text-[10px] font-bold uppercase tracking-wider"
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2, type: "spring", bounce: 0.5 }}
+              <span
+                className="bg-[#5A5A5A] text-white px-2 md:px-3 py-1 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider"
               >
                 {product.badge}
-              </motion.span>
+              </span>
             )}
             {!isPurchasable && (
-              <motion.span
-                className="bg-black/60 text-white px-1.5 md:px-3 py-0.5 md:py-1 rounded-full text-[7px] md:text-[10px] font-bold uppercase tracking-wider"
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
+              <span
+                className="bg-black/70 text-white px-2 md:px-3 py-1 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider"
               >
                 sold out
-              </motion.span>
+              </span>
             )}
             <motion.button
               onClick={handleToggleWishlist}
-              className="p-1.5 md:p-2 hover:bg-white/50 rounded-full transition-colors"
-              whileHover={{ scale: 1.2, rotate: inWishlist ? 0 : 10 }}
-              whileTap={{ scale: 0.9 }}
+              className="p-2 hover:bg-white/70 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F2]"
+              whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
+              aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
             >
-              <motion.div
-                animate={inWishlist ? { scale: [1, 1.3, 1] } : {}}
-                transition={{ duration: 0.3 }}
-              >
-                <Heart 
-                  size={16} 
-                  className={`md:w-5 md:h-5 transition-colors ${inWishlist ? 'fill-red-500 text-red-500' : 'text-[#666]'}`}
-                />
-              </motion.div>
+              <Heart
+                size={16}
+                className={`md:w-5 md:h-5 transition-colors ${inWishlist ? 'fill-red-500 text-red-500' : 'text-[#555]'}`}
+              />
             </motion.button>
           </div>
-        </motion.div>
+        </div>
 
         {/* Center Section: Product Image */}
         <div className="absolute inset-0 flex items-center justify-center p-4 md:p-12 py-10 md:py-20">
-          <motion.div
-            animate={isHovered ? { 
-              scale: 1.12, 
-              rotateY: 5,
-              rotateX: -5,
-            } : { 
-              scale: 1, 
-              rotateY: 0,
-              rotateX: 0
-            }}
-            transition={{ 
-              duration: 0.6, 
-              ease: [0.33, 1, 0.68, 1]
-            }}
-            style={{ transformStyle: "preserve-3d" }}
-          >
+          <div>
             <ImageWithFallback 
               src={product.image} 
               alt={product.name} 
-              className="max-w-[85%] md:max-w-[85%] max-h-[60%] md:max-h-[65%] object-contain drop-shadow-2xl"
+              className="max-w-[86%] md:max-w-[84%] max-h-[62%] md:max-h-[64%] object-contain drop-shadow-xl"
             />
-          </motion.div>
+          </div>
         </div>
 
         {/* Bottom Section: Info */}
-        <motion.div 
-          className="relative z-10 mt-auto space-y-2"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, duration: 0.4 }}
+        <div
+          className="relative z-10 mt-auto space-y-2.5"
         >
           {/* Stars and Count */}
           <div className="flex items-center gap-1 mb-1">
             <div className="flex">
               {[...Array(5)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.2 + i * 0.05 }}
-                >
+                <span key={i}>
                   <Star size={9} className="md:w-[13px] md:h-[13px]" fill="#4D4D4D" stroke="#4D4D4D" />
-                </motion.div>
+                </span>
               ))}
             </div>
-            <span className="text-[9px] md:text-[15px] text-[#4D4D4D] font-medium">
+            <span className="text-[10px] md:text-[14px] text-[#444] font-semibold">
               ({reviewsCount})
             </span>
           </div>
@@ -172,14 +152,14 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
           {/* Name and Price Row */}
           <div className="flex justify-between items-end gap-1 mb-2">
             <div className="flex flex-col min-w-0 flex-1">
-               <h2 className="text-[11px] md:text-[20px] font-black uppercase tracking-tight text-[#4D4D4D] leading-tight truncate">
-                 {product.category}
-               </h2>
-              <p className="text-[9px] md:text-[15px] text-[#666] font-medium leading-tight line-clamp-1">
+                <h2 className="text-[13px] md:text-[19px] font-black uppercase tracking-tight text-[#3F3F3F] leading-tight truncate">
+                  {product.category}
+                </h2>
+              <p className="text-[11px] md:text-[14px] text-[#555] font-medium leading-snug line-clamp-2 md:line-clamp-1">
                 {product.description}
               </p>
             </div>
-            <span className="text-[12px] md:text-[20px] font-bold text-[#4D4D4D] whitespace-nowrap">
+            <span className="text-[13px] md:text-[19px] font-bold text-[#3F3F3F] whitespace-nowrap">
               {product.price}
             </span>
           </div>
@@ -188,16 +168,12 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
           <motion.button
             onClick={handleAddToCart}
             disabled={!isPurchasable}
-            className="w-full py-2 md:py-2.5 border border-[#999] bg-transparent rounded-full text-[9px] md:text-[11px] font-black uppercase tracking-wider text-[#666] hover:bg-black hover:text-white hover:border-black transition-all duration-300 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-[#666] disabled:cursor-not-allowed"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25, duration: 0.4 }}
+            className="w-full py-2.5 md:py-2.5 border border-[#777] bg-transparent rounded-full text-[10px] md:text-[11px] font-black uppercase tracking-wider text-[#4A4A4A] hover:bg-black hover:text-white hover:border-black transition-colors duration-300 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-[#4A4A4A] disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F2]"
+            whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
           >
             {isPurchasable ? (lang === 'en' ? 'Add to Cart' : 'أضف للسلة') : (lang === 'en' ? 'Sold Out' : 'نفد المخزون')}
           </motion.button>
-        </motion.div>
+        </div>
 
         {/* Desktop Overlay - Hidden on Mobile */}
         <motion.div 
@@ -209,19 +185,13 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
           <motion.button 
             onClick={handleAddToCart}
             disabled={!isPurchasable}
-            className="bg-black text-white px-10 py-4 rounded-full text-[12px] font-black uppercase tracking-widest shadow-2xl flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={isHovered ? { scale: 1, opacity: 1 } : { scale: 0.8, opacity: 0 }}
-            transition={{ duration: 0.3, type: "spring", bounce: 0.4 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            className="bg-black text-white px-10 py-4 rounded-full text-[12px] font-black uppercase tracking-widest shadow-xl flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+            initial={{ opacity: 0 }}
+            animate={isHovered ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
           >
-            <motion.div
-              animate={{ rotate: isHovered ? 180 : 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <Plus size={18} strokeWidth={3} />
-            </motion.div>
+            <Plus size={18} strokeWidth={3} />
             {isPurchasable ? (lang === 'en' ? 'Add to Cart' : 'أضف للسلة') : (lang === 'en' ? 'Sold Out' : 'نفد المخزون')}
           </motion.button>
         </motion.div>

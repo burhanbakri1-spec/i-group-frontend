@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';
@@ -11,6 +11,11 @@ interface AccountPageProps {
   onNavigate?: (page: string) => void;
   lang?: Language;
 }
+
+const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F1ED]';
+const INPUT_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F1ED]';
+const ACCOUNT_INPUT_CLASS = `w-full bg-white border border-transparent rounded-[12px] px-6 py-4 text-[14px] text-[#5C5A56] placeholder:text-[#666] transition-[border-color,box-shadow] duration-200 ${INPUT_FOCUS_CLASS}`;
+const SHORT_TWEEN = { duration: 0.18, ease: 'easeOut' as const };
 
 export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) => {
   const {
@@ -48,6 +53,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
   const [orderDetail, setOrderDetail] = useState<CreatedOrder | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [cancelStatus, setCancelStatus] = useState<Record<string, 'idle' | 'loading' | 'cancelled'>>({});
+  const shouldReduceMotion = useReducedMotion();
 
   /** Fetch the user's order list on mount (or on access-token change). */
   const fetchOrders = useCallback(async () => {
@@ -146,9 +152,9 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
       {/* Right Section: Login Form */}
       <div className="md:w-1/2 bg-[#F2F1ED] flex items-center justify-center p-8 md:p-12 rounded-[32px] w-full h-auto md:h-[80vh]">
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
+          animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+          transition={SHORT_TWEEN}
           className="w-full max-w-[400px] flex flex-col items-center"
         >
           <h1 className="text-[36px] md:text-[48px] font-bold text-[#5C5A56] mb-12 lowercase">
@@ -158,9 +164,9 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
           {isAuthenticated ? (
             <div className="w-full space-y-5 text-center">
               <div className="bg-white rounded-[16px] p-6 text-[#5C5A56]">
-                <p className="text-[11px] font-black uppercase tracking-[0.2em] opacity-50 mb-2">{authSignedInAs}</p>
+                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#5C5A56]/70 mb-2">{authSignedInAs}</p>
                 <p className="text-[20px] font-bold">{user?.name}</p>
-                <p className="text-[13px] opacity-70">{user?.email}</p>
+                <p className="text-[13px] text-[#5C5A56]/80">{user?.email}</p>
               </div>
               {authError && <p className="text-sm text-red-600">{authError}</p>}
 
@@ -183,7 +189,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                     <p className="text-[13px] text-red-600 mb-3">{ordersError}</p>
                     <button
                       onClick={fetchOrders}
-                      className="text-[11px] font-black uppercase tracking-widest underline underline-offset-4 text-[#5C5A56] hover:text-black"
+                      className={`text-[11px] font-black uppercase tracking-widest underline underline-offset-4 text-[#5C5A56] hover:text-black ${CONTROL_FOCUS_CLASS}`}
                     >
                       Retry
                     </button>
@@ -193,12 +199,12 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                 {/* Empty */}
                 {!ordersLoading && !ordersError && orders.length === 0 && (
                   <div className="px-5 py-10 text-center">
-                    <p className="text-[13px] text-[#5C5A56]/60 mb-4">
+                    <p className="text-[13px] text-[#5C5A56]/75 mb-4">
                       You haven&apos;t placed any orders yet.
                     </p>
                     <button
                       onClick={() => onNavigate?.('shop')}
-                      className="text-[11px] font-black uppercase tracking-widest underline underline-offset-4 text-[#5C5A56] hover:text-black transition-colors"
+                      className={`text-[11px] font-black uppercase tracking-widest underline underline-offset-4 text-[#5C5A56] hover:text-black transition-colors ${CONTROL_FOCUS_CLASS}`}
                     >
                       Start shopping
                     </button>
@@ -216,13 +222,13 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                           {/* Row header */}
                           <button
                             onClick={() => toggleOrder(order)}
-                            className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-[#F2F1ED]/50 transition-colors"
+                            className={`w-full flex items-center justify-between px-5 py-4 text-left hover:bg-[#F2F1ED]/50 transition-colors ${CONTROL_FOCUS_CLASS}`}
                           >
                             <div className="flex-1 min-w-0 pr-3">
                               <p className="text-[12px] font-extrabold uppercase tracking-[0.04em] text-[#5C5A56] truncate">
                                 #{order.orderNumber}
                               </p>
-                              <p className="text-[10px] text-[#5C5A56]/50 mt-0.5">
+                              <p className="text-[10px] text-[#5C5A56]/70 mt-0.5">
                                 {formatDate(order.createdAt)}
                               </p>
                             </div>
@@ -233,11 +239,11 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                               <span className="text-[11px] font-bold text-[#5C5A56] whitespace-nowrap">
                                 EGP {order.total.toFixed(0)}
                               </span>
-                              <span className="text-[10px] text-[#5C5A56]/50 whitespace-nowrap">
+                              <span className="text-[10px] text-[#5C5A56]/70 whitespace-nowrap">
                                 {order.itemCount} {order.itemCount === 1 ? 'item' : 'items'}
                               </span>
                               <svg
-                                className={`w-3 h-3 text-[#5C5A56]/40 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                                className={`w-3 h-3 text-[#5C5A56]/70 transition-transform duration-200 motion-reduce:transition-none ${isExpanded ? 'rotate-180' : ''}`}
                                 viewBox="0 0 12 12"
                                 fill="none"
                               >
@@ -253,7 +259,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                                 initial={{ height: 0, opacity: 0 }}
                                 animate={{ height: 'auto', opacity: 1 }}
                                 exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.25 }}
+                                transition={SHORT_TWEEN}
                                 className="overflow-hidden"
                               >
                                 <div className="px-5 pb-4 bg-[#F2F1ED]/30 rounded-b-[16px]">
@@ -351,7 +357,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                                               setOrdersError(err instanceof IcareApiError ? err.message : 'Failed to cancel order. Please try again.');
                                             }
                                           }}
-                                          className="w-full mt-2 py-2 border border-red-300 text-red-600 rounded-[10px] text-[10px] font-black uppercase tracking-[0.1em] hover:bg-red-50 transition-colors active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                                           className={`w-full mt-2 py-2 border border-red-300 text-red-600 rounded-[10px] text-[10px] font-black uppercase tracking-[0.1em] hover:bg-red-50 transition-colors active:scale-[0.98] motion-reduce:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed ${CONTROL_FOCUS_CLASS}`}
                                         >
                                           {cancelState === 'loading' ? 'Cancelling…' : 'Cancel Order'}
                                         </button>
@@ -383,7 +389,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
 
               <button
                 onClick={() => logout()}
-                className="border border-[#5C5A56] text-[#5C5A56] px-14 py-3 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all duration-300 active:scale-95"
+                className={`border border-[#5C5A56] text-[#5C5A56] px-14 py-3 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors duration-200 active:scale-[0.98] motion-reduce:active:scale-100 ${CONTROL_FOCUS_CLASS}`}
               >
                 {authSignOut}
               </button>
@@ -397,7 +403,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                     value={name}
                     onChange={(event) => setName(event.target.value)}
                     placeholder={authPlaceholderName}
-                    className="w-full bg-white border-none rounded-[12px] px-6 py-4 text-[14px] text-[#5C5A56] placeholder:text-[#9A9A9A] focus:ring-1 focus:ring-black/10 transition-shadow outline-none"
+                    className={ACCOUNT_INPUT_CLASS}
                   />
                 </div>
               )}
@@ -407,7 +413,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   placeholder={authPlaceholderEmail}
-                  className="w-full bg-white border-none rounded-[12px] px-6 py-4 text-[14px] text-[#5C5A56] placeholder:text-[#9A9A9A] focus:ring-1 focus:ring-black/10 transition-shadow outline-none"
+                  className={ACCOUNT_INPUT_CLASS}
                 />
               </div>
               
@@ -417,7 +423,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   placeholder={authPlaceholderPassword}
-                  className="w-full bg-white border-none rounded-[12px] px-6 py-4 text-[14px] text-[#5C5A56] placeholder:text-[#9A9A9A] focus:ring-1 focus:ring-black/10 transition-shadow outline-none"
+                  className={ACCOUNT_INPUT_CLASS}
                 />
               </div>
 
@@ -428,14 +434,14 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                     value={phone}
                     onChange={(event) => setPhone(event.target.value)}
                     placeholder={authPlaceholderPhone}
-                    className="w-full bg-white border-none rounded-[12px] px-6 py-4 text-[14px] text-[#5C5A56] placeholder:text-[#9A9A9A] focus:ring-1 focus:ring-black/10 transition-shadow outline-none"
+                    className={ACCOUNT_INPUT_CLASS}
                   />
                 </div>
               )}
 
               {(formError || authError) && <p className="text-sm text-red-600">{formError ?? authError}</p>}
 
-              <button disabled={isSubmitting} className="mt-8 border border-[#5C5A56] text-[#5C5A56] px-14 py-3 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all duration-300 active:scale-95 disabled:opacity-50 flex items-center gap-2">
+               <button disabled={isSubmitting} className={`mt-8 border border-[#5C5A56] text-[#5C5A56] px-14 py-3 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors duration-200 active:scale-[0.98] motion-reduce:active:scale-100 disabled:opacity-50 flex items-center gap-2 ${CONTROL_FOCUS_CLASS}`}>
                 {isSubmitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-[#5C5A56] border-t-transparent rounded-full animate-spin" />
@@ -447,9 +453,9 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
           )}
 
           {!isAuthenticated && <div className="mt-8 flex flex-col items-center gap-3">
-            <div className="text-[12px] text-[#706E6A] font-medium">
+            <div className="text-[12px] text-[#5F5D59] font-medium">
               {mode === 'login' ? authToggleToRegister : authToggleToLogin}{' '}
-              <button onClick={() => setMode(mode === 'login' ? 'register' : 'login')} className="underline underline-offset-4 hover:text-black transition-colors">
+              <button onClick={() => setMode(mode === 'login' ? 'register' : 'login')} className={`underline underline-offset-4 hover:text-black transition-colors ${CONTROL_FOCUS_CLASS}`}>
                 {mode === 'login' ? 'Sign up!' : 'Sign in!'}
               </button>
             </div>

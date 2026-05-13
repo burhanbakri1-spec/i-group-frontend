@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { fetchProductShowcase } from '../lib/catalog-client';
 import { ShowcaseUnit } from '../types';
@@ -46,7 +46,7 @@ const LAYOUT_GAP = 'gap-8 md:gap-12';
 function renderStackedUnit(unit: ShowcaseUnit) {
   return (
     <div className="flex flex-col w-full border-b border-black/10 pb-8 md:pb-12 last:border-b-0 last:pb-0">
-      <div className="aspect-[16/10] overflow-hidden rounded-2xl md:rounded-3xl">
+      <div className="aspect-[4/3] overflow-hidden rounded-2xl md:rounded-3xl bg-[#F2F1ED]">
         <ImageWithFallback
           src={unit.image}
           alt={unit.title}
@@ -57,7 +57,7 @@ function renderStackedUnit(unit: ShowcaseUnit) {
         <h3 className="text-[18px] md:text-[22px] font-black lowercase tracking-tight text-black">
           {unit.title}
         </h3>
-        <p className="text-[13px] md:text-[15px] text-[#707070] font-medium leading-relaxed">
+        <p className="text-[13px] md:text-[15px] text-[#5f5f5f] font-medium leading-relaxed">
           {unit.description}
         </p>
       </div>
@@ -67,7 +67,7 @@ function renderStackedUnit(unit: ShowcaseUnit) {
 
 function renderSideBySideUnit(unit: ShowcaseUnit, imageLeft: boolean) {
   const imageCol = (
-    <div className="h-full min-h-[280px] overflow-hidden rounded-2xl md:rounded-3xl">
+    <div className="h-full min-h-[260px] aspect-[4/3] overflow-hidden rounded-2xl md:rounded-3xl bg-[#F2F1ED]">
       <ImageWithFallback
         src={unit.image}
         alt={unit.title}
@@ -81,7 +81,7 @@ function renderSideBySideUnit(unit: ShowcaseUnit, imageLeft: boolean) {
       <h3 className="text-[18px] md:text-[22px] font-black lowercase tracking-tight text-black">
         {unit.title}
       </h3>
-      <p className="text-[13px] md:text-[15px] text-[#707070] font-medium leading-relaxed">
+      <p className="text-[13px] md:text-[15px] text-[#5f5f5f] font-medium leading-relaxed">
         {unit.description}
       </p>
     </div>
@@ -107,7 +107,7 @@ function renderSideBySideUnit(unit: ShowcaseUnit, imageLeft: boolean) {
 function renderTwoColumnCard(unit: ShowcaseUnit) {
   return (
     <div className="flex flex-col w-full">
-      <div className="aspect-[16/10] overflow-hidden rounded-2xl md:rounded-3xl">
+      <div className="aspect-[4/3] overflow-hidden rounded-2xl md:rounded-3xl bg-[#F2F1ED]">
         <ImageWithFallback
           src={unit.image}
           alt={unit.title}
@@ -118,7 +118,7 @@ function renderTwoColumnCard(unit: ShowcaseUnit) {
         <h3 className="text-[16px] md:text-[18px] font-black lowercase tracking-tight text-black">
           {unit.title}
         </h3>
-        <p className="text-[12px] md:text-[14px] text-[#707070] font-medium leading-relaxed line-clamp-3">
+        <p className="text-[12px] md:text-[14px] text-[#5f5f5f] font-medium leading-relaxed line-clamp-3">
           {unit.description}
         </p>
       </div>
@@ -128,7 +128,7 @@ function renderTwoColumnCard(unit: ShowcaseUnit) {
 
 function renderFullBleedUnit(unit: ShowcaseUnit) {
   return (
-    <div className="relative rounded-2xl md:rounded-3xl overflow-hidden w-full aspect-[16/10] md:aspect-[21/9]">
+    <div className="relative rounded-2xl md:rounded-3xl overflow-hidden w-full aspect-[4/3] md:aspect-[21/9] bg-[#F2F1ED]">
       <ImageWithFallback
         src={unit.image}
         alt={unit.title}
@@ -139,7 +139,7 @@ function renderFullBleedUnit(unit: ShowcaseUnit) {
         <h3 className="text-[20px] md:text-[28px] font-black lowercase tracking-tight text-white">
           {unit.title}
         </h3>
-        <p className="text-[13px] md:text-[16px] text-white/80 font-medium leading-relaxed">
+        <p className="text-[13px] md:text-[16px] text-white/90 font-medium leading-relaxed">
           {unit.description}
         </p>
       </div>
@@ -173,21 +173,21 @@ function renderUnit(layout: LayoutType, unit: ShowcaseUnit) {
   }
 }
 
-function renderMotionUnit(unit: ShowcaseUnit, idx: number, children: React.ReactNode, yOffset = 40) {
+function renderMotionUnit(unit: ShowcaseUnit, idx: number, children: React.ReactNode, shouldReduceMotion: boolean, yOffset = 40) {
   return (
     <motion.div
       key={unit.id}
-      initial={{ opacity: 0, y: yOffset }}
+      initial={shouldReduceMotion ? false : { opacity: 0, y: yOffset }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 0.6, delay: idx * 0.1 }}
+      transition={{ duration: shouldReduceMotion ? 0 : 0.35, delay: shouldReduceMotion ? 0 : idx * 0.06 }}
     >
       {children}
     </motion.div>
   );
 }
 
-function renderMixedLayoutUnits(units: ShowcaseUnit[]) {
+function renderMixedLayoutUnits(units: ShowcaseUnit[], shouldReduceMotion: boolean) {
   const renderedGroups: React.ReactNode[] = [];
   let unitIndex = 0;
 
@@ -210,6 +210,7 @@ function renderMixedLayoutUnits(units: ShowcaseUnit[]) {
             unit,
             groupStartIndex + relativeIndex,
             renderTwoColumnCard(unit),
+            shouldReduceMotion,
             30,
           ))}
         </div>,
@@ -217,7 +218,7 @@ function renderMixedLayoutUnits(units: ShowcaseUnit[]) {
       continue;
     }
 
-    renderedGroups.push(renderMotionUnit(currentUnit, unitIndex, renderUnit(currentLayout, currentUnit)));
+    renderedGroups.push(renderMotionUnit(currentUnit, unitIndex, renderUnit(currentLayout, currentUnit), shouldReduceMotion));
     unitIndex += 1;
   }
 
@@ -234,9 +235,9 @@ function SkeletonLoader() {
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="w-full border-b border-black/10 pb-8 md:pb-12 last:border-b-0 last:pb-0 animate-pulse"
+              className="w-full border-b border-black/10 pb-8 md:pb-12 last:border-b-0 last:pb-0 animate-pulse motion-reduce:animate-none"
             >
-              <div className="aspect-[16/10] bg-[#F1F0ED] rounded-2xl md:rounded-3xl" />
+              <div className="aspect-[4/3] bg-[#F1F0ED] rounded-2xl md:rounded-3xl" />
               <div className="pt-5 md:pt-7 space-y-3 max-w-3xl">
                 <div className="h-5 w-2/5 bg-[#E5E3DF] rounded" />
                 <div className="h-4 w-full bg-[#E5E3DF] rounded" />
@@ -254,6 +255,7 @@ function SkeletonLoader() {
 
 export const ProductShowcaseBlock: React.FC<ProductShowcaseBlockProps> = ({ slug }) => {
   const [showcaseUnits, setShowcaseUnits] = useState<ShowcaseUnit[] | null>(null);
+  const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
     if (!slug) return;
@@ -275,10 +277,10 @@ export const ProductShowcaseBlock: React.FC<ProductShowcaseBlockProps> = ({ slug
   }
 
   return (
-    <section className="bg-white py-12 md:py-20">
+    <section className="overflow-hidden bg-white py-12 md:py-20">
       <div className="max-w-[1600px] mx-auto px-4 lg:px-12">
         <div className={`flex flex-col ${LAYOUT_GAP}`}>
-          {renderMixedLayoutUnits(unitsToRender)}
+          {renderMixedLayoutUnits(unitsToRender, Boolean(shouldReduceMotion))}
         </div>
       </div>
     </section>

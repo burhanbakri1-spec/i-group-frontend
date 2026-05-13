@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ProductCard } from './ProductCard';
 import { Language } from '../translations';
 import { fetchCatalogProducts } from '../lib/catalog-client';
@@ -11,6 +11,7 @@ interface ProductGridProps {
 }
 
 export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect }) => {
+  const shouldReduceMotion = useReducedMotion();
   const [products, setProducts] = useState<Product[] | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -52,10 +53,10 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
         style={{
           display: 'flex',
           flexWrap: 'nowrap',
-          gap: '8px',
+          gap: '12px',
           overflowX: 'auto',
           overflowY: 'hidden',
-          padding: '0 8px 8px',
+          padding: '0 16px 16px',
           scrollSnapType: 'x mandatory',
           WebkitOverflowScrolling: 'touch',
           touchAction: 'pan-x',
@@ -66,7 +67,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
         variants={{
           visible: {
             transition: {
-              staggerChildren: 0.08
+              staggerChildren: shouldReduceMotion ? 0 : 0.04
             }
           }
         }}
@@ -76,12 +77,12 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
             key={product.id}
             className="snap-start mobile-trending-item"
             style={{
-              flex: '0 0 76vw',
-              width: '76vw',
-              maxWidth: '76vw',
+              flex: '0 0 78vw',
+              width: '78vw',
+              maxWidth: '360px',
             }}
             variants={{
-              hidden: { opacity: 0, y: 20 },
+              hidden: shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 12 },
               visible: { opacity: 1, y: 0 }
             }}
           >
@@ -92,14 +93,14 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
       
       {/* Desktop: Original layout with stagger */}
       <motion.div 
-        className="hidden md:grid md:grid-cols-3 gap-6 md:gap-10 pb-8 px-6 md:px-0"
+        className="hidden md:grid md:grid-cols-3 gap-6 lg:gap-8 pb-10 px-6 md:px-8 max-w-[1440px] mx-auto"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
         variants={{
           visible: {
             transition: {
-              staggerChildren: 0.1
+              staggerChildren: shouldReduceMotion ? 0 : 0.06
             }
           }
         }}
@@ -109,7 +110,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
             key={product.id} 
             className="min-w-[85vw] md:min-w-0 snap-center"
             variants={{
-              hidden: { opacity: 0, y: 30, scale: 0.9 },
+              hidden: shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 16 },
               visible: { opacity: 1, y: 0, scale: 1 }
             }}
           >

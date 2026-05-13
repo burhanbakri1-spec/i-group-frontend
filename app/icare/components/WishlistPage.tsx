@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Heart, ShoppingBag, X, Share2 } from 'lucide-react';
 import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';
@@ -15,10 +15,15 @@ interface WishlistPageProps {
   onNavigate?: (page: string) => void;
 }
 
+const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+const SURFACE_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAFAFA]';
+const SHORT_TWEEN = { duration: 0.18, ease: 'easeOut' as const };
+
 export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelect, onNavigate }) => {
   const { wishlistItems, removeFromWishlist, addToCart } = useShop();
   const { wishlistEmpty, wishlistEmptySubtext, wishlistRecommendationsTitle } = useSiteContent();
   const [recommendations, setRecommendations] = useState<Product[]>([]);
+  const shouldReduceMotion = useReducedMotion();
 
   const t = {
     en: {
@@ -68,11 +73,11 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
             <Heart size={28} className="text-[#FF6B6B] md:w-8 md:h-8" fill="#FF6B6B" />
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight">{text.wishlist}</h1>
           </div>
-          <p className="text-sm md:text-base text-[#666] mb-4 px-4">{text.saveForLater}</p>
+          <p className="text-sm md:text-base text-[#5F5D59] mb-4 px-4">{text.saveForLater}</p>
           {wishlistItems.length > 0 && (
             <div className="flex items-center justify-center gap-4 md:gap-6">
-              <p className="text-xs md:text-sm text-[#888]">{wishlistItems.length} {text.items}</p>
-              <button className="flex items-center gap-2 text-xs md:text-sm hover:text-black transition-colors">
+              <p className="text-xs md:text-sm text-[#5F5D59]">{wishlistItems.length} {text.items}</p>
+              <button className={`flex items-center gap-2 text-xs md:text-sm text-[#5F5D59] hover:text-black transition-colors ${SURFACE_FOCUS_CLASS}`}>
                 <Share2 size={14} className="md:w-4 md:h-4" />
                 {text.share}
               </button>
@@ -83,16 +88,17 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
         {wishlistItems.length === 0 ? (
           /* Empty State */
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
+            animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            transition={SHORT_TWEEN}
             className="text-center py-16 md:py-20"
           >
             <div className="w-24 h-24 md:w-32 md:h-32 mx-auto mb-6 rounded-full bg-[#F5F5F5] flex items-center justify-center">
               <Heart size={48} className="text-[#DDD] md:w-16 md:h-16" />
             </div>
             <h2 className="text-xl md:text-2xl font-light mb-2">{wishlistEmpty}</h2>
-            <p className="text-sm md:text-base text-[#888] mb-8">{wishlistEmptySubtext}</p>
-            <button onClick={() => onNavigate?.('shop')} className="px-6 md:px-8 py-3 bg-black text-white text-sm md:text-base rounded-full hover:bg-[#333] transition-colors">
+            <p className="text-sm md:text-base text-[#5F5D59] mb-8">{wishlistEmptySubtext}</p>
+            <button onClick={() => onNavigate?.('shop')} className={`px-6 md:px-8 py-3 bg-black text-white text-sm md:text-base rounded-full hover:bg-[#333] transition-colors ${CONTROL_FOCUS_CLASS}`}>
               {text.shopNow}
             </button>
           </motion.div>
@@ -102,15 +108,16 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
             {wishlistItems.map((product, index) => (
               <motion.div
                 key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
+                animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                transition={{ ...SHORT_TWEEN, delay: shouldReduceMotion ? 0 : Math.min(index * 0.04, 0.16) }}
                 className="group relative bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
               >
                 {/* Remove Button */}
                 <button
                   onClick={() => removeFromWishlist(product.id)}
-                  className="absolute top-4 right-4 z-10 w-8 h-8 bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-[#FF6B6B] hover:text-white"
+                  className={`absolute top-4 right-4 z-10 w-8 h-8 bg-white rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity shadow-lg hover:bg-[#C81E3A] hover:text-white ${CONTROL_FOCUS_CLASS}`}
+                  aria-label={`${text.remove} ${product.name}`}
                 >
                   <X size={16} />
                 </button>
@@ -123,7 +130,7 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
                   <ImageWithFallback
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-200 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                   />
                   {product.badge && (
                     <span className="absolute top-4 left-4 px-3 py-1 bg-white text-xs uppercase tracking-wider">
@@ -134,11 +141,11 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
 
                 {/* Product Info */}
                 <div className="p-6">
-                  <p className="text-xs text-[#888] uppercase tracking-wider mb-1">{product.category}</p>
+                  <p className="text-xs text-[#5F5D59] uppercase tracking-wider mb-1">{product.category}</p>
                   <h3 className="font-medium mb-2">{product.name}</h3>
                   <div className="flex items-center justify-between mb-4">
                     <p className="text-lg font-medium">{product.price}</p>
-                    <div className="flex items-center gap-1 text-xs text-[#888]">
+                    <div className="flex items-center gap-1 text-xs text-[#5F5D59]">
                       <span>★</span>
                       <span>{product.rating}</span>
                       <span>({product.reviews})</span>
@@ -148,7 +155,7 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
                   {/* Add to Bag Button */}
                   <button 
                     onClick={(e) => handleAddToBag(product, e)}
-                    className="w-full py-3 bg-black text-white text-sm uppercase tracking-wider rounded-full hover:bg-[#333] transition-colors flex items-center justify-center gap-2"
+                    className={`w-full py-3 bg-black text-white text-sm uppercase tracking-wider rounded-full hover:bg-[#333] transition-colors flex items-center justify-center gap-2 ${CONTROL_FOCUS_CLASS}`}
                   >
                     <ShoppingBag size={16} />
                     {text.addToBag}

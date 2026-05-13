@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
@@ -11,8 +11,7 @@ interface CommitmentSectionProps {
 const DEFAULT_COMMITMENT_IMAGE = 'https://images.unsplash.com/photo-1603189777895-1dcbe39ec57e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200';
 
 export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang }) => {
-  const { scrollY } = useScroll();
-  const imageScale = useTransform(scrollY, [0, 1000], [1, 1.1]);
+  const shouldReduceMotion = useReducedMotion();
   const { commitmentHeadline, commitmentCta, commitmentImage } = useSiteContent();
   
   const listItems = lang === 'en' 
@@ -21,18 +20,18 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang }) =>
 
   return (
     <section className="px-4 md:px-8 py-4 md:py-8 bg-white">
-      <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
+      <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
         
         {/* Left Side: Info Box */}
-        <div className="bg-[#F2F2F0] rounded-[16px] p-8 md:p-16 flex flex-col justify-between min-h-[500px] md:min-h-[700px]">
+        <div className="bg-[#F2F2F0] rounded-[16px] p-8 md:p-14 lg:p-16 flex flex-col justify-between min-h-[460px] md:min-h-[650px]">
           <div>
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 14 }}
+              whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             >
-              <h2 className="text-[22px] md:text-[36px] font-[500] leading-[1.25] text-[#5C5A56] mb-10 max-w-lg">
+              <h2 className="text-[22px] md:text-[36px] font-[500] leading-[1.25] text-[#4F4D49] mb-10 max-w-lg">
                 {commitmentHeadline ? (
                   <span>{commitmentHeadline}</span>
                 ) : (
@@ -43,8 +42,8 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang }) =>
               </h2>
               
               <motion.button 
-                whileHover={{ scale: 1.05 }}
-                className="border border-black/10 bg-white/50 backdrop-blur-sm rounded-full px-8 py-3 text-[10px] font-black tracking-[0.2em] uppercase text-black hover:bg-black hover:text-white transition-all duration-500 shadow-sm"
+                whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
+                className="border border-black/10 bg-white/60 backdrop-blur-sm rounded-full px-8 py-3 text-[10px] font-black tracking-[0.2em] uppercase text-black hover:bg-black hover:text-white transition-colors duration-300 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
               >
                 {commitmentCta || (lang === 'en' ? 'OUR FOOTPRINT' : 'بصمتنا')}
               </motion.button>
@@ -56,35 +55,25 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang }) =>
             {listItems.map((item, index) => (
               <motion.div 
                 key={item}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                initial={shouldReduceMotion ? false : { opacity: 0, x: -10 }}
+                whileInView={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ 
-                  delay: index * 0.15, 
-                  duration: 0.6,
+                  delay: shouldReduceMotion ? 0 : index * 0.05,
+                  duration: 0.3,
                   ease: [0.22, 1, 0.36, 1]
                 }}
-                whileHover={{ 
-                  x: 10,
-                  transition: { duration: 0.3 }
-                }}
-                className={`py-6 border-t border-black/10 flex justify-between items-center group cursor-pointer ${index === listItems.length - 1 ? 'border-b' : ''}`}
+                className={`py-6 border-t border-black/10 flex justify-between items-center group ${index === listItems.length - 1 ? 'border-b' : ''}`}
               >
-                <motion.span 
-                  className="text-[20px] md:text-[28px] font-[900] text-black/30 group-hover:text-black transition-all duration-500 lowercase"
-                  whileHover={{ scale: 1.05 }}
+                <span
+                  className="text-[20px] md:text-[28px] font-[900] text-black/55 group-hover:text-black transition-colors duration-300 lowercase"
                 >
                   {item}
-                </motion.span>
-                <motion.div 
-                  className="w-8 h-8 rounded-full border border-black/5 flex items-center justify-center bg-white group-hover:bg-black group-hover:text-white transition-all duration-500"
-                  whileHover={{ 
-                    scale: 1.2,
-                    rotate: 45
-                  }}
-                  whileTap={{ scale: 0.9 }}
+                </span>
+                <div
+                  className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center bg-white group-hover:bg-black group-hover:text-white transition-colors duration-300"
                 >
-                  <motion.svg 
+                  <svg
                     width="14" 
                     height="14" 
                     viewBox="0 0 24 24" 
@@ -93,12 +82,10 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang }) =>
                     strokeWidth="2.5" 
                     strokeLinecap="round" 
                     strokeLinejoin="round"
-                    animate={{ x: [0, 3, 0] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
                   >
                     <path d="M5 12h14M12 5l7 7-7 7"/>
-                  </motion.svg>
-                </motion.div>
+                  </svg>
+                </div>
               </motion.div>
             ))}
           </div>
@@ -107,16 +94,13 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang }) =>
         {/* Right Side: Visual Box */}
         <motion.div 
           className="relative aspect-square md:aspect-auto h-[400px] md:h-full overflow-hidden rounded-[16px]"
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.5 }}
         >
           <motion.div
-            initial={{ scale: 1.2, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
+            initial={shouldReduceMotion ? false : { opacity: 0 }}
+            whileInView={shouldReduceMotion ? undefined : { opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             className="w-full h-full"
-            style={{ scale: imageScale }}
           >
             <ImageWithFallback 
               src={commitmentImage || DEFAULT_COMMITMENT_IMAGE} 
@@ -124,11 +108,7 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang }) =>
               className="w-full h-full object-cover"
             />
           </motion.div>
-          <motion.div 
-            className="absolute inset-0 bg-black/5"
-            whileHover={{ opacity: 0 }}
-            transition={{ duration: 0.7 }}
-          />
+          <div className="absolute inset-0 bg-black/5" />
         </motion.div>
       </div>
     </section>

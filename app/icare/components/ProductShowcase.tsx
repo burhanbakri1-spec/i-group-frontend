@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
@@ -15,6 +15,7 @@ interface ProductShowcaseProps {
 
 export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang, onProductSelect }) => {
   void products;
+  const shouldReduceMotion = useReducedMotion();
   const { productShowcaseLoading, productShowcaseEmpty } = useSiteContent();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [remoteProducts, setRemoteProducts] = useState<Product[] | null>(null);
@@ -31,8 +32,8 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
 
   if (remoteProducts === null) {
     return (
-      <section className="px-2 md:px-8 py-8 bg-white">
-        <div className="max-w-[1600px] mx-auto rounded-[16px] bg-[#F2F2F0] p-12 text-center text-[12px] font-bold uppercase tracking-[0.2em] text-black/40">
+      <section className="px-4 md:px-8 py-6 md:py-8 bg-white">
+        <div className="max-w-[1440px] mx-auto rounded-[16px] bg-[#F2F2F0] p-12 text-center text-[12px] font-bold uppercase tracking-[0.2em] text-black/55">
           {productShowcaseLoading}
         </div>
       </section>
@@ -41,8 +42,8 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
 
   if (showcaseProducts.length === 0) {
     return (
-      <section className="px-2 md:px-8 py-8 bg-white">
-        <div className="max-w-[1600px] mx-auto rounded-[16px] bg-[#F2F2F0] p-12 text-center text-[12px] font-bold uppercase tracking-[0.2em] text-black/40">
+      <section className="px-4 md:px-8 py-6 md:py-8 bg-white">
+        <div className="max-w-[1440px] mx-auto rounded-[16px] bg-[#F2F2F0] p-12 text-center text-[12px] font-bold uppercase tracking-[0.2em] text-black/55">
           {productShowcaseEmpty}
         </div>
       </section>
@@ -60,18 +61,18 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
   const current = showcaseProducts[currentIndex];
 
   return (
-    <section className="px-2 md:px-8 py-2 md:py-8 bg-white">
-      <div className="max-w-[1600px] mx-auto grid grid-cols-2 gap-2 md:gap-8">
+    <section className="px-4 md:px-8 py-4 md:py-8 bg-white">
+      <div className="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
         
         {/* Left Column: Lifestyle Image */}
-        <div className="relative aspect-[3/4] md:aspect-auto h-[350px] sm:h-[500px] md:h-[700px] rounded-[12px] md:rounded-[16px] overflow-hidden bg-[#F2F2F0] group">
+        <div className="relative aspect-[4/5] md:aspect-auto h-auto sm:h-[500px] md:h-[680px] rounded-[14px] md:rounded-[16px] overflow-hidden bg-[#F2F2F0] group">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentIndex}
-              initial={{ opacity: 0, scale: 1.1 }}
+              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 1.03 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               className="w-full h-full"
             >
               <ImageWithFallback 
@@ -87,55 +88,44 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
               <button
                 key={i}
                 onClick={() => setCurrentIndex(i)}
-                className={`w-1 md:w-1.5 h-1 md:h-1.5 rounded-full transition-all duration-500 ${i === currentIndex ? 'bg-white w-4 md:w-6' : 'bg-white/40'}`}
+                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/20 ${i === currentIndex ? 'bg-white w-5 md:w-6' : 'bg-white/55'}`}
+                aria-label={`Show product ${i + 1}`}
               />
             ))}
           </div>
         </div>
 
         {/* Right Column: Product Info Box */}
-        <div className="bg-[#F2F2F0] rounded-[12px] md:rounded-[16px] p-4 sm:p-8 md:p-16 flex flex-col justify-between relative h-[350px] sm:h-[500px] md:h-[700px] overflow-hidden">
+        <div className="bg-[#F2F2F0] rounded-[14px] md:rounded-[16px] p-5 sm:p-8 md:p-14 flex flex-col justify-between relative min-h-[440px] sm:h-[500px] md:h-[680px] overflow-hidden">
           
           <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 flex justify-between px-1 md:px-8 z-20 pointer-events-none">
             <motion.button 
               onClick={prevSlide}
-              className="w-8 h-8 md:w-14 md:h-14 border border-black/5 bg-white/60 backdrop-blur-xl rounded-full flex items-center justify-center shadow-md md:shadow-lg pointer-events-auto"
+              className="w-9 h-9 md:w-14 md:h-14 border border-black/10 bg-white/70 backdrop-blur-xl rounded-full flex items-center justify-center shadow-sm md:shadow-md pointer-events-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
               whileHover={{ 
-                scale: 1.1, 
                 backgroundColor: "rgba(255,255,255,1)",
-                boxShadow: "0 10px 30px rgba(0,0,0,0.15)"
+                boxShadow: "0 8px 20px rgba(0,0,0,0.12)"
               }}
-              whileTap={{ scale: 0.9 }}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
+              whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, x: -10 }}
+              animate={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
+              transition={{ duration: 0.25 }}
             >
-              <motion.div
-                whileHover={{ x: -2 }}
-                transition={{ duration: 0.2 }}
-              >
-                <ArrowLeft size={14} strokeWidth={1.5} />
-              </motion.div>
+              <ArrowLeft size={14} strokeWidth={1.5} />
             </motion.button>
             <motion.button 
               onClick={nextSlide}
-              className="w-8 h-8 md:w-14 md:h-14 border border-black/5 bg-white/60 backdrop-blur-xl rounded-full flex items-center justify-center shadow-md md:shadow-lg pointer-events-auto"
+              className="w-9 h-9 md:w-14 md:h-14 border border-black/10 bg-white/70 backdrop-blur-xl rounded-full flex items-center justify-center shadow-sm md:shadow-md pointer-events-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
               whileHover={{ 
-                scale: 1.1, 
                 backgroundColor: "rgba(255,255,255,1)",
-                boxShadow: "0 10px 30px rgba(0,0,0,0.15)"
+                boxShadow: "0 8px 20px rgba(0,0,0,0.12)"
               }}
-              whileTap={{ scale: 0.9 }}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
+              whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, x: 10 }}
+              animate={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
+              transition={{ duration: 0.25 }}
             >
-              <motion.div
-                whileHover={{ x: 2 }}
-                transition={{ duration: 0.2 }}
-              >
-                <ArrowRight size={14} strokeWidth={1.5} />
-              </motion.div>
+              <ArrowRight size={14} strokeWidth={1.5} />
             </motion.button>
           </div>
 
@@ -143,10 +133,10 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentIndex}
-                initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 1.1, y: -10 }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
                 className="w-full max-w-[140px] sm:max-w-[260px] md:max-w-[380px]"
               >
                 <ImageWithFallback 
@@ -162,10 +152,10 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
             <AnimatePresence mode="wait">
               <motion.div 
                 key={currentIndex}
-                initial={{ opacity: 0, x: -10 }}
+                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 10 }}
-                transition={{ duration: 0.4 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
                 className="space-y-2 md:space-y-6 w-full"
               >
                 <div className="flex items-center gap-1.5">
@@ -181,21 +171,20 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
 
                 <div className="space-y-0.5 md:space-y-2">
                   <div className="flex items-center gap-2">
-                    <img src="/icare-logo.png" alt="icare" className="h-3 md:h-5 w-auto object-contain hidden sm:block" />
+                    <ImageWithFallback src="/icare-logo.png" alt="icare" className="h-3 md:h-5 w-auto object-contain hidden sm:block" />
                     <h3 className="text-[14px] sm:text-[20px] md:text-[28px] font-[900] tracking-tight text-[#222] uppercase leading-tight">
                       {current.title ?? current.name}
                     </h3>
                   </div>
-                  <p className="text-[10px] sm:text-[14px] md:text-[16px] text-[#666] font-medium lowercase tracking-tight leading-none">
+                  <p className="text-[10px] sm:text-[14px] md:text-[16px] text-[#555] font-medium lowercase tracking-tight leading-snug">
                     {current.description}
                   </p>
                 </div>
 
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
                   onClick={() => onProductSelect(current)}
-                  className="bg-black text-white rounded-full w-full py-2.5 md:py-4 text-[9px] md:text-[11px] font-black tracking-[0.1em] md:tracking-[0.2em] uppercase hover:bg-[#333] transition-all duration-300 shadow-lg"
+                  className="bg-black text-white rounded-full w-full py-3 md:py-4 text-[10px] md:text-[11px] font-black tracking-[0.1em] md:tracking-[0.2em] uppercase hover:bg-[#333] transition-colors duration-300 shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
                 >
                   {lang === 'en' ? 'VIEW' : 'عرض'} — {current.price}
                 </motion.button>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Star, ChevronDown, ThumbsUp, ThumbsDown, CheckCircle2, ShoppingBag } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
@@ -18,6 +18,8 @@ interface ProductPageProps {
   onProductSelect?: (product: Product) => void;
 }
 
+const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+
 const ReviewItem = ({ review, content }: { review: ProductReview; content: { verifiedLabel: string; hydrationQuestion: string; hydrationLow: string; hydrationHigh: string; helpfulQuestion: string } }) => (
   <div className="py-12 border-b border-black/5 grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12">
     {/* Left Sidebar */}
@@ -26,7 +28,7 @@ const ReviewItem = ({ review, content }: { review: ProductReview; content: { ver
         <div className="flex items-center gap-2">
           <span className="text-[14px] font-bold text-[#333]">{review.name}</span>
           {review.verified && (
-            <div className="flex items-center gap-1 text-[11px] font-bold text-[#333] opacity-60">
+            <div className="flex items-center gap-1 text-[11px] font-bold text-[#555]">
               {content.verifiedLabel} <CheckCircle2 size={12} className="fill-black text-white" />
             </div>
           )}
@@ -42,7 +44,7 @@ const ReviewItem = ({ review, content }: { review: ProductReview; content: { ver
         ].map((item, idx) => (
           <div key={idx} className="space-y-1">
             <p className="text-[10px] font-black uppercase tracking-widest text-[#333]">{item.label}</p>
-            <p className="text-[12px] text-[#333] opacity-60 leading-relaxed">{item.value}</p>
+            <p className="text-[12px] text-[#555] leading-relaxed">{item.value}</p>
           </div>
         ))}
       </div>
@@ -57,7 +59,7 @@ const ReviewItem = ({ review, content }: { review: ProductReview; content: { ver
               <Star key={i} size={14} fill={i < review.rating ? "black" : "none"} className={i < review.rating ? "text-black" : "text-black/10"} />
             ))}
           </div>
-          <span className="text-[11px] font-bold opacity-40">{review.time}</span>
+          <span className="text-[11px] font-bold text-black/55">{review.time}</span>
         </div>
 
         <div className="space-y-3">
@@ -74,7 +76,7 @@ const ReviewItem = ({ review, content }: { review: ProductReview; content: { ver
                 style={{ left: `${review.hydration}%` }}
               />
             </div>
-            <div className="flex justify-between pt-3 text-[10px] font-bold opacity-40 uppercase tracking-widest">
+            <div className="flex justify-between pt-3 text-[10px] font-bold text-black/55 uppercase tracking-widest">
               <span>{content.hydrationLow}</span>
               <span>{content.hydrationHigh}</span>
             </div>
@@ -83,12 +85,12 @@ const ReviewItem = ({ review, content }: { review: ProductReview; content: { ver
       </div>
 
       <div className="flex justify-end gap-6 pt-8">
-        <div className="flex items-center gap-4 text-[11px] font-bold opacity-40">
+        <div className="flex items-center gap-4 text-[11px] font-bold text-black/55">
           <span>{content.helpfulQuestion}</span>
-          <button className="flex items-center gap-1.5 hover:opacity-100 transition-opacity">
+          <button className={`flex items-center gap-1.5 rounded-md hover:text-black transition-colors ${CONTROL_FOCUS_CLASS}`}>
             <ThumbsUp size={14} /> 0
           </button>
-          <button className="flex items-center gap-1.5 hover:opacity-100 transition-opacity">
+          <button className={`flex items-center gap-1.5 rounded-md hover:text-black transition-colors ${CONTROL_FOCUS_CLASS}`}>
             <ThumbsDown size={14} /> 0
           </button>
         </div>
@@ -128,6 +130,7 @@ const getProductImageGallery = (displayProduct: Product, selectedVariant: Produc
 
 export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProductSelect }) => {
   const { addToCart } = useShop();
+  const shouldReduceMotion = useReducedMotion();
   const {
     productDetailsFallback,
     productNoReviews,
@@ -150,7 +153,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
   const [displayProduct, setDisplayProduct] = useState<Product>(product);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(product.variants?.find((variant) => variant.id === product.variantId) ?? null);
   const [activeImageSelection, setActiveImageSelection] = useState({ index: 0, galleryKey: '', resetKey: '' });
-  const [showBottomBar, setShowBottomBar] = useState(true);
+  const [showBottomBar, setShowBottomBar] = useState(false);
   const [isReviewsExpanded, setIsReviewsExpanded] = useState(false);
   const [remoteReviews, setRemoteReviews] = useState<ProductReview[] | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[] | null>(null);
@@ -224,13 +227,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY.current) {
-        // Scrolling down
-        setShowBottomBar(true);
-      } else {
-        // Scrolling up
-        setShowBottomBar(false);
-      }
+      setShowBottomBar(currentScrollY > 520);
       lastScrollY.current = currentScrollY;
     };
 
@@ -239,13 +236,13 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
   }, []);
 
   return (
-    <div className={`bg-white min-h-screen selection:bg-black selection:text-white ${isRtl ? 'rtl' : 'ltr'}`}>
+    <div className={`bg-white min-h-screen overflow-x-hidden selection:bg-black selection:text-white ${isRtl ? 'rtl' : 'ltr'}`}>
       
       {/* 1. HERO SECTION - REFINED FOR MOBILE */}
       <section className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 p-4 md:p-6 overflow-hidden">
         
         {/* LEFT COLUMN: IMAGE SLIDER */}
-        <div className="relative aspect-[4/5] md:aspect-[4/5] rounded-[24px] md:rounded-[32px] group z-0 overflow-hidden shadow-sm">
+        <div className="relative aspect-[4/5] rounded-[24px] md:rounded-[32px] group z-0 overflow-hidden shadow-sm bg-[#F2F1ED]">
           <div className="absolute inset-0 overflow-hidden">
             <AnimatePresence initial={false}>
               <motion.div
@@ -253,7 +250,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.6 }}
+                transition={{ duration: shouldReduceMotion ? 0 : 0.25 }}
                 className="absolute inset-0"
               >
                 {activeProduct?.url ? (
@@ -277,7 +274,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                 <button 
                   key={img.url}
                   onClick={() => setActiveImageSelection({ index: idx, galleryKey: displayImagesKey, resetKey: activeImageResetKey })}
-                    className={`w-8 h-8 md:w-10 md:h-10 rounded-lg overflow-hidden border-2 transition-all scale-95 hover:scale-105 relative ${safeActiveImageIndex === idx ? 'border-white ring-2 ring-black/10 shadow-lg' : 'border-transparent opacity-40'}`}
+                    className={`w-9 h-9 md:w-11 md:h-11 rounded-lg overflow-hidden border-2 transition-colors relative ${CONTROL_FOCUS_CLASS} ${safeActiveImageIndex === idx ? 'border-white ring-2 ring-black/20 shadow-md opacity-100' : 'border-white/40 opacity-70 hover:opacity-100'}`}
                 >
                     <ImageWithFallback src={img.url} alt={img.altText || `${displayProduct.name} thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
                 </button>
@@ -288,7 +285,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
           {displayImages.length > 0 && (
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 md:hidden">
               {displayImages.map((image, idx) => (
-              <div key={image.url} className={`h-1 rounded-full transition-all duration-300 ${safeActiveImageIndex === idx ? 'w-4 bg-white' : 'w-1.5 bg-white/30'}`} />
+              <div key={image.url} className={`h-1 rounded-full transition-all duration-200 motion-reduce:transition-none ${safeActiveImageIndex === idx ? 'w-4 bg-white' : 'w-1.5 bg-white/40'}`} />
               ))}
             </div>
           )}
@@ -302,25 +299,25 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                 {displayProduct.name}
               </h1>
              <div className="flex items-center gap-4 md:gap-6">
-                <p className="text-[9px] md:text-[12px] font-black uppercase tracking-[0.2em] opacity-60">{displayProduct.brand ?? displayProduct.category ?? 'icare essentials'}</p>
+                 <p className="text-[9px] md:text-[12px] font-black uppercase tracking-[0.2em] text-black/70">{displayProduct.brand ?? displayProduct.category ?? 'icare essentials'}</p>
                <div className="flex items-center gap-1">
                   <div className="flex text-black">
                     {[...Array(5)].map((_, i) => <Star key={i} size={8} className="md:size-[10px]" fill="currentColor" />)}
                   </div>
-                   <span className="text-[10px] md:text-[11px] font-bold opacity-40">({displayProduct.reviews ?? '0'})</span>
+                    <span className="text-[10px] md:text-[11px] font-bold text-black/55">({displayProduct.reviews ?? '0'})</span>
                </div>
              </div>
           </div>
 
           <div className="space-y-4 md:space-y-6">
-            <p className="text-[14px] md:text-[15px] leading-relaxed text-[#444] font-medium opacity-80">
+            <p className="text-[14px] md:text-[15px] leading-relaxed text-[#444] font-medium">
               {displayProduct.description ?? productDetailsFallback}
             </p>
             
             <div className="space-y-3 text-[13px] md:text-[14px] border-t border-black/5 pt-6">
                 <p className="text-[#444] leading-relaxed"><span className="font-black lowercase">category:</span> {displayProduct.category ?? 'icare'} {displayProduct.stockStatus ? `— ${displayProduct.stockStatus.replaceAll('_', ' ')}` : ''}</p>
                 <div className="flex justify-between items-center py-2">
-                  <p className="font-black lowercase">{displayProduct.originalPrice ? <>original value: <span className="opacity-40 line-through ml-1">{displayProduct.originalPrice}</span></> : displayProduct.badge ?? 'selected care'}</p>
+                  <p className="font-black lowercase">{displayProduct.originalPrice ? <>original value: <span className="text-black/55 line-through ml-1">{displayProduct.originalPrice}</span></> : displayProduct.badge ?? 'selected care'}</p>
                   <p className="font-black text-[15px] md:text-[18px]">{purchasableProduct.price}</p>
                 </div>
             </div>
@@ -329,13 +326,13 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
           <div className="pt-4 space-y-6 md:space-y-8">
               {displayProduct.variants && displayProduct.variants.length > 0 && (
                 <div className="flex flex-wrap items-center gap-2 text-[12px] md:text-[13px]">
-                  <span className="opacity-40 lowercase">{productSelectOption}</span>
+                  <span className="text-black/60 lowercase">{productSelectOption}</span>
                   {displayProduct.variants.map((variant) => (
                     <button
                       key={variant.id}
                       onClick={() => setSelectedVariant(variant)}
                       disabled={!isPurchasableStock(variant.stockStatus, variant.stockQuantity)}
-                      className={`font-black underline underline-offset-4 flex items-center gap-1 lowercase ${selectedVariant?.id === variant.id ? 'text-black' : 'opacity-50'}`}
+                      className={`font-black underline underline-offset-4 flex items-center gap-1 rounded-md lowercase ${CONTROL_FOCUS_CLASS} ${selectedVariant?.id === variant.id ? 'text-black' : 'text-black/60 hover:text-black'} disabled:text-black/30 disabled:cursor-not-allowed`}
                     >
                       {variant.name}
                       {variant.isDefault && <ChevronDown size={14} />}
@@ -345,19 +342,19 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
               )}
 
              <div className="space-y-4">
-               <motion.button 
-                 whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.98 }}
+                 <motion.button
+                  whileHover={shouldReduceMotion ? undefined : { scale: 1.005 }}
+                   whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
                    onClick={() => isSelectedVariantPurchasable && addToCart(purchasableProduct)}
                   disabled={!isSelectedVariantPurchasable}
-                  className="w-full bg-black text-white py-5 rounded-full text-[12px] md:text-[13px] font-black uppercase tracking-[0.2em] hover:bg-black/90 transition-all duration-300 shadow-xl shadow-black/10 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className={`w-full bg-black text-white py-5 rounded-full text-[12px] md:text-[13px] font-black uppercase tracking-[0.2em] hover:bg-black/90 transition-colors duration-200 shadow-lg shadow-black/10 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${CONTROL_FOCUS_CLASS}`}
                 >
                   <ShoppingBag size={16} />
                     {isSelectedVariantPurchasable
                       ? (lang === 'en' ? `${productAddToBag} — ${purchasableProduct.price}` : `أضف للسلة — ${purchasableProduct.price}`)
                       : (lang === 'en' ? productSoldOut : 'نفد المخزون')}
                 </motion.button>
-               <div className="flex items-center justify-center gap-2 text-[9px] md:text-[10px] font-bold opacity-30">
+                <div className="flex items-center justify-center gap-2 text-[9px] md:text-[10px] font-bold text-black/55">
                   {lang === 'en' ? productAfterpayText : 'أو 4 دفعات بدون فوائد مع'} <span className="text-black font-black bg-[#ACEBFF] px-1.5 py-0.5 rounded italic">Afterpay</span>
                </div>
              </div>
@@ -383,16 +380,16 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                 </div>
                 <div className="space-y-1">
                   <p className="text-[12px] font-black uppercase tracking-widest text-[#333]">{productRatingLabel}</p>
-                  <p className="text-[12px] text-[#333] opacity-40">Based on {reviewCount} reviews</p>
+                  <p className="text-[12px] text-[#555]">Based on {reviewCount} reviews</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-4">
-                <button className="flex items-center gap-2 px-6 py-2.5 rounded-full border border-black/10 text-[10px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all">
+                <button className={`flex items-center gap-2 px-6 py-2.5 rounded-full border border-black/15 text-[10px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-colors ${CONTROL_FOCUS_CLASS}`}>
                   {reviewFilterButton}
                 </button>
                 <div className="relative group">
-                  <button className="flex items-center gap-6 px-6 py-2.5 rounded-full border border-black/10 text-[10px] font-black uppercase tracking-widest hover:border-black transition-all">
+                  <button className={`flex items-center gap-6 px-6 py-2.5 rounded-full border border-black/15 text-[10px] font-black uppercase tracking-widest hover:border-black transition-colors ${CONTROL_FOCUS_CLASS}`}>
                     {reviewSortRecent} <ChevronDown size={14} />
                   </button>
                 </div>
@@ -423,7 +420,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
             <div className="flex justify-center pt-8 md:pt-12 relative z-20">
             <button 
               onClick={() => setIsReviewsExpanded(!isReviewsExpanded)}
-              className="px-12 py-3 rounded-full border border-black/10 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all duration-500 bg-white"
+              className={`px-12 py-3 rounded-full border border-black/15 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors duration-200 bg-white ${CONTROL_FOCUS_CLASS}`}
             >
               {isReviewsExpanded ? reviewShowLess : reviewShowMore}
             </button>
@@ -443,22 +440,22 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
             y: showBottomBar ? 0 : 120, 
             opacity: showBottomBar ? 1 : 0 
           }}
-          transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
-          className="fixed bottom-0 left-0 w-full bg-[#EEEEEE] px-8 py-3 flex items-center justify-between z-50 border-t border-black/5"
+          transition={{ duration: shouldReduceMotion ? 0 : 0.28, ease: [0.32, 0.72, 0, 1] }}
+          className="fixed bottom-0 left-0 w-full bg-[#EEEEEE]/95 backdrop-blur-md px-4 md:px-8 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex items-center justify-between gap-4 z-50 border-t border-black/10 shadow-[0_-12px_30px_rgba(0,0,0,0.06)]"
         >
-          <div className="flex items-center gap-4">
+          <div className="flex min-w-0 items-center gap-3 md:gap-4">
             <div className="w-11 h-11 bg-white rounded-md flex items-center justify-center p-1.5 shadow-sm">
                <ImageWithFallback src={displayProduct.image} alt={displayProduct.name} className="w-full h-full object-contain mix-blend-multiply" />
             </div>
-            <span className="text-[12px] font-black uppercase tracking-[0.2em] text-[#333]">{displayProduct.name}</span>
+            <span className="min-w-0 truncate text-[11px] md:text-[12px] font-black uppercase tracking-[0.14em] md:tracking-[0.2em] text-[#333]">{displayProduct.name}</span>
           </div>
 
           <motion.button 
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={shouldReduceMotion ? undefined : { scale: 1.005 }}
+            whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
             onClick={() => isSelectedVariantPurchasable && addToCart(purchasableProduct)}
             disabled={!isSelectedVariantPurchasable}
-            className="bg-[#66635F] text-white px-8 py-3 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all duration-300 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`shrink-0 bg-[#66635F] text-white px-5 md:px-8 py-3 rounded-full text-[10px] md:text-[11px] font-black uppercase tracking-[0.16em] md:tracking-[0.2em] hover:bg-black transition-colors duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${CONTROL_FOCUS_CLASS}`}
           >
             <ShoppingBag size={14} />
             {isSelectedVariantPurchasable

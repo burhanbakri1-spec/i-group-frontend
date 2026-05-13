@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
@@ -10,6 +10,7 @@ interface SocialGridProps {
 }
 
 export const SocialGrid: React.FC<SocialGridProps> = ({ lang }) => {
+  const shouldReduceMotion = useReducedMotion();
   const { socialGridHeading, socialGridCta, socialGridImage1, socialGridImage2, socialGridImage3, socialGridImage4 } = useSiteContent();
 
   const lifestyleImages = [
@@ -30,34 +31,33 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang }) => {
   };
 
   return (
-    <section className="px-4 md:px-6 py-2 md:py-4 bg-white">
-      <div className="max-w-[1600px] mx-auto bg-[#F2F2F0] rounded-[16px] p-6 md:p-10 relative overflow-hidden">
+    <section className="px-4 md:px-8 py-4 md:py-8 bg-white">
+      <div className="max-w-[1440px] mx-auto bg-[#F2F2F0] rounded-[16px] p-6 md:p-10 relative overflow-hidden">
         
         {/* Header Area */}
         <div className="flex justify-between items-center mb-6 md:mb-8">
           <motion.h2 
             className="text-[28px] md:text-[36px] font-[900] tracking-tight text-[#222] lowercase"
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={shouldReduceMotion ? false : { opacity: 0, x: -10 }}
+            whileInView={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.32 }}
           >
             {socialGridHeading}
           </motion.h2>
           <motion.button 
-            className="hidden md:block border border-[#222]/20 rounded-full px-8 py-2 text-[10px] font-bold tracking-[0.1em] uppercase text-[#222] hover:bg-[#222] hover:text-white transition-all duration-300 relative overflow-hidden group"
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            className="hidden md:block border border-[#222]/20 rounded-full px-8 py-2 text-[10px] font-bold tracking-[0.1em] uppercase text-[#222] hover:bg-[#222] hover:text-white transition-all duration-300 relative overflow-hidden group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
+            initial={shouldReduceMotion ? false : { opacity: 0, x: 10 }}
+            whileInView={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.32 }}
+            whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
           >
             <motion.span
               className="absolute inset-0 bg-[#222]"
               initial={{ x: "-100%" }}
               whileHover={{ x: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.24 }}
             />
             <span className="relative z-10">{lang === 'en' ? socialGridCta : 'تابعنا على السوشيال'}</span>
           </motion.button>
@@ -71,32 +71,27 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang }) => {
           {lifestyleImages.map((image, index) => (
             <motion.div 
               key={image.id}
-              initial={{ opacity: 0, y: 30, scale: 0.9 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ 
-                delay: index * 0.1, 
-                duration: 0.6,
-                ease: [0.22, 1, 0.36, 1]
-              }}
-              whileHover={{ 
-                y: -10, 
-                scale: 1.05,
-                boxShadow: "0 20px 40px rgba(0,0,0,0.15)"
-              }}
-              className="flex-none w-[70%] md:w-[240px] lg:w-[280px] aspect-square rounded-[16px] overflow-hidden snap-start group"
-            >
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                transition={{ duration: 0.5 }}
-                className="w-full h-full"
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{
+                  delay: shouldReduceMotion ? 0 : index * 0.05,
+                  duration: 0.32,
+                  ease: [0.22, 1, 0.36, 1]
+                }}
+                whileHover={{
+                  y: shouldReduceMotion ? 0 : -4,
+                  boxShadow: "0 14px 28px rgba(0,0,0,0.1)"
+                }}
+                className="flex-none w-[70%] md:w-[240px] lg:w-[280px] aspect-square rounded-[16px] overflow-hidden snap-start group"
               >
+              <div className="w-full h-full">
                 <ImageWithFallback 
                   src={image.src} 
                   alt={image.alt}
                   className="w-full h-full object-cover"
                 />
-              </motion.div>
+              </div>
             </motion.div>
           ))}
         </div>
@@ -115,43 +110,31 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang }) => {
           <div className="flex gap-3">
             <motion.button 
               onClick={() => scroll('left')}
-              className="w-12 h-12 rounded-full border border-[#222]/10 flex items-center justify-center text-[#222]"
+              className="w-12 h-12 rounded-full border border-[#222]/10 flex items-center justify-center text-[#222] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
               whileHover={{ 
-                scale: 1.1,
                 backgroundColor: "rgba(255,255,255,1)",
-                boxShadow: "0 5px 15px rgba(0,0,0,0.1)"
+                boxShadow: "0 5px 14px rgba(0,0,0,0.08)"
               }}
-              whileTap={{ scale: 0.9 }}
+              whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
             >
-              <motion.div
-                whileHover={{ x: -2 }}
-                transition={{ duration: 0.2 }}
-              >
-                <ArrowLeft size={20} strokeWidth={1.5} />
-              </motion.div>
+              <ArrowLeft size={20} strokeWidth={1.5} />
             </motion.button>
             <motion.button 
               onClick={() => scroll('right')}
-              className="w-12 h-12 rounded-full border border-[#222]/10 flex items-center justify-center text-[#222]"
+              className="w-12 h-12 rounded-full border border-[#222]/10 flex items-center justify-center text-[#222] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
               whileHover={{ 
-                scale: 1.1,
                 backgroundColor: "rgba(255,255,255,1)",
-                boxShadow: "0 5px 15px rgba(0,0,0,0.1)"
+                boxShadow: "0 5px 14px rgba(0,0,0,0.08)"
               }}
-              whileTap={{ scale: 0.9 }}
+              whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
             >
-              <motion.div
-                whileHover={{ x: 2 }}
-                transition={{ duration: 0.2 }}
-              >
-                <ArrowRight size={20} strokeWidth={1.5} />
-              </motion.div>
+              <ArrowRight size={20} strokeWidth={1.5} />
             </motion.button>
           </div>
         </div>
 
         {/* Mobile Social Button */}
-        <button className="md:hidden w-full mt-8 border border-[#222]/20 rounded-full py-4 text-[10px] font-bold tracking-[0.1em] uppercase text-[#222]">
+        <button className="md:hidden w-full mt-8 border border-[#222]/20 rounded-full py-4 text-[10px] font-bold tracking-[0.1em] uppercase text-[#222] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]">
           {lang === 'en' ? socialGridCta : 'تابعنا على السوشيال'}
         </button>
       </div>

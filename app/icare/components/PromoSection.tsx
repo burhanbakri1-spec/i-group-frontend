@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
@@ -9,42 +9,37 @@ interface PromoSectionProps {
 }
 
 export const PromoSection: React.FC<PromoSectionProps> = ({ lang }) => {
+  const shouldReduceMotion = useReducedMotion();
   const { promoBadge, promoHeadline, promoDescription, promoCtaLabel, promoImage } = useSiteContent();
   return (
-    <section className="px-4 md:px-6 py-4 md:py-8 bg-white">
-      {/* Outer Container with reduced rounding */}
-      <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 overflow-hidden rounded-[16px] md:rounded-[24px] bg-[#F2F2F0]">
+    <section className="px-4 md:px-8 py-4 md:py-8 bg-white">
+      <div className="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-2 overflow-hidden rounded-[16px] md:rounded-[24px] bg-[#F2F2F0]">
         
         {/* Left Side: Content Section */}
-        <div className="flex flex-col justify-center p-10 md:p-24 min-h-[450px] md:min-h-[750px]">
+        <div className="flex flex-col justify-center p-8 sm:p-10 md:p-20 min-h-[420px] md:min-h-[680px]">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+            whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
             className="max-w-md"
           >
-            {/* Tagline or Category */}
-            <motion.span 
-              className="text-[10px] md:text-[12px] font-bold tracking-[0.3em] uppercase text-[#777] mb-6 block"
-              initial={{ opacity: 0, y: -10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
+            <span
+              className="text-[10px] md:text-[12px] font-bold tracking-[0.3em] uppercase text-[#5E5E5E] mb-6 block"
             >
               {lang === 'en' ? promoBadge : 'وصول جديد'}
-            </motion.span>
+            </span>
             
             {/* Main Title - Lowercase and Bold */}
             <div className="overflow-hidden mb-8">
               <motion.h2 
                 className="text-[42px] md:text-[64px] font-[900] leading-[0.95] tracking-[-0.04em] text-[#222] lowercase"
-                initial={{ y: 100, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
+                initial={shouldReduceMotion ? false : { y: 24, opacity: 0 }}
+                whileInView={shouldReduceMotion ? undefined : { y: 0, opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ 
-                  delay: 0.1, 
-                  duration: 0.8, 
+                  delay: 0.05,
+                  duration: 0.42,
                   ease: [0.22, 1, 0.36, 1] 
                 }}
               >
@@ -58,11 +53,11 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang }) => {
             
             {/* Description */}
             <motion.p 
-              className="text-[15px] md:text-[18px] leading-relaxed text-[#555] font-medium mb-12 max-w-[90%]"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              className="text-[15px] md:text-[18px] leading-relaxed text-[#4F4F4F] font-medium mb-10 md:mb-12 max-w-[92%]"
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
+              whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.25, duration: 0.6 }}
+              transition={{ delay: 0.12, duration: 0.35 }}
             >
               {lang === 'en' 
                 ? promoDescription
@@ -73,22 +68,21 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang }) => {
             {/* Button Styling */}
             <div className="flex flex-wrap gap-4">
               <motion.button 
-                className="border-2 border-[#222] rounded-full px-12 py-4 text-[11px] font-[900] tracking-[0.15em] uppercase text-[#222] hover:bg-[#222] hover:text-white transition-all duration-500 cursor-pointer relative overflow-hidden group"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                className="border-2 border-[#222] rounded-full px-12 py-4 text-[11px] font-[900] tracking-[0.15em] uppercase text-[#222] hover:bg-[#222] hover:text-white transition-all duration-300 cursor-pointer relative overflow-hidden group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
+                whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.4, duration: 0.6 }}
+                transition={{ delay: 0.18, duration: 0.35 }}
                 whileHover={{ 
-                  scale: 1.05,
-                  boxShadow: "0 10px 30px rgba(0,0,0,0.1)"
+                  boxShadow: "0 8px 22px rgba(0,0,0,0.1)"
                 }}
-                whileTap={{ scale: 0.95 }}
+                whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
               >
                 <motion.span
                   className="absolute inset-0 bg-[#222]"
                   initial={{ x: "-100%" }}
                   whileHover={{ x: 0 }}
-                  transition={{ duration: 0.5 }}
+                  transition={{ duration: 0.25 }}
                 />
                 <span className="relative z-10 group-hover:text-white">
                   {lang === 'en' ? promoCtaLabel : 'بوكيت بلاش'}
@@ -101,16 +95,13 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang }) => {
         {/* Right Side: Visual Section */}
         <motion.div 
           className="relative aspect-square md:aspect-auto h-full overflow-hidden group"
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.5 }}
         >
           <motion.div
-            initial={{ scale: 1.15, opacity: 0 }}
-            whileInView={{ scale: 1, opacity: 1 }}
+            initial={shouldReduceMotion ? false : { opacity: 0 }}
+            whileInView={shouldReduceMotion ? undefined : { opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             className="w-full h-full"
-            whileHover={{ scale: 1.05 }}
           >
             <ImageWithFallback 
               src={promoImage} 
@@ -120,11 +111,7 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang }) => {
           </motion.div>
           
           {/* Subtle Overlay for Premium feel */}
-          <motion.div 
-            className="absolute inset-0 bg-black/5 mix-blend-multiply pointer-events-none"
-            whileHover={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-          />
+          <div className="absolute inset-0 bg-black/5 mix-blend-multiply pointer-events-none" />
         </motion.div>
       </div>
     </section>
