@@ -67,6 +67,12 @@ const mapLabels: Record<
     noResults: string;
     resolvingAddress: string;
     searchLabel: string;
+    googleMapsButton: string;
+    googleMapsHelp: string;
+    googleMapsPasteLabel: string;
+    googleMapsPlaceholder: string;
+    googleMapsSet: string;
+    googleMapsParsed: string;
   }
 > = {
   en: {
@@ -83,6 +89,12 @@ const mapLabels: Record<
     ipFound: 'Location approximated from your network',
     ipWarning: '⚠️ Approximate location. Drag the pin or search for better accuracy.',
     locationDenied: 'Location access denied. Use search or click the map instead.',
+    googleMapsButton: '📍 Select on Google Maps ↗',
+    googleMapsHelp: '1. Find your location on Google Maps → drop a pin → tap Share → Copy link\n2. Paste the link below',
+    googleMapsPasteLabel: 'Paste Google Maps link or coordinates',
+    googleMapsPlaceholder: 'Paste link or paste coordinates like 30.0444,31.2357…',
+    googleMapsSet: 'Set Location',
+    googleMapsParsed: 'Parsed location: ',
     locationUnavailable: 'Could not determine your location. Please search for your area.',
     noResults: 'No results found. Try a different search term.',
     resolvingAddress: 'Resolving address…',
@@ -106,6 +118,12 @@ const mapLabels: Record<
     noResults: 'لا توجد نتائج. جرب مصطلح بحث مختلف.',
     resolvingAddress: 'جاري تحديد العنوان…',
     searchLabel: 'ابحث عن عنوان',
+    googleMapsButton: '📍 اختر على خرائط جوجل ↗',
+    googleMapsHelp: '١. ابحث عن موقعك على خرائط جوجل ← ضع علامة ← اضغط مشاركة ← نسخ الرابط\n٢. الصق الرابط أدناه',
+    googleMapsPasteLabel: 'الصق رابط خرائط جوجل أو الإحداثيات',
+    googleMapsPlaceholder: 'الصق الرابط أو الإحداثيات مثل 30.0444,31.2357…',
+    googleMapsSet: 'تحديد الموقع',
+    googleMapsParsed: 'الموقع المستخرج: ',
   },
 };
 
@@ -240,6 +258,11 @@ export default function MapAddressPicker({
   const [resolvingAddress, setResolvingAddress] = useState(false);
   const [panTrigger, setPanTrigger] = useState(0);
   const [tileLayerFailed, setTileLayerFailed] = useState(false);
+
+  // Google Maps paste flow
+  const [googleMapsOpen, setGoogleMapsOpen] = useState(false);
+  const [googleMapsInput, setGoogleMapsInput] = useState('');
+  const [googleMapsError, setGoogleMapsError] = useState<string | null>(null);
 
   // ── Mount detection ──
   useEffect(() => {
@@ -527,10 +550,78 @@ export default function MapAddressPicker({
   );
 
   // ═════════════════════════════════════════════════════════════════════════════
+  //  GOOGLE MAPS — open in new tab, paste link back, parse coordinates
+  // ═════════════════════════════════════════════════════════════════════════════
+
+  const handleGoogleMapsOpen = useCallback(() => {
+    window.open('https://www.google.com/maps/@?api=1&map_action=pano', '_blank');
+    setGoogleMapsOpen(true);
+  }, []);
+
+  const handleGoogleMapsPaste = useCallback(() => {
+    setGoogleMapsError(null);
+    const raw = googleMapsInput.trim();
+    if (!raw) return;
+
+    // Try to extract coordinates from various formats:
+    // - "@lat,lng,zoom" from Google Maps URLs
+    // - "q=lat,lng" from query params
+    // - Raw "lat, lng" input
+    let lat: number | null = null;
+    let lng: number | null = null;
+
+    // Pattern 1: @lat,lng,zoom (most common in Google Maps share links)
+    const atMatch = raw.match(/@(-?\d+\.?\d*),\s*(-?\d+\.?\d*)/);
+    if (atMatch) {
+      lat = parseFloat(atMatch[1]);
+      lng = parseFloat(atMatch[2]);
+    }
+
+    // Pattern 2: q=lat,lng (query parameter format)
+    if (lat === null) {
+      const qMatch = raw.match(/[?&]q=(-?\d+\.?\d*),\s*(-?\d+\.?\d*)/);
+      if (qMatch) {
+        lat = parseFloat(qMatch[1]);
+        lng = parseFloat(qMatch[2]);
+      }
+    }
+
+    // Pattern 3: Raw "lat, lng" or "lat lng" (user just types coordinates)
+    if (lat === null) {
+      const rawMatch = raw.match(/^(-?\d+\.?\d*)\s*[, :]\s*(-?\d+\.?\d*)$/);
+      if (rawMatch) {
+        lat = parseFloat(rawMatch[1]);
+        lng = parseFloat(rawMatch[2]);
+      }
+    }
+
+    // Validate
+    if (lat === null || lng === null || isNaN(lat) || isNaN(lng)) {
+      setGoogleMapsError(lang === 'ar' ? 'تعذر استخراج الإحداثيات. تأكد من نسخ الرابط الصحيح.' : 'Could not extract coordinates. Make sure you copied the correct link.');
+      return;
+    }
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      setGoogleMapsError(lang === 'ar' ? 'الإحداثيات غير صالحة' : 'Invalid coordinates');
+      return;
+    }
+
+    const pos: [number, number] = [lat, lng];
+    setGoogleMapsOpen(false);
+    setGoogleMapsInput('');
+    setMarkerPos(pos);
+    setMapCenter(pos);
+    setLocateState('found');
+    setLocateSource('search');
+    setPanTrigger((prev) => prev + 1);
+    onLocationSelect(lat, lng);
+    resolveAddress(lat, lng);
+  }, [googleMapsInput, onLocationSelect, resolveAddress, lang]);
+
+  // ═════════════════════════════════════════════════════════════════════════════
   //  RENDER
   // ═════════════════════════════════════════════════════════════════════════════
 
-  // ── Error state ──
+  // ── Map error ──
   if (mapError) {
     return (
       <div className={MAP_FRAME_CLASS} role="region" aria-label={labels.ariaLabel}>
@@ -666,6 +757,50 @@ export default function MapAddressPicker({
           >
             {labels.locateButton}
           </button>
+
+          {/* Select on Google Maps ↗ button */}
+          <button
+            type="button"
+            onClick={handleGoogleMapsOpen}
+            className={`w-full px-4 py-2 bg-white border border-dashed border-blue-400 rounded-lg text-sm text-blue-700 hover:bg-blue-50 transition-colors ${CONTROL_FOCUS_CLASS}`}
+          >
+            {labels.googleMapsButton}
+          </button>
+
+          {/* Paste area (shown after button is clicked) */}
+          {googleMapsOpen && (
+            <div className="border border-blue-200 bg-blue-50 rounded-lg p-3 space-y-2">
+              <p className="text-xs text-blue-800 whitespace-pre-line leading-relaxed">
+                {labels.googleMapsHelp}
+              </p>
+              <label className="block text-xs font-medium text-blue-800">
+                {labels.googleMapsPasteLabel}
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={googleMapsInput}
+                  onChange={(e) => { setGoogleMapsInput(e.target.value); setGoogleMapsError(null); }}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleGoogleMapsPaste(); }}
+                  placeholder={labels.googleMapsPlaceholder}
+                  className={`flex-1 px-3 py-2 border border-blue-300 rounded text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 ${INPUT_FOCUS_CLASS}`}
+                  dir={lang === 'ar' ? 'rtl' : 'ltr'}
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={handleGoogleMapsPaste}
+                  disabled={!googleMapsInput.trim()}
+                  className={`px-3 py-2 bg-blue-700 text-white rounded text-sm hover:bg-blue-800 disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors whitespace-nowrap ${CONTROL_FOCUS_CLASS}`}
+                >
+                  {labels.googleMapsSet}
+                </button>
+              </div>
+              {googleMapsError && (
+                <p className="text-xs text-red-600">{googleMapsError}</p>
+              )}
+            </div>
+          )}
         </div>
       )}
 
