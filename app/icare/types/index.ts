@@ -510,7 +510,7 @@ export interface CreatedOrder {
   status: string;
   paymentMethod?: 'cash_on_delivery' | 'online';
   paymentStatus?: string;
-  paymentGateway?: 'paymob' | 'fawry' | 'bop' | 'lahza';
+  paymentGateway?: 'paymob' | 'fawry' | 'bop' | 'lahza' | 'paypal';
   subtotal: number;
   shippingCost: number;
   tax: number;
