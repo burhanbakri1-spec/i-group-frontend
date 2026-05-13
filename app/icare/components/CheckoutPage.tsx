@@ -12,13 +12,13 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 const MAP_PICKER_FRAME_CLASS = 'w-full h-64 md:h-80 rounded-lg overflow-hidden border border-gray-300 mb-4';
 const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 const INPUT_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:border-black focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
-const CHECKOUT_INPUT_CLASS = `w-full px-4 py-3 border border-[#C9C6BF] rounded text-[#222] placeholder:text-[#666] transition-[border-color,box-shadow] duration-200 ${INPUT_FOCUS_CLASS}`;
+const CHECKOUT_INPUT_CLASS = `w-full px-4 py-3 border border-[#8A867E] rounded text-[#222] placeholder:text-[#666] transition-[border-color,box-shadow] duration-200 ${INPUT_FOCUS_CLASS}`;
 const SHORT_TWEEN = { duration: 0.18, ease: 'easeOut' as const };
 
 const MapAddressPicker = dynamic(() => import('./MapAddressPicker'), {
   ssr: false,
   loading: () => (
-    <div className={`${MAP_PICKER_FRAME_CLASS} bg-gray-50 animate-pulse`} aria-hidden="true" />
+    <div className={`${MAP_PICKER_FRAME_CLASS} bg-gray-50 animate-pulse motion-reduce:animate-none`} aria-hidden="true" />
   ),
 });
 
@@ -68,7 +68,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
     address: user?.address ?? '',
     city: user?.city ?? '',
     postalCode: '',
-    country: user?.country ?? 'Egypt',
+    country: user?.country ?? 'Palestine',
   });
   const shouldReduceMotion = useReducedMotion();
 
@@ -219,7 +219,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
       shippingAddress: shippingForm.address,
       shippingCity: shippingForm.city,
       shippingPostalCode: shippingForm.postalCode,
-      shippingCountry: shippingForm.country || 'Egypt',
+      shippingCountry: shippingForm.country || 'Palestine',
       billingSameAsShipping: true,
     };
 
@@ -269,7 +269,6 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
     setCheckoutError(null);
     try {
       const orderInput = buildOrderInput();
-      console.log('[CheckoutPage] Sending order payload:', JSON.stringify(orderInput, null, 2));
       const createdOrder = await icareApi.orders.create(orderInput, accessToken ?? undefined);
       setOrder(createdOrder);
       setOrderComplete(true);
@@ -529,7 +528,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                       }`}
                     >
                       {verifyingPayment ? (
-                        <div className="w-10 h-10 border-[3px] border-white border-t-transparent rounded-full animate-spin" />
+                        <div className="w-10 h-10 border-[3px] border-white border-t-transparent rounded-full animate-spin motion-reduce:animate-none" />
                       ) : (
                         <Check size={40} className="text-white" />
                       )}
@@ -633,7 +632,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
 
               {summaryLoading ? (
                 <div className="flex justify-center py-4 border-t border-[#EEE] pt-4">
-                  <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                  <div className="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin motion-reduce:animate-none" />
                 </div>
               ) : (
 

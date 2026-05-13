@@ -5,8 +5,8 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { translations, Language } from '../translations';
 import { useShop } from '../context/ShopContext';
 import { useSiteContent } from '../hooks/useSiteContent';
-import { Product } from '../types';
-import { fetchCatalogProducts } from '../lib/catalog-client';
+import { BackendCategory, Product } from '../types';
+import { fetchCatalogProducts, fetchCategoryRoots, fetchCategoryChildren } from '../lib/catalog-client';
 
 interface HeaderProps {
   onOpenCart: () => void;
@@ -21,6 +21,7 @@ interface HeaderProps {
 
 const FOCUS_VISIBLE_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF9F6]';
 const MUTED_TEXT_CLASS = 'text-[#5C5A56] hover:text-black';
+const SHOP_MEGA_MENU_ID = 'icare-shop-mega-menu';
 
 export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavigate, onProductSelect, onOpenMenu, isDrawerOpen, lang, onToggleLang }) => {
   const t = translations[lang];
@@ -31,9 +32,15 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
   const [isVisible, setIsVisible] = useState(true);
   const [isPinkTheme, setIsPinkTheme] = useState(false);
   const [previewProducts, setPreviewProducts] = useState<Product[]>([]);
+  const [rootCategories, setRootCategories] = useState<BackendCategory[]>([]);
+  const [categoryChildren, setCategoryChildren] = useState<Record<string, BackendCategory[]>>({});
+  const [activeRootSlug, setActiveRootSlug] = useState<string | null>(null);
   const { scrollY } = useScroll();
   const shouldReduceMotion = useReducedMotion();
+  const headerRef = useRef<HTMLDivElement | null>(null);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const shopButtonRef = useRef<HTMLButtonElement | null>(null);
+  const shopMenuRef = useRef<HTMLDivElement | null>(null);
   const calmTween = shouldReduceMotion ? { duration: 0 } : { duration: 0.2, ease: 'easeOut' as const };
 
   const cancelHideTimer = () => {
@@ -50,32 +57,105 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
 
   const hideShop = () => {
     cancelHideTimer();
-    hideTimerRef.current = setTimeout(() => setIsShopHovered(false), 200);
+    hideTimerRef.current = setTimeout(() => setIsShopHovered(false), 80);
+  };
+
+  const closeShopMenu = () => {
+    cancelHideTimer();
+    setIsShopHovered(false);
+  };
+
+  const focusFirstShopMenuItem = () => {
+    window.requestAnimationFrame(() => {
+      const firstMenuButton = shopMenuRef.current?.querySelector<HTMLButtonElement>('button');
+      firstMenuButton?.focus();
+    });
+  };
+
+  const handleHeaderBlur = (event: React.FocusEvent<HTMLDivElement>) => {
+    const nextFocusedElement = event.relatedTarget;
+    if (nextFocusedElement instanceof Node && headerRef.current?.contains(nextFocusedElement)) return;
+    closeShopMenu();
+  };
+
+  const handleShopKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      showShop();
+      focusFirstShopMenuItem();
+    }
+  };
+
+  const handleHeaderKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'Escape' || !isShopHovered) return;
+    event.preventDefault();
+    closeShopMenu();
+    shopButtonRef.current?.focus();
   };
 
   useEffect(() => () => { cancelHideTimer(); }, []);
 
   useEffect(() => {
-    let cancelled = false;
-    const loadPreviewProducts = async () => {
-      const products = await fetchCatalogProducts();
-      if (cancelled || products === null) return;
-      setPreviewProducts(products.slice(0, 16));
+    if (!isShopHovered) return;
+
+    const handleMouseDown = (e: MouseEvent) => {
+      if (
+        shopMenuRef.current &&
+        !shopMenuRef.current.contains(e.target as Node) &&
+        shopButtonRef.current &&
+        !shopButtonRef.current.contains(e.target as Node)
+      ) {
+        cancelHideTimer();
+        setIsShopHovered(false);
+      }
     };
-    loadPreviewProducts();
+
+    document.addEventListener('mousedown', handleMouseDown);
+    return () => {
+      document.removeEventListener('mousedown', handleMouseDown);
+    };
+  }, [isShopHovered]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadData = async () => {
+      const [products, categories] = await Promise.all([
+        fetchCatalogProducts(),
+        fetchCategoryRoots(),
+      ]);
+      if (cancelled) return;
+      if (products !== null) {
+        setPreviewProducts(products.slice(0, 16));
+      }
+      setRootCategories(categories);
+    };
+    loadData();
     return () => { cancelled = true; };
   }, []);
 
-  const previewCategories = useMemo(() => {
+  // Fetch children when a root category is hovered
+  useEffect(() => {
+    if (!activeRootSlug || categoryChildren[activeRootSlug]) return;
+    let cancelled = false;
+    fetchCategoryChildren(activeRootSlug).then(children => {
+      if (cancelled) return;
+      setCategoryChildren(prev => ({ ...prev, [activeRootSlug]: Array.isArray(children) ? children : [] }));
+    });
+    return () => { cancelled = true; };
+  }, [activeRootSlug, categoryChildren]);
+
+  const megaMenuCategories = useMemo(() => {
+    if (rootCategories.length > 0) {
+      return [t.categories.all, ...rootCategories.map((c) => c.name)];
+    }
     if (previewProducts.length === 0) return [];
     const backendCategories = Array.from(new Set(previewProducts
       .map((product) => product.category?.trim())
       .filter((category): category is string => Boolean(category))));
-
     return [t.categories.all, ...backendCategories];
-  }, [previewProducts, t.categories.all]);
+  }, [rootCategories, previewProducts, t.categories.all]);
 
-  const activePreviewCategory = previewCategories.some((category) => category.trim().toLowerCase() === activeCategory.trim().toLowerCase())
+  const activePreviewCategory = megaMenuCategories.some((category) => category.trim().toLowerCase() === activeCategory.trim().toLowerCase())
     ? activeCategory
     : t.categories.all;
 
@@ -106,10 +186,13 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
 
   return (
     <motion.div 
+      ref={headerRef}
       initial={{ y: 0, opacity: 1 }}
       animate={{ y: headerY, opacity: headerOpacity }}
       transition={calmTween}
       onMouseLeave={hideShop}
+      onBlur={handleHeaderBlur}
+      onKeyDown={handleHeaderKeyDown}
       className={`fixed top-0 left-0 right-0 z-[60] ${isDrawerOpen ? 'pointer-events-none' : ''}`}
     >
       {/* Announcement Bar */}
@@ -129,6 +212,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
           <div className="flex items-center gap-10">
             <button 
               onClick={onOpenMenu}
+              onMouseEnter={closeShopMenu}
               className={`p-2 hover:bg-black/5 rounded-full transition-colors lg:hidden ${FOCUS_VISIBLE_CLASS}`}
               aria-label="Open menu"
             >
@@ -136,16 +220,30 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
             </button>
             <nav className="hidden lg:flex items-center gap-7">
               <button 
+                ref={shopButtonRef}
                 onMouseEnter={showShop}
-                onClick={() => onNavigate('shop')}
+                onFocus={showShop}
+                onKeyDown={handleShopKeyDown}
+                onClick={() => {
+                  if (isShopHovered) {
+                    closeShopMenu();
+                    shopButtonRef.current?.focus();
+                  } else {
+                    onNavigate('shop');
+                  }
+                }}
                 className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors ${FOCUS_VISIBLE_CLASS} ${
                   isPinkTheme ? 'text-[#E11D48] hover:text-black' : MUTED_TEXT_CLASS
                 }`}
+                aria-haspopup="true"
+                aria-expanded={isShopHovered}
+                aria-controls={SHOP_MEGA_MENU_ID}
               >
                 {t.shop}
               </button>
               <button 
                 onClick={() => onNavigate('story')}
+                onMouseEnter={closeShopMenu}
                 className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors ${FOCUS_VISIBLE_CLASS} ${
                   isPinkTheme ? 'text-[#E11D48] hover:text-black' : MUTED_TEXT_CLASS
                 }`}
@@ -154,6 +252,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
               </button>
               <button 
                 onClick={onToggleLang}
+                onMouseEnter={closeShopMenu}
                 className={`text-[12px] font-bold flex items-center gap-2 border border-black/10 px-3 py-1.5 rounded-full hover:bg-black/5 transition-colors ${FOCUS_VISIBLE_CLASS} ${
                   isPinkTheme ? 'text-[#E11D48]' : 'text-[#5C5A56]'
                 }`}
@@ -184,6 +283,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
           <div className="flex items-center gap-3 md:gap-6">
             <button 
                 onClick={onOpenSearch}
+                onMouseEnter={closeShopMenu}
                 className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors ${FOCUS_VISIBLE_CLASS} ${
                   isPinkTheme ? 'text-[#E11D48] hover:text-black' : MUTED_TEXT_CLASS
                 }`}
@@ -194,6 +294,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
             </button>
             <button 
               onClick={() => onNavigate('wishlist')}
+              onMouseEnter={closeShopMenu}
               className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors relative ${FOCUS_VISIBLE_CLASS} ${
                 isPinkTheme ? 'text-[#E11D48] hover:text-black' : MUTED_TEXT_CLASS
               }`}
@@ -211,6 +312,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
             </button>
             <button 
               onClick={() => onNavigate('account')}
+              onMouseEnter={closeShopMenu}
               className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors hidden md:block ${FOCUS_VISIBLE_CLASS} ${
                 isPinkTheme ? 'text-[#E11D48] hover:text-black' : MUTED_TEXT_CLASS
               }`}
@@ -219,6 +321,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
             </button>
             <button 
               onClick={onOpenCart}
+              onMouseEnter={closeShopMenu}
               className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors relative ${FOCUS_VISIBLE_CLASS} ${
                 isPinkTheme ? 'text-[#E11D48] hover:text-black' : MUTED_TEXT_CLASS
               }`}
@@ -241,50 +344,101 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
         <AnimatePresence>
           {isShopHovered && (
             <motion.div
+              id={SHOP_MEGA_MENU_ID}
+              ref={shopMenuRef}
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={calmTween}
-              className="absolute top-[calc(100%-8px)] left-0 z-[55] w-full bg-[#FAF9F6]/90 backdrop-blur-3xl rounded-[16px] pt-10 pb-12 shadow-xl overflow-hidden border border-white/40"
+              className="absolute top-[calc(100%-8px)] left-0 z-[55] w-full bg-[#FAF9F6]/90 backdrop-blur-3xl rounded-[16px] pt-5 pb-6 shadow-xl overflow-hidden border border-white/40"
               onMouseEnter={showShop}
             >
               <div className="max-w-[1440px] mx-auto px-10">
-                {previewCategories.length > 0 && (
-                  <div className="flex justify-end gap-8 mb-10 px-10">
-                    {previewCategories.map((cat) => (
+                {megaMenuCategories.length > 0 && (
+                  <div className="flex justify-end gap-6 mb-4 px-6">
+                    {/* "All" button */}
+                    <button
+                      key={t.categories.all}
+                      onMouseEnter={() => { setActiveCategory(t.categories.all); setActiveRootSlug(null); }}
+                      onFocus={() => { setActiveCategory(t.categories.all); setActiveRootSlug(null); }}
+                      onClick={() => { onNavigate('shop'); closeShopMenu(); }}
+                      className={`rounded-full px-1 text-[14px] font-bold uppercase tracking-tight relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
+                        activePreviewCategory.trim().toLowerCase() === t.categories.all.trim().toLowerCase() ? 'text-black' : 'text-[#5C5A56]'
+                      }`}
+                    >
+                      {t.categories.all}
+                      {activePreviewCategory.trim().toLowerCase() === t.categories.all.trim().toLowerCase() && (
+                        <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="absolute -bottom-2 left-0 w-full h-[1px] bg-black" />
+                      )}
+                    </button>
+                    {/* Root category buttons */}
+                    {rootCategories.length > 0 ? rootCategories.map((cat) => (
                       <button
-                        key={cat}
-                        onMouseEnter={() => setActiveCategory(cat)}
-                         className={`rounded-full px-1 text-[14px] font-bold uppercase tracking-tight relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
-                           activePreviewCategory.trim().toLowerCase() === cat.trim().toLowerCase() ? 'text-black' : 'text-[#5C5A56]'
-                         }`}
+                        key={cat.slug}
+                        onMouseEnter={() => { setActiveCategory(cat.name); setActiveRootSlug(cat.slug); }}
+                        onFocus={() => { setActiveCategory(cat.name); setActiveRootSlug(cat.slug); }}
+                        onClick={() => { onNavigate('shop'); closeShopMenu(); }}
+                        className={`rounded-full px-1 text-[14px] font-bold uppercase tracking-tight relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
+                          activePreviewCategory.trim().toLowerCase() === cat.name.trim().toLowerCase() ? 'text-black' : 'text-[#5C5A56]'
+                        }`}
                       >
-                        {cat}
-                        {activePreviewCategory.trim().toLowerCase() === cat.trim().toLowerCase() && (
-                           <motion.div
-                             layoutId="activeCategoryUnderline"
-                             transition={calmTween}
-                             className="absolute -bottom-2 left-0 w-full h-[1px] bg-black"
-                           />
+                        {cat.name}
+                        {activePreviewCategory.trim().toLowerCase() === cat.name.trim().toLowerCase() && (
+                          <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="absolute -bottom-2 left-0 w-full h-[1px] bg-black" />
                         )}
+                      </button>
+                    )) : (
+                      /* Fallback when no root categories: use derived names */
+                      megaMenuCategories.filter(c => c !== t.categories.all).map((cat) => (
+                        <button
+                          key={cat}
+                          onMouseEnter={() => setActiveCategory(cat)}
+                          onFocus={() => setActiveCategory(cat)}
+                          onClick={() => { onNavigate('shop'); closeShopMenu(); }}
+                          className={`rounded-full px-1 text-[14px] font-bold uppercase tracking-tight relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
+                            activePreviewCategory.trim().toLowerCase() === cat.trim().toLowerCase() ? 'text-black' : 'text-[#5C5A56]'
+                          }`}
+                        >
+                          {cat}
+                          {activePreviewCategory.trim().toLowerCase() === cat.trim().toLowerCase() && (
+                            <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="absolute -bottom-2 left-0 w-full h-[1px] bg-black" />
+                          )}
+                        </button>
+                      ))
+                    )}
+                  </div>
+                )}
+
+                {/* Children subcategories row */}
+                {activeRootSlug && categoryChildren[activeRootSlug]?.length > 0 && (
+                  <div className="flex justify-center gap-4 mb-4 px-6">
+                    {categoryChildren[activeRootSlug].map((child) => (
+                      <button
+                        key={child.slug}
+                        onClick={() => { onNavigate('shop'); closeShopMenu(); }}
+                        className={`rounded-full px-4 py-1.5 text-[12px] font-bold tracking-wide transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} text-[#5C5A56] hover:text-black hover:bg-black/5`}
+                      >
+                        {child.name}
                       </button>
                     ))}
                   </div>
                 )}
 
                 {visiblePreviewProducts.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 px-10">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-6">
                     {visiblePreviewProducts.map((product) => (
-                    <motion.div 
+                    <motion.button
+                      type="button"
                       key={product.id}
                       layout
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={calmTween}
-                      className="bg-white/60 backdrop-blur-md rounded-[12px] p-6 flex flex-col group cursor-pointer hover:bg-white/85 transition-colors duration-200"
+                      className={`bg-white/60 backdrop-blur-md rounded-[12px] p-4 flex flex-col group cursor-pointer hover:bg-white/85 transition-colors duration-200 text-left ${FOCUS_VISIBLE_CLASS}`}
                       onClick={() => { onProductSelect?.(product); setIsShopHovered(false); }}
+                      aria-label={`${t.shopNow} ${product.title ?? product.name}`}
                     >
-                      <div className="relative aspect-square mb-6 flex items-center justify-center p-4">
+                      <div className="relative aspect-square mb-3 flex items-center justify-center p-4">
                         <ImageWithFallback 
                           src={product.image} 
                           alt={product.title ?? product.name}
@@ -295,14 +449,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                         <h4 className="text-[14px] font-bold uppercase tracking-tight text-black mb-1 italic">
                           {product.title ?? product.name}
                         </h4>
-                        <p className="text-[14px] text-[#5C5A56] font-medium leading-tight mb-4">
+                        <p className="text-[14px] text-[#5C5A56] font-medium leading-tight mb-2">
                           {product.description ?? product.price}
                         </p>
-                        <button className={`text-[11px] font-black uppercase tracking-widest border-b border-black pb-0.5 self-start hover:opacity-70 transition-opacity ${FOCUS_VISIBLE_CLASS}`}>
+                        <span className="text-[11px] font-black uppercase tracking-widest border-b border-black pb-0.5 self-start group-hover:opacity-70 transition-opacity">
                           {t.shopNow}
-                        </button>
+                        </span>
                       </div>
-                      </motion.div>
+                      </motion.button>
                     ))}
                   </div>
                 ) : (

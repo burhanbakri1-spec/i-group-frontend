@@ -13,8 +13,8 @@ interface AccountPageProps {
 }
 
 const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F1ED]';
-const INPUT_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F1ED]';
-const ACCOUNT_INPUT_CLASS = `w-full bg-white border border-transparent rounded-[12px] px-6 py-4 text-[14px] text-[#5C5A56] placeholder:text-[#666] transition-[border-color,box-shadow] duration-200 ${INPUT_FOCUS_CLASS}`;
+const INPUT_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:border-black focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F1ED]';
+const ACCOUNT_INPUT_CLASS = `w-full bg-white border border-[#8A867E] rounded-[12px] px-6 py-4 text-[14px] text-[#5C5A56] placeholder:text-[#666] transition-[border-color,box-shadow] duration-200 ${INPUT_FOCUS_CLASS}`;
 const SHORT_TWEEN = { duration: 0.18, ease: 'easeOut' as const };
 
 export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) => {
@@ -274,7 +274,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                                       {/* Items */}
                                       {orderDetail.items && orderDetail.items.length > 0 && (
                                         <div>
-                                          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#5C5A56]/40 mb-2">Items</p>
+                                          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#5C5A56]/70 mb-2">Items</p>
                                           <ul className="space-y-1.5">
                                             {orderDetail.items.map((item) => (
                                               <li key={item.id} className="flex justify-between text-[11px] text-[#5C5A56]">
@@ -291,22 +291,22 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
 
                                       {/* Totals */}
                                       <div className="border-t border-black/5 pt-2 space-y-1">
-                                        <div className="flex justify-between text-[11px] text-[#5C5A56]/60">
+                                        <div className="flex justify-between text-[11px] text-[#5C5A56]/75">
                                           <span>Subtotal</span>
                                           <span>EGP {orderDetail.subtotal.toFixed(0)}</span>
                                         </div>
-                                        <div className="flex justify-between text-[11px] text-[#5C5A56]/60">
+                                        <div className="flex justify-between text-[11px] text-[#5C5A56]/75">
                                           <span>Shipping</span>
                                           <span>EGP {orderDetail.shippingCost.toFixed(0)}</span>
                                         </div>
                                         {orderDetail.tax > 0 && (
-                                          <div className="flex justify-between text-[11px] text-[#5C5A56]/60">
+                                          <div className="flex justify-between text-[11px] text-[#5C5A56]/75">
                                             <span>Tax</span>
                                             <span>EGP {orderDetail.tax.toFixed(0)}</span>
                                           </div>
                                         )}
                                         {orderDetail.discount > 0 && (
-                                          <div className="flex justify-between text-[11px] text-[#5C5A56]/60">
+                                          <div className="flex justify-between text-[11px] text-[#5C5A56]/75">
                                             <span>Discount</span>
                                             <span>-EGP {orderDetail.discount.toFixed(0)}</span>
                                           </div>
@@ -320,7 +320,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                                       {/* Status timeline */}
                                       {orderDetail.statusHistory && orderDetail.statusHistory.length > 0 && (
                                         <div>
-                                          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#5C5A56]/40 mb-1.5">Status Timeline</p>
+                                          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#5C5A56]/70 mb-1.5">Status Timeline</p>
                                           {orderDetail.statusHistory.map((entry, idx) => {
                                             const s = entry.status.toLowerCase();
                                             const dotColor =
@@ -332,9 +332,9 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                                                 <div className={`w-2 h-2 rounded-full mt-1 flex-shrink-0 ${dotColor}`} />
                                                 <div>
                                                   <p className="text-[11px] font-bold text-[#5C5A56]">{entry.status}</p>
-                                                  <p className="text-[9px] text-[#5C5A56]/40">{formatDate(entry.createdAt)}</p>
+                                                  <p className="text-[9px] text-[#5C5A56]/70">{formatDate(entry.createdAt)}</p>
                                                   {entry.comment && (
-                                                    <p className="text-[10px] text-[#5C5A56]/60 italic">{entry.comment}</p>
+                                                    <p className="text-[10px] text-[#5C5A56]/75 italic">{entry.comment}</p>
                                                   )}
                                                 </div>
                                               </div>
@@ -357,7 +357,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                                               setOrdersError(err instanceof IcareApiError ? err.message : 'Failed to cancel order. Please try again.');
                                             }
                                           }}
-                                           className={`w-full mt-2 py-2 border border-red-300 text-red-600 rounded-[10px] text-[10px] font-black uppercase tracking-[0.1em] hover:bg-red-50 transition-colors active:scale-[0.98] motion-reduce:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed ${CONTROL_FOCUS_CLASS}`}
+                                          className={`w-full mt-2 py-2 border border-red-300 text-red-600 rounded-[10px] text-[10px] font-black uppercase tracking-[0.1em] hover:bg-red-50 transition-colors active:scale-[0.98] motion-reduce:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed ${CONTROL_FOCUS_CLASS}`}
                                         >
                                           {cancelState === 'loading' ? 'Cancelling…' : 'Cancel Order'}
                                         </button>
@@ -372,7 +372,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                                   )}
 
                                   {!detailLoading && !orderDetail && (
-                                    <p className="text-center text-[11px] text-[#5C5A56]/50 py-4">
+                                    <p className="text-center text-[11px] text-[#5C5A56]/75 py-4">
                                       Could not load order details.
                                     </p>
                                   )}
@@ -441,7 +441,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
 
               {(formError || authError) && <p className="text-sm text-red-600">{formError ?? authError}</p>}
 
-               <button disabled={isSubmitting} className={`mt-8 border border-[#5C5A56] text-[#5C5A56] px-14 py-3 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors duration-200 active:scale-[0.98] motion-reduce:active:scale-100 disabled:opacity-50 flex items-center gap-2 ${CONTROL_FOCUS_CLASS}`}>
+              <button disabled={isSubmitting} className={`mt-8 border border-[#5C5A56] text-[#5C5A56] px-14 py-3 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors duration-200 active:scale-[0.98] motion-reduce:active:scale-100 disabled:opacity-50 flex items-center gap-2 ${CONTROL_FOCUS_CLASS}`}>
                 {isSubmitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-[#5C5A56] border-t-transparent rounded-full animate-spin" />

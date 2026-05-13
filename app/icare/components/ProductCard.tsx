@@ -51,8 +51,7 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
   const cardMotion = shouldReduceMotion
     ? {}
     : {
-        initial: { opacity: 0, y: 12 },
-        animate: { opacity: 1, y: 0 },
+        initial: { opacity: 0, y: 14 },
         whileInView: { opacity: 1, y: 0 },
       };
 
@@ -64,7 +63,7 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
       {...cardMotion}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ 
-        duration: 0.35,
+        duration: 0.4,
         ease: [0.22, 1, 0.36, 1]
       }}
     >
@@ -74,12 +73,6 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
         onKeyDown={handleCardKeyDown}
         role={onSelect ? 'button' : undefined}
         tabIndex={onSelect ? 0 : undefined}
-        whileHover={{ 
-          y: shouldReduceMotion ? 0 : -4,
-          boxShadow: "0 14px 28px rgba(0,0,0,0.07)",
-          transition: { duration: 0.22 }
-        }}
-        whileTap={shouldReduceMotion ? undefined : { scale: 0.995 }}
       >
         
         {/* Top Section: Category Title and Badge */}
@@ -168,8 +161,7 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
           <motion.button
             onClick={handleAddToCart}
             disabled={!isPurchasable}
-            className="w-full py-2.5 md:py-2.5 border border-[#777] bg-transparent rounded-full text-[10px] md:text-[11px] font-black uppercase tracking-wider text-[#4A4A4A] hover:bg-black hover:text-white hover:border-black transition-colors duration-300 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-[#4A4A4A] disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F2]"
-            whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
+            className="w-full py-2.5 md:py-2.5 border border-[#777] bg-transparent rounded-full text-[10px] md:text-[11px] font-black uppercase tracking-wider text-[#4A4A4A] transition-all duration-200 ease-out hover:bg-black hover:text-white hover:border-black hover:scale-[1.02] hover:shadow-md active:scale-[0.97] motion-reduce:hover:scale-100 motion-reduce:active:scale-100 disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-[#4A4A4A] disabled:hover:scale-100 disabled:hover:shadow-none disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F2]"
           >
             {isPurchasable ? (lang === 'en' ? 'Add to Cart' : 'أضف للسلة') : (lang === 'en' ? 'Sold Out' : 'نفد المخزون')}
           </motion.button>
@@ -185,11 +177,10 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
           <motion.button 
             onClick={handleAddToCart}
             disabled={!isPurchasable}
-            className="bg-black text-white px-10 py-4 rounded-full text-[12px] font-black uppercase tracking-widest shadow-xl flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+            className="bg-black text-white px-10 py-4 rounded-full text-[12px] font-black uppercase tracking-widest shadow-xl flex items-center gap-2 transition-all duration-200 ease-out hover:scale-[1.03] active:scale-[0.97] motion-reduce:hover:scale-100 motion-reduce:active:scale-100 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
             initial={{ opacity: 0 }}
             animate={isHovered ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.2 }}
-            whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
           >
             <Plus size={18} strokeWidth={3} />
             {isPurchasable ? (lang === 'en' ? 'Add to Cart' : 'أضف للسلة') : (lang === 'en' ? 'Sold Out' : 'نفد المخزون')}

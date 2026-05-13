@@ -152,10 +152,12 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
                 className="space-y-3"
               >
                 {displayProducts.length > 0 ? displayProducts.map((product) => (
-                  <div 
+                  <button
+                    type="button"
                     key={product.id}
                     onClick={() => { onProductSelect?.(product); onClose(); }}
-                    className="bg-white rounded-[16px] p-4 flex items-center gap-5 relative group active:scale-[0.99] transition-transform duration-150"
+                    className={`w-full bg-white rounded-[16px] p-4 flex items-center gap-5 relative group active:scale-[0.99] transition-transform duration-150 text-left ${FOCUS_VISIBLE_CLASS}`}
+                    aria-label={`${lang === 'en' ? 'Open product' : 'فتح المنتج'} ${product.title ?? product.name}`}
                   >
                     <div className="w-20 h-20 bg-[#F9F9F8] rounded-[12px] flex items-center justify-center p-2">
                       <ImageWithFallback 
@@ -180,7 +182,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
                         {product.description ?? product.price}
                       </p>
                     </div>
-                  </div>
+                  </button>
                 )) : (
                   <div className="bg-white/70 rounded-[16px] p-6 text-center text-[12px] font-bold uppercase tracking-[0.15em] text-[#706E6A]">
                     no products available

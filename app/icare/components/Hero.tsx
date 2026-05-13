@@ -59,7 +59,7 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, lang }) => {
             
             <motion.button 
               onClick={() => onNavigate('shop')}
-              className="bg-white text-black px-10 md:px-12 py-4 md:py-5 rounded-full text-[11px] md:text-[12px] font-black uppercase tracking-[0.2em] shadow-lg relative overflow-hidden group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40"
+              className="bg-white text-black px-10 md:px-12 py-4 md:py-5 rounded-full text-[11px] md:text-[12px] font-black uppercase tracking-[0.2em] shadow-lg transition-all duration-200 ease-out hover:bg-[#F0EDE8] hover:shadow-xl hover:scale-[1.02] active:scale-[0.99] motion-reduce:hover:scale-100 motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40"
               initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
               animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
               transition={{ 
@@ -67,18 +67,8 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, lang }) => {
                 duration: 0.35,
                 ease: [0.22, 1, 0.36, 1] 
               }}
-              whileHover={{ 
-                boxShadow: "0 10px 24px rgba(0,0,0,0.16)"
-              }}
-              whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
             >
-              <motion.span 
-                className="absolute inset-0 bg-[#F2F1ED]"
-                initial={{ x: "-100%" }}
-                whileHover={{ x: 0 }}
-                transition={{ duration: 0.22 }}
-              />
-              <span className="relative z-10">{t.shopNow}</span>
+              <span>{t.shopNow}</span>
             </motion.button>
           </motion.div>
         </div>

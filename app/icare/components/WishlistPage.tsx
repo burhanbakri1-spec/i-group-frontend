@@ -116,7 +116,7 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
                 {/* Remove Button */}
                 <button
                   onClick={() => removeFromWishlist(product.id)}
-                  className={`absolute top-4 right-4 z-10 w-8 h-8 bg-white rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity shadow-lg hover:bg-[#C81E3A] hover:text-white ${CONTROL_FOCUS_CLASS}`}
+                  className={`absolute top-4 right-4 z-10 w-10 h-10 md:w-8 md:h-8 bg-white rounded-full flex items-center justify-center opacity-100 transition-opacity shadow-lg hover:bg-[#C81E3A] hover:text-white ${CONTROL_FOCUS_CLASS}`}
                   aria-label={`${text.remove} ${product.name}`}
                 >
                   <X size={16} />

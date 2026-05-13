@@ -113,7 +113,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
   return (
     <AnimatePresence>
       {isOpen && (
-        <>
+        <React.Fragment key="search-drawer">
           <motion.div 
             key="search-drawer-backdrop"
             initial={{ opacity: 0 }}
@@ -205,7 +205,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                                 </div>
                                 <div className="flex flex-col">
                                   <span className="text-[14px] font-black text-[#333] tracking-widest uppercase">{product.name}</span>
-                                  <span className="text-[12px] text-[#706E6A] lowercase">{product.category ?? product.price}</span>
+                                  <span className="text-[12px] text-[#5F5D59] lowercase">{product.category ?? product.price}</span>
                                 </div>
                               </button>
                             ))}
@@ -229,7 +229,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                     </>
                   ) : (
                     <div className="text-center py-20">
-                      <p className="text-[16px] text-[#706E6A] font-medium italic">{searchNoResults} &quot;{searchQuery}&quot;</p>
+                      <p className="text-[16px] text-[#5F5D59] font-medium italic">{searchNoResults} &quot;{searchQuery}&quot;</p>
                     </div>
                   )}
                 </div>
@@ -244,7 +244,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                         ))}
                       </div>
                     ) : (
-                      <p className="text-[13px] text-[#706E6A] font-medium italic">{searchCollectionsUnavailable}</p>
+                      <p className="text-[13px] text-[#5F5D59] font-medium italic">{searchCollectionsUnavailable}</p>
                     )}
                   </div>
 
@@ -262,16 +262,15 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                         ))}
                       </div>
                     ) : (
-                      <p className="text-[13px] text-[#706E6A] font-medium italic">recommendations unavailable</p>
+                      <p className="text-[13px] text-[#5F5D59] font-medium italic">recommendations unavailable</p>
                     )}
                   </div>
                 </div>
               )}
             </div>
           </motion.div>
-        </>
+        </React.Fragment>
       )}
-      <style dangerouslySetInnerHTML={{ __html: `.no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }`}} />
     </AnimatePresence>
   );
 };

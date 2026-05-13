@@ -31,9 +31,10 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
   return (
     <AnimatePresence>
       {isOpen && (
-        <>
+        <React.Fragment key="cart-drawer">
           {/* Overlay */}
           <motion.div 
+            key="cart-drawer-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -44,6 +45,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
           
           {/* Drawer */}
           <motion.div 
+            key="cart-drawer-panel"
             initial={shouldReduceMotion ? { opacity: 0 } : { x: lang === 'ar' ? '-100%' : '100%' }}
             animate={shouldReduceMotion ? { opacity: 1 } : { x: 0 }}
             exit={shouldReduceMotion ? { opacity: 0 } : { x: lang === 'ar' ? '-100%' : '100%' }}
@@ -118,7 +120,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                               <h3 className="text-[14px] font-[900] text-[#333] tracking-wider uppercase">
                                 {item.title}
                               </h3>
-                              <p className="text-[13px] text-[#706E6A] font-medium">
+                              <p className="text-[13px] text-[#5F5D59] font-medium">
                                 {item.category}
                               </p>
                             </div>
@@ -132,7 +134,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                             <div className="flex items-center gap-3">
                               <button
                                 onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                               className={`w-8 h-8 flex items-center justify-center border border-[#C9C6BF] rounded-full hover:border-black transition-colors ${CONTROL_FOCUS_CLASS}`}
+                                className={`w-8 h-8 flex items-center justify-center border border-[#C9C6BF] rounded-full hover:border-black transition-colors ${CONTROL_FOCUS_CLASS}`}
                                 aria-label={lang === 'en' ? `Decrease quantity of ${item.title}` : `تقليل كمية ${item.title}`}
                               >
                                 <Minus size={14} />
@@ -140,8 +142,8 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                               <span className="text-[14px] font-medium w-8 text-center">{item.quantity}</span>
                               <button
                                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                 className={`w-8 h-8 flex items-center justify-center border border-[#C9C6BF] rounded-full hover:border-black transition-colors ${CONTROL_FOCUS_CLASS}`}
-                                  aria-label={lang === 'en' ? `Increase quantity of ${item.title}` : `زيادة كمية ${item.title}`}
+                                className={`w-8 h-8 flex items-center justify-center border border-[#C9C6BF] rounded-full hover:border-black transition-colors ${CONTROL_FOCUS_CLASS}`}
+                                aria-label={lang === 'en' ? `Increase quantity of ${item.title}` : `زيادة كمية ${item.title}`}
                               >
                                 <Plus size={14} />
                               </button>
@@ -188,7 +190,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
               </div>
             )}
           </motion.div>
-        </>
+        </React.Fragment>
       )}
     </AnimatePresence>
   );

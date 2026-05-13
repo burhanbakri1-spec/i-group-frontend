@@ -68,25 +68,13 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang }) => {
             {/* Button Styling */}
             <div className="flex flex-wrap gap-4">
               <motion.button 
-                className="border-2 border-[#222] rounded-full px-12 py-4 text-[11px] font-[900] tracking-[0.15em] uppercase text-[#222] hover:bg-[#222] hover:text-white transition-all duration-300 cursor-pointer relative overflow-hidden group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
+                className="border-2 border-[#222] rounded-full px-12 py-4 text-[11px] font-[900] tracking-[0.15em] uppercase text-[#222] transition-all duration-200 ease-out cursor-pointer hover:bg-[#222] hover:text-white hover:shadow-lg hover:scale-[1.02] active:scale-[0.99] motion-reduce:hover:scale-100 motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
                 initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
                 whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.18, duration: 0.35 }}
-                whileHover={{ 
-                  boxShadow: "0 8px 22px rgba(0,0,0,0.1)"
-                }}
-                whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
               >
-                <motion.span
-                  className="absolute inset-0 bg-[#222]"
-                  initial={{ x: "-100%" }}
-                  whileHover={{ x: 0 }}
-                  transition={{ duration: 0.25 }}
-                />
-                <span className="relative z-10 group-hover:text-white">
-                  {lang === 'en' ? promoCtaLabel : 'بوكيت بلاش'}
-                </span>
+                <span>{lang === 'en' ? promoCtaLabel : 'بوكيت بلاش'}</span>
               </motion.button>
             </div>
           </motion.div>

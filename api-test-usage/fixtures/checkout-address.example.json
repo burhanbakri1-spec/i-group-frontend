@@ -7,7 +7,7 @@
   "shippingCity": "Cairo",
   "shippingState": "Cairo Governorate",
   "shippingPostalCode": "11511",
-  "shippingCountry": "Egypt",
+  "shippingCountry": "Palestine",
   "billingSameAsShipping": true,
   "notes": "Safe API verification order. Create only when API_TEST_ALLOW_ORDER_CREATE=true."
 }

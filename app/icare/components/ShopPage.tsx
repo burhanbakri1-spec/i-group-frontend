@@ -288,8 +288,8 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
       </div>
 
       {/* Toolbar */}
-      <div className="max-w-[1600px] mx-auto px-4 md:px-6 py-4 md:py-5 flex justify-between items-center border border-black/10 mb-8 md:mb-10 md:sticky md:top-3 bg-[#FFFFFF]/90 backdrop-blur-md z-40 rounded-2xl shadow-sm shadow-black/5">
-        <div className="relative">
+      <div className={`max-w-[1600px] mx-auto px-4 md:px-6 py-4 md:py-5 flex justify-between items-center border border-black/10 mb-8 md:mb-10 md:sticky md:top-3 bg-[#FFFFFF]/90 backdrop-blur-md rounded-2xl shadow-sm shadow-black/5 ${isSortOpen ? 'z-[65]' : 'z-40'}`}>
+        <div className="relative z-[66]">
           <button type="button" className={`flex items-center gap-2 cursor-pointer group ${CONTROL_FOCUS_CLASS}`} onClick={() => setIsSortOpen(!isSortOpen)} aria-expanded={isSortOpen}>
             <span className="text-[14px] text-black/65 lowercase font-medium">{shopSortLabel}</span>
             <span className="text-[14px] text-black font-black lowercase">{activeSort}</span>
@@ -302,7 +302,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 6 }}
                 transition={{ duration: 0.18 }}
-                className="absolute left-0 mt-4 w-56 bg-white rounded-[16px] shadow-2xl z-50 py-3 border border-black/5"
+                className="absolute left-0 mt-4 w-56 bg-white rounded-[16px] shadow-2xl z-[66] py-3 border border-black/5"
               >
                 {SORT_OPTIONS.map((opt) => (
                   <button
@@ -356,8 +356,6 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
           </div>
         )}
       </div>
-
-      <style dangerouslySetInnerHTML={{ __html: `.no-scrollbar::-webkit-scrollbar { display: none; }` }} />
     </div>
   );
 };
