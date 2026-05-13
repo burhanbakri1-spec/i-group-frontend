@@ -22,7 +22,7 @@ const CONTROL_FOCUS_CLASS =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 const INPUT_FOCUS_CLASS =
   'focus-visible:outline-none focus-visible:border-blue-700 focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
-const DEFAULT_CENTER: [number, number] = [30.0444, 31.2357];
+const DEFAULT_CENTER: [number, number] = [0, 0];
 
 const NOMINATIM_BASE = 'https://nominatim.openstreetmap.org';
 
@@ -883,7 +883,7 @@ export default function MapAddressPicker({
       <div className={MAP_FRAME_CLASS}>
         <MapContainer
           center={mapCenter}
-          zoom={markerPos ? 15 : 12}
+          zoom={markerPos ? 15 : 2}
           scrollWheelZoom={!readOnly}
           dragging={!readOnly}
           zoomControl={true}
