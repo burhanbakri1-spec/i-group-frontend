@@ -36,6 +36,12 @@ const IP_SERVICES = [
   'https://ipapi.co/json/',
 ];
 
+// Tile layers — street + satellite (ESRI, free, no key)
+const TILES_STREET = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+const TILES_SATELLITE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+const TILES_ATTRIB_STREET = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+const TILES_ATTRIB_SAT = '&copy; <a href="https://www.esri.com/">Esri</a>';
+
 // Fix Leaflet marker icon for Next.js/webpack — use CDN URLs
 const MARKER_ICON = L.icon({
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
@@ -79,6 +85,8 @@ const mapLabels: Record<
     googleMapsPlaceholder: string;
     googleMapsSet: string;
     googleMapsParsed: string;
+    mapLayer: string;
+    satelliteLayer: string;
   }
 > = {
   en: {
@@ -103,6 +111,8 @@ const mapLabels: Record<
     googleMapsPlaceholder: 'Paste link or paste coordinates like 30.0444,31.2357…',
     googleMapsSet: 'Set Location',
     googleMapsParsed: 'Parsed location: ',
+    mapLayer: 'Map',
+    satelliteLayer: 'Satellite',
     locationUnavailable: 'Could not determine your location. Please search for your area.',
     noResults: 'No results found. Try a different search term.',
     resolvingAddress: 'Resolving address…',
@@ -134,6 +144,8 @@ const mapLabels: Record<
     googleMapsPlaceholder: 'الصق الرابط أو الإحداثيات مثل 30.0444,31.2357…',
     googleMapsSet: 'تحديد الموقع',
     googleMapsParsed: 'الموقع المستخرج: ',
+    mapLayer: 'خريطة',
+    satelliteLayer: 'قمر صناعي',
   },
 };
 
@@ -266,6 +278,7 @@ export default function MapAddressPicker({
   const [resolvingAddress, setResolvingAddress] = useState(false);
   const [panTrigger, setPanTrigger] = useState(0);
   const [tileLayerFailed, setTileLayerFailed] = useState(false);
+  const [satelliteView, setSatelliteView] = useState(false);
 
   // Google Maps paste flow
   const [googleMapsOpen, setGoogleMapsOpen] = useState(false);
@@ -849,6 +862,23 @@ export default function MapAddressPicker({
         </div>
       )}
 
+      {/* ── Layer toggle ── */}
+      {!readOnly && (
+        <div className="mb-2 flex justify-end">
+          <button
+            type="button"
+            onClick={() => setSatelliteView(!satelliteView)}
+            className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+              satelliteView
+                ? 'bg-blue-700 text-white border-blue-700'
+                : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
+            } ${CONTROL_FOCUS_CLASS}`}
+          >
+            {satelliteView ? labels.satelliteLayer : labels.mapLayer}
+          </button>
+        </div>
+      )}
+
       {/* ── Map ── */}
       <div className={MAP_FRAME_CLASS}>
         <MapContainer
@@ -863,17 +893,17 @@ export default function MapAddressPicker({
           style={{ width: '100%', height: '100%' }}
         >
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url={tileLayerFailed
-              ? 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-              : 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png'
-            }
+            attribution={satelliteView ? TILES_ATTRIB_SAT : TILES_ATTRIB_STREET}
+            url={satelliteView ? TILES_SATELLITE : TILES_STREET}
             eventHandlers={{
               tileerror: () => {
-                if (!tileLayerFailed) {
-                  setTileLayerFailed(true);
-                } else {
+                if (satelliteView) {
+                  // Satellite tiles failed → silently fall back to street
+                  setSatelliteView(false);
+                } else if (tileLayerFailed) {
                   setMapError(true);
+                } else {
+                  setTileLayerFailed(true);
                 }
               },
             }}
