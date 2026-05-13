@@ -15,6 +15,8 @@ import { Language } from '../translations';
 // --- Constants ---
 const MAP_FRAME_CLASS =
   'w-full h-64 md:h-80 rounded-lg overflow-hidden border border-gray-300';
+const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+const INPUT_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:border-blue-700 focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 const CAIRO_CENTER: [number, number] = [30.0444, 31.2357];
 const TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
@@ -112,7 +114,8 @@ function MapFlyController({
 
   useEffect(() => {
     if (triggerPan > 0 && position) {
-      map.flyTo(position, 15, { duration: 1 });
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      map.flyTo(position, 15, { duration: prefersReducedMotion ? 0 : 0.35 });
     }
   }, [triggerPan]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -331,7 +334,7 @@ export default function MapAddressPicker({
         aria-label={labels.ariaLabel}
         aria-busy="true"
       >
-        <div className="w-full h-full bg-gray-100 animate-pulse flex items-center justify-center text-gray-400 text-sm">
+        <div className="w-full h-full bg-gray-100 animate-pulse motion-reduce:animate-none flex items-center justify-center text-gray-600 text-sm">
           {labels.loadingText}
         </div>
       </div>
@@ -356,13 +359,13 @@ export default function MapAddressPicker({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={handleSearchKeyDown}
-            className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className={`flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-600 transition-[border-color,box-shadow] duration-200 ${INPUT_FOCUS_CLASS}`}
             dir={lang === 'ar' ? 'rtl' : 'ltr'}
           />
           <button
             type="button"
             onClick={handleSearch}
-            className="px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors whitespace-nowrap"
+            className={`px-4 py-2.5 bg-blue-700 text-white rounded-lg text-sm hover:bg-blue-800 transition-colors whitespace-nowrap ${CONTROL_FOCUS_CLASS}`}
           >
             {labels.searchButton}
           </button>
@@ -371,18 +374,18 @@ export default function MapAddressPicker({
 
       {/* ── Location status banners ── */}
       {autoLocating && (
-        <div className="mb-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700 flex items-center gap-2">
+        <div className="mb-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800 flex items-center gap-2">
           <span className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin inline-block" />
           {labels.locatingText}
         </div>
       )}
       {autoLocated && (
-        <div className="mb-2 px-3 py-2 bg-green-50 border border-green-200 rounded text-xs text-green-700">
+        <div className="mb-2 px-3 py-2 bg-green-50 border border-green-200 rounded text-xs text-green-800">
           {labels.autoLocated} ✓
         </div>
       )}
       {locationDenied && !autoLocating && (
-        <div className="mb-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded text-xs text-amber-700">
+        <div className="mb-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded text-xs text-amber-800">
           {labels.locationDenied}
         </div>
       )}
