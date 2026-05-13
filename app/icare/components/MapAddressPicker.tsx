@@ -554,9 +554,16 @@ export default function MapAddressPicker({
   // ═════════════════════════════════════════════════════════════════════════════
 
   const handleGoogleMapsOpen = useCallback(() => {
-    window.open('https://www.google.com/maps/@?api=1&map_action=pano', '_blank');
+    // Open Google Maps centered on current pin, or let Google Maps detect the user
+    const currentLat = markerPos?.[0];
+    const currentLng = markerPos?.[1];
+    const url =
+      currentLat != null && currentLng != null
+        ? `https://www.google.com/maps?q=${currentLat},${currentLng}`
+        : 'https://www.google.com/maps';
+    window.open(url, '_blank');
     setGoogleMapsOpen(true);
-  }, []);
+  }, [markerPos]);
 
   const handleGoogleMapsPaste = useCallback(() => {
     setGoogleMapsError(null);
