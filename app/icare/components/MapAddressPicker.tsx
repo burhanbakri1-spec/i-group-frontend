@@ -22,13 +22,11 @@ const CONTROL_FOCUS_CLASS =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 const INPUT_FOCUS_CLASS =
   'focus-visible:outline-none focus-visible:border-blue-700 focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
-const CAIRO_CENTER: [number, number] = [30.0444, 31.2357];
+const DEFAULT_CENTER: [number, number] = [30.0444, 31.2357];
 
-// Egypt country bias for all location services
-const COUNTRY_CODES = 'eg';
 const NOMINATIM_BASE = 'https://nominatim.openstreetmap.org';
 
-// GPS timeout — increased for Egypt where GPS can be slow
+// GPS timeout
 const GPS_TIMEOUT = 15000;
 
 // IP geolocation fallback (free, 1000 req/day)
@@ -220,7 +218,7 @@ export default function MapAddressPicker({
   const hasInitialPos = initialLat != null && initialLng != null;
   const initialPos: [number, number] = hasInitialPos
     ? [initialLat!, initialLng!]
-    : CAIRO_CENTER;
+    : DEFAULT_CENTER;
 
   // ── State ──
   const [markerPos, setMarkerPos] = useState<[number, number] | null>(
@@ -265,7 +263,7 @@ export default function MapAddressPicker({
   }, [onLocationSelect]);
 
   // ═════════════════════════════════════════════════════════════════════════════
-  //  AUTO-LOCATE — with GPS → IP fallback for Egypt
+  //  AUTO-LOCATE — with GPS → IP fallback
   // ═════════════════════════════════════════════════════════════════════════════
 
   const attemptGPSLocate = useCallback(() => {
@@ -388,7 +386,7 @@ export default function MapAddressPicker({
   }, [lang]);
 
   // ═════════════════════════════════════════════════════════════════════════════
-  //  ADDRESS SEARCH (forward geocoding with Egypt bias)
+  //  ADDRESS SEARCH (forward geocoding)
   // ═════════════════════════════════════════════════════════════════════════════
 
   const handleSearch = useCallback(async () => {
@@ -399,7 +397,7 @@ export default function MapAddressPicker({
     setSearchError(null);
 
     try {
-      const url = `${NOMINATIM_BASE}/search?format=json&q=${encodeURIComponent(query)}&limit=3&countrycodes=${COUNTRY_CODES}&accept-language=${lang === 'ar' ? 'ar' : 'en'}`;
+      const url = `${NOMINATIM_BASE}/search?format=json&q=${encodeURIComponent(query)}&limit=3&accept-language=${lang === 'ar' ? 'ar' : 'en'}`;
       const res = await fetch(url);
       if (!res.ok) throw new Error('Search failed');
 
