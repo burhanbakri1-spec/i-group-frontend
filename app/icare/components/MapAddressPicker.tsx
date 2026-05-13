@@ -26,8 +26,8 @@ const DEFAULT_CENTER: [number, number] = [30.0444, 31.2357];
 
 const NOMINATIM_BASE = 'https://nominatim.openstreetmap.org';
 
-// GPS timeout
-const GPS_TIMEOUT = 15000;
+// GPS watch window — collect readings for this many ms, pick the best
+const GPS_WATCH_DURATION = 15000;
 
 // IP geolocation fallback (free, 1000 req/day)
 const IP_GEO_URL = 'https://ipapi.co/json/';
@@ -212,7 +212,9 @@ export default function MapAddressPicker({
   const isCancelledRef = useRef(false);
   const onLocationSelectRef = useRef(onLocationSelect);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const gpsWatchIdRef = useRef<number | null>(null);
   const gpsSlowTimerRef = useRef<number | null>(null);
+  const gpsHardTimerRef = useRef<number | null>(null);
 
   // ── Derived ──
   const hasInitialPos = initialLat != null && initialLng != null;
@@ -263,8 +265,14 @@ export default function MapAddressPicker({
   }, [onLocationSelect]);
 
   // ═════════════════════════════════════════════════════════════════════════════
-  //  AUTO-LOCATE — with GPS → IP fallback
+  //  AUTO-LOCATE — watchPosition → collect best reading, then IP fallback
   // ═════════════════════════════════════════════════════════════════════════════
+  //
+  //  Why watchPosition instead of getCurrentPosition:
+  //  - getCurrentPosition returns the FIRST reading (often cached, inaccurate)
+  //  - watchPosition fires continuously — accuracy improves over 5-15 seconds
+  //  - We pick the BEST reading by accuracy, not the first one
+  //  - Same browser permission prompt — user only asked once
 
   const attemptGPSLocate = useCallback(() => {
     if (!navigator.geolocation) {
@@ -272,44 +280,83 @@ export default function MapAddressPicker({
       return;
     }
 
+    let bestPos: [number, number] | null = null;
+    let bestAccuracy = Infinity;
+    let gotReading = false;
+
     setLocateState('locating-gps');
     setLocateSource('gps');
 
-    // Show "GPS slow" message after 6 seconds
+    // "GPS taking longer" banner after 6 seconds
     gpsSlowTimerRef.current = window.setTimeout(() => {
-      setLocateState('gps-slow');
+      if (!gotReading) setLocateState('gps-slow');
     }, 6000);
 
-    navigator.geolocation.getCurrentPosition(
+    // Hard timeout — give up GPS and try IP after GPS_WATCH_DURATION
+    gpsHardTimerRef.current = window.setTimeout(() => {
+      if (gpsWatchIdRef.current != null) {
+        navigator.geolocation.clearWatch(gpsWatchIdRef.current);
+        gpsWatchIdRef.current = null;
+      }
+      if (bestPos) {
+        applyPosition(bestPos, 'gps');
+      } else {
+        attemptIPLocate();
+      }
+    }, GPS_WATCH_DURATION);
+
+    gpsWatchIdRef.current = navigator.geolocation.watchPosition(
       (position) => {
         if (isCancelledRef.current) return;
-        if (gpsSlowTimerRef.current) window.clearTimeout(gpsSlowTimerRef.current);
+        gotReading = true;
+
+        const acc = position.coords.accuracy;
         const pos: [number, number] = [
           position.coords.latitude,
           position.coords.longitude,
         ];
-        setMapCenter(pos);
-        setMarkerPos(pos);
-        setLocateState('found');
-        setLocateSource('gps');
-        setPanTrigger((prev) => prev + 1);
-        onLocationSelectRef.current(pos[0], pos[1]);
-        resolveAddress(pos[0], pos[1]);
+
+        // Track the best reading
+        if (acc < bestAccuracy) {
+          bestAccuracy = acc;
+          bestPos = pos;
+        }
+
+        // If we got a really good reading (< 50m), accept immediately
+        if (bestAccuracy < 50 && bestPos) {
+          if (gpsWatchIdRef.current != null) {
+            navigator.geolocation.clearWatch(gpsWatchIdRef.current);
+            gpsWatchIdRef.current = null;
+          }
+          if (gpsSlowTimerRef.current) window.clearTimeout(gpsSlowTimerRef.current);
+          if (gpsHardTimerRef.current) window.clearTimeout(gpsHardTimerRef.current);
+          applyPosition(bestPos, 'gps');
+        }
       },
       (err) => {
         if (isCancelledRef.current) return;
         if (gpsSlowTimerRef.current) window.clearTimeout(gpsSlowTimerRef.current);
+        if (gpsHardTimerRef.current) window.clearTimeout(gpsHardTimerRef.current);
 
         if (err.code === err.PERMISSION_DENIED) {
           setLocateState('denied');
           setLocateSource('none');
         } else {
-          // POSITION_UNAVAILABLE or TIMEOUT — try IP fallback
           attemptIPLocate();
         }
       },
-      { enableHighAccuracy: true, timeout: GPS_TIMEOUT, maximumAge: 300000 },
+      { enableHighAccuracy: true, timeout: GPS_WATCH_DURATION + 5000, maximumAge: 0 },
     );
+  }, []);
+
+  const applyPosition = useCallback((pos: [number, number], source: LocateSource) => {
+    setMapCenter(pos);
+    setMarkerPos(pos);
+    setLocateState('found');
+    setLocateSource(source);
+    setPanTrigger((prev) => prev + 1);
+    onLocationSelectRef.current(pos[0], pos[1]);
+    resolveAddress(pos[0], pos[1]);
   }, []);
 
   const attemptIPLocate = useCallback(async () => {
@@ -339,6 +386,14 @@ export default function MapAddressPicker({
   }, []);
 
   const handleLocateMe = useCallback(() => {
+    // Clean up any existing watch
+    if (gpsWatchIdRef.current != null) {
+      navigator.geolocation.clearWatch(gpsWatchIdRef.current);
+      gpsWatchIdRef.current = null;
+    }
+    if (gpsSlowTimerRef.current) window.clearTimeout(gpsSlowTimerRef.current);
+    if (gpsHardTimerRef.current) window.clearTimeout(gpsHardTimerRef.current);
+    
     setLocateState('idle');
     setLocateSource('none');
     isCancelledRef.current = false;
@@ -358,7 +413,12 @@ export default function MapAddressPicker({
 
     return () => {
       isCancelledRef.current = true;
+      if (gpsWatchIdRef.current != null) {
+        navigator.geolocation.clearWatch(gpsWatchIdRef.current);
+        gpsWatchIdRef.current = null;
+      }
       if (gpsSlowTimerRef.current) window.clearTimeout(gpsSlowTimerRef.current);
+      if (gpsHardTimerRef.current) window.clearTimeout(gpsHardTimerRef.current);
     };
   }, [mounted]); // eslint-disable-line react-hooks/exhaustive-deps
 
