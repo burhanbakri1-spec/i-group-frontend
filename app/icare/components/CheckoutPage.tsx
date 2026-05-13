@@ -68,7 +68,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
     address: user?.address ?? '',
     city: user?.city ?? '',
     postalCode: '',
-    country: user?.country ?? 'Palestine',
+    country: user?.country ?? '',
   });
   const shouldReduceMotion = useReducedMotion();
 
@@ -219,7 +219,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
       shippingAddress: shippingForm.address,
       shippingCity: shippingForm.city,
       shippingPostalCode: shippingForm.postalCode,
-      shippingCountry: shippingForm.country || 'Palestine',
+      shippingCountry: shippingForm.country,
       billingSameAsShipping: true,
     };
 
