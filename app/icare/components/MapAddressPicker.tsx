@@ -26,11 +26,15 @@ const DEFAULT_CENTER: [number, number] = [30.0444, 31.2357];
 
 const NOMINATIM_BASE = 'https://nominatim.openstreetmap.org';
 
-// GPS watch window — collect readings for this many ms, pick the best
-const GPS_WATCH_DURATION = 15000;
+// GPS — try high-accuracy (phone) first, then low-accuracy (desktop WiFi positioning)
+const GPS_TRY_DURATION = 5000;
+const WIFI_TRY_DURATION = 8000;
 
-// IP geolocation fallback (free, 1000 req/day)
-const IP_GEO_URL = 'https://ipapi.co/json/';
+// IP geolocation — try multiple services
+const IP_SERVICES = [
+  'https://ipinfo.io/json',
+  'https://ipapi.co/json/',
+];
 
 // Fix Leaflet marker icon for Next.js/webpack — use CDN URLs
 const MARKER_ICON = L.icon({
@@ -59,6 +63,8 @@ const mapLabels: Record<
     gpsLocating: string;
     gpsFound: string;
     gpsSlow: string;
+    wifiLocating: string;
+    wifiFound: string;
     ipLocating: string;
     ipFound: string;
     ipWarning: string;
@@ -85,6 +91,8 @@ const mapLabels: Record<
     gpsLocating: 'Detecting your precise location via GPS…',
     gpsFound: 'Location found via GPS',
     gpsSlow: 'GPS is taking longer than expected…',
+    wifiLocating: 'Locating via WiFi networks…',
+    wifiFound: 'Location found via WiFi positioning',
     ipLocating: 'Approximating your location from your network…',
     ipFound: 'Location approximated from your network',
     ipWarning: '⚠️ Approximate location. Drag the pin or search for better accuracy.',
@@ -110,6 +118,8 @@ const mapLabels: Record<
     gpsLocating: 'جاري تحديد موقعك الدقيق عبر GPS…',
     gpsFound: 'تم تحديد الموقع عبر GPS',
     gpsSlow: 'GPS يستغرق وقتاً أطول من المتوقع…',
+    wifiLocating: 'جاري تحديد الموقع عبر شبكات WiFi…',
+    wifiFound: 'تم تحديد الموقع عبر شبكات WiFi',
     ipLocating: 'جاري تقريب موقعك من الشبكة…',
     ipFound: 'تم تقريب الموقع من الشبكة',
     ipWarning: '⚠️ موقع تقريبي. اسحب العلامة أو ابحث للحصول على دقة أفضل.',
@@ -231,8 +241,6 @@ export default function MapAddressPicker({
   const onLocationSelectRef = useRef(onLocationSelect);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const gpsWatchIdRef = useRef<number | null>(null);
-  const gpsSlowTimerRef = useRef<number | null>(null);
-  const gpsHardTimerRef = useRef<number | null>(null);
 
   // ── Derived ──
   const hasInitialPos = initialLat != null && initialLng != null;
@@ -248,7 +256,7 @@ export default function MapAddressPicker({
   const [mounted, setMounted] = useState(false);
   const [mapError, setMapError] = useState(false);
   const [locateState, setLocateState] = useState<
-    'idle' | 'locating-gps' | 'gps-slow' | 'locating-ip' | 'found' | 'denied' | 'failed'
+    'idle' | 'locating-gps' | 'locating-wifi' | 'locating-ip' | 'found' | 'denied' | 'failed'
   >('idle');
   const [locateSource, setLocateSource] = useState<LocateSource>('none');
   const [searchQuery, setSearchQuery] = useState('');
@@ -288,16 +296,14 @@ export default function MapAddressPicker({
   }, [onLocationSelect]);
 
   // ═════════════════════════════════════════════════════════════════════════════
-  //  AUTO-LOCATE — watchPosition → collect best reading, then IP fallback
+  //  AUTO-LOCATE — two-phase: GPS (phones) → WiFi (desktops) → IP (fallback)
   // ═════════════════════════════════════════════════════════════════════════════
   //
-  //  Why watchPosition instead of getCurrentPosition:
-  //  - getCurrentPosition returns the FIRST reading (often cached, inaccurate)
-  //  - watchPosition fires continuously — accuracy improves over 5-15 seconds
-  //  - We pick the BEST reading by accuracy, not the first one
-  //  - Same browser permission prompt — user only asked once
+  //  Phones have dedicated GPS chips → fast, accurate
+  //  Desktops have no GPS → rely on WiFi positioning (Google's WiFi DB)
+  //  We try GPS first (fast on phones), then WiFi (desktops), then IP (last resort)
 
-  const attemptGPSLocate = useCallback(() => {
+  const attemptLocate = useCallback((phase: 'gps' | 'wifi') => {
     if (!navigator.geolocation) {
       attemptIPLocate();
       return;
@@ -307,26 +313,27 @@ export default function MapAddressPicker({
     let bestAccuracy = Infinity;
     let gotReading = false;
 
-    setLocateState('locating-gps');
+    const isGps = phase === 'gps';
+    setLocateState(isGps ? 'locating-gps' : 'locating-wifi');
     setLocateSource('gps');
 
-    // "GPS taking longer" banner after 6 seconds
-    gpsSlowTimerRef.current = window.setTimeout(() => {
-      if (!gotReading) setLocateState('gps-slow');
-    }, 6000);
+    const duration = isGps ? GPS_TRY_DURATION : WIFI_TRY_DURATION;
 
-    // Hard timeout — give up GPS and try IP after GPS_WATCH_DURATION
-    gpsHardTimerRef.current = window.setTimeout(() => {
+    const settleTimer = window.setTimeout(() => {
       if (gpsWatchIdRef.current != null) {
         navigator.geolocation.clearWatch(gpsWatchIdRef.current);
         gpsWatchIdRef.current = null;
       }
       if (bestPos) {
         applyPosition(bestPos, 'gps');
+      } else if (isGps) {
+        // GPS gave nothing → try WiFi positioning
+        attemptLocate('wifi');
       } else {
+        // WiFi also gave nothing → try IP
         attemptIPLocate();
       }
-    }, GPS_WATCH_DURATION);
+    }, duration);
 
     gpsWatchIdRef.current = navigator.geolocation.watchPosition(
       (position) => {
@@ -339,36 +346,40 @@ export default function MapAddressPicker({
           position.coords.longitude,
         ];
 
-        // Track the best reading
         if (acc < bestAccuracy) {
           bestAccuracy = acc;
           bestPos = pos;
         }
 
-        // If we got a really good reading (< 50m), accept immediately
-        if (bestAccuracy < 50 && bestPos) {
+        // Good reading (< 50m GPS or < 200m WiFi) → accept immediately
+        const goodEnough = isGps ? bestAccuracy < 50 : bestAccuracy < 200;
+        if (goodEnough && bestPos) {
           if (gpsWatchIdRef.current != null) {
             navigator.geolocation.clearWatch(gpsWatchIdRef.current);
             gpsWatchIdRef.current = null;
           }
-          if (gpsSlowTimerRef.current) window.clearTimeout(gpsSlowTimerRef.current);
-          if (gpsHardTimerRef.current) window.clearTimeout(gpsHardTimerRef.current);
+          window.clearTimeout(settleTimer);
           applyPosition(bestPos, 'gps');
         }
       },
       (err) => {
         if (isCancelledRef.current) return;
-        if (gpsSlowTimerRef.current) window.clearTimeout(gpsSlowTimerRef.current);
-        if (gpsHardTimerRef.current) window.clearTimeout(gpsHardTimerRef.current);
+        window.clearTimeout(settleTimer);
 
         if (err.code === err.PERMISSION_DENIED) {
           setLocateState('denied');
           setLocateSource('none');
+        } else if (isGps) {
+          attemptLocate('wifi');
         } else {
           attemptIPLocate();
         }
       },
-      { enableHighAccuracy: true, timeout: GPS_WATCH_DURATION + 5000, maximumAge: 0 },
+      {
+        enableHighAccuracy: isGps,
+        timeout: duration + 2000,
+        maximumAge: 0,
+      },
     );
   }, []);
 
@@ -386,26 +397,29 @@ export default function MapAddressPicker({
     setLocateState('locating-ip');
     setLocateSource('ip');
 
-    try {
-      const res = await fetch(IP_GEO_URL);
-      if (!res.ok) throw new Error('IP geolocation failed');
-      const data = await res.json();
-
-      if (data.latitude && data.longitude) {
-        const pos: [number, number] = [data.latitude, data.longitude];
-        setMapCenter(pos);
-        setMarkerPos(pos);
-        setLocateState('found');
-        setLocateSource('ip');
-        setPanTrigger((prev) => prev + 1);
-        onLocationSelectRef.current(pos[0], pos[1]);
-        resolveAddress(pos[0], pos[1]);
-      } else {
-        setLocateState('failed');
+    for (const url of IP_SERVICES) {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) continue;
+        const data = await res.json();
+        const lat = data.lat ?? data.latitude;
+        const lng = data.lon ?? data.longitude ?? data.lng;
+        if (lat && lng) {
+          const pos: [number, number] = [lat, lng];
+          setMapCenter(pos);
+          setMarkerPos(pos);
+          setLocateState('found');
+          setLocateSource('ip');
+          setPanTrigger((prev) => prev + 1);
+          onLocationSelectRef.current(pos[0], pos[1]);
+          resolveAddress(pos[0], pos[1]);
+          return;
+        }
+      } catch {
+        continue;
       }
-    } catch {
-      setLocateState('failed');
     }
+    setLocateState('failed');
   }, []);
 
   const handleLocateMe = useCallback(() => {
@@ -414,15 +428,13 @@ export default function MapAddressPicker({
       navigator.geolocation.clearWatch(gpsWatchIdRef.current);
       gpsWatchIdRef.current = null;
     }
-    if (gpsSlowTimerRef.current) window.clearTimeout(gpsSlowTimerRef.current);
-    if (gpsHardTimerRef.current) window.clearTimeout(gpsHardTimerRef.current);
-    
+
     setLocateState('idle');
     setLocateSource('none');
     isCancelledRef.current = false;
     autoLocateCalledRef.current = false;
-    attemptGPSLocate();
-  }, [attemptGPSLocate]);
+    attemptLocate('gps');
+  }, [attemptLocate]);
 
   // ── Auto-locate on mount ──
   useEffect(() => {
@@ -432,7 +444,7 @@ export default function MapAddressPicker({
 
     autoLocateCalledRef.current = true;
     isCancelledRef.current = false;
-    attemptGPSLocate();
+    attemptLocate('gps');
 
     return () => {
       isCancelledRef.current = true;
@@ -440,8 +452,6 @@ export default function MapAddressPicker({
         navigator.geolocation.clearWatch(gpsWatchIdRef.current);
         gpsWatchIdRef.current = null;
       }
-      if (gpsSlowTimerRef.current) window.clearTimeout(gpsSlowTimerRef.current);
-      if (gpsHardTimerRef.current) window.clearTimeout(gpsHardTimerRef.current);
     };
   }, [mounted]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -661,11 +671,11 @@ export default function MapAddressPicker({
             {labels.gpsLocating}
           </div>
         );
-      case 'gps-slow':
+      case 'locating-wifi':
         return (
-          <div className="mb-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800 flex items-center gap-2">
-            <span className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin inline-block shrink-0" />
-            {labels.gpsSlow}
+          <div className="mb-2 px-3 py-2 bg-purple-50 border border-purple-200 rounded text-xs text-purple-800 flex items-center gap-2">
+            <span className="w-3 h-3 border-2 border-purple-500 border-t-transparent rounded-full animate-spin inline-block shrink-0" />
+            {labels.wifiLocating}
           </div>
         );
       case 'locating-ip':
@@ -759,7 +769,7 @@ export default function MapAddressPicker({
           <button
             type="button"
             onClick={handleLocateMe}
-            disabled={locateState === 'locating-gps' || locateState === 'locating-ip' || locateState === 'gps-slow'}
+            disabled={locateState === 'locating-gps' || locateState === 'locating-wifi' || locateState === 'locating-ip'}
             className={`w-full px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${CONTROL_FOCUS_CLASS}`}
           >
             {labels.locateButton}
