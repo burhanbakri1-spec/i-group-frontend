@@ -116,6 +116,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                     selectedAddress={checkout.selectedAddress}
                     onSelectSavedAddress={checkout.selectSavedAddress}
                     checkoutShippingHeading={siteContent.checkoutShippingHeading}
+                    cartItems={checkout.cartItems}
                   />
                 )}
 

@@ -69,8 +69,8 @@ function readCheckoutState(): PersistedCheckoutState | null {
 function writeCheckoutState(state: Partial<PersistedCheckoutState>) {
   if (typeof window === 'undefined') return;
   try {
-    const existing = readCheckoutState() ?? ({} as PersistedCheckoutState);
-    const merged: PersistedCheckoutState = {
+    const existing = readCheckoutState() ?? {};
+    const defaultState: PersistedCheckoutState = {
       step: 1,
       paymentMethod: 'cod',
       shippingForm: {
@@ -90,8 +90,12 @@ function writeCheckoutState(state: Partial<PersistedCheckoutState>) {
       selectedAddressId: null,
       appliedCoupon: null,
       timestamp: Date.now(),
+    };
+    const merged: PersistedCheckoutState = {
+      ...defaultState,
       ...existing,
       ...state,
+      timestamp: Date.now(),
     };
     window.sessionStorage.setItem(CHECKOUT_STORAGE_KEY, JSON.stringify(merged));
   } catch {
@@ -145,7 +149,7 @@ export interface CheckoutState {
   fallbackOrderSummary: OrderSummary;
   displayOrderSummary: OrderSummary;
   /** Checkout structural translations for the current language */
-  ct: typeof checkoutTranslations.en;
+  ct: (typeof checkoutTranslations)[Language];
   /** Passthrough from ShopContext — needed by sub-components */
   cartItems: import('../types').CartItem[];
   isAuthenticated: boolean;
@@ -156,6 +160,7 @@ export interface CheckoutActions {
   nextStep: () => void;
   previousStep: () => void;
   setPaymentMethod: (method: 'card' | 'paypal' | 'cod') => void;
+  updateShippingField: (field: keyof ShippingFormData, value: string) => void;
   /** Update payment status after manual verification (e.g., callback page) */
   setPaymentStatus: (status: CheckoutState['paymentStatus']) => void;
   placeOrder: () => Promise<void>;

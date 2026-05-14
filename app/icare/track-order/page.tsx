@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { useSearchParams } from 'next/navigation';
-import { TrackOrderPage } from '../../components/TrackOrderPage';
-import { Language } from '../../translations';
+import { TrackOrderPage } from '../components/TrackOrderPage';
+import { Language } from '../translations';
 
 export default function TrackOrderRoutePage() {
   const [lang, setLang] = React.useState<Language>('en');
