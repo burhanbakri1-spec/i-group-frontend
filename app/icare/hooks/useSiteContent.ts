@@ -24,7 +24,14 @@ export const useSiteContent = () => {
 
       // ── Announcement ──
       announcementText: g.announcement_text,
-      freeShippingThreshold: Number(g.free_shipping_threshold ?? '45'),
+      freeShippingThreshold: (() => {
+        const raw = Number(g.free_shipping_threshold ?? '45');
+        if (!Number.isFinite(raw)) {
+          console.warn('[useSiteContent] free_shipping_threshold is non-numeric, defaulting to 999999');
+          return 999999;
+        }
+        return raw;
+      })(),
 
       // ── Home Hero ──
       heroHeadline: g.home_hero_headline,
@@ -122,9 +129,23 @@ export const useSiteContent = () => {
       checkoutHeading: g.checkout_heading,
       checkoutShippingHeading: g.checkout_shipping_heading,
       checkoutPlaceOrder: g.checkout_place_order,
-      checkoutTaxRate: Number(g.tax_rate ?? '0'),
+      checkoutTaxRate: (() => {
+        const raw = Number(g.tax_rate ?? '0');
+        if (!Number.isFinite(raw)) {
+          console.warn('[useSiteContent] tax_rate is non-numeric, defaulting to 0');
+          return 0;
+        }
+        return raw;
+      })(),
       shippingRates: g.shipping_rates ?? '[]',
-      defaultShippingCost: Number(g.default_shipping_cost ?? '0'),
+      defaultShippingCost: (() => {
+        const raw = Number(g.default_shipping_cost ?? '0');
+        if (!Number.isFinite(raw)) {
+          console.warn('[useSiteContent] default_shipping_cost is non-numeric, defaulting to 0');
+          return 0;
+        }
+        return raw;
+      })(),
       checkoutCardLabel: g.checkout_card_label,
       checkoutPaypalLabel: g.checkout_paypal_label,
       checkoutCodLabel: g.checkout_cod_label,
@@ -237,7 +258,7 @@ export const useSiteContent = () => {
       enableProductReviews: g.enable_product_reviews !== 'false',
       enableGuestCheckout: g.enable_guest_checkout !== 'false',
       defaultCountry: g.default_country,
-      currencyCode: g.currency_code,
+      currencyCode: g.currency_code && g.currency_code !== 'NaN' ? g.currency_code : 'EGP',
       itemsPerPage: Number(g.items_per_page ?? '12'),
     };
   }, [settings, contextSocialLinks]);

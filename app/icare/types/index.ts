@@ -521,6 +521,7 @@ export interface CreatedOrder {
   discount: number;
   total: number;
   shippingName?: string;
+  shippingEmail?: string;
   shippingAddress?: string;
   shippingCity?: string;
   shippingCountry?: string;
@@ -528,6 +529,8 @@ export interface CreatedOrder {
   statusHistory?: Array<{ status: string; comment?: string | null; createdAt: string }>;
   /** Gateway transaction reference — available after payment gateway processes the transaction. Null for COD orders. */
   transactionId?: string | null;
+  /** Redirect URL for payment gateway — when present, the frontend must redirect the user to this URL for payment completion. Absent for COD orders. */
+  paymentUrl?: string | null;
   createdAt?: string;
 }
 
