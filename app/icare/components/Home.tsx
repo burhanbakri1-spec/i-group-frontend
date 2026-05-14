@@ -26,10 +26,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, onProductSelect })
       <Hero onNavigate={onNavigate} lang={lang} />
 
       {/* 2. Scrolling Marquee */}
-      <Marquee text={lang === 'en' 
-        ? marqueeText 
-        : "شحن مجاني للطلبات فوق 45$ • لم يختبر على الحيوانات • تم اختباره من قبل أطباء الجلد • نباتي • عناية بالبشرة عالية الأداء •"
-      } />
+      <Marquee text={marqueeText} />
 
       {/* 3. Featured Product Showcase (Carousel) */}
       <ProductShowcase products={[]} lang={lang} onProductSelect={onProductSelect} />

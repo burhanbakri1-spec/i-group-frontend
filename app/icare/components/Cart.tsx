@@ -3,6 +3,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { X, Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 import { Language, translations } from '../translations';
 import { useShop } from '../context/ShopContext';
+import { useSiteContent } from '../hooks/useSiteContent';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface CartProps {
@@ -20,8 +21,10 @@ const DRAWER_TRANSITION = { duration: 0.18, ease: 'easeOut' as const };
 
 export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate }) => {
   const { cartItems, removeFromCart, updateQuantity, cartTotal, cartCount, isAuthenticated } = useShop();
+  const { freeShippingThreshold, cartShippingUnlockedText, cartShippingDisclaimer } = useSiteContent(lang);
   const t = translations[lang];
   const shouldReduceMotion = useReducedMotion();
+  const hasUnlockedShipping = Number.isFinite(freeShippingThreshold) && cartTotal >= freeShippingThreshold;
 
   const handleCheckout = () => {
     onClose();
@@ -86,7 +89,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
               ) : (
                 <>
                   {/* Shipping Progress */}
-                  {cartTotal >= 45 && (
+                  {hasUnlockedShipping && (
                     <div className="mb-10 text-center space-y-3">
                       <div className="w-full h-[6px] bg-[#D9D7D2] rounded-full overflow-hidden">
                         <motion.div 
@@ -97,7 +100,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                         />
                       </div>
                       <p className="text-[13px] text-[#706E6A] font-medium tracking-tight">
-                        {lang === 'en' ? 'Free standard shipping unlocked ✓' : 'تم تفعيل الشحن المجاني ✓'}
+                        {cartShippingUnlockedText}
                       </p>
                     </div>
                   )}
@@ -185,7 +188,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                 </button>
                 
                 <p className="text-xs text-[#5F5D59] text-center">
-                  {lang === 'en' ? 'Shipping & taxes calculated at checkout' : 'يتم حساب الشحن والضرائب عند الدفع'}
+                  {cartShippingDisclaimer}
                 </p>
               </div>
             )}

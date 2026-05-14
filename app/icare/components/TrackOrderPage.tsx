@@ -19,11 +19,12 @@ interface TrackOrderPageProps {
 interface TrackingResult {
   orderNumber: string;
   status: string;
+  shippingName?: string;
+  shippingCity?: string;
   trackingNumber?: string | null;
   carrier?: string | null;
   shippedAt?: string | null;
-  estimatedDelivery?: string | null;
-  shippingCity?: string;
+  deliveredAt?: string | null;
   statusHistory?: Array<{ status: string; comment?: string | null; createdAt: string }>;
 }
 
