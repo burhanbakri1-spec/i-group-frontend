@@ -1,14 +1,82 @@
 import { useMemo } from 'react';
+import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';
+import {
+  ShippingPageContent,
+  ShippingPageContentByLanguage,
+} from '../types';
+import { parseShippingPageContent } from '../lib/settings';
 import { normalizeSocialLinksResponse } from '../lib/social-links';
 
-export const useSiteContent = () => {
+const EMPTY_SHIPPING_PAGE_CONTENT: ShippingPageContent = {
+  title: '',
+  subtitle: '',
+  shippingHeading: '',
+  freeShippingTitle: '',
+  freeShippingDescription: '',
+  expressTitle: '',
+  expressDescription: '',
+  internationalTitle: '',
+  internationalDescription: '',
+  processingTitle: '',
+  processingDescription: '',
+  returnsTitle: '',
+  returnPolicyTitle: '',
+  returnPolicyDescription: '',
+  howToReturnTitle: '',
+  returnSteps: ['', '', '', ''],
+  conditionsTitle: '',
+  conditions: ['', '', '', ''],
+  trackingTitle: '',
+  trackingDescription: '',
+  faqsTitle: '',
+  faqs: [
+    { question: '', answer: '' },
+    { question: '', answer: '' },
+    { question: '', answer: '' },
+    { question: '', answer: '' },
+  ],
+  ctaTitle: '',
+  ctaDescription: '',
+  ctaButton: '',
+};
+
+const resolveSetting = (...values: Array<string | undefined>) => values.find((value) => typeof value === 'string' && value.trim().length > 0);
+
+const parseSettingNumber = (value: string | undefined) => Number(value);
+
+const mergeArray = <T,>(value: T[] | undefined, fallback: T[]) => (
+  fallback.map((entry, index) => (value?.[index] ?? entry))
+);
+
+const resolveShippingPageContent = (
+  content: ShippingPageContentByLanguage | null,
+  lang: Language,
+): ShippingPageContent => {
+  const fallback = EMPTY_SHIPPING_PAGE_CONTENT;
+  const overrides: Partial<ShippingPageContent> = content?.[lang] ?? content?.en ?? content?.ar ?? {};
+
+  return {
+    ...fallback,
+    ...overrides,
+    returnSteps: mergeArray(overrides.returnSteps, fallback.returnSteps),
+    conditions: mergeArray(overrides.conditions, fallback.conditions),
+    faqs: mergeArray(overrides.faqs, fallback.faqs),
+  };
+};
+
+export const useSiteContent = (lang: Language = 'en') => {
   const { settings, socialLinks: contextSocialLinks } = useShop();
 
   return useMemo(() => {
     const g = settings?.general || {};
     const c = settings?.contact || {};
     const f = settings?.footer || {};
+    const s = settings?.shipping || {};
+    const shippingPageContent = resolveShippingPageContent(
+      parseShippingPageContent(resolveSetting(s.shipping_page_content, g.shipping_page_content)),
+      lang,
+    );
 
     // Compute social links directly from dedicated context state (no fallbacks)
     const socialLinks = normalizeSocialLinksResponse(contextSocialLinks);
@@ -23,15 +91,9 @@ export const useSiteContent = () => {
       ogImage: g.og_image,
 
       // ── Announcement ──
-      announcementText: g.announcement_text,
-      freeShippingThreshold: (() => {
-        const raw = Number(g.free_shipping_threshold ?? '45');
-        if (!Number.isFinite(raw)) {
-          console.warn('[useSiteContent] free_shipping_threshold is non-numeric, defaulting to 999999');
-          return 999999;
-        }
-        return raw;
-      })(),
+      announcementText: resolveSetting(s.announcement_text, g.announcement_text) ?? '',
+      freeShippingThreshold: parseSettingNumber(resolveSetting(s.free_shipping_threshold, g.free_shipping_threshold)),
+      cartShippingUnlockedText: resolveSetting(s.free_shipping_unlocked_text, g.free_shipping_unlocked_text) ?? '',
 
       // ── Home Hero ──
       heroHeadline: g.home_hero_headline,
@@ -121,31 +183,18 @@ export const useSiteContent = () => {
       // ── Cart ──
       cartEmptyDrawer: g.cart_drawer_empty,
       cartContinueShopping: g.cart_continue_shopping,
-      cartShippingDisclaimer: g.cart_shipping_disclaimer,
+      cartShippingDisclaimer: resolveSetting(s.cart_shipping_disclaimer, g.cart_shipping_disclaimer) ?? '',
       cartCheckoutLabel: g.cart_checkout_label,
       cartBagLabel: g.cart_bag_label,
+      shippingPageContent,
 
       // ── Checkout ──
       checkoutHeading: g.checkout_heading,
       checkoutShippingHeading: g.checkout_shipping_heading,
       checkoutPlaceOrder: g.checkout_place_order,
-      checkoutTaxRate: (() => {
-        const raw = Number(g.tax_rate ?? '0');
-        if (!Number.isFinite(raw)) {
-          console.warn('[useSiteContent] tax_rate is non-numeric, defaulting to 0');
-          return 0;
-        }
-        return raw;
-      })(),
+      checkoutTaxRate: Number(g.tax_rate ?? '0'),
       shippingRates: g.shipping_rates ?? '[]',
-      defaultShippingCost: (() => {
-        const raw = Number(g.default_shipping_cost ?? '0');
-        if (!Number.isFinite(raw)) {
-          console.warn('[useSiteContent] default_shipping_cost is non-numeric, defaulting to 0');
-          return 0;
-        }
-        return raw;
-      })(),
+      defaultShippingCost: parseSettingNumber(resolveSetting(s.default_shipping_cost, g.default_shipping_cost)),
       checkoutCardLabel: g.checkout_card_label,
       checkoutPaypalLabel: g.checkout_paypal_label,
       checkoutCodLabel: g.checkout_cod_label,
@@ -261,5 +310,5 @@ export const useSiteContent = () => {
       currencyCode: g.currency_code && g.currency_code !== 'NaN' ? g.currency_code : 'USD',
       itemsPerPage: Number(g.items_per_page ?? '12'),
     };
-  }, [settings, contextSocialLinks]);
+  }, [settings, contextSocialLinks, lang]);
 };

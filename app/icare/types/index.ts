@@ -144,6 +144,45 @@ export interface AppSettings {
   social?: Record<string, string>;
   contact?: Record<string, string>;
   footer?: Record<string, string>;
+  shipping?: Record<string, string>;
+}
+
+export interface ShippingPageFaqContent {
+  question: string;
+  answer: string;
+}
+
+export interface ShippingPageContent {
+  title: string;
+  subtitle: string;
+  shippingHeading: string;
+  freeShippingTitle: string;
+  freeShippingDescription: string;
+  expressTitle: string;
+  expressDescription: string;
+  internationalTitle: string;
+  internationalDescription: string;
+  processingTitle: string;
+  processingDescription: string;
+  returnsTitle: string;
+  returnPolicyTitle: string;
+  returnPolicyDescription: string;
+  howToReturnTitle: string;
+  returnSteps: string[];
+  conditionsTitle: string;
+  conditions: string[];
+  trackingTitle: string;
+  trackingDescription: string;
+  faqsTitle: string;
+  faqs: ShippingPageFaqContent[];
+  ctaTitle: string;
+  ctaDescription: string;
+  ctaButton: string;
+}
+
+export interface ShippingPageContentByLanguage {
+  en?: Partial<ShippingPageContent>;
+  ar?: Partial<ShippingPageContent>;
 }
 
 export interface ApiEnvelope<T> {
@@ -156,6 +195,10 @@ export interface ApiEnvelope<T> {
 
 export interface PaginatedData<T> {
   data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
   meta?: {
     page: number;
     limit: number;
@@ -401,10 +444,14 @@ export interface AuthUser {
   name: string;
   phone?: string | null;
   avatar?: string | null;
+  dateOfBirth?: string | null;
+  gender?: string | null;
   address?: string | null;
   city?: string | null;
   country?: string | null;
   isActive?: boolean;
+  emailVerifiedAt?: string | null;
+  createdAt?: string;
 }
 
 export interface AuthSession {
@@ -432,7 +479,7 @@ export interface CreateOrderInput {
   shippingState?: string;
   shippingPostalCode?: string;
   shippingCountry?: string;
-  billingSameAsShipping: boolean;
+  billingSameAsShipping?: boolean;
   notes?: string;
   // NOTE: couponCode is stored with the order but discount calculation is not yet implemented.
   // The code will be stored and visible in admin but will not affect the order total.
@@ -457,8 +504,8 @@ export interface UserAddress {
   governorate?: string | null;
   country: string;
   postalCode?: string | null;
-  latitude: number;
-  longitude: number;
+  latitude: number | null;
+  longitude: number | null;
   isDefault: boolean;
   createdAt: string;
   updatedAt: string;
@@ -476,6 +523,7 @@ export interface CreateAddressInput {
   latitude: number;
   longitude: number;
   isDefault?: boolean;
+  country?: string;
 }
 
 export interface OrderSummaryItem {
@@ -496,6 +544,8 @@ export interface OrderSummary {
   tax: number;
   discount: number;
   total: number;
+  itemCount: number;
+  totalQuantity: number;
 }
 
 export interface OrderListItem {
@@ -524,13 +574,25 @@ export interface CreatedOrder {
   shippingEmail?: string;
   shippingAddress?: string;
   shippingCity?: string;
+  shippingState?: string;
+  shippingPostalCode?: string;
   shippingCountry?: string;
+  shippingLatitude?: number | null;
+  shippingLongitude?: number | null;
   items?: Array<OrderSummaryItem & { id: number }>;
   statusHistory?: Array<{ status: string; comment?: string | null; createdAt: string }>;
+  guestEmail?: string | null;
+  guestPhone?: string | null;
+  guestSessionToken?: string | null;
   /** Gateway transaction reference — available after payment gateway processes the transaction. Null for COD orders. */
   transactionId?: string | null;
   /** Redirect URL for payment gateway — when present, the frontend must redirect the user to this URL for payment completion. Absent for COD orders. */
   paymentUrl?: string | null;
+  trackingNumber?: string | null;
+  carrier?: string | null;
+  shippedAt?: string | null;
+  deliveredAt?: string | null;
+  cancelledAt?: string | null;
   createdAt?: string;
 }
 
