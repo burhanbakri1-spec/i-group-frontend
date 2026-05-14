@@ -7,7 +7,7 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import type { Language } from '../translations';
 
 const CartPage: React.FC = () => {
-  const { cartItems, cartTotal, cartCount, removeFromCart, updateQuantity } = useShop();
+  const { cartItems, cartTotal, cartCount, removeFromCart, updateQuantity, isAuthenticated } = useShop();
   const { lang, navigateToPage } = useIcareShell();
 
   const t = {
@@ -17,6 +17,7 @@ const CartPage: React.FC = () => {
       emptyDesc: 'Looks like you haven\'t added anything to your bag yet.',
       shopNow: 'SHOP NOW',
       checkout: 'PROCEED TO CHECKOUT',
+      signInCheckout: 'SIGN IN TO CHECKOUT',
       continue: 'Continue Shopping',
       subtotal: 'Subtotal',
       items: 'items',
@@ -29,6 +30,7 @@ const CartPage: React.FC = () => {
       emptyDesc: 'لم تقم بإضافة أي منتجات إلى حقيبتك بعد.',
       shopNow: 'تسوق الآن',
       checkout: 'متابعة لإتمام الطلب',
+      signInCheckout: 'سجّل الدخول لإتمام الطلب',
       continue: 'متابعة التسوق',
       subtotal: 'المجموع الفرعي',
       items: 'منتجات',
@@ -38,6 +40,10 @@ const CartPage: React.FC = () => {
   };
 
   const text = t[lang as Language];
+
+  const handleCheckout = () => {
+    navigateToPage(isAuthenticated ? 'checkout' : 'account');
+  };
 
   if (cartItems.length === 0) {
     return (
@@ -96,7 +102,7 @@ const CartPage: React.FC = () => {
               <h3 className="text-[12px] font-black uppercase tracking-[0.2em] text-[#5C5A56] mb-6">Order Summary</h3>
               <div className="flex justify-between text-[14px] text-[#5C5A56] mb-2"><span>{text.subtotal}</span><span className="font-bold">${cartTotal.toFixed(2)}</span></div>
               <p className="text-[11px] text-[#999] mb-6">Shipping calculated at checkout</p>
-              <button onClick={() => navigateToPage('checkout')} className="w-full py-4 bg-black text-white rounded-full text-[12px] font-black uppercase tracking-[0.2em] hover:bg-black/90 transition-colors">{text.checkout}</button>
+              <button onClick={handleCheckout} className="w-full py-4 bg-black text-white rounded-full text-[12px] font-black uppercase tracking-[0.2em] hover:bg-black/90 transition-colors">{isAuthenticated ? text.checkout : text.signInCheckout}</button>
             </div>
           </div>
         </div>

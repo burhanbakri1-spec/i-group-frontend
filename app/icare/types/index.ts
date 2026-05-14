@@ -151,6 +151,7 @@ export interface ApiEnvelope<T> {
   message: string;
   data: T;
   timestamp: string;
+  errors?: string[];  // validation errors on failure
 }
 
 export interface PaginatedData<T> {
@@ -433,6 +434,9 @@ export interface CreateOrderInput {
   shippingCountry?: string;
   billingSameAsShipping: boolean;
   notes?: string;
+  // NOTE: couponCode is stored with the order but discount calculation is not yet implemented.
+  // The code will be stored and visible in admin but will not affect the order total.
+  couponCode?: string;
   guestEmail?: string;
   guestPhone?: string;
   items?: OrderItemInput[];

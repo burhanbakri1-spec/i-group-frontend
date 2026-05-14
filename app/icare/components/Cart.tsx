@@ -19,13 +19,13 @@ const DARK_CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-
 const DRAWER_TRANSITION = { duration: 0.18, ease: 'easeOut' as const };
 
 export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate }) => {
-  const { cartItems, removeFromCart, updateQuantity, cartTotal, cartCount } = useShop();
+  const { cartItems, removeFromCart, updateQuantity, cartTotal, cartCount, isAuthenticated } = useShop();
   const t = translations[lang];
   const shouldReduceMotion = useReducedMotion();
 
   const handleCheckout = () => {
     onClose();
-    onNavigate('checkout');
+    onNavigate(isAuthenticated ? 'checkout' : 'account');
   };
 
   return (
@@ -181,7 +181,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                   onClick={handleCheckout}
                   className={`w-full py-4 bg-black text-white text-[14px] font-[900] tracking-wider uppercase rounded-full hover:bg-[#333] transition-colors duration-200 motion-reduce:transition-none ${DARK_CONTROL_FOCUS_CLASS}`}
                 >
-                  {t.checkout}
+                  {isAuthenticated ? t.checkout : lang === 'en' ? 'SIGN IN TO CHECKOUT' : 'سجّل الدخول لإتمام الطلب'}
                 </button>
                 
                 <p className="text-xs text-[#5F5D59] text-center">

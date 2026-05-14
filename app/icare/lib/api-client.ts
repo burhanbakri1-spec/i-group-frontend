@@ -29,9 +29,11 @@ import {
 type QueryValue = string | number | boolean | null | undefined;
 
 export class IcareApiError extends Error {
-  constructor(message: string, public readonly status: number) {
+  public readonly errors?: string[];
+  constructor(message: string, public readonly status: number, errors?: string[]) {
     super(message);
     this.name = 'IcareApiError';
+    this.errors = errors;
   }
 }
 
@@ -96,9 +98,21 @@ const parseResponseBody = async <T>(response: Response): Promise<ApiEnvelope<T> 
 };
 
 const parseEnvelope = async <T>(response: Response): Promise<T> => {
-  const envelope = await parseResponseBody<T>(response);
+  // Read raw body once so we can pass it through unwrapped on error
+  const bodyText = await response.text();
+  let envelope: ApiEnvelope<T> | null = null;
+  try {
+    envelope = bodyText ? (JSON.parse(bodyText) as ApiEnvelope<T>) : null;
+  } catch {
+    // Invalid JSON — will throw with raw body below if !ok
+  }
+
   if (!response.ok || envelope?.success === false) {
-    throw new IcareApiError(envelope?.message || response.statusText || DEFAULT_API_ERROR_MESSAGE, response.status);
+    // Raw backend response — no wrappers, no cooking
+    throw new IcareApiError(
+      bodyText || response.statusText || DEFAULT_API_ERROR_MESSAGE,
+      response.status,
+    );
   }
   if (!envelope) {
     throw new IcareApiError('iCare API returned an empty response.', response.status);

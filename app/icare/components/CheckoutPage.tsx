@@ -107,6 +107,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
       deliveryLocation: '📍 Select delivery location on the map',
       clickMapToSetLocation: 'Click on the map to set your delivery location',
       savedAddresses: 'Or select a saved address',
+      authRequiredTitle: 'Please sign in to continue checkout',
+      authRequiredMessage: 'Checkout and order placement are only available after you sign in to your account.',
+      signInToCheckout: 'SIGN IN TO CHECKOUT',
     },
     ar: {
       checkout: 'إتمام الطلب',
@@ -136,6 +139,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
       deliveryLocation: '📍 اختر موقع التوصيل على الخريطة',
       clickMapToSetLocation: 'اضغط على الخريطة لتحديد موقع التوصيل',
       savedAddresses: 'أو اختر عنوان محفوظ',
+      authRequiredTitle: 'يرجى تسجيل الدخول لمتابعة إتمام الطلب',
+      authRequiredMessage: 'إتمام الطلب وتأكيده متاحان فقط بعد تسجيل الدخول إلى حسابك.',
+      signInToCheckout: 'سجّل الدخول لإتمام الطلب',
     }
   };
 
@@ -218,6 +224,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
       shippingPhone: shippingForm.phone,
       shippingAddress: shippingForm.address,
       shippingCity: shippingForm.city,
+      shippingState: shippingForm.city || '',
       shippingPostalCode: shippingForm.postalCode,
       shippingCountry: shippingForm.country,
       billingSameAsShipping: true,
@@ -232,18 +239,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
       baseOrder.shippingLongitude = mapLng;
     }
 
-    if (isAuthenticated) return baseOrder;
-
-    const items = cartItems
-      .filter((item) => item.backendId)
-      .map((item) => ({ productId: item.backendId as number, variantId: item.variantId, quantity: item.quantity }));
-
-    return {
-      ...baseOrder,
-      guestEmail: shippingForm.email,
-      guestPhone: shippingForm.phone,
-      items,
-    };
+    return baseOrder;
   };
 
   const validateCheckout = () => {
@@ -252,13 +248,15 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
     if (!shippingForm.firstName || !shippingForm.email || !shippingForm.phone || !shippingForm.address || !shippingForm.city) {
       return 'Please complete the required shipping fields.';
     }
-    if (!isAuthenticated && cartItems.some((item) => !item.backendId)) {
-      return 'Some guest cart items are local-only demo products. Please add backend catalog products before checkout.';
-    }
     return null;
   };
 
   const placeOrder = async () => {
+    if (!isAuthenticated) {
+      setCheckoutError('Please sign in to place your order.');
+      return;
+    }
+
     const validationError = validateCheckout();
     if (validationError) {
       setCheckoutError(validationError);
@@ -269,6 +267,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
     setCheckoutError(null);
     try {
       const orderInput = buildOrderInput();
+
+      console.log('[Checkout] Order payload:', JSON.stringify(orderInput, null, 2));
       const createdOrder = await icareApi.orders.create(orderInput, accessToken ?? undefined);
       setOrder(createdOrder);
       setOrderComplete(true);
@@ -293,7 +293,13 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
       }
     } catch (error) {
       console.error('[CheckoutPage] Order creation failed:', error);
-      setCheckoutError(error instanceof Error ? error.message : 'Failed to place order.');
+
+      // Passthrough raw error — no cooking, no wrappers
+      const errorMessage =
+        (error instanceof Error && error.message) ||
+        (typeof error === 'string' && error) ||
+        'Failed to place order. Please try again.';
+      setCheckoutError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -304,6 +310,42 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
     { number: 2, title: lang === 'en' ? checkoutPaymentHeading : 'طريقة الدفع', icon: CreditCard },
     { number: 3, title: lang === 'en' ? checkoutReviewHeading : 'ملخص الطلب', icon: ShoppingBag }
   ];
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#FAFAFA] py-8 md:py-12">
+        <div className="max-w-3xl mx-auto px-4 md:px-6">
+          <div className="text-center mb-8 md:mb-12">
+            <button
+              onClick={() => onNavigate('shop')}
+              className={`inline-flex items-center gap-2 text-xs md:text-sm text-[#5F5D59] hover:text-black mb-4 transition-colors ${CONTROL_FOCUS_CLASS}`}
+            >
+              <ArrowLeft size={16} />
+              {checkoutBackToShop}
+            </button>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-4">{checkoutHeading}</h1>
+          </div>
+
+          <motion.div
+            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
+            animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            transition={SHORT_TWEEN}
+            className="bg-white p-8 md:p-10 rounded-lg shadow-sm text-center"
+          >
+            <Lock size={36} className="mx-auto mb-5 text-[#5F5D59]" />
+            <h2 className="text-2xl md:text-3xl font-light mb-4">{text.authRequiredTitle}</h2>
+            <p className="text-sm md:text-base text-[#5F5D59] mb-8">{text.authRequiredMessage}</p>
+            <button
+              onClick={() => onNavigate('account')}
+              className={`px-8 py-3 bg-black text-white rounded-full text-[12px] font-black uppercase tracking-[0.2em] hover:bg-[#333] transition-colors ${CONTROL_FOCUS_CLASS}`}
+            >
+              {text.signInToCheckout}
+            </button>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] py-8 md:py-12">
