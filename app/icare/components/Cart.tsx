@@ -173,7 +173,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                     {lang === 'en' ? 'Subtotal' : 'المجموع الفرعي'}
                   </span>
                   <span className="font-[900] text-[#333]">
-                    EGP {cartTotal.toFixed(2)}
+                    USD {cartTotal.toFixed(2)}
                   </span>
                 </div>
                 

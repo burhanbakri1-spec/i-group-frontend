@@ -237,7 +237,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                                 {order.status}
                               </span>
                               <span className="text-[11px] font-bold text-[#5C5A56] whitespace-nowrap">
-                                EGP {order.total.toFixed(0)}
+                                USD {order.total.toFixed(0)}
                               </span>
                               <span className="text-[10px] text-[#5C5A56]/70 whitespace-nowrap">
                                 {order.itemCount} {order.itemCount === 1 ? 'item' : 'items'}
@@ -293,27 +293,27 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                                       <div className="border-t border-black/5 pt-2 space-y-1">
                                         <div className="flex justify-between text-[11px] text-[#5C5A56]/75">
                                           <span>Subtotal</span>
-                                          <span>EGP {orderDetail.subtotal.toFixed(0)}</span>
+                                          <span>USD {orderDetail.subtotal.toFixed(0)}</span>
                                         </div>
                                         <div className="flex justify-between text-[11px] text-[#5C5A56]/75">
                                           <span>Shipping</span>
-                                          <span>EGP {orderDetail.shippingCost.toFixed(0)}</span>
+                                          <span>USD {orderDetail.shippingCost.toFixed(0)}</span>
                                         </div>
                                         {orderDetail.tax > 0 && (
                                           <div className="flex justify-between text-[11px] text-[#5C5A56]/75">
                                             <span>Tax</span>
-                                            <span>EGP {orderDetail.tax.toFixed(0)}</span>
+                                            <span>USD {orderDetail.tax.toFixed(0)}</span>
                                           </div>
                                         )}
                                         {orderDetail.discount > 0 && (
                                           <div className="flex justify-between text-[11px] text-[#5C5A56]/75">
                                             <span>Discount</span>
-                                            <span>-EGP {orderDetail.discount.toFixed(0)}</span>
+                                            <span>-USD {orderDetail.discount.toFixed(0)}</span>
                                           </div>
                                         )}
                                         <div className="flex justify-between text-[12px] font-bold text-[#5C5A56] pt-1 border-t border-black/5">
                                           <span>Total</span>
-                                          <span>EGP {orderDetail.total.toFixed(0)}</span>
+                                          <span>USD {orderDetail.total.toFixed(0)}</span>
                                         </div>
                                       </div>
 

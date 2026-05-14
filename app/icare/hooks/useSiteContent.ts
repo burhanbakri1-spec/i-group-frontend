@@ -258,7 +258,7 @@ export const useSiteContent = () => {
       enableProductReviews: g.enable_product_reviews !== 'false',
       enableGuestCheckout: g.enable_guest_checkout !== 'false',
       defaultCountry: g.default_country,
-      currencyCode: g.currency_code && g.currency_code !== 'NaN' ? g.currency_code : 'EGP',
+      currencyCode: g.currency_code && g.currency_code !== 'NaN' ? g.currency_code : 'USD',
       itemsPerPage: Number(g.items_per_page ?? '12'),
     };
   }, [settings, contextSocialLinks]);
