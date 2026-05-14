@@ -157,6 +157,8 @@ interface MapAddressPickerProps {
   initialLat?: number;
   initialLng?: number;
   onLocationSelect: (lat: number, lng: number) => void;
+  /** Called when a reverse-geocoded address is resolved, with the display name and structured address components from Nominatim */
+  onAddressResolved?: (displayName: string, addressComponents?: Record<string, string>) => void;
   readOnly?: boolean;
   lang?: Language;
 }
@@ -242,6 +244,7 @@ export default function MapAddressPicker({
   initialLat,
   initialLng,
   onLocationSelect,
+  onAddressResolved,
   readOnly = false,
   lang,
 }: MapAddressPickerProps) {
@@ -251,6 +254,7 @@ export default function MapAddressPicker({
   const autoLocateCalledRef = useRef(false);
   const isCancelledRef = useRef(false);
   const onLocationSelectRef = useRef(onLocationSelect);
+  const onAddressResolvedRef = useRef(onAddressResolved);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const gpsWatchIdRef = useRef<number | null>(null);
 
@@ -306,7 +310,8 @@ export default function MapAddressPicker({
   // ── Keep callback ref fresh ──
   useEffect(() => {
     onLocationSelectRef.current = onLocationSelect;
-  }, [onLocationSelect]);
+    onAddressResolvedRef.current = onAddressResolved;
+  }, [onLocationSelect, onAddressResolved]);
 
   // ═════════════════════════════════════════════════════════════════════════════
   //  AUTO-LOCATE — two-phase: GPS (phones) → WiFi (desktops) → IP (fallback)

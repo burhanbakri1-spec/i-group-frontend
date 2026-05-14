@@ -223,6 +223,11 @@ export const icareApi = {
       request<BackendCart>(`/api/v1/cart/${cartItemId}`, { method: 'DELETE', token }),
     clear: (token: string) => request<BackendCart>('/api/v1/cart/clear', { method: 'POST', token }),
     syncPrices: (token: string) => request<BackendCart>('/api/v1/cart/sync-prices', { method: 'POST', token }),
+    applyCoupon: (token: string, code: string) =>
+      request<{ valid: boolean; couponName?: string; discount?: number; discountType?: string; message?: string }>(
+        '/api/v1/cart/apply-coupon',
+        { method: 'POST', token, body: JSON.stringify({ code }) },
+      ),
   },
 
   videos: {
@@ -342,12 +347,12 @@ export const icareApi = {
   payment: {
     /**
      * Verify a payment transaction via the payment gateway.
-     * No authentication required — called after user returns from gateway redirect.
+     * Requires authentication (JWT token) — the endpoint is protected.
      */
-    verify: (transactionId: string) =>
+    verify: (transactionId: string, token: string) =>
       request<{ transactionId: string; status: string; amount: number; currency: string; gateway: string; verifiedAt: string }>(
         '/api/v1/payment/verify',
-        { method: 'POST', body: JSON.stringify({ transactionId }) },
+        { method: 'POST', token, body: JSON.stringify({ transactionId }) },
       ),
   },
 
