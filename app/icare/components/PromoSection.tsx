@@ -6,9 +6,10 @@ import { useSiteContent } from '../hooks/useSiteContent';
 
 interface PromoSectionProps {
   lang: Language;
+  onNavigate: (page: string) => void;
 }
 
-export const PromoSection: React.FC<PromoSectionProps> = ({ lang }) => {
+export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) => {
   const shouldReduceMotion = useReducedMotion();
   const { promoBadge, promoHeadline, promoDescription, promoCtaLabel, promoImage } = useSiteContent();
   return (
@@ -68,6 +69,7 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang }) => {
             {/* Button Styling */}
             <div className="flex flex-wrap gap-4">
               <motion.button 
+                onClick={() => onNavigate('shop')}
                 className="border-2 border-[#222] rounded-full px-12 py-4 text-[11px] font-[900] tracking-[0.15em] uppercase text-[#222] transition-all duration-200 ease-out cursor-pointer hover:bg-[#222] hover:text-white hover:shadow-lg hover:scale-[1.02] active:scale-[0.99] motion-reduce:hover:scale-100 motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
                 initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
                 whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}

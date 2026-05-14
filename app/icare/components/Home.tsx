@@ -5,6 +5,7 @@ import { PromoSection } from './PromoSection';
 import { ProductGrid } from './ProductSection';
 import { CommitmentSection } from './CommitmentSection';
 import { SocialGrid } from './SocialGrid';
+import { PhilosophySection } from './PhilosophySection';
 import { Language, translations } from '../translations';
 import { Hero } from './Hero';
 import { Product } from '../types';
@@ -33,10 +34,7 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, onProductSelect })
       {/* 3. Featured Product Showcase (Carousel) */}
       <ProductShowcase products={[]} lang={lang} onProductSelect={onProductSelect} />
 
-      {/* 4. New Arrival Promo Section */}
-      <PromoSection lang={lang} />
-
-      {/* 5. Trending Products Grid */}
+      {/* 4. Trending Products Grid */}
       <div className="py-6 md:py-8 bg-white overflow-hidden">
         <div className="max-w-[1600px] mx-auto px-3 md:px-10 mb-3 md:mb-8 flex justify-between items-end">
           <h2 className="text-[28px] md:text-[42px] font-black tracking-tight text-[#222] lowercase leading-tight">
@@ -54,13 +52,19 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, onProductSelect })
         </div>
       </div>
 
-      {/* 6. Commitment / Philosophy Section */}
-      <CommitmentSection lang={lang} />
+      {/* 5. New Arrival Promo Section */}
+      <PromoSection lang={lang} onNavigate={onNavigate} />
 
-      {/* 7. Social Grid / Community Section */}
-      <SocialGrid lang={lang} />
+      {/* 6. Philosophy Section */}
+      <PhilosophySection lang={lang} onNavigate={onNavigate} />
 
-      {/* 8. Spacing before footer */}
+      {/* 7. Commitment Section */}
+      <CommitmentSection lang={lang} onNavigate={onNavigate} />
+
+      {/* 8. Social Grid / Community Section */}
+      <SocialGrid lang={lang} onNavigate={onNavigate} />
+
+      {/* 9. Spacing before footer */}
       <div className="h-12 md:h-20" />
     </div>
   );

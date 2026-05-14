@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
@@ -7,9 +7,12 @@ import { useSiteContent } from '../hooks/useSiteContent';
 
 interface SocialGridProps {
   lang: Language;
+  onNavigate: (page: string) => void;
 }
 
-export const SocialGrid: React.FC<SocialGridProps> = ({ lang }) => {
+const SCROLL_BOUNDARY_THRESHOLD = 1;
+
+export const SocialGrid: React.FC<SocialGridProps> = ({ lang, onNavigate }) => {
   const shouldReduceMotion = useReducedMotion();
   const { socialGridHeading, socialGridCta, socialGridImage1, socialGridImage2, socialGridImage3, socialGridImage4 } = useSiteContent();
 
@@ -21,13 +24,83 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang }) => {
   ];
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollFrameRef = useRef<number | null>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateScrollState = useCallback(() => {
+    scrollFrameRef.current = null;
+
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer) return;
+
+    const maxScrollLeft = Math.max(0, scrollContainer.scrollWidth - scrollContainer.clientWidth);
+    const currentScrollLeft = Math.min(Math.max(scrollContainer.scrollLeft, 0), maxScrollLeft);
+    const nextProgress = maxScrollLeft <= SCROLL_BOUNDARY_THRESHOLD
+      ? 100
+      : (currentScrollLeft / maxScrollLeft) * 100;
+
+    setScrollProgress(nextProgress);
+    setCanScrollLeft(currentScrollLeft > SCROLL_BOUNDARY_THRESHOLD);
+    setCanScrollRight(currentScrollLeft < maxScrollLeft - SCROLL_BOUNDARY_THRESHOLD);
+  }, []);
+
+  const scheduleScrollStateUpdate = useCallback(() => {
+    if (scrollFrameRef.current !== null) return;
+    scrollFrameRef.current = window.requestAnimationFrame(updateScrollState);
+  }, [updateScrollState]);
+
+  useEffect(() => {
+    scheduleScrollStateUpdate();
+    window.addEventListener('resize', scheduleScrollStateUpdate);
+
+    return () => {
+      window.removeEventListener('resize', scheduleScrollStateUpdate);
+      if (scrollFrameRef.current !== null) {
+        window.cancelAnimationFrame(scrollFrameRef.current);
+      }
+    };
+  }, [scheduleScrollStateUpdate]);
+
+  useEffect(() => {
+    scheduleScrollStateUpdate();
+  }, [socialGridImage1, socialGridImage2, socialGridImage3, socialGridImage4, scheduleScrollStateUpdate]);
+
+  const getNextCardScrollLeft = useCallback((direction: 'left' | 'right') => {
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer) return 0;
+
+    const maxScrollLeft = Math.max(0, scrollContainer.scrollWidth - scrollContainer.clientWidth);
+    const currentScrollLeft = Math.min(Math.max(scrollContainer.scrollLeft, 0), maxScrollLeft);
+    const cardPositions = Array.from(scrollContainer.children).map((child) => {
+      const card = child as HTMLElement;
+      return Math.min(Math.max(card.offsetLeft - scrollContainer.offsetLeft, 0), maxScrollLeft);
+    });
+
+    if (direction === 'right') {
+      return cardPositions.find((position) => position > currentScrollLeft + SCROLL_BOUNDARY_THRESHOLD) ?? maxScrollLeft;
+    }
+
+    return [...cardPositions].reverse().find((position) => position < currentScrollLeft - SCROLL_BOUNDARY_THRESHOLD) ?? 0;
+  }, []);
 
   const scroll = (direction: 'left' | 'right') => {
-    if (scrollRef.current) {
-      const { scrollLeft, clientWidth } = scrollRef.current;
-      const scrollTo = direction === 'left' ? scrollLeft - clientWidth / 2 : scrollLeft + clientWidth / 2;
-      scrollRef.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
-    }
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer) return;
+
+    scrollContainer.scrollTo({
+      left: getNextCardScrollLeft(direction),
+      behavior: shouldReduceMotion ? 'auto' : 'smooth',
+    });
+    scheduleScrollStateUpdate();
+  };
+
+  const handleScrollKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+
+    event.preventDefault();
+    scroll(event.key === 'ArrowLeft' ? 'left' : 'right');
   };
 
   return (
@@ -46,6 +119,7 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang }) => {
             {socialGridHeading}
           </motion.h2>
           <motion.button 
+            onClick={() => onNavigate('vlog')}
             className="hidden md:block border border-[#222]/20 rounded-full px-8 py-2 text-[10px] font-bold tracking-[0.1em] uppercase text-[#222] hover:bg-[#222] hover:text-white transition-all duration-300 relative overflow-hidden group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
             initial={shouldReduceMotion ? false : { opacity: 0, x: 10 }}
             whileInView={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
@@ -66,7 +140,13 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang }) => {
         {/* Horizontal Scrollable Grid */}
         <div 
           ref={scrollRef}
-          className="flex gap-4 md:gap-5 overflow-x-auto no-scrollbar pb-6 snap-x snap-mandatory"
+          dir="ltr"
+          role="region"
+          aria-label="iCare + you image carousel"
+          tabIndex={0}
+          onScroll={scheduleScrollStateUpdate}
+          onKeyDown={handleScrollKeyDown}
+          className="flex gap-4 md:gap-5 overflow-x-auto no-scrollbar pt-2 pb-6 snap-x snap-mandatory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
         >
           {lifestyleImages.map((image, index) => (
             <motion.div 
@@ -101,8 +181,11 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang }) => {
           {/* Progress Line */}
           <div className="flex-1 h-[1px] bg-[#222]/10 relative mr-10">
             <motion.div 
-              className="absolute left-0 top-0 h-full bg-[#222] w-1/4"
-              initial={{ width: "25%" }}
+              className="absolute left-0 top-0 h-full bg-[#222]"
+              initial={false}
+              animate={{ width: `${scrollProgress}%` }}
+              transition={{ duration: shouldReduceMotion ? 0 : 0.18, ease: 'easeOut' }}
+              aria-hidden="true"
             />
           </div>
 
@@ -110,23 +193,27 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang }) => {
           <div className="flex gap-3">
             <motion.button 
               onClick={() => scroll('left')}
-              className="w-12 h-12 rounded-full border border-[#222]/10 flex items-center justify-center text-[#222] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
-              whileHover={{ 
+              disabled={!canScrollLeft}
+              aria-label="Scroll iCare + you left"
+              className="w-12 h-12 rounded-full border border-[#222]/10 flex items-center justify-center text-[#222] transition-opacity disabled:cursor-not-allowed disabled:opacity-35 disabled:text-[#222]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
+              whileHover={canScrollLeft ? { 
                 backgroundColor: "rgba(255,255,255,1)",
                 boxShadow: "0 5px 14px rgba(0,0,0,0.08)"
-              }}
-              whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
+              } : undefined}
+              whileTap={shouldReduceMotion || !canScrollLeft ? undefined : { scale: 0.98 }}
             >
               <ArrowLeft size={20} strokeWidth={1.5} />
             </motion.button>
             <motion.button 
               onClick={() => scroll('right')}
-              className="w-12 h-12 rounded-full border border-[#222]/10 flex items-center justify-center text-[#222] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
-              whileHover={{ 
+              disabled={!canScrollRight}
+              aria-label="Scroll iCare + you right"
+              className="w-12 h-12 rounded-full border border-[#222]/10 flex items-center justify-center text-[#222] transition-opacity disabled:cursor-not-allowed disabled:opacity-35 disabled:text-[#222]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
+              whileHover={canScrollRight ? { 
                 backgroundColor: "rgba(255,255,255,1)",
                 boxShadow: "0 5px 14px rgba(0,0,0,0.08)"
-              }}
-              whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
+              } : undefined}
+              whileTap={shouldReduceMotion || !canScrollRight ? undefined : { scale: 0.98 }}
             >
               <ArrowRight size={20} strokeWidth={1.5} />
             </motion.button>
@@ -134,7 +221,10 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang }) => {
         </div>
 
         {/* Mobile Social Button */}
-        <button className="md:hidden w-full mt-8 border border-[#222]/20 rounded-full py-4 text-[10px] font-bold tracking-[0.1em] uppercase text-[#222] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]">
+        <button
+          onClick={() => onNavigate('vlog')}
+          className="md:hidden w-full mt-8 border border-[#222]/20 rounded-full py-4 text-[10px] font-bold tracking-[0.1em] uppercase text-[#222] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
+        >
           {lang === 'en' ? socialGridCta : 'تابعنا على السوشيال'}
         </button>
       </div>

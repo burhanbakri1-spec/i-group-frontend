@@ -2,8 +2,14 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useSiteContent } from '../hooks/useSiteContent';
+import { Language } from '../translations';
 
-export const PhilosophySection = () => {
+interface PhilosophySectionProps {
+  lang: Language;
+  onNavigate: (page: string) => void;
+}
+
+export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ lang, onNavigate }) => {
   const { philosophyHeadline, philosophyText, philosophyCta, philosophyImage } = useSiteContent();
   return (
     <section className="relative w-full min-h-[80vh] flex flex-col items-center justify-center overflow-hidden px-6 py-24">
@@ -42,11 +48,13 @@ export const PhilosophySection = () => {
         </motion.p>
 
         <motion.button 
+          onClick={() => onNavigate('story')}
+          aria-label={lang === 'en' ? philosophyCta : 'تعرف على قصة آي كير'}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="border border-[#222] rounded-full px-12 py-4 text-[11px] font-[900] tracking-[0.2em] uppercase text-[#222] hover:bg-black hover:text-white transition-all duration-300"
+          className="border border-[#222] rounded-full px-12 py-4 text-[11px] font-[900] tracking-[0.2em] uppercase text-[#222] hover:bg-black hover:text-white transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
         >
           {philosophyCta}
         </motion.button>
