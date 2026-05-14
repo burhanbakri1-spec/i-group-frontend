@@ -303,7 +303,7 @@ export const icareApi = {
      * Requires authentication (access token).
      */
     cancel: (orderNumber: string, token: string) =>
-      request<{ orderNumber: string; status: string; cancelledAt: string; message: string }>(
+      request<{ message: string }>(
         `/api/v1/orders/${orderNumber}/cancel`,
         { method: 'POST', token },
       ),
@@ -315,10 +315,12 @@ export const icareApi = {
       request<{
         orderNumber: string;
         status: string;
+        shippingName?: string;
+        shippingCity?: string;
         trackingNumber?: string | null;
         carrier?: string | null;
         shippedAt?: string | null;
-        estimatedDelivery?: string | null;
+        deliveredAt?: string | null;
         statusHistory?: Array<{ status: string; comment?: string | null; createdAt: string }>;
       }>(`/api/v1/orders/${orderNumber}/track`, { method: 'POST' }),
   },
@@ -357,6 +359,6 @@ export const icareApi = {
   },
 
   social: {
-    links: () => request<unknown>('/api/v1/social-links'),
+    links: () => request<Record<string, string>>('/api/v1/social-links'),
   },
 };

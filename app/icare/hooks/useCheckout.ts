@@ -358,6 +358,8 @@ export function useCheckout(lang: Language): UseCheckoutReturn {
       tax,
       discount,
       total: cartTotal + shipping + tax - discount,
+      itemCount: cartItems.length,
+      totalQuantity: cartItems.reduce((sum, item) => sum + item.quantity, 0),
     };
   }, [cartItems, cartTotal, checkoutTaxRate, freeShippingThreshold, defaultShippingCost]);
 
