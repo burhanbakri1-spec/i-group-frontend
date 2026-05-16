@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import React, { Suspense } from 'react';
 import { IcareShell } from './components/IcareShell';
 import { fetchServerSettings } from './lib/settings-server';
+import { ProductGridSkeleton } from './components/ui/skeletons';
 import './icare.css';
 
 const FALLBACK_TITLE = 'iCare Beauty';
@@ -40,8 +41,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
 function LayoutFallback() {
   return (
-    <div className="min-h-[60vh] flex items-center justify-center bg-white">
-      <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin" />
+    <div className="min-h-[60vh] flex items-center justify-center bg-white px-6">
+      <div className="w-full max-w-screen-xl">
+        <ProductGridSkeleton count={4} />
+      </div>
     </div>
   );
 }

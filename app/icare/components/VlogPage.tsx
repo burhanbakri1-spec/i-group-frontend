@@ -6,6 +6,7 @@ import { Play } from 'lucide-react';
 import { fetchProductMediaVlogs } from '../lib/catalog-client';
 import { VlogContentItem } from '../types';
 import { useSiteContent } from '../hooks/useSiteContent';
+import { VlogGridSkeleton } from './ui/skeletons';
 
 interface VlogPageProps {
   lang: Language;
@@ -146,9 +147,7 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
       {/* 2. Vlog Grid */}
       <section className="max-w-[1400px] mx-auto px-4 md:px-6 pt-8 md:pt-12">
         {isLoading ? (
-          <div className="py-20 flex items-center justify-center">
-            <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin" />
-          </div>
+          <VlogGridSkeleton count={6} />
         ) : error ? (
           <div className="py-20 text-center space-y-4">
             <p className="text-[13px] text-red-600 font-medium">{error}</p>

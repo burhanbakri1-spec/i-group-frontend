@@ -4,6 +4,7 @@ import { ChevronRight, Star, Plus } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Product } from '../types';
 import { fetchProductShortcut } from '../lib/catalog-client';
+import { SkeletonPulse } from './ui/skeletons';
 
 interface ProductLineupProps {
   lang?: string;
@@ -175,8 +176,16 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ onProductSelect, p
     return (
       <section className="bg-white pt-12 pb-24 lg:pb-32 overflow-hidden">
         <div className="max-w-[1600px] mx-auto px-4 lg:px-12">
-          <div className="rounded-[24px] bg-[#F6F6F6] p-12 flex items-center justify-center">
-            <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin" />
+          <div className="rounded-[24px] bg-[#F6F6F6] p-12">
+            <div className="flex gap-5 md:gap-8 overflow-hidden">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex-shrink-0 w-[280px] space-y-3">
+                  <SkeletonPulse className="aspect-square w-full rounded-xl" />
+                  <SkeletonPulse className="h-4 w-2/3 rounded" />
+                  <SkeletonPulse className="h-4 w-1/3 rounded" />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

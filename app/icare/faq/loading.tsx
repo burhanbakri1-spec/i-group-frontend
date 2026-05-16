@@ -1,12 +1,10 @@
+import { FAQSkeleton } from '../components/ui/skeletons';
+
 export default function FAQLoading() {
   return (
     <div className="px-6 md:px-12 py-20 max-w-3xl mx-auto">
-      <div className="h-10 w-36 bg-gray-200 rounded animate-pulse mb-12" />
-      <div className="space-y-4">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-16 w-full bg-gray-200 rounded-lg animate-pulse" />
-        ))}
-      </div>
+      <div className="h-10 w-36 bg-muted motion-safe:animate-[skeleton-pulse_1.8s_ease-in-out_infinite] motion-reduce:opacity-50 rounded mb-12" />
+      <FAQSkeleton count={6} />
     </div>
   );
 }

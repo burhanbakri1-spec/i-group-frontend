@@ -3,6 +3,7 @@ import { AuthSession, AppSettings, BackendCart, CartItem, Product, WishlistItem,
 import { IcareApiError, icareApi } from '../lib/api-client';
 import { mapBackendCartToCartItems } from '../lib/mappers';
 import { normalizeSettingsGroups } from '../lib/settings';
+import { cachedFetch, cacheMiddleware } from '../lib/cache-middleware';
 
 const GUEST_CART_STORAGE_KEY = 'icare_guest_cart';
 const WISHLIST_STORAGE_KEY = 'icare_wishlist';
@@ -136,12 +137,12 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return undefined;
   }, [accessToken, refreshCart]);
 
-  // Load public settings from backend on mount
+  // Load public settings from backend on mount (cached: reference)
   useEffect(() => {
     const loadSettings = async () => {
       if (!icareApi.isConfigured()) return;
       try {
-        const data = await icareApi.settings.all();
+        const data = await cachedFetch('/api/v1/settings', () => icareApi.settings.all(), { tier: 'reference' });
         const normalizedSettings = normalizeSettingsGroups(data);
         if (normalizedSettings) {
           setSettings(normalizedSettings);
@@ -153,12 +154,12 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     loadSettings();
   }, []);
 
-  // Load social links from dedicated endpoint on mount
+  // Load social links from dedicated endpoint on mount (cached: reference)
   useEffect(() => {
     const loadSocialLinks = async () => {
       if (!icareApi.isConfigured()) return;
       try {
-        const data = await icareApi.social.links();
+        const data = await cachedFetch('/api/v1/social-links', () => icareApi.social.links(), { tier: 'reference' });
         setSocialLinks(data || {});
       } catch (error) {
         warnInDevelopment('Failed to load iCare social links.', error);
@@ -192,6 +193,7 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const addToCart = (product: Product, quantity = 1) => {
+    cacheMiddleware.invalidate('/api/v1/cart');
     if (session && product.backendId && icareApi.isConfigured()) {
       runCartRequest((token) => icareApi.cart.add(token, product.backendId as number, product.variantId, quantity), session)
         .catch((error: Error) => {
@@ -205,6 +207,7 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const removeFromCart = (id: string) => {
+    cacheMiddleware.invalidate('/api/v1/cart');
     const item = cartItems.find((cartItem) => cartItem.id === id);
     if (session && item?.cartItemId && icareApi.isConfigured()) {
       runCartRequest((token) => icareApi.cart.remove(token, item.cartItemId as number), session)
@@ -215,6 +218,7 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const updateQuantity = (id: string, quantity: number) => {
+    cacheMiddleware.invalidate('/api/v1/cart');
     if (quantity <= 0) {
       removeFromCart(id);
       return;
@@ -231,6 +235,7 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const clearCart = () => {
+    cacheMiddleware.invalidate('/api/v1/cart');
     if (session && icareApi.isConfigured()) {
       runCartRequest((token) => icareApi.cart.clear(token), session)
         .catch((error: Error) => setAuthError(error.message));

@@ -7,6 +7,7 @@ import { fetchCatalogProducts, fetchCategoryRoots, fetchCategoryChildren } from 
 import { Language } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { Product, BackendCategory } from '../types';
+import { ProductGridSkeleton } from './ui/skeletons';
 
 interface ShopPageProps {
   lang: Language;
@@ -173,8 +174,10 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
 
   if (loading && !catalogProducts) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FFFFFF]">
-        <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-[#FFFFFF] px-4">
+        <div className="w-full max-w-screen-xl">
+          <ProductGridSkeleton count={12} />
+        </div>
       </div>
     );
   }

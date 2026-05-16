@@ -6,6 +6,7 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { icareApi, IcareApiError } from '../lib/api-client';
 import { BackendStore, PaginatedData } from '../types';
+import { StoreLocatorSkeleton } from './ui/skeletons';
 
 interface Store {
   id: string;
@@ -161,9 +162,7 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
           <div className="flex-1 overflow-y-auto px-4 lg:px-8 pb-8 no-scrollbar border-t md:border-t-0 border-black/5">
             <div className="space-y-3 pt-4">
               {fetchState === 'loading' && (
-                <div className="flex items-center justify-center py-20">
-                  <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin" />
-                </div>
+                <StoreLocatorSkeleton count={4} />
               )}
 
               {fetchState === 'error' && (

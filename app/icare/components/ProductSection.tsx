@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ProductCard } from './ProductCard';
 import { Language } from '../translations';
 import { fetchCatalogProducts } from '../lib/catalog-client';
+import { ProductGridSkeleton } from './ui/skeletons';
 import { Product } from '../types';
 
 interface ProductGridProps {
@@ -29,8 +30,8 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
 
   if (loading && !products) {
     return (
-      <div className="w-full flex justify-center py-20">
-        <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin" />
+      <div className="w-full py-20 px-4">
+        <ProductGridSkeleton count={8} />
       </div>
     );
   }

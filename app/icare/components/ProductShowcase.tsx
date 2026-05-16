@@ -6,6 +6,7 @@ import { Language } from '../translations';
 import { Product } from '../types';
 import { fetchProductShortcut } from '../lib/catalog-client';
 import { useSiteContent } from '../hooks/useSiteContent';
+import { SkeletonPulse } from './ui/skeletons';
 
 interface ProductShowcaseProps {
   products: Product[];
@@ -33,8 +34,16 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
   if (remoteProducts === null) {
     return (
       <section className="px-4 md:px-8 py-6 md:py-8 bg-white">
-        <div className="max-w-[1440px] mx-auto rounded-[16px] bg-[#F2F2F0] p-12 text-center text-[12px] font-bold uppercase tracking-[0.2em] text-black/55">
-          {productShowcaseLoading}
+        <div className="max-w-[1440px] mx-auto rounded-[16px] bg-[#F2F2F0] p-8 md:p-12">
+          <div className="flex gap-6 md:gap-8">
+            <SkeletonPulse className="flex-1 aspect-[4/3] rounded-xl" />
+            <div className="flex-1 flex flex-col justify-center space-y-4">
+              <SkeletonPulse className="h-4 w-1/4 rounded" />
+              <SkeletonPulse className="h-8 w-3/4 rounded" />
+              <SkeletonPulse className="h-4 w-2/3 rounded" />
+              <SkeletonPulse className="h-4 w-1/2 rounded" />
+            </div>
+          </div>
         </div>
       </section>
     );

@@ -46,6 +46,26 @@
   }
 }
 
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes skeleton-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.skeleton-content {
+  animation: skeleton-enter 50ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-content {
+    animation: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
