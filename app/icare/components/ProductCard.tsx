@@ -72,7 +72,7 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
         <motion.div
           className="absolute inset-0"
           animate={{ opacity: isHovered && hoverImage ? 0 : 1 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
           <ImageWithFallback
             src={product.image}
@@ -84,7 +84,7 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
           <motion.div
             className="absolute inset-0"
             animate={{ opacity: isHovered ? 1 : 0 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           >
             <ImageWithFallback
               src={hoverImage}
