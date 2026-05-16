@@ -5,7 +5,7 @@ function SkeletonPulse({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="skeleton"
       className={cn(
-        'bg-muted motion-safe:animate-[skeleton-pulse_1.8s_ease-in-out_infinite]',
+        'bg-muted motion-safe:animate-[skeleton-pulse_2.5s_ease-in-out_infinite]',
         'motion-reduce:opacity-50',
         className,
       )}

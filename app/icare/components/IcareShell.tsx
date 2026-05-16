@@ -35,7 +35,7 @@ const PageTransition = ({ children, pageKey }: { children: React.ReactNode; page
     initial={{ opacity: 0, y: 16 }}
     animate={{ opacity: 1, y: 0 }}
     exit={{ opacity: 0, y: -12 }}
-    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
   >
     {children}
   </motion.div>
@@ -103,7 +103,7 @@ export const IcareShell = ({ children }: { children: React.ReactNode }) => {
           />
 
           <main className="pt-[120px]">
-            <AnimatePresence mode="wait">
+            <AnimatePresence>
               <PageTransition pageKey={pathname}>{children}</PageTransition>
             </AnimatePresence>
           </main>

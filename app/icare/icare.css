@@ -47,7 +47,7 @@
 }
 
 @keyframes skeleton-pulse {
-  0%, 100% { opacity: 0.4; }
+  0%, 100% { opacity: 0.35; }
   50% { opacity: 1; }
 }
 
@@ -57,7 +57,7 @@
 }
 
 .skeleton-content {
-  animation: skeleton-enter 50ms ease-out;
+  animation: skeleton-enter 250ms ease-out;
 }
 
 @media (prefers-reduced-motion: reduce) {

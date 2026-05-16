@@ -23,7 +23,7 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, lang }) => {
       <motion.div 
         className="relative h-[68vh] min-h-[520px] md:h-[78vh] w-full max-w-[1440px] mx-auto overflow-hidden rounded-[20px] md:rounded-[24px] shadow-sm bg-[#FFFFFF]"
         {...heroReveal}
-        transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
       >
         <motion.div
           style={shouldReduceMotion ? undefined : { y: imageY }}
@@ -48,8 +48,8 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, lang }) => {
                 initial={shouldReduceMotion ? false : { y: 24, opacity: 0 }}
                 animate={shouldReduceMotion ? undefined : { y: 0, opacity: 1 }}
                 transition={{ 
-                  delay: 0.12,
-                  duration: 0.45,
+                  delay: 0.15,
+                  duration: 0.7,
                   ease: [0.22, 1, 0.36, 1] 
                 }}
               >
@@ -59,12 +59,12 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, lang }) => {
             
             <motion.button 
               onClick={() => onNavigate('shop')}
-              className="bg-white text-black px-10 md:px-12 py-4 md:py-5 rounded-full text-[11px] md:text-[12px] font-black uppercase tracking-[0.2em] shadow-lg transition-all duration-200 ease-out hover:bg-[#F0EDE8] hover:shadow-xl hover:scale-[1.02] active:scale-[0.99] motion-reduce:hover:scale-100 motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40"
+              className="bg-white text-black px-10 md:px-12 py-4 md:py-5 rounded-full text-[11px] md:text-[12px] font-black uppercase tracking-[0.2em] shadow-lg transition-all duration-300 ease-out hover:bg-[#F0EDE8] hover:shadow-xl hover:scale-[1.02] active:scale-[0.99] motion-reduce:hover:scale-100 motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40"
               initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
               animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
               transition={{ 
-                delay: 0.22,
-                duration: 0.35,
+                delay: 0.25,
+                duration: 0.5,
                 ease: [0.22, 1, 0.36, 1] 
               }}
             >
