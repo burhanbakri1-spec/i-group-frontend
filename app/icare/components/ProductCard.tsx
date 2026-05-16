@@ -66,16 +66,14 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
       </button>
 
       <div
-        className="aspect-square bg-neutral-50 cursor-pointer relative overflow-hidden"
+        className="aspect-square bg-neutral-100 cursor-pointer relative overflow-hidden"
         onClick={onSelect}
       >
-        <div className="absolute inset-0 flex items-center justify-center p-4 md:p-6">
-          <ImageWithFallback
-            src={isHovered && hoverImage ? hoverImage : product.image}
-            alt={product.name}
-            className="max-w-[86%] md:max-w-[84%] max-h-[62%] md:max-h-[64%] object-contain drop-shadow-xl group-hover:scale-[1.04] transition-transform duration-700 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-          />
-        </div>
+        <ImageWithFallback
+          src={isHovered && hoverImage ? hoverImage : product.image}
+          alt={product.name}
+          className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+        />
         {product.badge && (
           <span className="absolute top-3 left-3 px-3 py-1 bg-white text-[10px] font-bold uppercase tracking-wider rounded-full shadow-sm">
             {product.badge}
