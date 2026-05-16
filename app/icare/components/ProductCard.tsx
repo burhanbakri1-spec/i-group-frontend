@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';
@@ -69,11 +69,22 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
         className="aspect-square bg-neutral-100 cursor-pointer relative overflow-hidden"
         onClick={onSelect}
       >
-        <ImageWithFallback
-          src={isHovered && hoverImage ? hoverImage : product.image}
-          alt={product.name}
-          className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-        />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={isHovered && hoverImage ? 'hover' : 'default'}
+            className="absolute inset-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <ImageWithFallback
+              src={isHovered && hoverImage ? hoverImage : product.image}
+              alt={product.name}
+              className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+            />
+          </motion.div>
+        </AnimatePresence>
         {product.badge && (
           <span className="absolute top-3 left-3 px-3 py-1 bg-white text-[10px] font-bold uppercase tracking-wider rounded-full shadow-sm">
             {product.badge}
