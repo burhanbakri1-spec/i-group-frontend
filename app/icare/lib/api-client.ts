@@ -126,11 +126,12 @@ const request = async <T>(
   options: RequestInit & { token?: string; query?: Record<string, QueryValue> } = {},
 ): Promise<T> => {
   const { token, query, headers, ...init } = options;
+  const hasBody = init.body !== undefined && init.body !== null;
   try {
     const response = await fetch(buildUrl(path, query), {
       ...init,
       headers: {
-        'Content-Type': 'application/json',
+        ...(hasBody ? { 'Content-Type': 'application/json' } : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...headers,
       },

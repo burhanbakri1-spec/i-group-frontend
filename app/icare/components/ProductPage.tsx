@@ -383,7 +383,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
 
           <div className="space-y-4 md:space-y-6">
             <p className="text-[14px] md:text-[15px] leading-relaxed text-[#444] font-medium">
-              {displayProduct.description ?? productDetailsFallback}
+                  {displayProduct.description ?? (productDetailsFallback || 'Product details coming soon')}
             </p>
             
             <div className="space-y-3 text-[13px] md:text-[14px] border-t border-black/5 pt-6">
@@ -398,7 +398,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
           <div className="pt-4 space-y-6 md:space-y-8">
               {displayProduct.variants && displayProduct.variants.length > 0 && (
                 <div className="flex flex-wrap items-center gap-2 text-[12px] md:text-[13px]">
-                  <span className="text-black/60 lowercase">{productSelectOption}</span>
+                  <span className="text-black/60 lowercase">{productSelectOption || 'Select option'}</span>
                   {displayProduct.variants.map((variant) => (
                     <button
                       key={variant.id}
@@ -423,11 +423,11 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                 >
                   <ShoppingBag size={16} />
                     {isSelectedVariantPurchasable
-                      ? (lang === 'en' ? `${productAddToBag} — ${purchasableProduct.price}` : `أضف للسلة — ${purchasableProduct.price}`)
-                      : (lang === 'en' ? productSoldOut : 'نفد المخزون')}
+                      ? (lang === 'en' ? `${productAddToBag || 'Add to Bag'} — ${purchasableProduct.price}` : `أضف للسلة — ${purchasableProduct.price}`)
+                      : (lang === 'en' ? (productSoldOut || 'Sold Out') : 'نفد المخزون')}
                 </motion.button>
                 <div className="flex items-center justify-center gap-2 text-[9px] md:text-[10px] font-bold text-black/55">
-                  {lang === 'en' ? productAfterpayText : 'أو 4 دفعات بدون فوائد مع'} <span className="text-black font-black bg-[#ACEBFF] px-1.5 py-0.5 rounded italic">Afterpay</span>
+                  {lang === 'en' ? (productAfterpayText || 'Or 4 interest-free payments with') : 'أو 4 دفعات بدون فوائد مع'} <span className="text-black font-black bg-[#ACEBFF] px-1.5 py-0.5 rounded italic">Afterpay</span>
                </div>
              </div>
           </div>
@@ -451,7 +451,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[12px] font-black uppercase tracking-widest text-[#333]">{productRatingLabel}</p>
+                  <p className="text-[12px] font-black uppercase tracking-widest text-[#333]">{productRatingLabel || 'Customer reviews'}</p>
                   <p className="text-[12px] text-[#555]">Based on {reviewCount} reviews</p>
                 </div>
                 {/* Rating distribution */}
@@ -557,7 +557,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
               </div>
             ) : (
               <div className="py-16 text-center text-[14px] font-bold uppercase tracking-[0.2em] text-[#333]/40">
-                {productNoReviews}
+                {productNoReviews || 'No reviews yet'}
               </div>
             )}
             
@@ -574,7 +574,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                   onClick={() => setIsReviewsExpanded(true)}
                   className={`px-12 py-3 rounded-full border border-black/15 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors duration-200 bg-white ${CONTROL_FOCUS_CLASS}`}
                 >
-                  {reviewShowMore}
+                  {reviewShowMore || 'Show more'}
                 </button>
               )}
               {isReviewsExpanded && hasMoreReviews && (
@@ -590,7 +590,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                   onClick={() => { setIsReviewsExpanded(false); setAdditionalReviews([]); setReviewPage(1); }}
                   className={`px-8 py-2 rounded-full border border-black/10 text-[10px] font-bold uppercase tracking-widest hover:border-black transition-colors ${CONTROL_FOCUS_CLASS}`}
                 >
-                  {reviewShowLess}
+                  {reviewShowLess || 'Show less'}
                 </button>
               )}
             </div>
@@ -628,8 +628,8 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
           >
             <ShoppingBag size={14} />
             {isSelectedVariantPurchasable
-              ? (lang === 'en' ? `${productBuyNow} - ${purchasableProduct.price}` : `اشتر الآن - ${purchasableProduct.price}`)
-              : (lang === 'en' ? productSoldOut.toUpperCase() : 'نفد المخزون')}
+              ? (lang === 'en' ? `${productBuyNow || 'Buy Now'} - ${purchasableProduct.price}` : `اشتر الآن - ${purchasableProduct.price}`)
+              : (lang === 'en' ? (productSoldOut || 'Sold Out').toUpperCase() : 'نفد المخزون')}
           </motion.button>
         </motion.div>
       </AnimatePresence>
