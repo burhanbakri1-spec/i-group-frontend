@@ -19,6 +19,7 @@ import {
   AllSettingsResponse,
   CreateAddressInput,
   CreateOrderInput,
+  CreateReviewInput,
   CreatedOrder,
   OrderListItem,
   OrderSummary,
@@ -159,6 +160,20 @@ export const icareApi = {
       request<PaginatedData<BackendProductReview> | BackendProductReview[]>(`/api/v1/products/${slug}/reviews`, { query }),
     related: (slug: string) => request<BackendProduct[]>(`/api/v1/products/${slug}/related`),
     showcase: (slug: string) => request<BackendShowcaseUnit[]>(`/api/v1/products/${slug}/showcase`),
+    submitReview: (slug: string, review: CreateReviewInput, token?: string) =>
+      request<BackendProductReview>(`/api/v1/products/${slug}/reviews`, {
+        method: 'POST',
+        token,
+        body: JSON.stringify(review),
+      }),
+  },
+
+  reviews: {
+    helpful: (reviewId: number, token?: string) =>
+      request<{ helpfulCount: number }>(`/api/v1/reviews/${reviewId}/helpful`, {
+        method: 'POST',
+        token,
+      }),
   },
 
   categories: {

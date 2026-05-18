@@ -1,6 +1,6 @@
-import { BackendProduct, BackendVlog, FAQCategoryGroup, Product, ProductReview, ShowcaseUnit, VlogContentItem } from '../types';
+import { BackendProduct, BackendShowcaseUnit, BackendVlog, ContentDirection, CreateReviewInput, FAQCategoryGroup, Product, ProductReview, ShowcaseUnit, ShowcaseUnitType, VlogContentItem } from '../types';
 import { icareApi, IcareApiError } from './api-client';
-import { cachedFetch } from './cache-middleware';
+import { cachedFetch, cacheMiddleware } from './cache-middleware';
 import {
   mapBackendFaqsToGroups,
   mapBackendProductToProduct,
@@ -21,6 +21,44 @@ const normalizeShowcaseImageUrl = (image?: string | null) => {
   if (image.startsWith('http')) return image;
   if (image.startsWith('/')) return `${IMAGE_BASE_URL || IMAGE_PROXY_BASE_URL}${image}`;
   return image;
+};
+
+const SEMANTIC_SHOWCASE_TYPES = new Set<ShowcaseUnitType>([
+  'generic',
+  'simple_media_text',
+  'kit_contents',
+  'application_steps',
+  'results_study',
+  'routine_steps',
+]);
+
+const getShowcaseUnitType = (type?: string | null): ShowcaseUnitType => (
+  SEMANTIC_SHOWCASE_TYPES.has(type as ShowcaseUnitType) ? type as ShowcaseUnitType : 'generic'
+);
+
+const mapBackendShowcaseUnit = (unit: BackendShowcaseUnit): ShowcaseUnit => {
+  const image = normalizeShowcaseImageUrl(unit.image);
+  const title = unit.title ?? '';
+  const description = unit.description ?? '';
+  const type = getShowcaseUnitType(unit.type);
+
+  return {
+    id: unit.id,
+    type,
+    payload: unit.payload ?? {
+      eyebrow: 'showcase',
+      title,
+      description,
+      image: image ? { url: image, alt: title || 'Product showcase' } : undefined,
+    },
+    theme: unit.theme,
+    image,
+    title,
+    description,
+    sortOrder: unit.sortOrder,
+    isActive: unit.isActive,
+    direction: (unit.direction === 'rtl' ? 'rtl' : 'ltr') as ContentDirection,
+  };
 };
 
 const isDirectVideoUrl = (url: string) => VIDEO_FILE_PATTERN.test(url);
@@ -216,11 +254,20 @@ export const fetchRelatedProducts = async (slug: string, limit = 8): Promise<Pro
   }
 };
 
-export const fetchProductReviews = async (slug: string, limit = 10): Promise<ProductReview[] | null> => {
+export const fetchProductReviews = async (
+  slug: string,
+  limit = 10,
+  options?: { page?: number; sortBy?: string; rating?: number },
+): Promise<ProductReview[] | null> => {
   try {
     if (!icareApi.isConfigured()) return null;
     return await cachedFetch(`/api/v1/products/${slug}/reviews`, async () => {
-      const payload = await icareApi.products.reviews(slug, { page: 1, limit });
+      const payload = await icareApi.products.reviews(slug, {
+        page: options?.page ?? 1,
+        limit,
+        sortBy: options?.sortBy,
+        rating: options?.rating,
+      });
       return unwrapListData(payload).map((review) => mapBackendReviewToProductReview(review));
     }, { tier: 'list', query: { limit } });
   } catch (error) {
@@ -296,16 +343,44 @@ export const fetchProductShowcase = async (slug: string): Promise<ShowcaseUnit[]
   try {
     if (!icareApi.isConfigured()) return null;
     const units = await icareApi.products.showcase(slug);
-    return units.map(u => ({
-      id: u.id,
-      image: normalizeShowcaseImageUrl(u.image),
-      title: u.title,
-      description: u.description ?? '',
-      layout: u.layout ?? 'stacked',
-    }));
+    return units.map(mapBackendShowcaseUnit);
   } catch (error) {
     if (!(error instanceof IcareApiError && error.status === 0)) {
       console.error('Error fetching product showcase:', error);
+    }
+    return null;
+  }
+};
+
+export const submitProductReview = async (
+  slug: string,
+  review: CreateReviewInput,
+  token?: string,
+): Promise<ProductReview | null> => {
+  try {
+    if (!icareApi.isConfigured()) return null;
+    const result = await icareApi.products.submitReview(slug, review, token);
+    cacheMiddleware.invalidate(`/api/v1/products/${slug}/reviews`);
+    return mapBackendReviewToProductReview(result);
+  } catch (error) {
+    if (!(error instanceof IcareApiError && error.status === 0)) {
+      console.error('Error submitting iCare product review:', error);
+    }
+    throw error;
+  }
+};
+
+export const voteReviewHelpful = async (
+  reviewId: number,
+  token?: string,
+): Promise<number | null> => {
+  try {
+    if (!icareApi.isConfigured()) return null;
+    const result = await icareApi.reviews.helpful(reviewId, token);
+    return result.helpfulCount;
+  } catch (error) {
+    if (!(error instanceof IcareApiError && error.status === 0)) {
+      console.error('Error voting review helpful:', error);
     }
     return null;
   }

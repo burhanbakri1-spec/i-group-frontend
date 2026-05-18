@@ -7,9 +7,12 @@ import { ProductLineup } from './ProductLineup';
 import { ProductShowcaseBlock } from './ProductShowcaseBlock';
 import { useShop } from '../context/ShopContext';
 import { useSiteContent } from '../hooks/useSiteContent';
-import { Product, ProductGalleryMedia, ProductReview, ProductVariant } from '../types';
+import { Product, ProductGalleryMedia, ProductReview, ProductVariant, CreateReviewInput } from '../types';
 import { getDefaultVariant, isPurchasableStock, mapBackendProductGalleryMedia, mapBackendProductToProduct, mapBackendReviewToProductReview, normalizeProductMediaUrl } from '../lib/mappers';
-import { fetchProductBySlug, fetchProductReviews, fetchRelatedProducts } from '../lib/catalog-client';
+import { fetchProductBySlug, fetchProductReviews, fetchRelatedProducts, submitProductReview, voteReviewHelpful } from '../lib/catalog-client';
+import { cacheMiddleware } from '../lib/cache-middleware';
+import { WriteReviewDialog } from './WriteReviewDialog';
+import { useIcareShell } from './IcareShell';
 
 interface ProductPageProps {
   product: Product;
@@ -20,7 +23,14 @@ interface ProductPageProps {
 
 const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 
-const ReviewItem = ({ review, content }: { review: ProductReview; content: { verifiedLabel: string; hydrationQuestion: string; hydrationLow: string; hydrationHigh: string; helpfulQuestion: string } }) => (
+interface ReviewItemProps {
+  review: ProductReview;
+  content: { verifiedLabel: string; hydrationQuestion: string; hydrationLow: string; hydrationHigh: string; helpfulQuestion: string };
+  helpfulCount?: number;
+  onHelpfulVote?: (reviewId: number) => void;
+}
+
+const ReviewItem = ({ review, content, helpfulCount = 0, onHelpfulVote }: ReviewItemProps) => (
   <div className="py-12 border-b border-black/5 grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12">
     {/* Left Sidebar */}
     <div className="space-y-6">
@@ -87,8 +97,8 @@ const ReviewItem = ({ review, content }: { review: ProductReview; content: { ver
       <div className="flex justify-end gap-6 pt-8">
         <div className="flex items-center gap-4 text-[11px] font-bold text-black/55">
           <span>{content.helpfulQuestion}</span>
-          <button className={`flex items-center gap-1.5 rounded-md hover:text-black transition-colors ${CONTROL_FOCUS_CLASS}`}>
-            <ThumbsUp size={14} /> 0
+          <button onClick={() => review.id && onHelpfulVote?.(review.id)} className={`flex items-center gap-1.5 rounded-md hover:text-black transition-colors ${CONTROL_FOCUS_CLASS}`}>
+            <ThumbsUp size={14} /> {helpfulCount}
           </button>
           <button className={`flex items-center gap-1.5 rounded-md hover:text-black transition-colors ${CONTROL_FOCUS_CLASS}`}>
             <ThumbsDown size={14} /> 0
@@ -129,7 +139,8 @@ const getProductImageGallery = (displayProduct: Product, selectedVariant: Produc
 };
 
 export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProductSelect }) => {
-  const { addToCart } = useShop();
+  const { addToCart, isAuthenticated, accessToken } = useShop();
+  const { navigateToPage } = useIcareShell();
   const shouldReduceMotion = useReducedMotion();
   const {
     productDetailsFallback,
@@ -157,7 +168,18 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
   const [isReviewsExpanded, setIsReviewsExpanded] = useState(false);
   const [remoteReviews, setRemoteReviews] = useState<ProductReview[] | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[] | null>(null);
+  const [isWriteReviewOpen, setIsWriteReviewOpen] = useState(false);
+  const [reviewSortBy, setReviewSortBy] = useState<string>('recent');
+  const [reviewRatingFilter, setReviewRatingFilter] = useState<number | undefined>(undefined);
+  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const [reviewPage, setReviewPage] = useState(1);
+  const [helpfulVotes, setHelpfulVotes] = useState<Record<number, number>>({});
+  const [hasMoreReviews, setHasMoreReviews] = useState(false);
+  const [additionalReviews, setAdditionalReviews] = useState<ProductReview[]>([]);
   const lastScrollY = useRef(0);
+  const filterDropdownRef = useRef<HTMLDivElement>(null);
+  const sortDropdownRef = useRef<HTMLDivElement>(null);
   const isRtl = lang === 'ar';
 
   const displayImages = useMemo(
@@ -207,20 +229,70 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
         return;
       }
       const [reviewData, relatedData] = await Promise.all([
-        fetchProductReviews(product.slug, 10),
+        fetchProductReviews(product.slug, 10, { page: 1, sortBy: reviewSortBy, rating: reviewRatingFilter }),
         fetchRelatedProducts(product.slug, 8),
       ]);
       setRemoteReviews(reviewData ?? []);
       setRelatedProducts(relatedData ?? []);
+      setReviewPage(1);
+      setAdditionalReviews([]);
+      setHasMoreReviews((reviewData ?? []).length >= 10);
     };
 
     loadProductSupportData();
-  }, [product.slug]);
+  }, [product.slug, reviewSortBy, reviewRatingFilter]);
 
-  const displayReviews = remoteReviews ?? [];
+  const displayReviews = [...(remoteReviews ?? []), ...additionalReviews];
   const hasReviews = displayReviews.length > 0;
   const averageRating = displayProduct.rating ?? '0';
   const reviewCount = displayProduct.reviews ?? '0';
+  const ratingDistribution = displayProduct.backendProduct?.reviews?.summary?.distribution ?? {};
+
+  const loadMoreReviews = async () => {
+    if (!product.slug) return;
+    const nextPage = reviewPage + 1;
+    const moreReviews = await fetchProductReviews(product.slug, 10, { page: nextPage, sortBy: reviewSortBy, rating: reviewRatingFilter });
+    if (moreReviews && moreReviews.length > 0) {
+      setAdditionalReviews((prev) => [...prev, ...moreReviews]);
+      setReviewPage(nextPage);
+      setHasMoreReviews(moreReviews.length >= 10);
+    } else {
+      setHasMoreReviews(false);
+    }
+  };
+
+  const handleReviewSubmit = async (review: CreateReviewInput) => {
+    const submitted = await submitProductReview(product.slug ?? '', review, accessToken ?? undefined);
+    if (submitted) {
+      setRemoteReviews((prev) => [submitted, ...(prev ?? [])]);
+      cacheMiddleware.invalidate(`/api/v1/products/${product.slug}/reviews`);
+    }
+  };
+
+  const handleHelpfulVote = async (reviewId: number) => {
+    const newCount = await voteReviewHelpful(reviewId, accessToken ?? undefined);
+    if (newCount !== null) {
+      setHelpfulVotes((prev) => ({ ...prev, [reviewId]: newCount }));
+    }
+  };
+
+  const handleLoginRequest = () => {
+    setIsWriteReviewOpen(false);
+    navigateToPage('account');
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isFilterDropdownOpen && filterDropdownRef.current && !filterDropdownRef.current.contains(event.target as Node)) {
+        setIsFilterDropdownOpen(false);
+      }
+      if (isSortDropdownOpen && sortDropdownRef.current && !sortDropdownRef.current.contains(event.target as Node)) {
+        setIsSortDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isFilterDropdownOpen, isSortDropdownOpen]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -382,16 +454,89 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                   <p className="text-[12px] font-black uppercase tracking-widest text-[#333]">{productRatingLabel}</p>
                   <p className="text-[12px] text-[#555]">Based on {reviewCount} reviews</p>
                 </div>
+                {/* Rating distribution */}
+                <div className="space-y-2 w-full max-w-xs">
+                  {[5, 4, 3, 2, 1].map((star) => {
+                    const count = Number(ratingDistribution[String(star)] ?? 0);
+                    const total = Object.values(ratingDistribution).reduce((sum, c) => sum + Number(c), 0);
+                    const pct = total > 0 ? (count / total) * 100 : 0;
+                    return (
+                      <div key={star} className="flex items-center gap-3">
+                        <span className="text-[11px] font-bold text-black/55 w-3 text-right">{star}</span>
+                        <Star size={10} fill="black" className="text-black shrink-0" />
+                        <div className="flex-1 h-1.5 bg-black/5 rounded-full overflow-hidden">
+                          <div className="h-full bg-black rounded-full transition-all" style={{ width: `${pct}%` }} />
+                        </div>
+                        <span className="text-[10px] font-bold text-black/40 w-6 text-right">{count}</span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
               <div className="flex items-center gap-4">
-                <button className={`flex items-center gap-2 px-6 py-2.5 rounded-full border border-black/15 text-[10px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-colors ${CONTROL_FOCUS_CLASS}`}>
-                  {reviewFilterButton}
+                <button
+                  onClick={() => setIsWriteReviewOpen(true)}
+                  className={`flex items-center gap-2 px-6 py-2.5 rounded-full bg-black text-white text-[10px] font-black uppercase tracking-widest hover:bg-black/90 transition-colors ${CONTROL_FOCUS_CLASS}`}
+                >
+                  write a review
                 </button>
-                <div className="relative group">
-                  <button className={`flex items-center gap-6 px-6 py-2.5 rounded-full border border-black/15 text-[10px] font-black uppercase tracking-widest hover:border-black transition-colors ${CONTROL_FOCUS_CLASS}`}>
-                    {reviewSortRecent} <ChevronDown size={14} />
+                <div ref={filterDropdownRef} className="relative">
+                  <button
+                    onClick={() => { setIsFilterDropdownOpen((prev) => !prev); setIsSortDropdownOpen(false); }}
+                    className={`flex items-center gap-2 px-6 py-2.5 rounded-full border text-[10px] font-black uppercase tracking-widest transition-colors ${CONTROL_FOCUS_CLASS} ${reviewRatingFilter ? 'bg-black text-white border-black' : 'border-black/15 hover:bg-black hover:text-white'}`}
+                  >
+                    {reviewRatingFilter ? `${reviewRatingFilter} stars` : reviewFilterButton}
+                    <ChevronDown size={12} className={`transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
+                  {isFilterDropdownOpen && (
+                    <div className="absolute top-full mt-2 left-0 bg-white rounded-xl border border-black/10 shadow-lg py-1 z-20 min-w-[140px]">
+                      {reviewRatingFilter && (
+                        <button
+                          onClick={() => { setReviewRatingFilter(undefined); setIsFilterDropdownOpen(false); }}
+                          className={`w-full px-4 py-2 text-left text-[11px] font-bold hover:bg-black/5 transition-colors text-black/40`}
+                        >
+                          all ratings
+                        </button>
+                      )}
+                      {[5, 4, 3, 2, 1].map((r) => (
+                        <button
+                          key={r}
+                          onClick={() => { setReviewRatingFilter(r); setIsFilterDropdownOpen(false); }}
+                          className={`w-full px-4 py-2 text-left text-[11px] font-bold hover:bg-black/5 transition-colors flex items-center gap-2 ${reviewRatingFilter === r ? 'text-black' : 'text-black/55'}`}
+                        >
+                          {r} star{r !== 1 ? 's' : ''}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div ref={sortDropdownRef} className="relative">
+                  <button
+                    onClick={() => { setIsSortDropdownOpen((prev) => !prev); setIsFilterDropdownOpen(false); }}
+                    className={`flex items-center gap-2 px-6 py-2.5 rounded-full border border-black/15 text-[10px] font-black uppercase tracking-widest hover:border-black transition-colors bg-white ${CONTROL_FOCUS_CLASS}`}
+                  >
+                    {reviewSortBy === 'recent' ? 'Most recent' : reviewSortBy === 'highest' ? 'Highest rated' : reviewSortBy === 'lowest' ? 'Lowest rated' : 'Most helpful'}
+                    <ChevronDown size={12} className={`transition-transform ${isSortDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  {isSortDropdownOpen && (
+                    <div className="absolute top-full mt-2 right-0 bg-white rounded-xl border border-black/10 shadow-lg py-1 z-20 min-w-[160px]">
+                      {[
+                        { value: 'recent', label: 'Most recent' },
+                        { value: 'highest', label: 'Highest rated' },
+                        { value: 'lowest', label: 'Lowest rated' },
+                        { value: 'helpful', label: 'Most helpful' },
+                      ].map((opt) => (
+                        <button
+                          key={opt.value}
+                          onClick={() => { setReviewSortBy(opt.value); setIsSortDropdownOpen(false); }}
+                          className={`w-full px-4 py-2 text-left text-[11px] font-bold hover:bg-black/5 transition-colors ${reviewSortBy === opt.value ? 'text-black' : 'text-black/55'}`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -401,7 +546,13 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
             {hasReviews ? (
               <div className="divide-y divide-black/5">
                 {displayReviews.map((review, idx) => (
-                  <ReviewItem key={review.id ?? idx} review={review} content={{ verifiedLabel: reviewVerifiedLabel, hydrationQuestion: reviewHydrationQuestion, hydrationLow: reviewHydrationLow, hydrationHigh: reviewHydrationHigh, helpfulQuestion: reviewHelpfulQuestion }} />
+                  <ReviewItem
+                    key={review.id ?? idx}
+                    review={review}
+                    content={{ verifiedLabel: reviewVerifiedLabel, hydrationQuestion: reviewHydrationQuestion, hydrationLow: reviewHydrationLow, hydrationHigh: reviewHydrationHigh, helpfulQuestion: reviewHelpfulQuestion }}
+                    helpfulCount={helpfulVotes[review.id ?? 0] ?? 0}
+                    onHelpfulVote={handleHelpfulVote}
+                  />
                 ))}
               </div>
             ) : (
@@ -417,13 +568,31 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
           </div>
 
           {hasReviews && (
-            <div className="flex justify-center pt-8 md:pt-12 relative z-20">
-            <button 
-              onClick={() => setIsReviewsExpanded(!isReviewsExpanded)}
-              className={`px-12 py-3 rounded-full border border-black/15 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors duration-200 bg-white ${CONTROL_FOCUS_CLASS}`}
-            >
-              {isReviewsExpanded ? reviewShowLess : reviewShowMore}
-            </button>
+            <div className="flex flex-col items-center gap-3 pt-8 md:pt-12 relative z-20">
+              {!isReviewsExpanded && (
+                <button 
+                  onClick={() => setIsReviewsExpanded(true)}
+                  className={`px-12 py-3 rounded-full border border-black/15 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors duration-200 bg-white ${CONTROL_FOCUS_CLASS}`}
+                >
+                  {reviewShowMore}
+                </button>
+              )}
+              {isReviewsExpanded && hasMoreReviews && (
+                <button 
+                  onClick={loadMoreReviews}
+                  className={`px-12 py-3 rounded-full border border-black/15 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors duration-200 bg-white ${CONTROL_FOCUS_CLASS}`}
+                >
+                  load more reviews
+                </button>
+              )}
+              {isReviewsExpanded && (
+                <button 
+                  onClick={() => { setIsReviewsExpanded(false); setAdditionalReviews([]); setReviewPage(1); }}
+                  className={`px-8 py-2 rounded-full border border-black/10 text-[10px] font-bold uppercase tracking-widest hover:border-black transition-colors ${CONTROL_FOCUS_CLASS}`}
+                >
+                  {reviewShowLess}
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -469,6 +638,16 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}} />
+
+      <WriteReviewDialog
+        open={isWriteReviewOpen}
+        onClose={() => setIsWriteReviewOpen(false)}
+        productSlug={product.slug ?? ''}
+        productName={displayProduct.name}
+        onSubmit={handleReviewSubmit}
+        isAuthenticated={isAuthenticated}
+        onLoginRequest={handleLoginRequest}
+      />
     </div>
   );
 };

@@ -274,6 +274,12 @@ export const useSiteContent = (lang: Language = 'en') => {
       reviewShowLess: g.review_show_less,
       reviewHelpfulQuestion: g.review_helpful_question,
       reviewHydrationQuestion: g.review_hydration_question,
+      reviewWriteButton: g.review_write_button,
+      reviewSortHighest: g.review_sort_highest,
+      reviewSortLowest: g.review_sort_lowest,
+      reviewSortHelpful: g.review_sort_helpful,
+      reviewLoadMore: g.review_load_more,
+      reviewFilterStars: g.review_filter_stars,
 
       // ── Social ──
       socialLinks: socialLinks,

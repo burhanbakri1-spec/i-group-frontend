@@ -2,6 +2,29 @@
  * Shared type definitions for iCare application
  */
 
+import type {
+  ApplicationStepsPayload,
+  ContentDirection,
+  KitContentsPayload,
+  PresentationTheme,
+  ProductPresentationUnitType,
+  ResultsStudyPayload,
+  RoutineStepsPayload,
+  SimpleMediaTextPayload,
+} from './product-presentation-units';
+
+export type {
+  ApplicationStepsPayload,
+  ContentDirection,
+  KitContentsPayload,
+  PresentationTheme,
+  ProductPresentationUnit,
+  ProductPresentationUnitType,
+  ResultsStudyPayload,
+  RoutineStepsPayload,
+  SimpleMediaTextPayload,
+} from './product-presentation-units';
+
 export interface Product {
   id: string;
   backendId?: number;
@@ -310,6 +333,17 @@ export interface BackendProductReview {
   } | null;
 }
 
+export interface CreateReviewInput {
+  rating: number;
+  title?: string;
+  comment?: string;
+  ageRange?: string;
+  skinType?: string;
+  skinConcerns?: string[];
+  favoriteFeatures?: string[];
+  hydrationRating?: number;
+}
+
 export interface BackendProductReviewsSummary {
   summary?: {
     average?: BackendNumeric | null;
@@ -596,21 +630,42 @@ export interface CreatedOrder {
   createdAt?: string;
 }
 
+export type ShowcaseUnitType = ProductPresentationUnitType | 'generic' | 'simple_media_text';
+
+export type ShowcaseUnitPayload =
+  | KitContentsPayload
+  | ApplicationStepsPayload
+  | ResultsStudyPayload
+  | RoutineStepsPayload
+  | SimpleMediaTextPayload
+  | Record<string, unknown>
+  | null;
+
+export type ShowcaseTheme = PresentationTheme | string | Record<string, unknown> | null;
+
 export interface BackendShowcaseUnit {
   id: number;
   productId: number;
-  image: string;
-  title: string;
+  type?: ShowcaseUnitType | string | null;
+  payload?: ShowcaseUnitPayload | unknown;
+  theme?: ShowcaseTheme;
+  image?: string | null;
+  title?: string | null;
   description?: string | null;
   sortOrder: number;
-  layout?: string;
+  direction?: ContentDirection | string | null;
   isActive: boolean;
 }
 
 export interface ShowcaseUnit {
   id: number;
+  type: ShowcaseUnitType;
+  payload?: ShowcaseUnitPayload | unknown;
+  theme?: ShowcaseTheme;
   image: string;
   title: string;
   description: string;
-  layout?: string;
+  sortOrder?: number;
+  isActive?: boolean;
+  direction?: ContentDirection | string;
 }
