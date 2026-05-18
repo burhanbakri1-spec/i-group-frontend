@@ -20,10 +20,10 @@ export const PRODUCT_SHOWCASE_FALLBACK_UNITS: ShowcaseUnit[] = [
         alt: 'Travel size skincare kit contents',
       },
       items: [
-        { id: 'glazing-milk', title: 'Little glazing milk', quantity: '30 ml', description: 'Milky skin prep for a dewy base.' },
-        { id: 'barrier-butter', title: 'Little barrier butter', quantity: '10 ml', description: 'Rich comfort for dry winter skin.' },
-        { id: 'lip-tint', title: 'Scented peptide lip tint', quantity: 'mini', description: 'Glossy nourishment with a soft tint.' },
-        { id: 'bubble-bag', title: 'Mini rhode bubble bag', description: 'Soft carry-all for daily essentials.' },
+        { id: 'glazing-milk', title: 'Little glazing milk', quantity: '30 ml', description: 'Milky skin prep for a dewy base.', expand: 'A lightweight, milky essence that preps skin with a burst of hydration. Use after cleansing and before moisturizer to create the perfect dewy canvas. The travel-friendly 30 ml size slips into any bag for skincare on the go.' },
+        { id: 'barrier-butter', title: 'Little barrier butter', quantity: '10 ml', description: 'Rich comfort for dry winter skin.', expand: 'An ultra-rich comfort cream designed to protect and nourish skin during harsh winter months. The whipped butter texture melts into skin, delivering deep moisture without feeling greasy. Perfect for flaky, sensitized, or wind-chapped areas.' },
+        { id: 'lip-tint', title: 'Scented peptide lip tint', quantity: 'mini', description: 'Glossy nourishment with a soft tint.', expand: 'A glossy, peptide-infused lip treatment that delivers lasting hydration with a subtle wash of color. The cushiony formula smooths lip lines and leaves a soft, juicy tint that builds with every swipe. Scented with a delicate vanilla-mint blend.' },
+        { id: 'bubble-bag', title: 'Mini rhode bubble bag', description: 'Soft carry-all for daily essentials.', expand: 'A squishy, tactile carry-all designed to hold your daily skincare essentials. The bubble-textured exterior is wipe-clean and crush-resistant, making it ideal for travel, gym bags, or keeping your vanity organized. Sized to fit the full travel kit.' },
       ],
       oldSectionLayoutNotes: {
         oldBaGroupTopology: 'Two-column editorial kit block with media and included-item list.',

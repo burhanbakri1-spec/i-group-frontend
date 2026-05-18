@@ -76,6 +76,7 @@ export interface KitContentsItem {
   description?: string;
   quantity?: string;
   image?: MediaAsset;
+  expand?: string;
 }
 
 export interface SectionHeadingFragments {

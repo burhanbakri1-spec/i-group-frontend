@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { ChevronRight, Plus } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { fetchProductShowcase } from '../lib/catalog-client';
 import { PRODUCT_SHOWCASE_FALLBACK_UNITS } from '../lib/product-showcase-fallback';
@@ -27,6 +27,7 @@ interface NormalizedKitItem {
   description?: string;
   quantity?: string;
   badge?: string;
+  expand?: string;
   image?: NormalizedMedia;
 }
 
@@ -145,7 +146,6 @@ function renderMotionUnit(unit: ShowcaseUnit, idx: number, children: React.React
 function KitContentsShowcaseSection({ unit, direction }: { unit: ShowcaseUnit; direction: ContentDirection }) {
   const payload = isRecord(unit.payload) ? unit.payload : undefined;
   const heading = getHeading(payload, unit);
-  const media = getMedia(payload?.media ?? unit.image, heading.title);
   const items = asRecordArray(payload?.items)
     .map((item, index): NormalizedKitItem => ({
       id: asString(item.id) ?? `kit-item-${index}`,
@@ -153,37 +153,57 @@ function KitContentsShowcaseSection({ unit, direction }: { unit: ShowcaseUnit; d
       description: asString(item.description),
       quantity: asString(item.quantity),
       badge: asString(item.badge),
+      expand: asString(item.expand),
       image: getMedia(item.image, asString(item.title) ?? 'Kit item'),
     }))
     .filter((item) => item.title);
+
+  const sideMedia = getMedia(payload?.media, heading.title) ?? items[0]?.image;
+
+  const [openItemId, setOpenItemId] = useState<string | null>(null);
+
+  const toggleItem = (itemId: string) => {
+    setOpenItemId((current) => current === itemId ? null : itemId);
+  };
 
   if (!heading.title || items.length === 0) return null;
 
   const textOrder = direction === 'rtl' ? 'order-1 md:order-2' : 'order-2 md:order-1';
   const mediaOrder = direction === 'rtl' ? 'order-2 md:order-1' : 'order-1 md:order-2';
 
-  return (
-    <section className="bg-[#F2F1ED] rounded-[24px] md:rounded-[40px] px-6 md:px-20 py-10 md:py-16 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-20 items-center overflow-hidden">
-      <div className={`space-y-8 md:space-y-12 ${textOrder} px-2 md:px-0`}>
-        {heading.eyebrow && <p className="text-[10px] font-black uppercase tracking-[0.25em] text-black/35">{heading.eyebrow}</p>}
-        <div className="space-y-3 max-w-md">
-          <h2 className="text-[28px] md:text-[44px] tracking-tight leading-[1] text-[#333]">
-            <span className="font-black uppercase">{heading.title}</span>
-          </h2>
-          {heading.description && <p className="text-[13px] md:text-[15px] font-medium leading-relaxed text-[#666]">{heading.description}</p>}
-        </div>
-        <div className="border-t border-black/10 pt-4">
-          {items.map((item) => (
-            <div key={item.id} className="group flex items-center justify-between gap-4 py-5 md:py-6 border-b border-black/10 px-2 transition-colors duration-300 hover:bg-black/5">
-              <div className="flex items-center gap-3 min-w-0">
+  const listPanel = (
+    <div className={`${textOrder} space-y-8 md:space-y-12`}>
+      {heading.eyebrow && <p className="text-[10px] font-black uppercase tracking-[0.25em] text-black/35">{heading.eyebrow}</p>}
+      <div className="space-y-3">
+        <h2 className="text-[28px] md:text-[44px] tracking-tight leading-[1] text-[#333]">
+          <span className="font-black uppercase">{heading.title}</span>
+        </h2>
+        {heading.description && <p className="text-[13px] md:text-[15px] font-medium leading-relaxed text-[#666]">{heading.description}</p>}
+      </div>
+      <div className="border-t border-black/10">
+        {items.map((item) => {
+          const isOpen = openItemId === item.id;
+          const buttonId = `kit-item-${item.id}-button`;
+          const panelId = `kit-item-${item.id}-panel`;
+
+          return (
+            <div key={item.id} className="border-b border-black/10">
+              <button
+                id={buttonId}
+                type="button"
+                aria-expanded={isOpen}
+                aria-controls={panelId}
+                onClick={() => toggleItem(item.id)}
+                className="group flex w-full items-center gap-4 py-5 md:py-6 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F1ED] transition-colors duration-300 hover:bg-black/[0.03] px-2 -mx-2 rounded-xl"
+              >
                 {item.image && (
-                  <div className="w-12 h-12 rounded-xl overflow-hidden bg-white shrink-0">
+                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl overflow-hidden bg-white shrink-0">
                     <ImageWithFallback src={item.image.url} alt={item.image.alt} className="w-full h-full object-cover object-center" />
                   </div>
                 )}
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[11px] md:text-[13px] font-black uppercase tracking-[0.15em]">{item.title}</span>
+                    <span className="text-[13px] md:text-[15px] font-black uppercase tracking-[0.12em] group-hover:text-black/80 transition-colors">{item.title}</span>
                     {item.badge && <span className="rounded-full bg-white px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.12em] text-black/50">{item.badge}</span>}
                   </div>
                   {(item.quantity || item.description) && (
@@ -193,17 +213,54 @@ function KitContentsShowcaseSection({ unit, direction }: { unit: ShowcaseUnit; d
                     </div>
                   )}
                 </div>
-              </div>
-              <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-[#66635F] text-white flex items-center justify-center group-hover:bg-black transition-colors duration-300">
-                <Plus size={12} strokeWidth={3} />
-              </div>
+                <span className="w-7 h-7 md:w-8 md:h-8 shrink-0 rounded-full border border-black/10 flex items-center justify-center bg-white group-hover:bg-black group-hover:text-white transition-colors duration-300">
+                  <svg
+                    aria-hidden="true"
+                    className={`${isOpen ? 'rotate-45' : 'rotate-0'} transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 5v14" />
+                    <path d="M5 12h14" />
+                  </svg>
+                </span>
+              </button>
+
+              <motion.div
+                id={panelId}
+                role="region"
+                aria-labelledby={buttonId}
+                aria-hidden={!isOpen}
+                initial={false}
+                animate={{ height: isOpen ? 'auto' : 0, opacity: isOpen ? 1 : 0 }}
+                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                className="overflow-hidden"
+              >
+                <div className="pb-6 md:pb-8 pl-[72px] md:pl-[80px] pr-2">
+                  <p className="text-[14px] md:text-[16px] leading-[1.7] text-black/60 font-medium">
+                    {item.expand || item.description || ''}
+                  </p>
+                </div>
+              </motion.div>
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
-      {media && (
-        <div className={`${mediaOrder} bg-white rounded-[24px] md:rounded-[32px] overflow-hidden aspect-square md:h-[500px] shadow-sm`}>
-          <ImageWithFallback src={media.url} alt={media.alt} className="w-full h-full object-cover object-center" />
+    </div>
+  );
+
+  return (
+    <section className="bg-[#F2F1ED] rounded-[24px] md:rounded-[40px] px-6 md:px-20 py-10 md:py-16 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-20 items-start overflow-hidden">
+      {listPanel}
+      {sideMedia && (
+        <div className={`${mediaOrder} bg-white rounded-[24px] md:rounded-[32px] overflow-hidden aspect-square md:h-[500px] shadow-sm sticky md:top-24`}>
+          <ImageWithFallback src={sideMedia.url} alt={sideMedia.alt} className="w-full h-full object-cover object-center" />
         </div>
       )}
     </section>
