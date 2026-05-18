@@ -173,6 +173,7 @@ export const icareApi = {
       request<{ helpfulCount: number }>(`/api/v1/reviews/${reviewId}/helpful`, {
         method: 'POST',
         token,
+        body: JSON.stringify({}),
       }),
   },
 

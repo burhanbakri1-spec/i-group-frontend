@@ -486,7 +486,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                     onClick={() => { setIsFilterDropdownOpen((prev) => !prev); setIsSortDropdownOpen(false); }}
                     className={`flex items-center gap-2 px-6 py-2.5 rounded-full border text-[10px] font-black uppercase tracking-widest transition-colors ${CONTROL_FOCUS_CLASS} ${reviewRatingFilter ? 'bg-black text-white border-black' : 'border-black/15 hover:bg-black hover:text-white'}`}
                   >
-                    {reviewRatingFilter ? `${reviewRatingFilter} stars` : reviewFilterButton}
+                    {reviewRatingFilter ? `${reviewRatingFilter} stars` : (reviewFilterButton || 'Filter')}
                     <ChevronDown size={12} className={`transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
                   {isFilterDropdownOpen && (
