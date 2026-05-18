@@ -158,7 +158,7 @@ function KitContentsShowcaseSection({ unit, direction }: { unit: ShowcaseUnit; d
     }))
     .filter((item) => item.title);
 
-  const sideMedia = getMedia(payload?.media, heading.title) ?? items[0]?.image;
+  const mainMedia = getMedia(payload?.media ?? unit.image, heading.title);
 
   const [openItemId, setOpenItemId] = useState<string | null>(null);
 
@@ -170,6 +170,15 @@ function KitContentsShowcaseSection({ unit, direction }: { unit: ShowcaseUnit; d
 
   const textOrder = direction === 'rtl' ? 'order-1 md:order-2' : 'order-2 md:order-1';
   const mediaOrder = direction === 'rtl' ? 'order-2 md:order-1' : 'order-1 md:order-2';
+  const openItem = items.find((item) => item.id === openItemId);
+  const activeMedia = openItem?.image ?? mainMedia ?? items[0]?.image;
+  const activeMediaKey = openItem?.image
+    ? `kit-item-${openItem.id}-${openItem.image.url}`
+    : mainMedia
+      ? `kit-main-${mainMedia.url}`
+      : activeMedia
+        ? `kit-fallback-${activeMedia.url}`
+        : 'kit-empty-media';
 
   const listPanel = (
     <div className={`${textOrder} space-y-8 md:space-y-12`}>
@@ -258,9 +267,22 @@ function KitContentsShowcaseSection({ unit, direction }: { unit: ShowcaseUnit; d
   return (
     <section className="bg-[#F2F1ED] rounded-[24px] md:rounded-[40px] px-6 md:px-20 py-10 md:py-16 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-20 items-start overflow-hidden">
       {listPanel}
-      {sideMedia && (
-        <div className={`${mediaOrder} bg-white rounded-[24px] md:rounded-[32px] overflow-hidden aspect-square md:h-[500px] shadow-sm sticky md:top-24`}>
-          <ImageWithFallback src={sideMedia.url} alt={sideMedia.alt} className="w-full h-full object-cover object-center" />
+      {activeMedia && (
+        <div className={`${mediaOrder} bg-white rounded-[24px] md:rounded-[32px] aspect-square md:min-h-[500px] shadow-sm sticky md:top-24 p-4 md:p-6`}>
+          <div className="relative h-full w-full overflow-hidden rounded-[18px] md:rounded-[26px] bg-[#F8F7F4]">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeMediaKey}
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.03 }}
+                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                className="absolute inset-0 flex items-center justify-center p-5 md:p-8"
+              >
+                <ImageWithFallback src={activeMedia.url} alt={activeMedia.alt} className="h-full w-full object-contain object-center" />
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
       )}
     </section>
