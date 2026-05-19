@@ -195,7 +195,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
                   onClick={() => onProductSelect(current)}
                   className="bg-black text-white rounded-full w-full py-3 md:py-4 text-[10px] md:text-[11px] font-black tracking-[0.1em] md:tracking-[0.2em] uppercase hover:bg-[#333] transition-colors duration-300 shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
                 >
-                  {lang === 'en' ? 'VIEW' : 'عرض'} — {current.price}
+                  {lang === 'en' ? 'VIEW' : 'عرض'} — {current.originalPrice && <><span className="line-through text-white/60 mr-1">{current.originalPrice}</span> </>}{current.price}
                 </motion.button>
               </motion.div>
             </AnimatePresence>

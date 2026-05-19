@@ -127,9 +127,14 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                                 {item.category}
                               </p>
                             </div>
-                            <span className="text-[14px] font-[900] text-[#333]">
-                              {item.price}
-                            </span>
+                            <div className="text-right">
+                              {item.originalPrice && (
+                                <span className="text-[12px] font-[700] text-[#333]/50 line-through block">{item.originalPrice}</span>
+                              )}
+                              <span className="text-[14px] font-[900] text-[#333]">
+                                {item.price}
+                              </span>
+                            </div>
                           </div>
 
                           {/* Quantity Selector */}

@@ -194,9 +194,12 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
     ? activeImageSelection.index
     : 0;
   const activeProduct = displayImages[safeActiveImageIndex];
-  const purchasableProduct = displayProduct.backendProduct
-    ? mapBackendProductToProduct(displayProduct.backendProduct, selectedVariant)
-    : displayProduct;
+  const purchasableProduct = useMemo(
+    () => displayProduct.backendProduct
+      ? mapBackendProductToProduct(displayProduct.backendProduct, selectedVariant)
+      : displayProduct,
+    [displayProduct, selectedVariant],
+  );
   const isSelectedVariantPurchasable = isPurchasableStock(purchasableProduct.stockStatus, purchasableProduct.stock);
 
   useEffect(() => {
@@ -389,7 +392,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
             <div className="space-y-3 text-[13px] md:text-[14px] border-t border-black/5 pt-6">
                 <p className="text-[#444] leading-relaxed"><span className="font-black lowercase">category:</span> {displayProduct.category ?? 'icare'} {displayProduct.stockStatus ? `— ${displayProduct.stockStatus.replaceAll('_', ' ')}` : ''}</p>
                 <div className="flex justify-between items-center py-2">
-                  <p className="font-black lowercase">{displayProduct.originalPrice ? <>original value: <span className="text-black/55 line-through ml-1">{displayProduct.originalPrice}</span></> : displayProduct.badge ?? 'selected care'}</p>
+                  <p className="font-black lowercase">{purchasableProduct.originalPrice ? <>original value: <span className="text-black/55 line-through ml-1">{purchasableProduct.originalPrice}</span></> : purchasableProduct.badge ?? 'selected care'}</p>
                   <p className="font-black text-[15px] md:text-[18px]">{purchasableProduct.price}</p>
                 </div>
             </div>

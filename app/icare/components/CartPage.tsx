@@ -82,7 +82,12 @@ const CartPage: React.FC = () => {
                   <div>
                     <p className="text-[11px] font-bold uppercase tracking-widest text-black/40">{item.title}</p>
                     <h3 className="text-[14px] md:text-[16px] font-bold text-[#333] mt-1">{item.name}</h3>
-                    <p className="text-[14px] font-bold text-[#333] mt-2">{item.price}</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      {item.originalPrice && (
+                        <span className="text-[12px] font-bold text-[#333]/50 line-through">{item.originalPrice}</span>
+                      )}
+                      <p className="text-[14px] font-bold text-[#333]">{item.price}</p>
+                    </div>
                   </div>
                   <div className="flex items-center gap-4 mt-3">
                     <div className="flex items-center gap-2 bg-[#F2F1ED] rounded-full">

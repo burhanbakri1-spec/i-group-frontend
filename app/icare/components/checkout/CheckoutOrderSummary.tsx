@@ -104,7 +104,12 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
               <p className="text-xs text-[#5F5D59]">
                 {ct.qtyLabel}: {item.quantity}
               </p>
-              <p className="text-sm font-medium mt-1">{item.price}</p>
+              <div className="flex items-center gap-2 mt-1">
+                {item.originalPrice && (
+                  <span className="text-xs text-[#5F5D59]/50 line-through">{item.originalPrice}</span>
+                )}
+                <p className="text-sm font-medium">{item.price}</p>
+              </div>
             </div>
           </div>
         ))}

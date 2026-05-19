@@ -113,7 +113,12 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
           {product.name}
         </h3>
         <div className="flex items-center justify-between mb-4">
-          <p className="text-lg font-medium text-neutral-900">{product.price}</p>
+          <div className="flex items-center gap-2">
+            {product.originalPrice && (
+              <span className="text-sm text-neutral-400 line-through">{product.originalPrice}</span>
+            )}
+            <p className="text-lg font-medium text-neutral-900">{product.price}</p>
+          </div>
           <div className="flex items-center gap-1 text-[11px] text-neutral-500">
             <span className="text-amber-500">&#9733;</span>
             <span>{product.rating}</span>

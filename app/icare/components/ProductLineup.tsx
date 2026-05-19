@@ -20,6 +20,7 @@ interface LineupItemProps {
   name: string;
   description: string;
   price: string;
+  originalPrice?: string;
   image: string;
   reviews: string;
   onSelect?: (product: Product) => void;
@@ -27,7 +28,7 @@ interface LineupItemProps {
 
 const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 
-const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, badge, name, description, price, image, reviews, onSelect }) => {
+const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, badge, name, description, price, originalPrice, image, reviews, onSelect }) => {
   const [isHovered, setIsHovered] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const selectProduct = () => product && onSelect?.(product);
@@ -116,9 +117,14 @@ const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, badge, n
           <h4 className="text-[12px] md:text-[14px] font-black uppercase tracking-[0.05em] text-black leading-tight flex-1">
             {name}
           </h4>
-          <span className="text-[13px] md:text-[15px] font-black text-black">
-            {price}
-          </span>
+          <div className="flex items-center gap-2">
+            {originalPrice && (
+              <span className="text-[13px] md:text-[15px] font-black text-black/40 line-through">{originalPrice}</span>
+            )}
+            <span className="text-[13px] md:text-[15px] font-black text-black">
+              {price}
+            </span>
+          </div>
         </div>
         
         <p className="text-[11px] md:text-[12px] text-[#5f5f5f] font-medium leading-relaxed">
@@ -232,16 +238,17 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ onProductSelect, p
           {items.map((item) => (
             <div key={item.id} className="snap-start first:pl-1 last:pr-2">
                <LineupCard
-                 product={item}
-                 category={item.title ?? item.category ?? 'icare'}
-                 badge={item.badge}
-                 name={item.name}
-                 description={item.description ?? item.category ?? 'iCare product'}
-                 price={item.price}
-                 image={item.image}
-                 reviews={item.reviews ?? '0'}
-                 onSelect={onProductSelect}
-               />
+                  product={item}
+                  category={item.title ?? item.category ?? 'icare'}
+                  badge={item.badge}
+                  name={item.name}
+                  description={item.description ?? item.category ?? 'iCare product'}
+                  price={item.price}
+                  originalPrice={item.originalPrice}
+                  image={item.image}
+                  reviews={item.reviews ?? '0'}
+                  onSelect={onProductSelect}
+                />
             </div>
           ))}
         </div>

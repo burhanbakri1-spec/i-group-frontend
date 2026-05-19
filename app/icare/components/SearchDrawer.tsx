@@ -205,7 +205,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                                 </div>
                                 <div className="flex flex-col">
                                   <span className="text-[14px] font-black text-[#333] tracking-widest uppercase">{product.name}</span>
-                                  <span className="text-[12px] text-[#5F5D59] lowercase">{product.category ?? product.price}</span>
+                                  <span className="text-[12px] text-[#5F5D59] lowercase">{product.category ?? <>{product.originalPrice && <span className="line-through mr-1">{product.originalPrice}</span>}{product.price}</>}</span>
                                 </div>
                               </button>
                             ))}

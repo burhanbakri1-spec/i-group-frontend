@@ -47,6 +47,7 @@ export interface Product {
   categoryId?: number;
   stock?: number;
   stockStatus?: string;
+  size?: string | null;
   main?: string;
   sub?: string;
   type?: string;
@@ -261,6 +262,7 @@ export interface ProductVariant {
   sku?: string | null;
   colorCode?: string | null;
   image?: string | null;
+  size?: string | null;
   price?: BackendNumeric | null;
   salePrice?: BackendNumeric | null;
   stockQuantity?: number;

@@ -450,7 +450,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                           {product.title ?? product.name}
                         </h4>
                         <p className="text-[14px] text-[#5C5A56] font-medium leading-tight mb-2">
-                          {product.description ?? product.price}
+                          {product.description ?? <>{product.originalPrice && <span className="line-through mr-1">{product.originalPrice}</span>}{product.price}</>}
                         </p>
                         <span className="text-[11px] font-black uppercase tracking-widest border-b border-black pb-0.5 self-start group-hover:opacity-70 transition-opacity">
                           {t.shopNow}

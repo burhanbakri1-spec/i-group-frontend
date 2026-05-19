@@ -59,9 +59,18 @@ export const isPurchasableStock = (stockStatus?: string, stock?: number) => {
 };
 
 const getProductBadge = (product: BackendProduct) => {
-  const salePrice = coerceNumber(product.salePrice);
-  const price = coerceNumber(product.price);
-  if (salePrice !== null && price !== null && salePrice < price) return 'sale';
+  // Check default variant-level sale first
+  const defaultVariant = getDefaultVariant(product);
+  if (defaultVariant) {
+    const vSalePrice = coerceNumber(defaultVariant.salePrice);
+    const vPrice = coerceNumber(defaultVariant.price);
+    if (vSalePrice !== null && vPrice !== null && vSalePrice < vPrice) return 'sale';
+  }
+
+  // Check product-level sale (fallback)
+  const pSalePrice = coerceNumber(product.salePrice);
+  const pPrice = coerceNumber(product.price);
+  if (pSalePrice !== null && pPrice !== null && pSalePrice < pPrice) return 'sale';
   if (product.isNew) return 'new';
   if (product.isBestseller) return 'bestseller';
   if (product.isFeatured) return 'featured';
@@ -158,9 +167,16 @@ export const mapBackendProductGalleryMedia = (product: BackendProduct, variant?:
 export const mapBackendProductToProduct = (product: BackendProduct, selectedVariant?: ProductVariant | null): Product => {
   const variant = selectedVariant ?? getDefaultVariant(product);
   const displayPrice = getVariantDisplayPrice(product, variant);
+
+  // Determine the regular (non-sale) price: variant's price if available, otherwise product's price
+  const variantPrice = coerceNumber(variant?.price);
   const productPrice = coerceNumber(product.price);
-  const salePrice = coerceNumber(product.salePrice);
-  const originalPrice = salePrice !== null && productPrice !== null && salePrice < productPrice ? formatUsdPrice(productPrice) : undefined;
+  const regularPrice = variantPrice ?? productPrice;
+
+  // Show original price only when the display (sale) price is lower than the regular price
+  const originalPrice = regularPrice !== null && displayPrice < regularPrice
+    ? formatUsdPrice(regularPrice)
+    : undefined;
   const ratingAverage = coerceNumber(product.ratingAverage);
   const ratingCount = coerceNumber(product.ratingCount);
   const galleryMedia = mapBackendProductGalleryMedia(product, variant);
@@ -193,6 +209,7 @@ export const mapBackendProductToProduct = (product: BackendProduct, selectedVari
     categoryId: product.category?.id,
     stock: variant?.stockQuantity ?? product.stockQuantity,
     stockStatus: variant?.stockStatus ?? product.stockStatus,
+    size: variant?.size ?? product.size ?? null,
     main: normalizedCategoryName,
     sub: normalizedBrandName || normalizedCategoryName,
     type: normalizeFilterName(variant?.name ?? product.size ?? categoryName),

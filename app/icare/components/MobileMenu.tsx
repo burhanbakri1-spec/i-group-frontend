@@ -179,7 +179,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
                         )}
                       </div>
                       <p className="text-[12px] text-[#706E6A] font-medium leading-tight mt-1">
-                        {product.description ?? product.price}
+                        {product.description ?? <>{product.originalPrice && <span className="line-through mr-1">{product.originalPrice}</span>}{product.price}</>}
                       </p>
                     </div>
                   </button>
