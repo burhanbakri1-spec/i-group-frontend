@@ -25,8 +25,8 @@ function ProductsPage({
           <p>{t("products.subtitle")}</p>
         </div>
         <div className="products-hero-visual">
-          <div className="scene-bottle scene-bottle-large"><span>EP</span></div>
-          <div className="scene-bottle scene-bottle-spray"><span>EP</span></div>
+          <div className="scene-bottle scene-bottle-large"><span>EB</span></div>
+          <div className="scene-bottle scene-bottle-spray"><span>EB</span></div>
         </div>
       </div>
 

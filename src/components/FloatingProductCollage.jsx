@@ -48,10 +48,10 @@ function pickProducts(products) {
 }
 
 const CARD_CONFIG = [
-  { rotate: -7, top: "6%",  left: "4%",  width: "26%", parallax: -90, mouseX: -22, mouseY: -14, z: 2 },
-  { rotate:  4, top: "0%",  left: "32%", width: "30%", parallax:  60, mouseX:  14, mouseY:  22, z: 3 },
-  { rotate: -3, top: "18%", left: "60%", width: "24%", parallax: -50, mouseX: -16, mouseY:  18, z: 2 },
-  { rotate:  8, top: "44%", left: "26%", width: "22%", parallax:  80, mouseX:  20, mouseY: -18, z: 1 },
+  { rotate: -2, parallax: -18, mouseX: -6, mouseY: -4, z: 2 },
+  { rotate: 1.5, parallax: 12, mouseX: 4, mouseY: 6, z: 3 },
+  { rotate: -1, parallax: -10, mouseX: -4, mouseY: 5, z: 2 },
+  { rotate: 2, parallax: 16, mouseX: 5, mouseY: -5, z: 1 },
 ];
 
 function FloatingProductCollage({ language, products, onViewProduct }) {
@@ -103,9 +103,9 @@ function FloatingProductCollage({ language, products, onViewProduct }) {
       onMouseLeave={handleMouseLeave}
     >
       <div className="floating-collage-heading">
-        <p className="eyebrow">{isArabic ? "مختارات EP Chemical" : "EP Chemical picks"}</p>
+        <p className="eyebrow">{isArabic ? "مختارات EB Chemical" : "EB Chemical picks"}</p>
         <h2>
-          {isArabic ? "منتجات مميزة من EP Chemical" : "Featured EP Chemical Products"}
+          {isArabic ? "منتجات مميزة من EB Chemical" : "Featured EB Chemical Products"}
         </h2>
         <p>
           {isArabic
@@ -164,13 +164,6 @@ function CollageCard({
       style={{
         y,
         zIndex: config.z,
-        ...(isMobile
-          ? {}
-          : {
-              top: config.top,
-              left: config.left,
-              width: config.width,
-            }),
       }}
       initial={{ opacity: 0, y: 40, rotate: 0, scale: 0.92 }}
       whileInView={{ opacity: 1, y: 0, rotate: config.rotate, scale: 1 }}
@@ -180,7 +173,7 @@ function CollageCard({
         delay: index * 0.12,
         ease: [0.22, 1, 0.36, 1],
       }}
-      whileHover={reduceMotion ? {} : { scale: 1.04, rotate: config.rotate * 0.4, y: -8 }}
+      whileHover={reduceMotion ? {} : { scale: 1.02, rotate: config.rotate * 0.4, y: -4 }}
     >
       <motion.div
         className="collage-card-inner"

@@ -1,6 +1,6 @@
 const placeholderImage = "/images/products/product-placeholder.svg";
 
-// Storefront catalog for EP Chemical products.
+// Storefront catalog for EB Chemical products.
 const cleaningSizes = [
   { size: "500ml", price: 18 },
   { size: "5L", price: 55 },
@@ -432,8 +432,8 @@ export const products = [
       "ماء روديتر زهري للعناية اليومية بالسيارة."
     ),
     longDescription: localized(
-      "A radiator water product in convenient sizes for the EP Chemical catalog.",
-      "منتج ماء روديتر بأحجام مناسبة ضمن كتالوج EP Chemical."
+      "A radiator water product in convenient sizes for the EB Chemical catalog.",
+      "منتج ماء روديتر بأحجام مناسبة ضمن كتالوج EB Chemical."
     ),
     sizes: radiatorSizes,
     badge: localized("Featured", "منتج مميز"),

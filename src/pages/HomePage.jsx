@@ -58,8 +58,8 @@ function FeaturedProductsCarousel({ language, onAddToCart, onViewProduct, produc
           <h2>{isArabic ? "عروض ومنتجات عليها طلب كبير" : "Offers and high-demand products"}</h2>
           <p>
             {isArabic
-              ? "اكتشف المنتجات الأكثر طلبًا من EP Chemical للعناية والتنظيف، مختارة لتناسب الاستخدام اليومي بجودة عالية وتجربة عملية."
-              : "Discover high-demand EP Chemical cleaning and care products selected for daily use, reliable quality, and a practical experience."}
+              ? "اكتشف المنتجات الأكثر طلبًا من EB Chemical للعناية والتنظيف، مختارة لتناسب الاستخدام اليومي بجودة عالية وتجربة عملية."
+              : "Discover high-demand EB Chemical cleaning and care products selected for daily use, reliable quality, and a practical experience."}
           </p>
         </div>
         <div className="carousel-controls" aria-label={isArabic ? "التحكم بالمنتجات" : "Carousel controls"}>
@@ -149,7 +149,7 @@ function HowItWorksSplit({ language, onNavigate }) {
         },
         {
           title: "استخدمه بطريقة عملية",
-          text: "منتجات EP Chemical مصممة لتكون سهلة الاستخدام وتناسب الاستخدام اليومي.",
+          text: "منتجات EB Chemical مصممة لتكون سهلة الاستخدام وتناسب الاستخدام اليومي.",
         },
         {
           title: "احصل على نتيجة أفضل",
@@ -163,7 +163,7 @@ function HowItWorksSplit({ language, onNavigate }) {
         },
         {
           title: "Use it with ease",
-          text: "EP Chemical products are designed to be practical, clear, and suitable for daily use.",
+          text: "EB Chemical products are designed to be practical, clear, and suitable for daily use.",
         },
         {
           title: "Get a better result",
@@ -200,12 +200,14 @@ function HowItWorksSplit({ language, onNavigate }) {
 }
 
 function HomePage({
+  homepageOffers = [],
   language,
   onAddToCart,
   onCategorySelect,
   onNavigate,
   onViewProduct,
   products,
+  reviews = [],
   t,
 }) {
   const bestSellers = products
@@ -214,7 +216,25 @@ function HomePage({
     )
     .slice(0, 4);
   const featuredProducts = products.slice(8, 11);
-  const heroProducts = products.slice(0, 3);
+  const heroImages = [products[0], products[1]].filter(Boolean);
+  const activeOffers = homepageOffers
+    .filter((offer) => offer.isActive !== false)
+    .sort((a, b) => Number(a.displayOrder || 0) - Number(b.displayOrder || 0));
+  const siteReviews = reviews.filter(
+    (review) =>
+      (review.type === "store" || review.type === "site" || !review.employeeId) &&
+      review.isActive !== false &&
+      review.isApproved !== false &&
+      (review.status || "approved") === "approved",
+  );
+
+  function handleOfferClick(offer) {
+    if (offer.ctaLink === "car-care" || offer.ctaLink === "home-cleaning") {
+      onCategorySelect(offer.ctaLink);
+      return;
+    }
+    onNavigate(offer.ctaLink || "products");
+  }
 
   return (
     <div className="storefront-home">
@@ -238,22 +258,58 @@ function HomePage({
         </div>
 
         <div className="hero-panel hero-panel-visual" aria-label={brand.name}>
-          <div className="lifestyle-scene">
-            <div className="scene-surface" />
-            <div className="scene-bottle scene-bottle-large"><span>EP</span></div>
-            <div className="scene-bottle scene-bottle-spray"><span>EP</span></div>
-            <div className="scene-cloth" />
-          </div>
-          <div className="hero-product-strip">
-            {heroProducts.map((product) => (
-              <button key={product.id} onClick={() => onViewProduct(product.slug)} type="button">
-                <span>{product.badge?.[language]}</span>
-                <strong>{product.name[language]}</strong>
+          <div className="hero-image-duo">
+            {heroImages.map((product, index) => (
+              <button
+                className="hero-image-panel"
+                key={product.id}
+                onClick={() => onViewProduct(product.slug)}
+                type="button"
+              >
+                <img
+                  alt={product.name?.[language] || product.name?.en}
+                  src={product.image || product.fallbackImage || "/images/products/product-placeholder.svg"}
+                  onError={(event) => {
+                    event.currentTarget.src = "/images/products/product-placeholder.svg";
+                  }}
+                />
+                <span>{index === 0 ? t("home.bestEyebrow") : t("home.highlightEyebrow")}</span>
               </button>
             ))}
           </div>
         </div>
       </section>
+
+      {activeOffers.length > 0 && (
+        <section className="homepage-offers-section storefront-section">
+          <div className="section-heading split-heading">
+            <div>
+              <p className="eyebrow">{t("homeContent.eyebrow")}</p>
+              <h2>{t("homeContent.title")}</h2>
+            </div>
+          </div>
+          <div className="homepage-offers-grid">
+            {activeOffers.map((offer) => (
+              <article className="homepage-offer-card" key={offer.id}>
+                <img
+                  alt={getLocalized(offer.title, language)}
+                  src={offer.image || "/images/products/product-placeholder.svg"}
+                  onError={(event) => {
+                    event.currentTarget.src = "/images/products/product-placeholder.svg";
+                  }}
+                />
+                <div>
+                  <h3>{getLocalized(offer.title, language)}</h3>
+                  <p>{getLocalized(offer.description, language)}</p>
+                  <button className="text-action" onClick={() => handleOfferClick(offer)} type="button">
+                    {getLocalized(offer.ctaText, language) || t("home.shopProducts")}
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="category-feature-section storefront-section" id="categories">
         <div className="section-heading">
@@ -347,6 +403,32 @@ function HomePage({
         products={products}
         onViewProduct={onViewProduct}
       />
+
+      {siteReviews.length > 0 && (
+        <section className="reviews-section storefront-section">
+          <div className="section-heading split-heading">
+            <div>
+              <p className="eyebrow">{t("reviews.storeReview")}</p>
+              <h2>{t("reviews.title")}</h2>
+              <p>{t("reviews.subtitle")}</p>
+            </div>
+          </div>
+          <div className="reviews-track">
+            {siteReviews.map((review) => (
+              <article className="review-card" key={review.id}>
+                <div className="review-stars" aria-label={`${review.rating} stars`}>
+                  {"★".repeat(Number(review.rating || 0))}
+                </div>
+                <p>{getLocalized(review.comment, language)}</p>
+                <div>
+                  <strong>{review.customerName}</strong>
+                  {review.relatedProductName && <span>{review.relatedProductName}</span>}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="why-section storefront-section">
         <div>

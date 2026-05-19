@@ -1,6 +1,6 @@
 export const brand = {
-  name: "EP Chemical",
-  logoText: "EP Chemical",
+  name: "EB Chemical",
+  logoText: "EB Chemical",
   tagline: "Fresh cleaning solutions for homes, cars, and everyday care.",
   industry:
     "Cleaning products, chemical products, car care products, fragrances, and radiator water.",
@@ -8,9 +8,9 @@ export const brand = {
   whatsappLinkNumber: "970599000000",
   email: "hello@epchemical.example",
   contentNotice:
-    "EP Chemical تقدم حلول تنظيف وعناية عملية للمنزل والسيارة، بمنتجات مصممة لتسهيل الاستخدام اليومي وتحسين تجربة النظافة والعناية.",
+    "EB Chemical تقدم حلول تنظيف وعناية عملية للمنزل والسيارة، بمنتجات مصممة لتسهيل الاستخدام اليومي وتحسين تجربة النظافة والعناية.",
   aboutText:
-    "EP Chemical offers practical cleaning and care solutions for homes, cars, furniture, floors, fragrances, and radiator water. Our products are designed for reliable daily use, clear results, and a smooth shopping experience.",
+    "EB Chemical offers practical cleaning and care solutions for homes, cars, furniture, floors, fragrances, and radiator water. Our products are designed for reliable daily use, clear results, and a smooth shopping experience.",
   socials: [
     {
       name: "Instagram",
@@ -20,7 +20,7 @@ export const brand = {
     },
     {
       name: "Facebook",
-      handle: "EP Chemical",
+      handle: "EB Chemical",
       url: "#",
       description: "Updates, offers, and community announcements.",
     },

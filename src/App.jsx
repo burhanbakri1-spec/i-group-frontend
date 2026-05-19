@@ -48,6 +48,17 @@ import {
   fetchProducts,
   updateProduct as updateProductApi,
 } from "./utils/productsApi.js";
+import {
+  deleteHomepageOffer,
+  deleteReview as deleteReviewApi,
+  fetchAllHomepageOffers,
+  fetchAllReviews,
+  fetchHomepageOffers,
+  fetchReviews,
+  saveHomepageOffer,
+  submitCustomerReview,
+  updateReviewStatus,
+} from "./utils/homeContentApi.js";
 import "./styles/global.css";
 
 const cartStorageKey = "epChemicalCart";
@@ -72,6 +83,8 @@ function App() {
   const [orders, setOrders] = React.useState([]);
   const [workSession, setWorkSession] = React.useState(null);
   const [employeeSessions, setEmployeeSessions] = React.useState([]);
+  const [homepageOffers, setHomepageOffers] = React.useState([]);
+  const [reviews, setReviews] = React.useState([]);
   const [currentUser, setUser] = React.useState(getCurrentUser);
   const [loginMessage, setLoginMessage] = React.useState("");
   const [registerMessage, setRegisterMessage] = React.useState("");
@@ -89,12 +102,14 @@ function App() {
 
   React.useEffect(() => {
     loadProducts();
+    loadHomeContent();
     hydrateUser();
   }, []);
 
   React.useEffect(() => {
     loadOrders(currentUser);
     loadEmployees(currentUser);
+    loadReviews(currentUser);
     loadWorkSession(currentUser);
   }, [currentUser]);
 
@@ -213,6 +228,19 @@ function App() {
       if (user.role === "admin") {
         setEmployeeSessions([]);
       }
+    }
+  }
+
+  async function loadHomeContent() {
+    setHomepageOffers(await fetchHomepageOffers());
+    setReviews(await fetchReviews());
+  }
+
+  async function loadReviews(user) {
+    if (!user) return;
+    setReviews(await fetchAllReviews());
+    if (user.role === "admin" || user.role === "employee") {
+      setHomepageOffers(await fetchAllHomepageOffers());
     }
   }
 
@@ -523,6 +551,35 @@ function App() {
     }
   }
 
+  async function handleSaveOffer(offer) {
+    const savedOffer = await saveHomepageOffer(offer);
+    const nextOffers = await fetchAllHomepageOffers();
+    setHomepageOffers(nextOffers);
+    return savedOffer;
+  }
+
+  async function handleDeleteOffer(offerId) {
+    await deleteHomepageOffer(offerId);
+    setHomepageOffers(await fetchAllHomepageOffers());
+  }
+
+  async function handleSubmitReview(review) {
+    const savedReview = await submitCustomerReview(review);
+    setReviews(await fetchReviews());
+    return savedReview;
+  }
+
+  async function handleModerateReview(reviewId, status, isActive = true) {
+    const updatedReview = await updateReviewStatus(reviewId, status, isActive);
+    setReviews(await fetchAllReviews());
+    return updatedReview;
+  }
+
+  async function handleDeleteReview(reviewId) {
+    await deleteReviewApi(reviewId);
+    setReviews(await fetchAllReviews());
+  }
+
   async function handleCreateOrder(customerInfo) {
     try {
       const order = await createOrder({
@@ -544,7 +601,11 @@ function App() {
 
   async function handleCreateEmployeeOrder(orderPayload) {
     try {
-      const order = await createOrder(orderPayload);
+      const order = await createOrder({
+        ...orderPayload,
+        createdByEmployeeId: currentUser?.role === "employee" ? currentUser.id : "",
+        createdByEmployeeName: currentUser?.role === "employee" ? currentUser.name : "",
+      });
       setOrders((currentOrders) => [order, ...currentOrders]);
       await refreshOrders();
       return { ok: true, message: t("employee.orderCreatedSuccessfully"), order };
@@ -576,12 +637,14 @@ function App() {
       <main>
         {activePage === "home" && (
           <HomePage
+            homepageOffers={homepageOffers}
             language={language}
             onAddToCart={handleAddToCart}
             onCategorySelect={handleCategorySelect}
             onNavigate={navigate}
             onViewProduct={handleViewProduct}
             products={demoProducts}
+            reviews={reviews}
             t={t}
           />
         )}
@@ -669,6 +732,7 @@ function App() {
             language={language}
             onLogout={handleLogout}
             onNavigate={navigate}
+            onSubmitReview={handleSubmitReview}
             orders={orders}
             products={demoProducts}
             t={t}
@@ -684,9 +748,15 @@ function App() {
             onDeleteProduct={handleDeleteProduct}
             onNavigate={navigate}
             onSaveProduct={handleSaveProduct}
+            onSaveOffer={handleSaveOffer}
+            onDeleteOffer={handleDeleteOffer}
+            onModerateReview={handleModerateReview}
+            onDeleteReview={handleDeleteReview}
             onStatusChange={handleOrderStatusChange}
             orders={orders}
             products={demoProducts}
+            homepageOffers={homepageOffers}
+            reviews={reviews}
             t={t}
             workSession={workSession}
           />
@@ -702,11 +772,17 @@ function App() {
             onAssignEmployee={handleAssignEmployee}
             onDeleteOrder={handleDeleteOrder}
             onNavigate={navigate}
+            onSaveOffer={handleSaveOffer}
+            onDeleteOffer={handleDeleteOffer}
+            onModerateReview={handleModerateReview}
+            onDeleteReview={handleDeleteReview}
             onSaveEmployee={handleSaveEmployee}
             onSaveProduct={handleSaveProduct}
             onStatusChange={handleOrderStatusChange}
             orders={orders}
             products={demoProducts}
+            homepageOffers={homepageOffers}
+            reviews={reviews}
             statusMessage={adminMessage}
             t={t}
           />

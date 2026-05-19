@@ -73,7 +73,7 @@ function AdminOrdersTable({
                 )}
               </td>
               <td>
-                {order.createdBy?.name || order.createdBy?.role || "-"}
+                {order.createdByEmployeeName || order.createdBy?.name || order.createdBy?.role || "-"}
                 {order.createdBy?.role && (
                   <span className="table-muted">{order.createdBy.role}</span>
                 )}

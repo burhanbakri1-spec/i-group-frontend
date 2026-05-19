@@ -2,19 +2,26 @@ import React from "react";
 import AdminOrdersTable from "../components/AdminOrdersTable.jsx";
 import AdminProductForm from "../components/AdminProductForm.jsx";
 import AdminProductTable from "../components/AdminProductTable.jsx";
+import HomeContentManager from "../components/HomeContentManager.jsx";
 
 function AdminDashboardPage({
   currentUser,
   employees,
   language,
+  homepageOffers,
   onDeleteProduct,
+  onDeleteOffer,
+  onDeleteReview,
   onAssignEmployee,
   onDeleteOrder,
   onNavigate,
   onSaveProduct,
+  onSaveOffer,
+  onModerateReview,
   onStatusChange,
   orders,
   products,
+  reviews,
   statusMessage,
   t,
 }) {
@@ -109,6 +116,18 @@ function AdminDashboardPage({
           t={t}
         />
       </section>
+
+      <HomeContentManager
+        canDelete
+        language={language}
+        offers={homepageOffers}
+        onDeleteOffer={onDeleteOffer}
+        onDeleteReview={onDeleteReview}
+        onModerateReview={onModerateReview}
+        onSaveOffer={onSaveOffer}
+        reviews={reviews}
+        t={t}
+      />
 
       <section className="admin-section">
         <div className="section-heading">

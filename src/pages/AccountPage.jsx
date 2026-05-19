@@ -11,8 +11,15 @@ function getLocalized(value, language, fallback = "") {
   return value[language] || value.en || value.ar || fallback;
 }
 
-function AccountPage({ currentUser, language, onLogout, onNavigate, orders, products, t }) {
+function AccountPage({ currentUser, language, onLogout, onNavigate, onSubmitReview, orders, products, t }) {
   const [activeTab, setActiveTab] = React.useState("orders");
+  const [reviewForm, setReviewForm] = React.useState({
+    type: "store",
+    rating: 5,
+    comment: "",
+    orderId: "",
+  });
+  const [reviewMessage, setReviewMessage] = React.useState("");
   const isArabic = language === "ar";
 
   const copy = {
@@ -39,8 +46,18 @@ function AccountPage({ currentUser, language, onLogout, onNavigate, orders, prod
     role: isArabic ? "نوع الحساب" : "Account type",
     currentSubscriptions: isArabic ? "الاشتراكات الحالية" : "Current Subscriptions",
     noSubscriptions: isArabic ? "لا توجد اشتراكات نشطة حاليًا." : "No active subscriptions yet.",
-    discover: isArabic ? "اكتشف منتجات EP Chemical المختارة لك" : "Discover selected EP Chemical products",
+    discover: isArabic ? "اكتشف منتجات EB Chemical المختارة لك" : "Discover selected EB Chemical products",
     addToCart: t("common.add"),
+    reviews: isArabic ? "التقييمات" : "Reviews",
+    writeReview: isArabic ? "اكتب تقييماً" : "Write a review",
+    reviewType: isArabic ? "نوع التقييم" : "Review type",
+    storeReview: isArabic ? "تقييم عام" : "Store Review",
+    employeeReview: isArabic ? "تقييم الموظف" : "Employee Review",
+    rating: isArabic ? "التقييم" : "Rating",
+    reviewComment: isArabic ? "نص التقييم" : "Review text",
+    relatedOrder: isArabic ? "الطلب المرتبط" : "Related order",
+    submitReview: isArabic ? "إرسال التقييم" : "Submit review",
+    reviewSaved: isArabic ? "تم حفظ التقييم بنجاح" : "Review saved successfully",
   };
 
   if (!currentUser) {
@@ -60,6 +77,7 @@ function AccountPage({ currentUser, language, onLogout, onNavigate, orders, prod
   const customerOrders = orders.filter(
     (order) => order.customerUserId === currentUser.id || order.customer_user_id === currentUser.id
   );
+  const reviewableOrders = customerOrders.filter((order) => order.status === "Completed");
 
   const featuredProducts = products.slice(0, 4);
   const promoProduct = products[0];
@@ -96,6 +114,96 @@ function AccountPage({ currentUser, language, onLogout, onNavigate, orders, prod
               </article>
             ))}
           </div>
+        )}
+      </section>
+    );
+  }
+
+  function updateReviewField(event) {
+    const { name, value } = event.target;
+    setReviewForm((currentForm) => ({
+      ...currentForm,
+      [name]: name === "rating" ? Number(value) : value,
+    }));
+  }
+
+  async function submitReview(event) {
+    event.preventDefault();
+    if (!reviewableOrders.length) return;
+    const selectedOrder =
+      reviewableOrders.find((order) => order.id === reviewForm.orderId) || reviewableOrders[0];
+    await onSubmitReview?.({
+      type: reviewForm.type,
+      rating: reviewForm.rating,
+      customerName: currentUser.name,
+      comment: {
+        en: reviewForm.comment,
+        ar: reviewForm.comment,
+      },
+      orderId: selectedOrder.id,
+      employeeId:
+        reviewForm.type === "employee"
+          ? selectedOrder.handledByEmployeeId || selectedOrder.assignedToEmployeeId || ""
+          : "",
+      employeeName:
+        reviewForm.type === "employee"
+          ? selectedOrder.createdByEmployeeName || selectedOrder.createdBy?.name || ""
+          : "",
+      isActive: true,
+    });
+    setReviewMessage(copy.reviewSaved);
+    setReviewForm({ type: "store", rating: 5, comment: "", orderId: "" });
+  }
+
+  function renderReviews() {
+    return (
+      <section className="account-main-card account-review-panel">
+        <h2>{copy.writeReview}</h2>
+        {reviewableOrders.length === 0 ? (
+          <p>{copy.noOrders}</p>
+        ) : (
+          <form className="account-review-form" onSubmit={submitReview}>
+            {reviewMessage && <div className="message-panel success">{reviewMessage}</div>}
+            <label>
+              {copy.reviewType}
+              <select name="type" onChange={updateReviewField} value={reviewForm.type}>
+                <option value="store">{copy.storeReview}</option>
+                <option value="employee">{copy.employeeReview}</option>
+              </select>
+            </label>
+            <label>
+              {copy.relatedOrder}
+              <select name="orderId" onChange={updateReviewField} value={reviewForm.orderId}>
+                {reviewableOrders.map((order) => (
+                  <option key={order.id} value={order.id}>
+                    {order.id}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              {copy.rating}
+              <select name="rating" onChange={updateReviewField} value={reviewForm.rating}>
+                {[5, 4, 3, 2, 1].map((rating) => (
+                  <option key={rating} value={rating}>
+                    {"★".repeat(rating)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="full-field">
+              {copy.reviewComment}
+              <textarea
+                name="comment"
+                onChange={updateReviewField}
+                required
+                value={reviewForm.comment}
+              />
+            </label>
+            <button className="primary-action" type="submit">
+              {copy.submitReview}
+            </button>
+          </form>
         )}
       </section>
     );
@@ -196,6 +304,13 @@ function AccountPage({ currentUser, language, onLogout, onNavigate, orders, prod
             >
               <span>⟳</span>{copy.subscriptions}
             </button>
+            <button
+              className={activeTab === "reviews" ? "active" : ""}
+              onClick={() => setActiveTab("reviews")}
+              type="button"
+            >
+              <span>★</span>{copy.reviews}
+            </button>
             <button onClick={onLogout} type="button">
               <span>↪</span>{copy.logout}
             </button>
@@ -220,6 +335,7 @@ function AccountPage({ currentUser, language, onLogout, onNavigate, orders, prod
           {activeTab === "orders" && renderOrderHistory()}
           {activeTab === "products" && renderProducts()}
           {activeTab === "info" && renderPersonalInfo()}
+          {activeTab === "reviews" && renderReviews()}
           {activeTab === "subscriptions" && (
             <section className="account-main-card account-empty-orders">
               <h2>{copy.currentSubscriptions}</h2>

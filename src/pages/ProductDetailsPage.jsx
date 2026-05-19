@@ -44,8 +44,12 @@ function ProductDetailsPage({
     product.longDescription?.[language] ||
     product.shortDescription?.[language] ||
     (language === "ar"
-      ? "منتج من EP Chemical مصمم للاستخدام اليومي، يجمع بين الأداء العملي وسهولة الاستخدام للحصول على نتيجة نظيفة ومنعشة."
-      : "An EP Chemical product designed for daily use, practical performance, and a clean, fresh result.");
+      ? "منتج من EB Chemical مصمم للاستخدام اليومي، يجمع بين الأداء العملي وسهولة الاستخدام للحصول على نتيجة نظيفة ومنعشة."
+      : "An EB Chemical product designed for daily use, practical performance, and a clean, fresh result.");
+  const detailImages = [
+    product.image,
+    product.hoverImage || product.secondaryImage || product.gallery?.[1],
+  ].filter(Boolean);
 
   function handleAddSelectedToCart() {
     for (let count = 0; count < quantity; count += 1) {
@@ -65,6 +69,20 @@ function ProductDetailsPage({
             }}
             src={product.image || placeholderImage}
           />
+          {detailImages.length > 1 && (
+            <div className="product-detail-gallery">
+              {detailImages.map((image, index) => (
+                <img
+                  alt={`${product.name[language]} ${index + 1}`}
+                  key={`${image}-${index}`}
+                  onError={(event) => {
+                    event.currentTarget.src = product.fallbackImage || placeholderImage;
+                  }}
+                  src={image}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="product-detail-copy">

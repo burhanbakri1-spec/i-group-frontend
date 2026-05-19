@@ -2,6 +2,7 @@ import React from "react";
 import AdminOrdersTable from "../components/AdminOrdersTable.jsx";
 import AdminProductForm from "../components/AdminProductForm.jsx";
 import AdminProductTable from "../components/AdminProductTable.jsx";
+import HomeContentManager from "../components/HomeContentManager.jsx";
 import StatusBadge from "../components/StatusBadge.jsx";
 import WorkTimer from "../components/WorkTimer.jsx";
 import { hasPermission, permissionGroups } from "../data/permissions.js";
@@ -18,15 +19,18 @@ const emptyCustomer = {
 
 function EmployeeDashboardPage({
   currentUser,
+  homepageOffers,
   language,
   onCreateOrder,
   onDeleteOrder,
   onDeleteProduct,
+  onSaveOffer,
   onNavigate,
   onSaveProduct,
   onStatusChange,
   orders,
   products,
+  reviews,
   t,
   workSession,
 }) {
@@ -35,6 +39,7 @@ function EmployeeDashboardPage({
   const [customer, setCustomer] = React.useState(emptyCustomer);
   const [selectedProductId, setSelectedProductId] = React.useState("");
   const [selectedSize, setSelectedSize] = React.useState("");
+  const [productQuery, setProductQuery] = React.useState("");
   const [quantity, setQuantity] = React.useState(1);
   const [draftItems, setDraftItems] = React.useState([]);
   const [message, setMessage] = React.useState(null);
@@ -66,11 +71,13 @@ function EmployeeDashboardPage({
     canViewProducts || canCreateProducts || canUpdateProducts || canDeleteProducts;
   const hasOrderPermission =
     canViewOrders || canCreateOrders || canUpdateOrderStatus || canDeleteOrders;
+  const canManageHomeContent = hasProductPermission || canCreateOrders;
   const hasAnyPermission = currentUser.permissions?.length > 0;
 
-  const assignedOrders = orders.filter(
-    (order) => order.handledByEmployeeId === currentUser.id
-  );
+  const assignedOrders = orders.filter((order) => {
+    const assignedId = order.assignedToEmployeeId || order.handledByEmployeeId;
+    return assignedId === currentUser.id || order.createdByEmployeeId === currentUser.id;
+  });
   const pendingOrders = assignedOrders.filter((order) => order.status === "Pending");
   const today = new Date().toISOString().slice(0, 10);
   const completedToday = assignedOrders.filter(
@@ -86,6 +93,27 @@ function EmployeeDashboardPage({
   const selectedSizeOption = selectedProduct?.sizes.find(
     (sizeOption) => sizeOption.size === selectedSize
   );
+  const productResults = React.useMemo(() => {
+    const normalizedQuery = productQuery.trim().toLowerCase();
+    if (!normalizedQuery) {
+      return products.slice(0, 8);
+    }
+
+    return products
+      .filter((product) => {
+        const haystack = [
+          product.name?.en,
+          product.name?.ar,
+          product.slug,
+          product.categoryId,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+        return haystack.includes(normalizedQuery);
+      })
+      .slice(0, 8);
+  }, [productQuery, products]);
   const draftTotal = draftItems.reduce((sum, item) => sum + item.lineTotal, 0);
 
   React.useEffect(() => {
@@ -189,6 +217,19 @@ function EmployeeDashboardPage({
       },
     ]);
     setQuantity(1);
+  }
+
+  function selectProduct(product) {
+    setSelectedProductId(product.id);
+    setSelectedSize(product.sizes[0]?.size || "");
+    setProductQuery(product.name?.[language] || product.name?.en || "");
+  }
+
+  function getOrderSource(order) {
+    const assignedId = order.assignedToEmployeeId || order.handledByEmployeeId;
+    return order.createdByEmployeeId === currentUser.id && assignedId !== currentUser.id
+      ? t("employee.createdByYou")
+      : t("employee.assignedOrder");
   }
 
   async function handleSubmitOrder(event) {
@@ -306,6 +347,15 @@ function EmployeeDashboardPage({
             {t("employee.createCustomerOrder")}
           </button>
         )}
+        {canManageHomeContent && (
+          <button
+            className={activeTab === "home-content" ? "nav-link active" : "nav-link"}
+            onClick={() => setActiveTab("home-content")}
+            type="button"
+          >
+            {t("homeContent.title")}
+          </button>
+        )}
       </div>
 
       {activeTab === "overview" && (
@@ -340,6 +390,7 @@ function EmployeeDashboardPage({
                     <div>
                       <strong>{order.id}</strong>
                       <StatusBadge status={order.status} t={t} />
+                      <span className="order-source-badge">{getOrderSource(order)}</span>
                     </div>
                     <p>{order.customer.name}</p>
                     <strong>
@@ -442,17 +493,41 @@ function EmployeeDashboardPage({
             <div className="draft-order-builder full-field">
               <label>
                 {t("admin.product")}
-                <select
-                  onChange={(event) => setSelectedProductId(event.target.value)}
-                  value={selectedProductId}
-                >
-                  {products.map((product) => (
-                    <option key={product.id} value={product.id}>
-                      {product.name[language]}
-                    </option>
-                  ))}
-                </select>
+                <input
+                  autoComplete="off"
+                  name="productSearch"
+                  onChange={(event) => setProductQuery(event.target.value)}
+                  placeholder={t("employee.searchProduct")}
+                  value={productQuery}
+                />
               </label>
+              <div className="product-search-results full-field" role="listbox">
+                {productResults.map((product) => {
+                  const firstSize = product.sizes[0];
+                  return (
+                    <button
+                      className={selectedProductId === product.id ? "product-search-option active" : "product-search-option"}
+                      key={product.id}
+                      onClick={() => selectProduct(product)}
+                      type="button"
+                    >
+                      <img
+                        alt={product.name?.[language] || product.name?.en}
+                        src={product.image || "/images/products/product-placeholder.svg"}
+                        onError={(event) => {
+                          event.currentTarget.src = "/images/products/product-placeholder.svg";
+                        }}
+                      />
+                      <span>
+                        <strong>{product.name?.[language] || product.name?.en}</strong>
+                        <small>
+                          {firstSize?.size} - {firstSize?.price} {t("common.ils")}
+                        </small>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
               <label>
                 {t("productDetails.chooseSize")}
                 <select
@@ -509,6 +584,16 @@ function EmployeeDashboardPage({
             </div>
           </form>
         </section>
+      )}
+
+      {activeTab === "home-content" && canManageHomeContent && (
+        <HomeContentManager
+          language={language}
+          offers={homepageOffers}
+          onSaveOffer={onSaveOffer}
+          reviews={reviews.filter((review) => review.employeeId === currentUser.id)}
+          t={t}
+        />
       )}
     </section>
   );

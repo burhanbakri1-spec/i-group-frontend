@@ -1,7 +1,7 @@
 // Frontend-only demo account. Replace with secure backend auth in production.
 export const demoAdminUser = {
   id: "admin-demo",
-  name: "EP Chemical Admin",
+  name: "EB Chemical Admin",
   email: "admin@epchemical.com",
   phone: "+970599000000",
   password: "admin123",

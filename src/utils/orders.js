@@ -11,7 +11,14 @@ export async function getOrders(currentUser) {
     : apiRequest("/orders/my-orders");
 }
 
-export async function createOrder({ cartItems = [], customer, items, total }) {
+export async function createOrder({
+  cartItems = [],
+  customer,
+  items,
+  total,
+  createdByEmployeeId,
+  createdByEmployeeName,
+}) {
   const orderItems = (items || cartItems).map((item) => ({
     productId: item.productId,
     productName: item.productName || item.label || item.slug || "",
@@ -32,6 +39,8 @@ export async function createOrder({ cartItems = [], customer, items, total }) {
       subtotal: total,
       total,
       paymentMethod: "Cash on delivery",
+      createdByEmployeeId,
+      createdByEmployeeName,
     }),
   });
 }

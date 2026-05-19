@@ -10,6 +10,7 @@ const emptyForm = {
   shortEn: "",
   shortAr: "",
   image: "/images/products/product-placeholder.svg",
+  hoverImage: "",
   sizes: "500ml:18, 5L:55, 18L:145",
   badgeEn: "Featured",
   badgeAr: "منتج مميز",
@@ -49,6 +50,7 @@ function productToForm(product) {
     shortEn: product.shortDescription.en,
     shortAr: product.shortDescription.ar,
     image: product.image,
+    hoverImage: product.hoverImage || product.secondaryImage || "",
     sizes: sizesToText(product.sizes),
     badgeEn: product.badge?.en || "Featured",
     badgeAr: product.badge?.ar || "منتج مميز",
@@ -99,6 +101,7 @@ function AdminProductForm({ editingProduct, language, onCancel, onSave, t }) {
         ar: form.shortAr,
       },
       image: form.image || "/images/products/product-placeholder.svg",
+      hoverImage: form.hoverImage || "",
       fallbackImage: "/images/products/product-placeholder.svg",
       sizes: parseSizes(form.sizes),
       badge: {
@@ -142,6 +145,10 @@ function AdminProductForm({ editingProduct, language, onCancel, onSave, t }) {
       <label>
         {t("admin.imagePath")}
         <input name="image" onChange={handleChange} value={form.image} />
+      </label>
+      <label>
+        {t("admin.secondImagePath")}
+        <input name="hoverImage" onChange={handleChange} value={form.hoverImage} />
       </label>
       <label>
         {t("admin.shortDescriptionEn")}
