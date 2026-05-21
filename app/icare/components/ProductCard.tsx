@@ -4,6 +4,7 @@ import { Language } from '../translations';
 import { Product } from '../types';
 import { isPurchasableStock } from '../lib/mappers';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { useShop } from '../context/ShopContext';
 
 interface ProductCardProps {
   product: Product;
@@ -14,6 +15,7 @@ interface ProductCardProps {
 const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }) => {
   const [isHovered, setIsHovered] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+  const { addToCart } = useShop();
   const isPurchasable = isPurchasableStock(product.stockStatus, product.stock);
 
   const hoverImage = product.images && product.images.length > 1 ? product.images[1] : null;
@@ -121,17 +123,17 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
-              if (isPurchasable && onSelect) {
-                onSelect();
+              if (isPurchasable) {
+                addToCart(product);
               }
             }}
             disabled={!isPurchasable}
-            className="w-full py-2.5 bg-[var(--rb-primary-text)] text-white text-[13px] font-medium rounded-full hover:bg-[var(--rb-gray-525252)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full py-2.5 bg-[var(--rb-primary-text)] text-white text-[13px] font-medium rounded-full hover:bg-[#525252] active:scale-[0.98] hover:shadow-lg transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-              {isPurchasable
-                ? (lang === 'en' ? 'Quick Add' : 'إضافة سريعة')
-                : (lang === 'en' ? 'Sold Out' : 'نفد المخزون')}
-            </button>
+            {isPurchasable
+              ? (lang === 'en' ? 'Quick Add' : 'إضافة سريعة')
+              : (lang === 'en' ? 'Sold Out' : 'نفد المخزون')}
+          </button>
         </motion.div>
       </a>
     </motion.div>
