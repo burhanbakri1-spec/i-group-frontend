@@ -21,7 +21,7 @@ interface MobileMenuProps {
 }
 
 const SHOP_ALL_CATEGORY = 'SHOP ALL';
-const FOCUS_VISIBLE_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F1ED]';
+const FOCUS_VISIBLE_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67645E]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--rb-bg-warm-gray)]';
 
 export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavigate, onProductSelect, onOpenCart, onOpenSearch, lang, onToggleLang }) => {
   // onOpenSearch is passed from parent but not currently used in this component
@@ -73,12 +73,12 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
           animate={shouldReduceMotion ? { opacity: 1 } : { x: 0 }}
           exit={shouldReduceMotion ? { opacity: 0 } : { x: '-100%' }}
           transition={calmTween}
-          className="fixed inset-0 z-[80] bg-[#F2F1ED] flex flex-col"
+          className="fixed inset-0 z-[80] bg-[var(--rb-bg-warm-gray)] flex flex-col"
         >
           {/* Mobile Header Inside Menu */}
-          <div className="px-6 py-5 flex items-center justify-between">
+          <div className="px-6 py-4 flex items-center justify-between">
             <button onClick={onClose} className={`p-2 rounded-full hover:bg-black/5 transition-colors ${FOCUS_VISIBLE_CLASS}`} aria-label="Close menu">
-              <X size={24} className="text-[#5C5A56]" />
+              <X size={24} className="text-[var(--rb-primary-text)]" />
             </button>
             <div className="absolute left-1/2 -translate-x-1/2 h-10">
               <img src="/icare-logo.png" alt="icare" className="h-full w-auto object-contain" />
@@ -86,23 +86,23 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
             <div className="flex items-center gap-1">
               <button 
                 onClick={onToggleLang}
-                className={`p-2 flex items-center gap-1.5 border border-black/10 rounded-full bg-white/60 hover:bg-white transition-colors ${FOCUS_VISIBLE_CLASS}`}
+                className={`p-2 flex items-center gap-1.5 border border-[var(--rb-border-light)] rounded-full bg-[var(--rb-bg-surface)] hover:bg-[var(--rb-bg-light)] transition-colors ${FOCUS_VISIBLE_CLASS}`}
               >
-                <Globe size={16} className="text-[#5C5A56]" />
-                <span className="text-[12px] font-bold text-[#5C5A56] uppercase">
+                <Globe size={16} className="text-[var(--rb-primary-text)]" />
+                <span className="text-[12px] font-bold text-[var(--rb-primary-text)] uppercase">
                   {lang === 'en' ? 'AR' : 'EN'}
                 </span>
               </button>
               <button onClick={() => { onNavigate('wishlist'); onClose(); }} className={`p-2 relative rounded-full hover:bg-black/5 transition-colors ${FOCUS_VISIBLE_CLASS}`} aria-label="Open wishlist">
-                <Heart size={22} className="text-[#5C5A56]" />
+                <Heart size={22} className="text-[var(--rb-primary-text)]" />
                 {wishlistItems.length > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#E11D48] text-white text-[10px] font-black rounded-full flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-[var(--rb-primary-text)] text-white text-[10px] font-black rounded-full flex items-center justify-center">
                     {wishlistItems.length}
                   </span>
                 )}
               </button>
               <button onClick={() => { onOpenCart(); onClose(); }} className={`p-2 relative rounded-full hover:bg-black/5 transition-colors ${FOCUS_VISIBLE_CLASS}`} aria-label="Open cart">
-                <ShoppingBag size={22} className="text-[#5C5A56]" />
+                <ShoppingBag size={22} className="text-[var(--rb-primary-text)]" />
                 {cartCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-black text-white text-[10px] font-black rounded-full flex items-center justify-center">
                     {cartCount}
@@ -113,14 +113,14 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
           </div>
 
           {/* Horizontal Category Scroll */}
-          <div className="px-6 border-b border-[#D9D7D2] overflow-x-auto no-scrollbar">
+          <div className="px-6 border-b border-[var(--rb-border-light)] overflow-x-auto no-scrollbar">
             <div className="flex gap-8 min-w-max py-4">
               {mobileCategories.length > 0 ? mobileCategories.map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setActiveCategory(cat)}
                     className={`text-[13px] font-bold uppercase tracking-tight relative pb-2 rounded-sm transition-colors ${FOCUS_VISIBLE_CLASS} ${
-                      activeMobileCategory === cat ? 'text-black' : 'text-[#5C5A56]'
+                      activeMobileCategory === cat ? 'text-[var(--rb-near-black)]' : 'text-[var(--rb-primary-text)]'
                     }`}
                   >
                     {cat}
@@ -128,12 +128,12 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
                       <motion.div
                         layoutId="mobileActiveTab"
                         transition={calmTween}
-                        className="absolute bottom-0 left-0 w-full h-[1.5px] bg-black"
+                        className="absolute bottom-0 left-0 w-full h-[1.5px] bg-[var(--rb-near-black)]"
                       />
                     )}
                   </button>
                 )) : (
-                  <span className="text-[12px] font-bold uppercase tracking-[0.15em] text-[#5C5A56] pb-2">
+                  <span className="text-[12px] font-bold uppercase tracking-[0.15em] text-[var(--rb-primary-text)] pb-2">
                     no categories available
                   </span>
                 )}
@@ -156,10 +156,10 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
                     type="button"
                     key={product.id}
                     onClick={() => { onProductSelect?.(product); onClose(); }}
-                    className={`w-full bg-white rounded-[16px] p-4 flex items-center gap-5 relative group active:scale-[0.99] transition-transform duration-150 text-left ${FOCUS_VISIBLE_CLASS}`}
+                    className={`w-full bg-[var(--rb-pure-white)] rounded-[var(--rb-radius-card)] p-4 flex items-center gap-5 relative group active:scale-[0.99] transition-transform duration-150 text-left ${FOCUS_VISIBLE_CLASS}`}
                     aria-label={`${lang === 'en' ? 'Open product' : 'فتح المنتج'} ${product.title ?? product.name}`}
                   >
-                    <div className="w-20 h-20 bg-[#F9F9F8] rounded-[12px] flex items-center justify-center p-2">
+                    <div className="w-20 h-20 bg-[var(--rb-bg-light)] rounded-[var(--rb-radius-card)] flex items-center justify-center p-2">
                       <ImageWithFallback 
                         src={product.image} 
                         alt={product.title ?? product.name}
@@ -169,22 +169,22 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
                     
                     <div className="flex-1">
                       <div className="flex items-start justify-between">
-                        <h4 className="text-[13px] font-bold uppercase tracking-tight text-[#444] leading-tight">
+                        <h4 className="text-[13px] font-bold uppercase tracking-tight text-[var(--rb-near-black)] leading-tight">
                           {product.title ?? product.name}
                         </h4>
                         {product.badge && (
-                          <span className="text-[8px] font-bold uppercase tracking-widest bg-[#6E6E6E] text-white px-2 py-0.5 rounded-full">
+                          <span className="text-[8px] font-bold uppercase tracking-widest bg-[var(--rb-gray-6D6E70)] text-white px-2 py-0.5 rounded-full">
                             {product.badge}
                           </span>
                         )}
                       </div>
-                      <p className="text-[12px] text-[#706E6A] font-medium leading-tight mt-1">
+                      <p className="text-[12px] text-[var(--rb-gray-84827E)] font-medium leading-tight mt-1">
                         {product.description ?? <>{product.originalPrice && <span className="line-through mr-1">{product.originalPrice}</span>}{product.price}</>}
                       </p>
                     </div>
                   </button>
                 )) : (
-                  <div className="bg-white/70 rounded-[16px] p-6 text-center text-[12px] font-bold uppercase tracking-[0.15em] text-[#706E6A]">
+                  <div className="bg-[var(--rb-bg-light)]/70 rounded-[var(--rb-radius-card)] p-6 text-center text-[12px] font-bold uppercase tracking-[0.15em] text-[var(--rb-primary-text)]">
                     no products available
                   </div>
                 )}
@@ -193,15 +193,15 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
           </div>
 
           {/* Bottom Navigation Links - Compact */}
-          <div className="p-6 py-4 border-t border-[#D9D7D2] space-y-3 bg-white/30">
+          <div className="p-6 py-4 border-t border-[var(--rb-border-light)] space-y-3 bg-[var(--rb-bg-surface)]/30">
             <div className="flex gap-6">
-                <button onClick={() => { onNavigate('story'); onClose(); }} className={`block rounded-sm text-[15px] font-bold uppercase tracking-tight text-[#444] hover:text-black transition-colors ${FOCUS_VISIBLE_CLASS}`}>
+                <button onClick={() => { onNavigate('story'); onClose(); }} className={`block rounded-sm text-[15px] font-bold uppercase tracking-tight text-[var(--rb-near-black)] hover:text-[var(--rb-near-black)] transition-colors ${FOCUS_VISIBLE_CLASS}`}>
                   {lang === 'en' ? 'STORY' : 'قصتنا'}
                 </button>
-                <button onClick={() => { onNavigate('vlog'); onClose(); }} className={`block rounded-sm text-[15px] font-bold uppercase tracking-tight text-[#444] hover:text-black transition-colors ${FOCUS_VISIBLE_CLASS}`}>
+                <button onClick={() => { onNavigate('vlog'); onClose(); }} className={`block rounded-sm text-[15px] font-bold uppercase tracking-tight text-[var(--rb-near-black)] hover:text-[var(--rb-near-black)] transition-colors ${FOCUS_VISIBLE_CLASS}`}>
                   {lang === 'en' ? 'VLOG' : 'فلوج'}
                 </button>
-                <button onClick={() => { onNavigate('account'); onClose(); }} className={`block rounded-sm text-[15px] font-bold uppercase tracking-tight text-[#444] hover:text-black transition-colors ${FOCUS_VISIBLE_CLASS}`}>
+                <button onClick={() => { onNavigate('account'); onClose(); }} className={`block rounded-sm text-[15px] font-bold uppercase tracking-tight text-[var(--rb-near-black)] hover:text-[var(--rb-near-black)] transition-colors ${FOCUS_VISIBLE_CLASS}`}>
                   {lang === 'en' ? 'ACCOUNT' : 'حسابي'}
                 </button>
             </div>
@@ -215,7 +215,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
                     href={social.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`p-2 bg-white rounded-full shadow-sm text-[#5C5A56] hover:text-black transition-colors ${FOCUS_VISIBLE_CLASS}`}
+                    className={`p-2 bg-[var(--rb-pure-white)] rounded-full shadow-sm text-[var(--rb-primary-text)] hover:text-[var(--rb-near-black)] transition-colors ${FOCUS_VISIBLE_CLASS}`}
                     aria-label={social.name}
                   >
                     <social.Icon size={18} strokeWidth={1.5} />
@@ -224,7 +224,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
               </div>
             )}
 
-            <p className="text-[9px] text-[#706E6A] font-bold tracking-widest uppercase">
+            <p className="text-[9px] text-[var(--rb-gray-84827E)] font-bold tracking-widest uppercase">
               © ICARE 2026
             </p>
           </div>

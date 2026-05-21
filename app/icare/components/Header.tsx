@@ -19,8 +19,8 @@ interface HeaderProps {
   onToggleLang: () => void;
 }
 
-const FOCUS_VISIBLE_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF9F6]';
-const MUTED_TEXT_CLASS = 'text-[#5C5A56] hover:text-black';
+const FOCUS_VISIBLE_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67645E]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--rb-bg-warm-gray)]';
+const MUTED_TEXT_CLASS = 'text-[var(--rb-primary-text)] hover:text-[var(--rb-near-black)]';
 const SHOP_MEGA_MENU_ID = 'icare-shop-mega-menu';
 
 export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavigate, onProductSelect, onOpenMenu, isDrawerOpen, lang, onToggleLang }) => {
@@ -30,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
   const [isShopHovered, setIsShopHovered] = useState(false);
   const [activeCategory, setActiveCategory] = useState(t.categories.all);
   const [isVisible, setIsVisible] = useState(true);
-  const [isPinkTheme, setIsPinkTheme] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [previewProducts, setPreviewProducts] = useState<Product[]>([]);
   const [rootCategories, setRootCategories] = useState<BackendCategory[]>([]);
   const [categoryChildren, setCategoryChildren] = useState<Record<string, BackendCategory[]>>({});
@@ -174,10 +174,11 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
       setIsVisible(true);
     }
 
-    if (latest > 1200 && latest < 2200) {
-      setIsPinkTheme(true);
+    // Switch to warm beige surface after scroll
+    if (latest > 100) {
+      setIsScrolled(true);
     } else {
-      setIsPinkTheme(false);
+      setIsScrolled(false);
     }
   });
 
@@ -195,18 +196,18 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
       onKeyDown={handleHeaderKeyDown}
       className={`fixed top-0 left-0 right-0 z-[60] ${isDrawerOpen ? 'pointer-events-none' : ''}`}
     >
-      {/* Announcement Bar */}
-      <div className="bg-[#FAF9F6]/70 backdrop-blur-xl text-[#5C5A56] py-2 text-center border-b border-black/5">
+      {/* Announcement Bar — warm beige strip, brown microcopy */}
+      <div className="bg-[var(--rb-bg-warm-gray)] text-[var(--rb-primary-text)] py-2 text-center border-b border-[var(--rb-border-light)]">
         <span className="text-[10px] font-bold uppercase tracking-[0.12em]">
           {announcementText}
         </span>
       </div>
 
-      <div className="mx-3 md:mx-5 mt-2 md:mt-3">
+      <div className="mx-4 md:mx-8 lg:mx-8 mt-2 md:mt-3">
         <header 
-          className={`transition-colors duration-200 rounded-[12px] px-4 md:px-6 py-3 flex min-h-[64px] items-center justify-between border border-white/40 shadow-sm ${
-            isPinkTheme ? 'bg-[#FFE4E6]/40' : 'bg-[#FAF9F6]/60'
-          } backdrop-blur-3xl`}
+          className={`transition-colors duration-200 rounded-[var(--rb-radius-pill)] px-4 md:px-6 py-3 flex min-h-[64px] items-center justify-between border border-[var(--rb-border-light)] shadow-sm ${
+            isScrolled ? 'bg-[var(--rb-bg-warm-gray)]' : 'bg-transparent'
+          }`}
         >
           {/* Navigation */}
           <div className="flex items-center gap-10">
@@ -216,7 +217,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
               className={`p-2 hover:bg-black/5 rounded-full transition-colors lg:hidden ${FOCUS_VISIBLE_CLASS}`}
               aria-label="Open menu"
             >
-              <Menu size={20} className={isPinkTheme ? 'text-[#E11D48]' : 'text-[#706E6A]'} />
+              <Menu size={20} className="text-[var(--rb-primary-text)]" />
             </button>
             <nav className="hidden lg:flex items-center gap-7">
               <button 
@@ -232,9 +233,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                     onNavigate('shop');
                   }
                 }}
-                className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors ${FOCUS_VISIBLE_CLASS} ${
-                  isPinkTheme ? 'text-[#E11D48] hover:text-black' : MUTED_TEXT_CLASS
-                }`}
+                className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors ${FOCUS_VISIBLE_CLASS} ${MUTED_TEXT_CLASS}`}
                 aria-haspopup="true"
                 aria-expanded={isShopHovered}
                 aria-controls={SHOP_MEGA_MENU_ID}
@@ -244,18 +243,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
               <button 
                 onClick={() => onNavigate('story')}
                 onMouseEnter={closeShopMenu}
-                className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors ${FOCUS_VISIBLE_CLASS} ${
-                  isPinkTheme ? 'text-[#E11D48] hover:text-black' : MUTED_TEXT_CLASS
-                }`}
+                className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors ${FOCUS_VISIBLE_CLASS} ${MUTED_TEXT_CLASS}`}
               >
                 {t.story}
               </button>
               <button 
                 onClick={onToggleLang}
                 onMouseEnter={closeShopMenu}
-                className={`text-[12px] font-bold flex items-center gap-2 border border-black/10 px-3 py-1.5 rounded-full hover:bg-black/5 transition-colors ${FOCUS_VISIBLE_CLASS} ${
-                  isPinkTheme ? 'text-[#E11D48]' : 'text-[#5C5A56]'
-                }`}
+                className={`text-[12px] font-bold flex items-center gap-2 border border-[var(--rb-border-light)] px-3 py-1.5 rounded-full hover:bg-black/5 transition-colors ${FOCUS_VISIBLE_CLASS} text-[var(--rb-primary-text)]`}
               >
                 <Globe size={14} />
                 {lang === 'en' ? 'العربية' : 'EN'}
@@ -284,9 +279,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
             <button 
                 onClick={onOpenSearch}
                 onMouseEnter={closeShopMenu}
-                className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors ${FOCUS_VISIBLE_CLASS} ${
-                  isPinkTheme ? 'text-[#E11D48] hover:text-black' : MUTED_TEXT_CLASS
-                }`}
+                className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors ${FOCUS_VISIBLE_CLASS} ${MUTED_TEXT_CLASS}`}
                 aria-label={t.search}
             >
               <span className="hidden md:inline">{t.search}</span>
@@ -295,16 +288,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
             <button 
               onClick={() => onNavigate('wishlist')}
               onMouseEnter={closeShopMenu}
-              className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors relative ${FOCUS_VISIBLE_CLASS} ${
-                isPinkTheme ? 'text-[#E11D48] hover:text-black' : MUTED_TEXT_CLASS
-              }`}
+              className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors relative ${FOCUS_VISIBLE_CLASS} ${MUTED_TEXT_CLASS}`}
               aria-label={t.wishlist}
             >
               <span className="hidden md:inline">{t.wishlist}</span>
               <div className="md:hidden relative">
                 <Heart size={20} />
                 {wishlistItems.length > 0 && (
-                  <span className="absolute -top-2 -right-2 w-5 h-5 bg-[#E11D48] text-white text-[10px] font-black rounded-full flex items-center justify-center">
+                  <span className="absolute -top-2 -right-2 w-5 h-5 bg-[var(--rb-primary-text)] text-white text-[10px] font-black rounded-full flex items-center justify-center">
                     {wishlistItems.length}
                   </span>
                 )}
@@ -313,18 +304,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
             <button 
               onClick={() => onNavigate('account')}
               onMouseEnter={closeShopMenu}
-              className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors hidden md:block ${FOCUS_VISIBLE_CLASS} ${
-                isPinkTheme ? 'text-[#E11D48] hover:text-black' : MUTED_TEXT_CLASS
-              }`}
+              className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors hidden md:block ${FOCUS_VISIBLE_CLASS} ${MUTED_TEXT_CLASS}`}
             >
               {t.account}
             </button>
             <button 
               onClick={onOpenCart}
               onMouseEnter={closeShopMenu}
-              className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors relative ${FOCUS_VISIBLE_CLASS} ${
-                isPinkTheme ? 'text-[#E11D48] hover:text-black' : MUTED_TEXT_CLASS
-              }`}
+              className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors relative ${FOCUS_VISIBLE_CLASS} ${MUTED_TEXT_CLASS}`}
               aria-label={t.cart}
             >
               <span className="hidden md:inline">{t.cart} ({cartCount})</span>
@@ -350,20 +337,20 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={calmTween}
-              className="absolute top-[calc(100%-8px)] left-0 z-[55] w-full bg-[#FAF9F6]/90 backdrop-blur-3xl rounded-[16px] pt-5 pb-6 shadow-xl overflow-hidden border border-white/40"
+              className="absolute top-[calc(100%-8px)] left-0 z-[55] w-full bg-[var(--rb-bg-warm-gray)] rounded-[var(--rb-radius-card)] pt-5 pb-6 shadow-xl overflow-hidden border border-[var(--rb-border-light)]"
               onMouseEnter={showShop}
             >
               <div className="max-w-[1440px] mx-auto px-10">
                 {megaMenuCategories.length > 0 && (
                   <div className="flex justify-end gap-6 mb-4 px-6">
                     {/* "All" button */}
-                    <button
+                      <button
                       key={t.categories.all}
                       onMouseEnter={() => { setActiveCategory(t.categories.all); setActiveRootSlug(null); }}
                       onFocus={() => { setActiveCategory(t.categories.all); setActiveRootSlug(null); }}
                       onClick={() => { onNavigate('shop'); closeShopMenu(); }}
                       className={`rounded-full px-1 text-[14px] font-bold uppercase tracking-tight relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
-                        activePreviewCategory.trim().toLowerCase() === t.categories.all.trim().toLowerCase() ? 'text-black' : 'text-[#5C5A56]'
+                        activePreviewCategory.trim().toLowerCase() === t.categories.all.trim().toLowerCase() ? 'text-[var(--rb-near-black)]' : 'text-[var(--rb-primary-text)]'
                       }`}
                     >
                       {t.categories.all}
@@ -379,12 +366,12 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                         onFocus={() => { setActiveCategory(cat.name); setActiveRootSlug(cat.slug); }}
                         onClick={() => { onNavigate('shop'); closeShopMenu(); }}
                         className={`rounded-full px-1 text-[14px] font-bold uppercase tracking-tight relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
-                          activePreviewCategory.trim().toLowerCase() === cat.name.trim().toLowerCase() ? 'text-black' : 'text-[#5C5A56]'
+                          activePreviewCategory.trim().toLowerCase() === cat.name.trim().toLowerCase() ? 'text-[var(--rb-near-black)]' : 'text-[var(--rb-primary-text)]'
                         }`}
                       >
                         {cat.name}
                         {activePreviewCategory.trim().toLowerCase() === cat.name.trim().toLowerCase() && (
-                          <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="absolute -bottom-2 left-0 w-full h-[1px] bg-black" />
+                          <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="absolute -bottom-2 left-0 w-full h-[1px] bg-[var(--rb-near-black)]" />
                         )}
                       </button>
                     )) : (
@@ -396,12 +383,12 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                           onFocus={() => setActiveCategory(cat)}
                           onClick={() => { onNavigate('shop'); closeShopMenu(); }}
                           className={`rounded-full px-1 text-[14px] font-bold uppercase tracking-tight relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
-                            activePreviewCategory.trim().toLowerCase() === cat.trim().toLowerCase() ? 'text-black' : 'text-[#5C5A56]'
+                            activePreviewCategory.trim().toLowerCase() === cat.trim().toLowerCase() ? 'text-[var(--rb-near-black)]' : 'text-[var(--rb-primary-text)]'
                           }`}
                         >
                           {cat}
                           {activePreviewCategory.trim().toLowerCase() === cat.trim().toLowerCase() && (
-                            <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="absolute -bottom-2 left-0 w-full h-[1px] bg-black" />
+                            <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="absolute -bottom-2 left-0 w-full h-[1px] bg-[var(--rb-near-black)]" />
                           )}
                         </button>
                       ))
@@ -416,7 +403,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                       <button
                         key={child.slug}
                         onClick={() => { onNavigate('shop'); closeShopMenu(); }}
-                        className={`rounded-full px-4 py-1.5 text-[12px] font-bold tracking-wide transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} text-[#5C5A56] hover:text-black hover:bg-black/5`}
+                        className={`rounded-full px-4 py-1.5 text-[12px] font-bold tracking-wide transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} text-[var(--rb-primary-text)] hover:text-[var(--rb-near-black)] hover:bg-[var(--rb-bg-surface)]`}
                       >
                         {child.name}
                       </button>
@@ -434,7 +421,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={calmTween}
-                      className={`bg-white/60 backdrop-blur-md rounded-[12px] p-4 flex flex-col group cursor-pointer hover:bg-white/85 transition-colors duration-200 text-left ${FOCUS_VISIBLE_CLASS}`}
+                      className={`bg-[var(--rb-bg-surface)] rounded-[var(--rb-radius-card)] p-4 flex flex-col group cursor-pointer hover:bg-[var(--rb-bg-light)] transition-colors duration-200 text-left ${FOCUS_VISIBLE_CLASS}`}
                       onClick={() => { onProductSelect?.(product); setIsShopHovered(false); }}
                       aria-label={`${t.shopNow} ${product.title ?? product.name}`}
                     >
@@ -446,13 +433,13 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                         />
                       </div>
                       <div className="mt-auto">
-                        <h4 className="text-[14px] font-bold uppercase tracking-tight text-black mb-1 italic">
+                        <h4 className="text-[14px] font-bold uppercase tracking-tight text-[var(--rb-near-black)] mb-1">
                           {product.title ?? product.name}
                         </h4>
-                        <p className="text-[14px] text-[#5C5A56] font-medium leading-tight mb-2">
+                        <p className="text-[14px] text-[var(--rb-primary-text)] font-medium leading-tight mb-2">
                           {product.description ?? <>{product.originalPrice && <span className="line-through mr-1">{product.originalPrice}</span>}{product.price}</>}
                         </p>
-                        <span className="text-[11px] font-black uppercase tracking-widest border-b border-black pb-0.5 self-start group-hover:opacity-70 transition-opacity">
+                        <span className="text-[11px] font-black uppercase tracking-widest border-b border-[var(--rb-near-black)] pb-0.5 self-start group-hover:opacity-70 transition-opacity">
                           {t.shopNow}
                         </span>
                       </div>
@@ -460,7 +447,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                     ))}
                   </div>
                 ) : (
-                  <div className="px-10 py-16 text-center text-[13px] font-bold uppercase tracking-[0.2em] text-[#5C5A56]">
+                  <div className="px-10 py-16 text-center text-[13px] font-bold uppercase tracking-[0.2em] text-[var(--rb-primary-text)]">
                     product previews unavailable
                   </div>
                 )}
