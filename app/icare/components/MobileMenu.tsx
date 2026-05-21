@@ -168,15 +168,15 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
                     </div>
                     
                     <div className="flex-1">
+                      {product.label && (
+                        <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[var(--rb-primary-text)] mb-1">
+                          {product.label}
+                        </p>
+                      )}
                       <div className="flex items-start justify-between">
                         <h4 className="text-[13px] font-bold uppercase tracking-tight text-[var(--rb-near-black)] leading-tight">
                           {product.title ?? product.name}
                         </h4>
-                        {product.badge && (
-                          <span className="text-[8px] font-bold uppercase tracking-widest bg-[var(--rb-gray-6D6E70)] text-white px-2 py-0.5 rounded-full">
-                            {product.badge}
-                          </span>
-                        )}
                       </div>
                       <p className="text-[12px] text-[var(--rb-gray-84827E)] font-medium leading-tight mt-1">
                         {product.description ?? <>{product.originalPrice && <span className="line-through mr-1">{product.originalPrice}</span>}{product.price}</>}

@@ -28,14 +28,15 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
 
   return (
     <div className="min-h-screen bg-[#F1F0ED] pb-32">
-      {/* Hero Banner - More minimal and cleaner */}
-      <section className="relative w-full h-[35vh] md:h-[50vh] overflow-hidden bg-[#F8F7F4]">
-        <ImageWithFallback 
-          src={contactHeroImage || "https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=2000"} 
-          alt="Contact Hero" 
-          className="w-full h-full object-cover opacity-90"
-        />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+      {/* Hero Banner */}
+      <section className="bg-white px-4 md:px-8">
+        <div className="relative h-[80vh] md:h-[85vh] w-full overflow-hidden shadow-sm">
+          <ImageWithFallback 
+            src={contactHeroImage || "https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=2000"} 
+            alt="Contact Hero" 
+            className="w-full h-full object-cover opacity-90"
+          />
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -48,6 +49,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
               {isEn ? 'customer experience' : 'تجربة العملاء'}
             </p>
           </motion.div>
+          </div>
         </div>
       </section>
 

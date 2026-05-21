@@ -40,7 +40,7 @@ export interface Product {
   galleryMedia?: ProductGalleryMedia[];
   rating?: string | undefined;
   reviews?: string;
-  badge?: string;
+  label?: string;
   brand?: string;
   brandId?: number;
   category?: string;
@@ -303,6 +303,7 @@ export interface BackendProduct {
   isFeatured?: boolean;
   isNew?: boolean;
   isBestseller?: boolean;
+  label?: string | null;
   ratingAverage?: BackendNumeric | null;
   ratingCount?: BackendNumeric | null;
   salesCount?: number;

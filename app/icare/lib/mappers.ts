@@ -58,7 +58,10 @@ export const isPurchasableStock = (stockStatus?: string, stock?: number) => {
   return true;
 };
 
-const getProductBadge = (product: BackendProduct) => {
+const getProductLabel = (product: BackendProduct) => {
+  // Admin-set label has highest priority
+  if (product.label) return product.label;
+
   // Check default variant-level sale first
   const defaultVariant = getDefaultVariant(product);
   if (defaultVariant) {
@@ -202,7 +205,7 @@ export const mapBackendProductToProduct = (product: BackendProduct, selectedVari
     galleryMedia,
     rating: ratingAverage && ratingAverage > 0 ? ratingAverage.toFixed(1) : '0',
     reviews: ratingCount && ratingCount > 0 ? String(ratingCount) : '0',
-    badge: getProductBadge(product),
+    label: getProductLabel(product),
     brand: brandName,
     brandId: product.brand?.id,
     category: categoryName,

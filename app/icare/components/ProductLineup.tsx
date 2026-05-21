@@ -16,7 +16,7 @@ interface ProductLineupProps {
 interface LineupItemProps {
   product?: Product;
   category: string;
-  badge?: string;
+  label?: string;
   name: string;
   description: string;
   price: string;
@@ -28,7 +28,7 @@ interface LineupItemProps {
 
 const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872] focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 
-const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, badge, name, description, price, originalPrice, image, reviews, onSelect }) => {
+const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, label, name, description, price, originalPrice, image, reviews, onSelect }) => {
   const [isHovered, setIsHovered] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const selectProduct = () => product && onSelect?.(product);
@@ -53,10 +53,10 @@ const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, badge, n
         <h3 className="text-[28px] md:text-[38px] font-bold lowercase tracking-tight text-[#67645E] leading-none">
           {category}
         </h3>
-        {badge && (
+        {label && (
           <div className="bg-[#67645E] px-4 py-1.5 rounded-full">
             <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] text-white">
-              {badge}
+              {label}
             </span>
           </div>
         )}
@@ -240,7 +240,7 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ onProductSelect, p
                <LineupCard
                   product={item}
                   category={item.title ?? item.category ?? 'icare'}
-                  badge={item.badge}
+                   label={item.label}
                   name={item.name}
                   description={item.description ?? item.category ?? 'iCare product'}
                   price={item.price}

@@ -87,7 +87,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
   return (
     <div className="bg-[#F1F0ED]">
       {/* 1. CINEMATIC HERO SECTION */}
-      <section className="relative w-full h-screen overflow-hidden group">
+      <section className="bg-white px-4 md:px-8">
+        <div className="relative h-[80vh] md:h-[85vh] w-full overflow-hidden shadow-sm">
         <ImageWithFallback 
           src={aboutHeroImage || DEFAULT_HERO_IMAGE} 
           alt="icare Philosophy" 
@@ -115,6 +116,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               {aboutHeroCta}
             </motion.button>
           </motion.div>
+        </div>
         </div>
       </section>
 

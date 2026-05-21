@@ -185,13 +185,14 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#F1F0ED]">
       {/* Banner */}
-      <section className="relative w-full h-[30vh] md:h-[40vh] overflow-hidden rounded-b-[24px]">
-        <ImageWithFallback
-          src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1920"
-          alt="Shop Hero"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/15 flex flex-col items-center justify-center text-white text-center px-4">
+      <section className="bg-white px-4 md:px-8">
+        <div className="relative h-[80vh] md:h-[85vh] w-full overflow-hidden shadow-sm">
+          <ImageWithFallback
+            src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1920"
+            alt="Shop Hero"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/15 flex flex-col items-center justify-center text-white text-center px-4">
           <motion.h1
             initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}
             className="text-[42px] md:text-[68px] font-brand lowercase italic leading-tight"
@@ -201,6 +202,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
           <p className="text-[12px] font-bold uppercase tracking-[0.3em] mt-4 opacity-80">
             {lang === 'en' ? 'exploration of beauty' : 'استكشاف الجمال'}
           </p>
+          </div>
         </div>
       </section>
 

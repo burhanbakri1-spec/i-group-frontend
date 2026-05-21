@@ -205,7 +205,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
 
       <div className="mx-4 md:mx-8 lg:mx-8 mt-2 md:mt-3">
         <header 
-          className={`transition-colors duration-200 rounded-[var(--rb-radius-pill)] px-4 md:px-6 py-3 flex min-h-[64px] items-center justify-between border border-[var(--rb-border-light)] shadow-sm ${
+          className={`transition-colors duration-200 rounded-t-[var(--rb-radius-card)] rounded-b-[0px] px-4 md:px-6 py-3 flex min-h-[64px] items-center justify-between border border-[var(--rb-border-light)] border-b-0 ${
             isScrolled ? 'bg-[var(--rb-bg-warm-gray)]' : 'bg-transparent'
           }`}
         >

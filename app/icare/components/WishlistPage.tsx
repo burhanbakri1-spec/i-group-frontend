@@ -132,15 +132,15 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-200 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                   />
-                  {product.badge && (
-                    <span className="absolute top-4 left-4 px-3 py-1 bg-white text-xs uppercase tracking-wider">
-                      {product.badge}
-                    </span>
-                  )}
                 </div>
 
                 {/* Product Info */}
                 <div className="p-6">
+                  {product.label && (
+                    <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[var(--rb-primary-text)] mb-1">
+                      {product.label}
+                    </p>
+                  )}
                   <p className="text-xs text-[#67645E] uppercase tracking-wider mb-1">{product.category}</p>
                   <h3 className="font-medium mb-2">{product.name}</h3>
                   <div className="flex items-center justify-between mb-4">

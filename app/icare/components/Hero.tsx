@@ -19,9 +19,9 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, lang }) => {
   const heroReveal = shouldReduceMotion ? {} : { initial: { opacity: 0 }, animate: { opacity: 1 } };
   
   return (
-    <section className="px-6 md:px-8 pb-6 pt-4">
+    <section className="bg-white px-4 md:px-8">
       <motion.div 
-        className="relative h-[68vh] min-h-[520px] md:h-[78vh] w-full max-w-[1600px] mx-auto overflow-hidden rounded-[12px] shadow-sm"
+        className="relative h-[80vh] md:h-[85vh] w-full overflow-hidden shadow-sm"
         {...heroReveal}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
       >

@@ -392,7 +392,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
             <div className="space-y-3 text-[13px] md:text-[14px] border-t border-[#DDDDDD] pt-6">
                 <p className="text-[#84827E] leading-relaxed"><span className="font-black lowercase">category:</span> {displayProduct.category ?? 'icare'} {displayProduct.stockStatus ? `— ${displayProduct.stockStatus.replaceAll('_', ' ')}` : ''}</p>
                 <div className="flex justify-between items-center py-2">
-                  <p className="font-black lowercase">{purchasableProduct.originalPrice ? <>original value: <span className="text-black/55 line-through ml-1">{purchasableProduct.originalPrice}</span></> : purchasableProduct.badge ?? 'selected care'}</p>
+                  <p className="font-black lowercase">{purchasableProduct.originalPrice ? <>original value: <span className="text-black/55 line-through ml-1">{purchasableProduct.originalPrice}</span></> : purchasableProduct.label ?? 'selected care'}</p>
                   <p className="font-black text-[15px] md:text-[18px]">{purchasableProduct.price}</p>
                 </div>
             </div>

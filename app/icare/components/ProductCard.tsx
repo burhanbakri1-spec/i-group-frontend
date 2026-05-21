@@ -52,8 +52,15 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
       >
         {/* Primary content: image + text — visible at rest, with padding on all sides */}
         <div className="relative z-10 transition-opacity duration-500 ease-out group-hover:opacity-0">
+          {/* Label — floating over image, categorization header */}
+          {product.label && (
+            <span className="absolute top-3 left-3 z-20 text-[16px] font-black uppercase tracking-[0.25em] text-[var(--rb-primary-text)]">
+              {product.label}
+            </span>
+          )}
+
           {/* Main image */}
-          <div className="aspect-square bg-[var(--rb-bg-surface)] overflow-hidden">
+          <div className="aspect-square rounded-[var(--rb-radius-card)] overflow-hidden">
             <ImageWithFallback
               src={product.image}
               alt={product.name}
@@ -62,19 +69,14 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
           </div>
 
           {/* Badges */}
-          {product.badge && (
-            <span className="absolute top-3 left-3 z-20 px-3 py-1 bg-white text-[10px] font-bold uppercase tracking-wider rounded-full shadow-sm">
-              {product.badge}
-            </span>
-          )}
           {!isPurchasable && (
-            <span className="absolute top-3 left-3 z-20 px-3 py-1 bg-black/70 text-white text-[10px] font-bold uppercase tracking-wider rounded-full">
+            <span className="absolute top-3 right-3 z-20 px-3 py-1 bg-black/70 text-white text-[10px] font-bold uppercase tracking-wider rounded-full">
               sold out
             </span>
           )}
 
           {/* Text */}
-          <div className="pt-[10px] pb-[14px] flex flex-col gap-[10px]">
+          <div className="pt-[10px] pb-[14px] flex flex-col gap-[12px]">
             <h3 className="font-bold text-sm text-[var(--rb-primary-text)] uppercase tracking-[0.28px] leading-[16.8px]">
               {product.name}
             </h3>
