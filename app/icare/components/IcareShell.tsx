@@ -79,7 +79,7 @@ export const IcareShell = ({ children }: { children: React.ReactNode }) => {
   return (
     <ShopProvider>
       <IcareShellContext.Provider value={contextValue}>
-        <div className={`min-h-screen bg-[#FFFFFF] font-sans selection:bg-black selection:text-white text-[#444] ${lang === 'ar' ? 'font-arabic' : ''}`}>
+        <div className={`min-h-screen bg-[#F1F0ED] font-sans selection:bg-[#7B7872] selection:text-white text-[#67645E] ${lang === 'ar' ? 'font-arabic' : ''}`}>
           <Header
             onOpenCart={() => setIsCartOpen(true)}
             onOpenSearch={() => setIsSearchOpen(true)}

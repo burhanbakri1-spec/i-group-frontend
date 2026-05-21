@@ -41,7 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 function LayoutFallback() {
   return (
-    <div className="min-h-[60vh] flex items-center justify-center bg-white px-6">
+    <div className="min-h-[60vh] flex items-center justify-center bg-[#F1F0ED] px-6">
       <div className="w-full max-w-screen-xl">
         <ProductGridSkeleton count={4} />
       </div>

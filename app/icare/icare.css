@@ -1,28 +1,176 @@
-.font-brand {
-  font-family: Georgia, serif;
+@layer theme {
+  :root {
+    /* ─── Rhode Skin — Core Design Token System ─── */
+
+    /* Color Tokens */
+    --rb-primary-text: #67645E;
+    --rb-pure-black: #000000;
+    --rb-near-black: #040404;
+    --rb-muted-text: #898984;
+    --rb-gray-525252: #525252;
+    --rb-gray-6D6E70: #6D6E70;
+    --rb-gray-84827E: #84827E;
+    --rb-gray-ACA9A5: #ACA9A5;
+    --rb-taupe-7B7872: #7B7872;
+    --rb-pure-white: #FFFFFF;
+    --rb-bg-warm-gray: #F1F0ED;
+    --rb-bg-light: #F5F5F5;
+    --rb-bg-surface: #EDECEB;
+    --rb-border-light: #DDDDDD;
+    --rb-gray-CCCCCC: #CCCCCC;
+
+    /* Theme-mapped semantic aliases */
+    --rb-foreground: var(--rb-primary-text);
+    --rb-background: var(--rb-bg-warm-gray);
+    --rb-border: var(--rb-border-light);
+    --rb-ring: var(--rb-taupe-7B7872);
+
+    /* Typography Tokens */
+    --font-swiss: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-display: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+    --rb-text-xs: 0.75rem;
+    --rb-text-xs--line-height: 1.2;
+    --rb-text-sm: 0.875rem;
+    --rb-text-sm--line-height: 1.25;
+    --rb-text-base: 1rem;
+    --rb-text-base--line-height: 1.5;
+    --rb-text-md: 1.125rem;
+    --rb-text-md--line-height: 1.4;
+    --rb-text-lg: 1.25rem;
+    --rb-text-lg--line-height: 1.35;
+    --rb-text-xl: 1.5rem;
+    --rb-text-xl--line-height: 1.2;
+    --rb-text-2xl: 1.875rem;
+    --rb-text-2xl--line-height: 1.1;
+    --rb-text-3xl: 2.25rem;
+    --rb-text-3xl--line-height: 1.05;
+    --rb-text-4xl: 3rem;
+    --rb-text-4xl--line-height: 0.95;
+    --rb-text-5xl: 3.75rem;
+    --rb-text-5xl--line-height: 0.9;
+    --rb-text-6xl: 4.5rem;
+    --rb-text-6xl--line-height: 0.85;
+
+    --rb-font-weight-normal: 400;
+    --rb-font-weight-medium: 500;
+    --rb-font-weight-semibold: 600;
+    --rb-font-weight-bold: 700;
+    --rb-font-weight-extrabold: 800;
+    --rb-font-weight-black: 900;
+
+    --rb-tracking-tighter: -0.04em;
+    --rb-tracking-tight: -0.02em;
+    --rb-tracking-normal: 0em;
+    --rb-tracking-wide: 0.02em;
+    --rb-tracking-wider: 0.04em;
+    --rb-tracking-widest: 0.08em;
+
+    /* Spacing Tokens */
+    --rb-space-0: 0;
+    --rb-space-1: 0.25rem;
+    --rb-space-2: 0.5rem;
+    --rb-space-3: 0.75rem;
+    --rb-space-4: 1rem;
+    --rb-space-5: 1.25rem;
+    --rb-space-6: 1.5rem;
+    --rb-space-8: 2rem;
+    --rb-space-10: 2.5rem;
+    --rb-space-12: 3rem;
+    --rb-space-16: 4rem;
+    --rb-space-20: 5rem;
+    --rb-space-24: 6rem;
+    --rb-space-32: 8rem;
+    --rb-space-40: 10rem;
+    --rb-space-px: 1px;
+
+    /* Border Radius Tokens */
+    --rb-radius-pill: 40px;
+    --rb-radius-card: 12px;
+    --rb-radius-button: 90px;
+    --rb-radius-small: 3.2px;
+    --rb-radius-full: 9999px;
+
+    /* Transitions / Motion */
+    --rb-ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --rb-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --rb-duration-fast: 150ms;
+    --rb-duration-base: 300ms;
+    --rb-duration-slow: 500ms;
+    --rb-duration-enter: 600ms;
+
+    /* Shadows */
+    --rb-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+    --rb-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --rb-shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.10);
+  }
 }
 
-/* iCare z-index scale: sticky/toolbars (40-50) < header (60) < mobile menu (80) < drawer overlay (250) < drawer panel (300). */
+@layer base {
+  /* iCare Shell — enforce warm beige background + brand brown text */
+  .rb-shell {
+    background-color: var(--rb-bg-warm-gray);
+    color: var(--rb-primary-text);
+    font-family: var(--font-swiss);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-.icare-focus-ring:focus {
-  outline: none;
+  /* Global selection tuned to the warm palette */
+  .rb-shell ::selection {
+    background-color: var(--rb-taupe-7B7872);
+    color: var(--rb-pure-white);
+  }
 }
 
-.icare-focus-ring:focus-visible {
-  outline: 2px solid #111111;
-  outline-offset: 4px;
-  box-shadow: 0 0 0 4px rgba(17, 17, 17, 0.18);
+@layer utilities {
+  /* ─── Rhode Utility Classes ─── */
+
+  /* Backgrounds */
+  .rb-bg-warm      { background-color: var(--rb-bg-warm-gray); }
+  .rb-bg-light     { background-color: var(--rb-bg-light); }
+  .rb-bg-surface   { background-color: var(--rb-bg-surface); }
+  .rb-bg-white     { background-color: var(--rb-pure-white); }
+
+  /* Typography */
+  .rb-text-display {
+    font-family: var(--font-display);
+    font-weight: var(--rb-font-weight-extrabold);
+    letter-spacing: var(--rb-tracking-tight);
+    line-height: var(--rb-text-4xl--line-height);
+  }
+
+  .rb-text-brand {
+    font-family: var(--font-swiss);
+    font-weight: var(--rb-font-weight-medium);
+    letter-spacing: var(--rb-tracking-normal);
+  }
+
+  .rb-text-muted {
+    color: var(--rb-muted-text);
+  }
+
+  /* Border radius helpers */
+  .rb-pill     { border-radius: var(--rb-radius-pill); }
+  .rb-card     { border-radius: var(--rb-radius-card); }
+  .rb-btn-round{ border-radius: var(--rb-radius-button); }
+  .rb-small    { border-radius: var(--rb-radius-small); }
+  .rb-full     { border-radius: var(--rb-radius-full); }
+
+  /* Borders */
+  .rb-border-light { border-color: var(--rb-border-light); }
+
+  /* Scrollbar hiding */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }
 
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
+/* ─── Mobile Trending Scroll (used in ProductSection) ─── */
 @media (max-width: 767px) {
   .mobile-trending-scroll {
     display: flex !important;
@@ -46,14 +194,15 @@
   }
 }
 
+/* ─── Skeleton Animations ─── */
 @keyframes skeleton-pulse {
   0%, 100% { opacity: 0.35; }
-  50% { opacity: 1; }
+  50%      { opacity: 1; }
 }
 
 @keyframes skeleton-enter {
   from { opacity: 0; }
-  to { opacity: 1; }
+  to   { opacity: 1; }
 }
 
 .skeleton-content {
@@ -66,6 +215,7 @@
   }
 }
 
+/* ─── Reduced Motion Global ─── */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
