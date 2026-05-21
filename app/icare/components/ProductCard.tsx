@@ -46,7 +46,7 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
         onMouseLeave={() => setIsHovered(false)}
         tabIndex={0}
         role="link"
-        className="block w-full bg-white rounded-[12px] overflow-hidden font-sans pt-[26px] pb-[14px] flex flex-col gap-[10px] cursor-pointer"
+        className="block w-full bg-white rounded-[12px] overflow-hidden font-sans pt-[26px] pb-[14px] px-[16px] flex flex-col gap-[10px] cursor-pointer"
       >
         {/* Image container */}
         <div className="relative overflow-hidden rounded-[12px]">
