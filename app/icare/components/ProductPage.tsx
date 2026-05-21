@@ -38,7 +38,7 @@ const ReviewItem = ({ review, content, helpfulCount = 0, onHelpfulVote }: Review
         <div className="flex items-center gap-2">
           <span className="text-[14px] font-bold text-[#67645E]">{review.name}</span>
           {review.verified && (
-            <div className="flex items-center gap-1 text-[11px] font-bold text-[#555]">
+            <div className="flex items-center gap-1 text-[11px] font-bold text-[#84827E]">
               {content.verifiedLabel} <CheckCircle2 size={12} className="fill-black text-white" />
             </div>
           )}
@@ -559,7 +559,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                 ))}
               </div>
             ) : (
-              <div className="py-16 text-center text-[14px] font-bold uppercase tracking-[0.2em] text-[#333]/40">
+              <div className="py-16 text-center text-[14px] font-bold uppercase tracking-[0.2em] text-[#67645E]/40">
                 {productNoReviews || 'No reviews yet'}
               </div>
             )}

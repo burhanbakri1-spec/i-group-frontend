@@ -277,7 +277,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
               <div className="p-8 md:p-10">
                 {/* Header */}
                 <div className="pr-8 mb-8">
-                  <h2 className="text-[12px] font-black uppercase tracking-widest text-[#333]">
+                  <h2 className="text-[12px] font-black uppercase tracking-widest text-[#67645E]">
                     {label('dialogTitle')}
                   </h2>
                   <p className="text-[13px] text-black/50 mt-1.5">{productName}</p>
@@ -286,7 +286,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                 {/* Auth gate */}
                 {!isAuthenticated ? (
                   <div className="py-16 flex flex-col items-center justify-center text-center gap-6">
-                    <p className="text-[12px] font-bold uppercase tracking-widest text-[#333]/60">
+                    <p className="text-[12px] font-bold uppercase tracking-widest text-[#67645E]/60">
                       {label('loginPrompt')}
                     </p>
                     <button
@@ -304,7 +304,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: shouldReduceMotion ? 0 : 0.3 }}
                     >
-                      <p className="text-[14px] font-bold uppercase tracking-widest text-[#333]">
+                      <p className="text-[14px] font-bold uppercase tracking-widest text-[#67645E]">
                         {label('thankYouMessage')}
                       </p>
                     </motion.div>
@@ -328,7 +328,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
 
                     {/* Star rating */}
                     <div className="space-y-3">
-                      <label className="block text-[10px] font-black uppercase tracking-widest text-[#333]">
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-[#67645E]">
                         {label('ratingLabel')}
                       </label>
                       <div className="flex gap-1.5">
@@ -356,7 +356,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
 
                     {/* Title */}
                     <div className="space-y-2">
-                      <label className="block text-[10px] font-black uppercase tracking-widest text-[#333]">
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-[#67645E]">
                         {label('titleLabel')}
                         <span className="text-black/30 normal-case tracking-normal font-normal ml-1.5">
                           optional
@@ -379,7 +379,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
 
                     {/* Comment */}
                     <div className="space-y-2">
-                      <label className="block text-[10px] font-black uppercase tracking-widest text-[#333]">
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-[#67645E]">
                         {label('commentLabel')}
                         <span className="text-black/30 normal-case tracking-normal font-normal ml-1.5">
                           optional
@@ -404,7 +404,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       {/* Age range */}
                       <div className="space-y-2">
-                        <label className="block text-[10px] font-black uppercase tracking-widest text-[#333]">
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-[#67645E]">
                           {label('ageRangeLabel')}
                           <span className="text-black/30 normal-case tracking-normal font-normal ml-1.5">
                             optional
@@ -428,7 +428,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
 
                       {/* Skin type */}
                       <div className="space-y-2">
-                        <label className="block text-[10px] font-black uppercase tracking-widest text-[#333]">
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-[#67645E]">
                           {label('skinTypeLabel')}
                           <span className="text-black/30 normal-case tracking-normal font-normal ml-1.5">
                             optional
@@ -453,7 +453,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
 
                     {/* Skin concerns chips */}
                     <div className="space-y-3">
-                      <label className="block text-[10px] font-black uppercase tracking-widest text-[#333]">
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-[#67645E]">
                         {label('skinConcernsLabel')}
                         <span className="text-black/30 normal-case tracking-normal font-normal ml-1.5">
                           optional
@@ -481,7 +481,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
 
                     {/* Favorite features chips */}
                     <div className="space-y-3">
-                      <label className="block text-[10px] font-black uppercase tracking-widest text-[#333]">
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-[#67645E]">
                         {label('favoriteFeaturesLabel')}
                         <span className="text-black/30 normal-case tracking-normal font-normal ml-1.5">
                           optional
@@ -509,7 +509,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
 
                     {/* Hydration slider */}
                     <div className="space-y-4">
-                      <label className="block text-[10px] font-black uppercase tracking-widest text-[#333]">
+                      <label className="block text-[10px] font-black uppercase tracking-widest text-[#67645E]">
                         {label('hydrationLabel')}
                         <span className="text-black/30 normal-case tracking-normal font-normal ml-1.5">
                           optional

@@ -114,7 +114,7 @@ const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, badge, n
 
         {/* Name and Price */}
         <div className="flex justify-between items-baseline gap-4">
-          <h4 className="text-[12px] md:text-[14px] font-black uppercase tracking-[0.05em] text-[#67645E] leading-tight flex-1">
+          <h4 className="text-[12px] md:text-[14px] font-bold lowercase tracking-[0.05em] text-[#67645E] leading-tight flex-1">
             {name}
           </h4>
           <div className="flex items-center gap-2">

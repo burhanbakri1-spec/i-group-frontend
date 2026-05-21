@@ -10,7 +10,7 @@ export const OurStory = () => {
         <motion.h1 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-[12vw] md:text-[8vw] leading-none font-black tracking-tighter text-[#222] lowercase mb-12"
+          className="text-[12vw] md:text-[8vw] leading-none font-bold tracking-tighter text-[#67645E] lowercase mb-12"
         >
           the icare way
         </motion.h1>
@@ -30,12 +30,12 @@ export const OurStory = () => {
           </motion.div>
           <div className="text-left space-y-6">
             <h2 className="text-2xl font-bold tracking-tight uppercase">Intentional Essentials</h2>
-            <p className="text-[16px] leading-relaxed text-[#555] font-medium">
+            <p className="text-[16px] leading-relaxed text-[#84827E] font-medium">
               We believe in the power of simplicity. icare was born from the desire to create 
               a streamlined collection of high-performance products that nourish your skin 
               without the noise.
             </p>
-            <p className="text-[16px] leading-relaxed text-[#555] font-medium">
+            <p className="text-[16px] leading-relaxed text-[#84827E] font-medium">
               Every formula is developed with dermatologists and chemists to ensure 
               the perfect balance of efficacy and gentleness.
             </p>
@@ -48,15 +48,15 @@ export const OurStory = () => {
         <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
           <div className="space-y-4">
             <h3 className="font-black tracking-widest text-[12px] uppercase">Curated</h3>
-            <p className="text-[14px] text-[#666] leading-relaxed">Only what is necessary. One of everything really good.</p>
+            <p className="text-[14px] text-[#84827E] leading-relaxed">Only what is necessary. One of everything really good.</p>
           </div>
           <div className="space-y-4">
             <h3 className="font-black tracking-widest text-[12px] uppercase">Effective</h3>
-            <p className="text-[14px] text-[#666] leading-relaxed">High-performance ingredients that deliver real results.</p>
+            <p className="text-[14px] text-[#84827E] leading-relaxed">High-performance ingredients that deliver real results.</p>
           </div>
           <div className="space-y-4">
             <h3 className="font-black tracking-widest text-[12px] uppercase">Mindful</h3>
-            <p className="text-[14px] text-[#666] leading-relaxed">Consciously formulated and packaged with the planet in mind.</p>
+            <p className="text-[14px] text-[#84827E] leading-relaxed">Consciously formulated and packaged with the planet in mind.</p>
           </div>
         </div>
       </section>

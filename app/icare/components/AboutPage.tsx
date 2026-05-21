@@ -37,7 +37,7 @@ const AccordionItem = ({ title, content, isOpen, onClick }: { title: string, con
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden"
           >
-            <div className="pb-8 text-[15px] md:text-[16px] text-[#666] leading-relaxed max-w-xl">
+            <div className="pb-8 text-[15px] md:text-[16px] text-[#84827E] leading-relaxed max-w-xl">
               {content}
             </div>
           </motion.div>
@@ -130,10 +130,10 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               />
             </div>
             <div className="lg:absolute lg:right-20 lg:top-1/2 lg:-translate-y-1/2 bg-[#F2F1ED] p-10 md:p-20 rounded-[16px] lg:max-w-xl -mt-20 mx-4 lg:mt-0 lg:mx-0 z-10">
-              <h2 className="text-[32px] md:text-[48px] font-black tracking-tight text-[#444] mb-6 lowercase">
+              <h2 className="text-[32px] md:text-[48px] font-bold tracking-tight text-[#67645E] mb-6 lowercase">
                 {aboutIntentionalTitle}
               </h2>
-              <p className="text-[16px] md:text-[18px] text-[#666] leading-[1.6]">
+              <p className="text-[16px] md:text-[18px] text-[#84827E] leading-[1.6]">
                 {aboutIntentionalText}
               </p>
             </div>
@@ -148,12 +148,12 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             <div className="space-y-8 md:space-y-10 order-2 lg:order-1 px-4 lg:px-0">
               <div className="space-y-2">
                 <span className="text-[10px] font-black tracking-[0.3em] uppercase text-[#999]">{aboutFoundationLabel}</span>
-                <h2 className="text-[42px] md:text-[64px] font-[900] leading-[0.9] tracking-[-0.04em] text-[#222] lowercase">
+                <h2 className="text-[42px] md:text-[64px] font-bold leading-[0.9] tracking-[-0.04em] text-[#67645E] lowercase">
                   {aboutFoundationTitle}
                 </h2>
               </div>
               <div className="space-y-6 max-w-lg">
-                <p className="text-[18px] text-[#555] leading-relaxed">
+                <p className="text-[18px] text-[#84827E] leading-relaxed">
                   {aboutFoundationText1}
                 </p>
                 <p className="text-[16px] text-[#777] leading-relaxed">
@@ -206,7 +206,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-black/10 pb-10">
             <div className="space-y-4">
               <span className="text-[10px] font-black tracking-[0.3em] uppercase text-[#999]">{aboutTeamLabel}</span>
-              <h2 className="text-[42px] md:text-[64px] font-[900] leading-[0.9] tracking-[-0.04em] text-[#222] lowercase">
+              <h2 className="text-[42px] md:text-[64px] font-bold leading-[0.9] tracking-[-0.04em] text-[#67645E] lowercase">
                 {aboutTeamTitle}
               </h2>
             </div>
@@ -226,7 +226,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 />
               </div>
               <div className="space-y-1 px-4 text-center">
-                <h4 className="text-[20px] font-black tracking-tight text-[#222] lowercase">{aboutTeamMember1Name}</h4>
+                <h4 className="text-[20px] font-black tracking-tight text-[#67645E] lowercase">{aboutTeamMember1Name}</h4>
                 <p className="text-[12px] font-bold uppercase tracking-widest text-[#999]">{aboutTeamMember1Title}</p>
               </div>
             </div>
@@ -241,7 +241,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 />
               </div>
               <div className="space-y-1 px-4 text-center">
-                <h4 className="text-[20px] font-black tracking-tight text-[#222] lowercase">{aboutTeamMember2Name}</h4>
+                <h4 className="text-[20px] font-black tracking-tight text-[#67645E] lowercase">{aboutTeamMember2Name}</h4>
                 <p className="text-[12px] font-bold uppercase tracking-widest text-[#999]">{aboutTeamMember2Title}</p>
               </div>
             </div>
@@ -256,7 +256,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 />
               </div>
               <div className="space-y-1 px-4 text-center">
-                <h4 className="text-[20px] font-black tracking-tight text-[#222] lowercase">{aboutTeamMember3Name}</h4>
+                <h4 className="text-[20px] font-black tracking-tight text-[#67645E] lowercase">{aboutTeamMember3Name}</h4>
                 <p className="text-[12px] font-bold uppercase tracking-widest text-[#999]">{aboutTeamMember3Title}</p>
               </div>
             </div>
@@ -271,7 +271,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             {aboutFounderNoteHeading}
           </h2>
           
-          <p className="text-[20px] md:text-[26px] text-[#444] leading-[1.6] font-[400] tracking-tight">
+          <p className="text-[20px] md:text-[26px] text-[#67645E] leading-[1.6] font-[400] tracking-tight">
             {aboutFounderLetter}
           </p>
 

@@ -62,7 +62,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
             className="space-y-8 md:space-y-16 pt-8 md:pt-24"
           >
             <div className="space-y-4 md:space-y-6 px-2 md:px-0">
-              <h2 className="text-[28px] md:text-[42px] font-black lowercase tracking-tight text-[#222] leading-tight">
+              <h2 className="text-[28px] md:text-[42px] font-bold lowercase tracking-tight text-[#67645E] leading-tight">
                 {isEn ? contactInfoTitle : "نحن هنا للمساعدة."}
               </h2>
               <div className="space-y-4 md:space-y-6 text-[13px] md:text-[16px] text-[#5C5A56] leading-relaxed font-medium">

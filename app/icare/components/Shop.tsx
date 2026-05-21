@@ -33,10 +33,10 @@ export const Shop: React.FC = () => {
             </div>
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="text-[16px] font-black uppercase tracking-tight text-[#444]">{product.title}</h3>
+                <h3 className="text-[16px] font-black lowercase tracking-tight text-[#67645E]">{product.title}</h3>
                 <p className="text-[14px] text-[#706E6A] font-medium">{product.subtitle}</p>
               </div>
-              <span className="text-[16px] font-bold text-[#444]">{product.price}</span>
+              <span className="text-[16px] font-bold text-[#67645E]">{product.price}</span>
             </div>
             <button className="mt-4 text-[11px] font-black uppercase tracking-widest border-b border-black pb-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
               ADD TO CART
