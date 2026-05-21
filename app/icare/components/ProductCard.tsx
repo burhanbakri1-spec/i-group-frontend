@@ -56,7 +56,7 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
     >
       <button
         onClick={handleToggleWishlist}
-        className="absolute top-3 right-3 z-10 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--rb-primary-text)] focus-visible:ring-offset-2"
+        className="absolute top-3 right-3 z-10 w-9 h-9 bg-white rounded-full flex items-center justify-center hover:bg-[#F1F0ED] transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--rb-primary-text)] focus-visible:ring-offset-2"
         aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
       >
         <Heart
