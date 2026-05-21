@@ -118,12 +118,12 @@ const getHeading = (payload: unknown, unit: ShowcaseUnit) => {
 function renderStackedUnit(unit: ShowcaseUnit) {
   return (
     <div className="flex flex-col w-full border-b border-black/10 pb-8 md:pb-12 last:border-b-0 last:pb-0">
-      <div className="aspect-[4/3] overflow-hidden rounded-2xl md:rounded-3xl bg-[#F2F1ED]">
+      <div className="aspect-[4/3] overflow-hidden rounded-[12px] bg-white">
         <ImageWithFallback src={unit.image} alt={unit.title} className="w-full h-full object-cover object-center" />
       </div>
       <div className="pt-5 md:pt-7 space-y-3 max-w-3xl">
-        <h3 className="text-[18px] md:text-[22px] font-black lowercase tracking-tight text-black">{unit.title}</h3>
-        <p className="text-[13px] md:text-[15px] text-[#5f5f5f] font-medium leading-relaxed">{unit.description}</p>
+        <h3 className="text-[18px] md:text-[22px] font-black lowercase tracking-tight text-[#67645E]">{unit.title}</h3>
+        <p className="text-[13px] md:text-[15px] text-[#84827E] font-medium leading-relaxed">{unit.description}</p>
       </div>
     </div>
   );
@@ -182,12 +182,12 @@ function KitContentsShowcaseSection({ unit, direction }: { unit: ShowcaseUnit; d
 
   const listPanel = (
     <div className={`${textOrder} space-y-8 md:space-y-12`}>
-      {heading.eyebrow && <p className="text-[10px] font-black uppercase tracking-[0.25em] text-black/35">{heading.eyebrow}</p>}
+      {heading.eyebrow && <p className="text-[10px] font-black uppercase tracking-[0.25em] text-[#84827E]">{heading.eyebrow}</p>}
       <div className="space-y-3">
-        <h2 className="text-[28px] md:text-[44px] tracking-tight leading-[1] text-[#333]">
+        <h2 className="text-[28px] md:text-[44px] tracking-tight leading-[1] text-[#67645E]">
           <span className="font-black uppercase">{heading.title}</span>
         </h2>
-        {heading.description && <p className="text-[13px] md:text-[15px] font-medium leading-relaxed text-[#666]">{heading.description}</p>}
+        {heading.description && <p className="text-[13px] md:text-[15px] font-medium leading-relaxed text-[#84827E]">{heading.description}</p>}
       </div>
       <div className="border-t border-black/10">
         {items.map((item) => {
@@ -203,7 +203,7 @@ function KitContentsShowcaseSection({ unit, direction }: { unit: ShowcaseUnit; d
                 aria-expanded={isOpen}
                 aria-controls={panelId}
                 onClick={() => toggleItem(item.id)}
-                className="group flex w-full items-center gap-4 py-5 md:py-6 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F1ED] transition-colors duration-300 hover:bg-black/[0.03] px-2 -mx-2 rounded-xl"
+                className="group flex w-full items-center gap-4 py-5 md:py-6 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872] focus-visible:ring-offset-2 focus-visible:ring-offset-[#F1F0ED] transition-colors duration-300 hover:bg-black/[0.03] px-2 -mx-2 rounded-xl"
               >
                 {item.image && (
                   <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl overflow-hidden bg-white shrink-0">
@@ -212,17 +212,17 @@ function KitContentsShowcaseSection({ unit, direction }: { unit: ShowcaseUnit; d
                 )}
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[13px] md:text-[15px] font-black uppercase tracking-[0.12em] group-hover:text-black/80 transition-colors">{item.title}</span>
-                    {item.badge && <span className="rounded-full bg-white px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.12em] text-black/50">{item.badge}</span>}
+                    <span className="text-[13px] md:text-[15px] font-black uppercase tracking-[0.12em] group-hover:text-[#67645E]/80 transition-colors">{item.title}</span>
+                    {item.badge && <span className="rounded-full bg-[#F1F0ED] px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.12em] text-[#67645E]">{item.badge}</span>}
                   </div>
                   {(item.quantity || item.description) && (
                     <div className="mt-1 space-y-0.5">
-                      {item.quantity && <p className="text-[11px] text-black/45 font-black uppercase tracking-[0.12em]">{item.quantity}</p>}
-                      {item.description && <p className="text-[11px] text-black/45 font-medium lowercase">{item.description}</p>}
+                      {item.quantity && <p className="text-[11px] text-[#84827E] font-black uppercase tracking-[0.12em]">{item.quantity}</p>}
+                      {item.description && <p className="text-[11px] text-[#84827E] font-medium lowercase">{item.description}</p>}
                     </div>
                   )}
                 </div>
-                <span className="w-7 h-7 md:w-8 md:h-8 shrink-0 rounded-full border border-black/10 flex items-center justify-center bg-white group-hover:bg-black group-hover:text-white transition-colors duration-300">
+                <span className="w-7 h-7 md:w-8 md:h-8 shrink-0 rounded-full border border-[#DDDDDD] flex items-center justify-center bg-white group-hover:bg-[#67645E] group-hover:text-white transition-colors duration-300">
                   <svg
                     aria-hidden="true"
                     className={`${isOpen ? 'rotate-45' : 'rotate-0'} transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`}
@@ -252,7 +252,7 @@ function KitContentsShowcaseSection({ unit, direction }: { unit: ShowcaseUnit; d
                 className="overflow-hidden"
               >
                 <div className="pb-6 md:pb-8 pl-[72px] md:pl-[80px] pr-2">
-                  <p className="text-[14px] md:text-[16px] leading-[1.7] text-black/60 font-medium">
+                  <p className="text-[14px] md:text-[16px] leading-[1.7] text-[#84827E] font-medium">
                     {item.expand || item.description || ''}
                   </p>
                 </div>
@@ -265,11 +265,11 @@ function KitContentsShowcaseSection({ unit, direction }: { unit: ShowcaseUnit; d
   );
 
   return (
-    <section className="bg-[#F2F1ED] rounded-[24px] md:rounded-[40px] px-6 md:px-20 py-10 md:py-16 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-20 items-start overflow-hidden">
+    <section className="bg-white rounded-[12px] px-6 md:px-20 py-10 md:py-16 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-20 items-start overflow-hidden">
       {listPanel}
       {activeMedia && (
-        <div className={`${mediaOrder} bg-white rounded-[24px] md:rounded-[32px] aspect-square md:min-h-[500px] shadow-sm sticky md:top-24 p-4 md:p-6`}>
-          <div className="relative h-full w-full overflow-hidden rounded-[18px] md:rounded-[26px] bg-[#F8F7F4]">
+        <div className={`${mediaOrder} bg-white rounded-[12px] aspect-square md:min-h-[500px] sticky md:top-24 p-4 md:p-6`}>
+          <div className="relative h-full w-full overflow-hidden rounded-[12px] bg-white">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeMediaKey}
@@ -314,7 +314,7 @@ function ApplicationStepsShowcaseSection({ unit, shouldReduceMotion, direction }
   if (!active) return null;
 
   const textPanel = (
-    <div className="bg-[#F2F1ED] rounded-[32px] p-6 md:p-12 flex flex-col justify-between min-h-fit md:min-h-[600px] shadow-sm">
+    <div className="bg-white rounded-[12px] p-6 md:p-12 flex flex-col justify-between min-h-fit md:min-h-[600px]">
       <div className="space-y-6 md:space-y-10">
         <div className="flex gap-2 md:gap-3 overflow-x-auto pb-1">
           {steps.map((step, index) => (
@@ -322,7 +322,7 @@ function ApplicationStepsShowcaseSection({ unit, shouldReduceMotion, direction }
               type="button"
               key={step.id}
               onClick={() => setActiveStep(index)}
-              className={`rounded-xl overflow-hidden shadow-sm transition-opacity duration-400 shrink-0 w-16 md:w-28 aspect-square ${safeActiveStep === index ? 'opacity-100' : 'opacity-30 hover:opacity-100'}`}
+               className={`rounded-[12px] overflow-hidden transition-opacity duration-400 shrink-0 w-16 md:w-28 aspect-square ${safeActiveStep === index ? 'opacity-100' : 'opacity-30 hover:opacity-100'}`}
               aria-label={`Show ${step.title}`}
             >
               {step.image ? (
@@ -339,9 +339,9 @@ function ApplicationStepsShowcaseSection({ unit, shouldReduceMotion, direction }
             <div className="flex gap-3 md:gap-4 items-start max-w-md">
               <span className="text-[10px] md:text-[11px] font-bold opacity-30 mt-1.5">{String(safeActiveStep + 1).padStart(2, '0')}</span>
               <div className="space-y-3">
-                <h3 className="text-[20px] md:text-[32px] font-medium leading-[1.3] text-[#333] tracking-tight">{active.title}</h3>
-                {active.description && <p className="text-[13px] md:text-[15px] text-[#666] font-medium leading-relaxed">{active.description}</p>}
-                {active.duration && <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/35">{active.duration}</p>}
+                <h3 className="text-[20px] md:text-[32px] font-medium leading-[1.3] text-[#67645E] tracking-tight">{active.title}</h3>
+                {active.description && <p className="text-[13px] md:text-[15px] text-[#84827E] font-medium leading-relaxed">{active.description}</p>}
+                {active.duration && <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#84827E]">{active.duration}</p>}
               </div>
             </div>
             {active.image && (
@@ -353,7 +353,7 @@ function ApplicationStepsShowcaseSection({ unit, shouldReduceMotion, direction }
         </AnimatePresence>
       </div>
       <div className="flex justify-end pt-6">
-        <button type="button" onClick={() => setActiveStep((prev) => (prev + 1) % steps.length)} className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-black/10 flex items-center justify-center bg-white/50 md:bg-transparent hover:bg-black hover:text-white transition-colors duration-300 group" aria-label="Next application step">
+        <button type="button" onClick={() => setActiveStep((prev) => (prev + 1) % steps.length)} className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-[#DDDDDD] flex items-center justify-center bg-white hover:bg-[#67645E] hover:text-white transition-colors duration-300 group" aria-label="Next application step">
           <ChevronRight size={18} className="group-hover:translate-x-0.5 transition-transform duration-300" />
         </button>
       </div>
@@ -361,7 +361,7 @@ function ApplicationStepsShowcaseSection({ unit, shouldReduceMotion, direction }
   );
 
   const imagePanel = (
-    <div className="hidden md:block bg-white rounded-[32px] overflow-hidden min-h-[600px] shadow-sm relative group">
+    <div className="hidden md:block bg-white rounded-[12px] overflow-hidden min-h-[600px] relative group">
       <AnimatePresence mode="wait">
         <motion.div key={active.id} initial={shouldReduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: shouldReduceMotion ? 0 : 0.6 }} className="absolute inset-0">
           {active.image ? (
@@ -449,8 +449,8 @@ function ResultsStudyShowcaseSection({ unit, shouldReduceMotion, direction }: { 
     <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {direction === 'rtl' ? (
         <>
-          <BeforeAfterImage pair={activeTab.beforeAfter} className="hidden md:flex bg-white rounded-[32px] overflow-hidden aspect-[4/5] md:min-h-[600px] relative group shadow-sm" />
-          <div className="bg-[#F2F1ED] rounded-[32px] p-8 md:p-16 flex flex-col justify-between min-h-[550px] md:min-h-[600px]">
+          <BeforeAfterImage pair={activeTab.beforeAfter} className="hidden md:flex bg-white rounded-[12px] overflow-hidden aspect-[4/5] md:min-h-[600px] relative group" />
+          <div className="bg-white rounded-[12px] p-8 md:p-16 flex flex-col justify-between min-h-[550px] md:min-h-[600px]">
             <div className="space-y-12 md:space-y-16">
               {shouldShowGlobalMetrics && (
                 <div className="space-y-8 md:space-y-10">
@@ -463,10 +463,10 @@ function ResultsStudyShowcaseSection({ unit, shouldReduceMotion, direction }: { 
                 <motion.div key={activeTab.id} initial={shouldReduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: shouldReduceMotion ? 0 : 0.6, ease: 'easeOut' }} className="space-y-10 md:space-y-14">
                   {(activeTab.title || activeTab.description || activeTab.bullets.length > 0) && (
                     <div className="space-y-4 max-w-md">
-                      {activeTab.title && <h3 className="text-[24px] md:text-[36px] font-medium leading-[1.1] text-[#333] tracking-tight">{activeTab.title}</h3>}
-                      {activeTab.description && <p className="text-[13px] md:text-[15px] text-[#666] font-medium leading-relaxed">{activeTab.description}</p>}
+                      {activeTab.title && <h3 className="text-[24px] md:text-[36px] font-medium leading-[1.1] text-[#67645E] tracking-tight">{activeTab.title}</h3>}
+                      {activeTab.description && <p className="text-[13px] md:text-[15px] text-[#84827E] font-medium leading-relaxed">{activeTab.description}</p>}
                       {activeTab.bullets.length > 0 && (
-                        <ul className="space-y-2 text-[12px] md:text-[13px] text-[#555] font-medium leading-relaxed">
+                        <ul className="space-y-2 text-[12px] md:text-[13px] text-[#84827E] font-medium leading-relaxed">
                           {activeTab.bullets.map((bullet) => <li key={bullet} className="flex gap-2"><span aria-hidden="true">•</span><span>{bullet}</span></li>)}
                         </ul>
                       )}
@@ -476,14 +476,14 @@ function ResultsStudyShowcaseSection({ unit, shouldReduceMotion, direction }: { 
                 </motion.div>
               </AnimatePresence>
             </div>
-            <BeforeAfterImage pair={activeTab.beforeAfter} className="md:hidden relative h-[340px] rounded-[24px] overflow-hidden mt-10 shadow-sm" />
+            <BeforeAfterImage pair={activeTab.beforeAfter} className="md:hidden relative h-[340px] rounded-[12px] overflow-hidden mt-10" />
             <div className="space-y-8 md:space-y-10 pt-12">
               {(activeTab.beforeAfter?.caption || activeTab.source || activeTab.disclaimer) && (
                 <p className="text-[9px] md:text-[10px] leading-relaxed opacity-40 italic max-w-[360px]">{[activeTab.beforeAfter?.caption, activeTab.source, activeTab.disclaimer].filter(Boolean).join(' · ')}</p>
               )}
               <div className="space-y-2.5">
                 {tabs.map((tab, index) => (
-                  <button key={tab.id} type="button" onClick={() => setActiveTabIndex(index)} className={`w-full py-5 px-8 rounded-[14px] text-left transition-colors text-[15px] md:text-[17px] font-medium lowercase ${safeActiveTabIndex === index ? 'bg-black/[0.04] text-black shadow-sm' : 'text-black/30 hover:text-black/50'}`}>
+                  <button key={tab.id} type="button" onClick={() => setActiveTabIndex(index)} className={`w-full py-5 px-8 rounded-[14px] text-left transition-colors text-[15px] md:text-[17px] font-medium lowercase ${safeActiveTabIndex === index ? 'bg-[#F1F0ED] text-[#67645E]' : 'text-[#84827E] hover:text-[#67645E]'}`}>
                     {tab.label}
                   </button>
                 ))}
@@ -493,7 +493,7 @@ function ResultsStudyShowcaseSection({ unit, shouldReduceMotion, direction }: { 
         </>
       ) : (
         <>
-          <div className="bg-[#F2F1ED] rounded-[32px] p-8 md:p-16 flex flex-col justify-between min-h-[550px] md:min-h-[600px]">
+          <div className="bg-white rounded-[12px] p-8 md:p-16 flex flex-col justify-between min-h-[550px] md:min-h-[600px]">
             <div className="space-y-12 md:space-y-16">
               {shouldShowGlobalMetrics && (
                 <div className="space-y-8 md:space-y-10">
@@ -506,10 +506,10 @@ function ResultsStudyShowcaseSection({ unit, shouldReduceMotion, direction }: { 
                 <motion.div key={activeTab.id} initial={shouldReduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: shouldReduceMotion ? 0 : 0.6, ease: 'easeOut' }} className="space-y-10 md:space-y-14">
                   {(activeTab.title || activeTab.description || activeTab.bullets.length > 0) && (
                     <div className="space-y-4 max-w-md">
-                      {activeTab.title && <h3 className="text-[24px] md:text-[36px] font-medium leading-[1.1] text-[#333] tracking-tight">{activeTab.title}</h3>}
-                      {activeTab.description && <p className="text-[13px] md:text-[15px] text-[#666] font-medium leading-relaxed">{activeTab.description}</p>}
+                      {activeTab.title && <h3 className="text-[24px] md:text-[36px] font-medium leading-[1.1] text-[#67645E] tracking-tight">{activeTab.title}</h3>}
+                      {activeTab.description && <p className="text-[13px] md:text-[15px] text-[#84827E] font-medium leading-relaxed">{activeTab.description}</p>}
                       {activeTab.bullets.length > 0 && (
-                        <ul className="space-y-2 text-[12px] md:text-[13px] text-[#555] font-medium leading-relaxed">
+                        <ul className="space-y-2 text-[12px] md:text-[13px] text-[#84827E] font-medium leading-relaxed">
                           {activeTab.bullets.map((bullet) => <li key={bullet} className="flex gap-2"><span aria-hidden="true">•</span><span>{bullet}</span></li>)}
                         </ul>
                       )}
@@ -519,21 +519,21 @@ function ResultsStudyShowcaseSection({ unit, shouldReduceMotion, direction }: { 
                 </motion.div>
               </AnimatePresence>
             </div>
-            <BeforeAfterImage pair={activeTab.beforeAfter} className="md:hidden relative h-[340px] rounded-[24px] overflow-hidden mt-10 shadow-sm" />
+            <BeforeAfterImage pair={activeTab.beforeAfter} className="md:hidden relative h-[340px] rounded-[12px] overflow-hidden mt-10" />
             <div className="space-y-8 md:space-y-10 pt-12">
               {(activeTab.beforeAfter?.caption || activeTab.source || activeTab.disclaimer) && (
                 <p className="text-[9px] md:text-[10px] leading-relaxed opacity-40 italic max-w-[360px]">{[activeTab.beforeAfter?.caption, activeTab.source, activeTab.disclaimer].filter(Boolean).join(' · ')}</p>
               )}
               <div className="space-y-2.5">
                 {tabs.map((tab, index) => (
-                  <button key={tab.id} type="button" onClick={() => setActiveTabIndex(index)} className={`w-full py-5 px-8 rounded-[14px] text-left transition-colors text-[15px] md:text-[17px] font-medium lowercase ${safeActiveTabIndex === index ? 'bg-black/[0.04] text-black shadow-sm' : 'text-black/30 hover:text-black/50'}`}>
+                  <button key={tab.id} type="button" onClick={() => setActiveTabIndex(index)} className={`w-full py-5 px-8 rounded-[14px] text-left transition-colors text-[15px] md:text-[17px] font-medium lowercase ${safeActiveTabIndex === index ? 'bg-[#F1F0ED] text-[#67645E]' : 'text-[#84827E] hover:text-[#67645E]'}`}>
                     {tab.label}
                   </button>
                 ))}
               </div>
             </div>
           </div>
-          <BeforeAfterImage pair={activeTab.beforeAfter} className="hidden md:flex bg-white rounded-[32px] overflow-hidden aspect-[4/5] md:min-h-[600px] relative group shadow-sm" />
+          <BeforeAfterImage pair={activeTab.beforeAfter} className="hidden md:flex bg-white rounded-[12px] overflow-hidden aspect-[4/5] md:min-h-[600px] relative group" />
         </>
       )}
     </section>
@@ -543,9 +543,9 @@ function ResultsStudyShowcaseSection({ unit, shouldReduceMotion, direction }: { 
 function ResultMetricStat({ metric }: { metric: NormalizedResultMetric }) {
   return (
     <div className="space-y-2">
-      <h4 className="text-[48px] md:text-[64px] font-bold text-[#4A5D4E] tracking-tight leading-none">{metric.value}</h4>
-      <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-[#333] opacity-60">{metric.label}</p>
-      {metric.description && <p className="text-[11px] md:text-[12px] text-[#666] font-medium leading-relaxed max-w-[280px]">{metric.description}</p>}
+      <h4 className="text-[48px] md:text-[64px] font-bold text-[#67645E] tracking-tight leading-none">{metric.value}</h4>
+      <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-[#67645E] opacity-60">{metric.label}</p>
+      {metric.description && <p className="text-[11px] md:text-[12px] text-[#84827E] font-medium leading-relaxed max-w-[280px]">{metric.description}</p>}
     </div>
   );
 }
@@ -557,16 +557,16 @@ function BeforeAfterImage({ pair, className }: { pair?: NormalizedBeforeAfterPai
       {pair.before && (
           <div className="relative w-1/2 h-full overflow-hidden">
           <ImageWithFallback src={pair.before.url} alt={pair.before.alt} className="w-full h-full object-cover object-center grayscale-[0.2]" />
-          <div className="absolute bottom-6 left-0 w-full flex justify-center z-10"><span className="bg-black/20 backdrop-blur-md px-4 py-1.5 rounded-full text-[9px] font-bold text-white uppercase tracking-widest border border-white/10">Before</span></div>
+          <div className="absolute bottom-6 left-0 w-full flex justify-center z-10"><span className="bg-[#67645E]/80 px-4 py-1.5 rounded-full text-[9px] font-bold text-white uppercase tracking-widest">Before</span></div>
         </div>
       )}
       {pair.after && (
         <div className="relative flex-1 h-full overflow-hidden">
           <ImageWithFallback src={pair.after.url} alt={pair.after.alt} className="w-full h-full object-cover object-center" />
-          <div className="absolute bottom-6 left-0 w-full flex justify-center z-10"><span className="bg-white/20 backdrop-blur-lg px-4 py-1.5 rounded-full text-[9px] font-bold text-white uppercase tracking-widest border border-white/20">After</span></div>
+          <div className="absolute bottom-6 left-0 w-full flex justify-center z-10"><span className="bg-white/80 px-4 py-1.5 rounded-full text-[9px] font-bold text-[#67645E] uppercase tracking-widest">After</span></div>
         </div>
       )}
-      {pair.caption && <div className="absolute left-4 right-4 top-4 z-20 rounded-full bg-black/25 px-4 py-2 text-center text-[9px] font-bold uppercase tracking-[0.16em] text-white backdrop-blur-md">{pair.caption}</div>}
+      {pair.caption && <div className="absolute left-4 right-4 top-4 z-20 rounded-full bg-[#67645E]/80 px-4 py-2 text-center text-[9px] font-bold uppercase tracking-[0.16em] text-white">{pair.caption}</div>}
     </div>
   );
 }
@@ -597,16 +597,16 @@ function RoutineStepsShowcaseSection({ unit, shouldReduceMotion, direction }: { 
   if (!active || !heroImage) return null;
 
   const heroPanel = (
-    <div className="bg-white rounded-[24px] overflow-hidden min-h-[500px] lg:min-h-[700px] relative">
+    <div className="bg-white rounded-[12px] overflow-hidden min-h-[500px] lg:min-h-[700px] relative">
       <ImageWithFallback src={heroImage.url} alt={heroImage.alt} className="w-full h-full object-cover object-center" />
     </div>
   );
 
   const stepsPanel = (
-    <div className="bg-[#FAF9F6] rounded-[24px] p-8 lg:p-16 flex flex-col justify-between min-h-[500px] lg:min-h-[700px] relative overflow-hidden">
+    <div className="bg-white rounded-[12px] p-8 lg:p-16 flex flex-col justify-between min-h-[500px] lg:min-h-[700px] relative overflow-hidden">
       <div className="space-y-4">
-        <h2 className="text-[44px] lg:text-[56px] font-medium leading-[1] text-[#333]">{asString(payload?.routineTitle) ?? heading.title}</h2>
-        {(asString(payload?.routineSubtitle) ?? heading.description) && <p className="text-[14px] text-[#666]">{asString(payload?.routineSubtitle) ?? heading.description}</p>}
+        <h2 className="text-[44px] lg:text-[56px] font-medium leading-[1] text-[#67645E]">{asString(payload?.routineTitle) ?? heading.title}</h2>
+        {(asString(payload?.routineSubtitle) ?? heading.description) && <p className="text-[14px] text-[#84827E]">{asString(payload?.routineSubtitle) ?? heading.description}</p>}
       </div>
       <div className="flex-1 flex items-center justify-center relative py-12">
         <AnimatePresence mode="wait">
@@ -614,18 +614,18 @@ function RoutineStepsShowcaseSection({ unit, shouldReduceMotion, direction }: { 
             {active.image ? (
               <ImageWithFallback src={active.image.url} alt={active.image.alt} className="w-full h-full object-contain object-center mix-blend-multiply" />
             ) : (
-              <div className="flex h-full w-full items-center justify-center rounded-[28px] bg-white p-8 text-center shadow-sm">
+              <div className="flex h-full w-full items-center justify-center rounded-[12px] bg-white p-8 text-center">
                 <div className="space-y-3">
-                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-black/30">routine step</p>
-                  <p className="text-[22px] font-medium leading-tight text-[#333]">{active.title}</p>
+                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#84827E]">routine step</p>
+                  <p className="text-[22px] font-medium leading-tight text-[#67645E]">{active.title}</p>
                 </div>
               </div>
             )}
             <motion.div initial={shouldReduceMotion ? false : { opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: shouldReduceMotion ? 0 : 0.3, duration: shouldReduceMotion ? 0 : 0.5, ease: 'easeOut' }} className="absolute top-[40%] left-[-20px] lg:left-[-40px] z-10">
               <div className="flex flex-col">
-                <span className="text-[14px] font-black uppercase tracking-widest text-[#333] mb-0.5">{active.title}</span>
-                {(active.subtitle || active.description) && <span className="text-[12px] text-[#666]">{active.subtitle ?? active.description}</span>}
-                {active.products.length > 0 && <span className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-black/35">{active.products.join(' + ')}</span>}
+                <span className="text-[14px] font-black uppercase tracking-widest text-[#67645E] mb-0.5">{active.title}</span>
+                {(active.subtitle || active.description) && <span className="text-[12px] text-[#84827E]">{active.subtitle ?? active.description}</span>}
+                {active.products.length > 0 && <span className="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#84827E]">{active.products.join(' + ')}</span>}
                 <div className="w-[100px] lg:w-[150px] h-[1px] bg-black/10 mt-2 relative"><div className="absolute right-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-black/20 rounded-full" /></div>
               </div>
             </motion.div>
@@ -635,7 +635,7 @@ function RoutineStepsShowcaseSection({ unit, shouldReduceMotion, direction }: { 
       <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-2 lg:gap-4">
         {steps.map((step, index) => (
           <button key={step.id} type="button" onClick={() => setActiveStepIndex(index)} className="flex flex-col items-center gap-4 group" aria-label={`Show ${step.title}`}>
-            <div className={`w-12 h-12 lg:w-16 lg:h-16 rounded-full border-2 flex items-center justify-center text-[12px] font-black transition-colors duration-500 ${safeActiveStepIndex === index ? 'bg-black border-black text-white' : 'border-black/10 bg-transparent text-black/40 hover:border-black/30'}`}>{String(index + 1).padStart(2, '0')}</div>
+            <div className={`w-12 h-12 lg:w-16 lg:h-16 rounded-full border-2 flex items-center justify-center text-[12px] font-black transition-colors duration-500 ${safeActiveStepIndex === index ? 'bg-[#67645E] border-[#67645E] text-white' : 'border-[#DDDDDD] bg-transparent text-[#84827E] hover:border-[#67645E]'}`}>{String(index + 1).padStart(2, '0')}</div>
             <span className={`text-[9px] lg:text-[10px] font-black uppercase tracking-[0.2em] transition-opacity duration-500 ${safeActiveStepIndex === index ? 'opacity-100' : 'opacity-20 group-hover:opacity-60'}`}>{step.label ?? step.title}</span>
           </button>
         ))}
@@ -669,7 +669,7 @@ function renderMixedLayoutUnits(units: ShowcaseUnit[], shouldReduceMotion: boole
 
 function SkeletonLoader() {
   return (
-    <section className="bg-white py-12 md:py-20">
+    <section className="bg-[#F1F0ED] py-12 md:py-20">
       <div className="max-w-[1600px] mx-auto px-4 lg:px-12">
         <div className="flex flex-col gap-8 md:gap-12">
           {[...Array(3)].map((_, i) => (
@@ -711,7 +711,7 @@ export const ProductShowcaseBlock: React.FC<ProductShowcaseBlockProps> = ({ slug
   if (activeUnits.length === 0) return null;
 
   return (
-    <section className="overflow-hidden bg-white py-12 md:py-20">
+    <section className="overflow-hidden bg-[#F1F0ED] py-12 md:py-20">
       <div className="max-w-[1600px] mx-auto px-4 lg:px-12">
         <div className={`flex flex-col ${LAYOUT_GAP}`}>{renderMixedLayoutUnits(activeUnits, shouldReduceMotion)}</div>
       </div>

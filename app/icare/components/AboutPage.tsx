@@ -85,7 +85,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
   ];
 
   return (
-    <div className="bg-white">
+    <div className="bg-[#F1F0ED]">
       {/* 1. CINEMATIC HERO SECTION */}
       <section className="relative w-full h-screen overflow-hidden group">
         <ImageWithFallback 
@@ -119,7 +119,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* 2. INTENTIONAL SKINCARE SECTION */}
-      <section className="bg-white py-8 px-4 md:px-8">
+      <section className="bg-[#F1F0ED] py-8 px-4 md:px-8">
         <div className="max-w-[1600px] mx-auto relative">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 items-center">
             <div className="rounded-[16px] overflow-hidden aspect-[4/5] lg:aspect-auto lg:h-[80vh] z-0">
@@ -129,7 +129,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="lg:absolute lg:right-20 lg:top-1/2 lg:-translate-y-1/2 bg-[#F2F1ED] p-10 md:p-20 rounded-[16px] lg:max-w-xl -mt-20 mx-4 lg:mt-0 lg:mx-0 shadow-2xl lg:shadow-none z-10">
+            <div className="lg:absolute lg:right-20 lg:top-1/2 lg:-translate-y-1/2 bg-[#F2F1ED] p-10 md:p-20 rounded-[16px] lg:max-w-xl -mt-20 mx-4 lg:mt-0 lg:mx-0 z-10">
               <h2 className="text-[32px] md:text-[48px] font-black tracking-tight text-[#444] mb-6 lowercase">
                 {aboutIntentionalTitle}
               </h2>
@@ -142,7 +142,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* 3. OUR FOUNDATION SECTION */}
-      <section className="py-8 md:py-12 px-4 md:px-12 bg-white">
+      <section className="py-8 md:py-12 px-4 md:px-12 bg-[#F1F0ED]">
         <div className="max-w-[1600px] mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <div className="space-y-8 md:space-y-10 order-2 lg:order-1 px-4 lg:px-0">
@@ -173,7 +173,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* 4. OUR VALUES ACCORDION SECTION */}
-      <section className="py-8 px-4 md:px-8 bg-white">
+      <section className="py-8 px-4 md:px-8 bg-[#F1F0ED]">
         <div className="max-w-[1600px] mx-auto relative">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-0 items-stretch">
             <div className="rounded-[16px] overflow-hidden aspect-[4/5] lg:aspect-auto lg:h-[80vh]">
@@ -183,7 +183,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 className="w-full h-full object-cover grayscale"
               />
             </div>
-            <div className="bg-[#F2F1ED] p-8 md:p-20 rounded-[16px] lg:-ml-20 lg:my-20 relative z-10 flex flex-col justify-center shadow-xl lg:shadow-2xl">
+            <div className="bg-[#F2F1ED] p-8 md:p-20 rounded-[16px] lg:-ml-20 lg:my-20 relative z-10 flex flex-col justify-center">
               <div className="space-y-2">
                 {valuesData.map((item, index) => (
                   <AccordionItem 
@@ -201,7 +201,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* 5. OUR CREW SECTION */}
-      <section className="py-10 px-4 md:px-8 bg-white overflow-hidden">
+      <section className="py-10 px-4 md:px-8 bg-[#F1F0ED] overflow-hidden">
         <div className="max-w-[1600px] mx-auto space-y-12 md:space-y-16">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-black/10 pb-10">
             <div className="space-y-4">

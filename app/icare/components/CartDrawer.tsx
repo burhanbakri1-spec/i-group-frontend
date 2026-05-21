@@ -15,14 +15,14 @@ export const CartDrawer = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[100]"
+            className="fixed inset-0 bg-black/20 z-[100]"
           />
           <motion.div
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 h-full w-full max-w-[400px] bg-[#F3F3F3] z-[101] shadow-2xl p-8 flex flex-col"
+            className="fixed top-0 right-0 h-full w-full max-w-[400px] bg-[#F1F0ED] z-[101] p-8 flex flex-col"
           >
             <div className="flex justify-between items-center mb-12">
               <h2 className="text-[12px] tracking-[0.2em] uppercase font-medium">{cartBagLabel} (0)</h2>
@@ -32,19 +32,19 @@ export const CartDrawer = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
             </div>
             
             <div className="flex-1 flex flex-col items-center justify-center text-center">
-              <p className="text-[11px] tracking-wider text-[#777] uppercase mb-8">{cartEmptyDrawer}</p>
-              <button onClick={onClose} className="bg-black text-white w-full py-4 text-[10px] tracking-[0.2em] uppercase font-medium">
+              <p className="text-[11px] tracking-wider text-[#84827E] uppercase mb-8">{cartEmptyDrawer}</p>
+              <button onClick={onClose} className="bg-[#67645E] text-white w-full py-4 rounded-full text-[10px] tracking-[0.2em] uppercase font-medium hover:bg-[#5A5853] transition-colors">
                 {cartContinueShopping}
               </button>
             </div>
 
-            <div className="pt-8 border-t border-[#D1D1D1]">
+            <div className="pt-8 border-t border-[#DDDDDD]">
               <div className="flex justify-between mb-4">
-                <span className="text-[11px] tracking-widest uppercase font-medium">Subtotal</span>
-                <span className="text-[11px] tracking-widest uppercase font-medium">$0.00</span>
+                <span className="text-[11px] tracking-widest uppercase font-medium text-[#67645E]">Subtotal</span>
+                <span className="text-[11px] tracking-widest uppercase font-medium text-[#67645E]">$0.00</span>
               </div>
-              <p className="text-[9px] text-[#999] tracking-wider uppercase mb-6 text-center">{cartShippingDisclaimer}</p>
-              <button disabled className="bg-black/10 text-black/40 w-full py-4 text-[10px] tracking-[0.2em] uppercase font-medium cursor-not-allowed">
+              <p className="text-[9px] text-[#84827E] tracking-wider uppercase mb-6 text-center">{cartShippingDisclaimer}</p>
+              <button disabled className="bg-[#67645E]/10 text-[#67645E]/40 w-full py-4 rounded-full text-[10px] tracking-[0.2em] uppercase font-medium cursor-not-allowed">
                 {cartCheckoutLabel}
               </button>
             </div>

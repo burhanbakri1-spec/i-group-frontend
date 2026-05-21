@@ -82,7 +82,7 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm sticky top-24">
+    <div className="bg-white p-6 rounded-[12px] sticky top-24">
       <h3 className="text-xl font-light mb-6">{ct.orderSummary}</h3>
 
       {/* Cart items */}
@@ -92,7 +92,7 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
             key={item.id}
             className="flex items-center gap-4 pb-4 border-b border-[#EEE]"
           >
-            <div className="w-20 h-20 bg-[#F5F5F5] rounded overflow-hidden">
+            <div className="w-20 h-20 bg-[#F1F0ED] rounded-[12px] overflow-hidden">
               <ImageWithFallback
                 src={item.image}
                 alt={item.name}
@@ -101,12 +101,12 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
             </div>
             <div className="flex-1">
               <p className="font-medium text-sm">{item.title}</p>
-              <p className="text-xs text-[#5F5D59]">
+              <p className="text-xs text-[#84827E]">
                 {ct.qtyLabel}: {item.quantity}
               </p>
               <div className="flex items-center gap-2 mt-1">
                 {item.originalPrice && (
-                  <span className="text-xs text-[#5F5D59]/50 line-through">{item.originalPrice}</span>
+                  <span className="text-xs text-[#84827E]/50 line-through">{item.originalPrice}</span>
                 )}
                 <p className="text-sm font-medium">{item.price}</p>
               </div>
@@ -122,13 +122,13 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
       ) : (
         <div className="space-y-3 text-sm border-t border-[#EEE] pt-4">
           <div className="flex justify-between">
-            <span className="text-[#5F5D59]">{ct.subtotal}</span>
+            <span className="text-[#84827E]">{ct.subtotal}</span>
             <span>
               {currency} {displayOrderSummary.subtotal.toFixed(2)}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-[#5F5D59]">{ct.shipping}</span>
+            <span className="text-[#84827E]">{ct.shipping}</span>
             <span
               className={
                 displayOrderSummary.shipping === 0 ? 'text-green-600' : ''
@@ -140,14 +140,14 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-[#5F5D59]">{ct.tax}</span>
+            <span className="text-[#84827E]">{ct.tax}</span>
             <span>
               {currency} {displayOrderSummary.tax.toFixed(2)}
             </span>
           </div>
           {displayOrderSummary.discount > 0 && (
             <div className="flex justify-between">
-              <span className="text-[#5F5D59]">{ct.discount}</span>
+              <span className="text-[#84827E]">{ct.discount}</span>
               <span>
                 -{currency} {displayOrderSummary.discount.toFixed(2)}
               </span>
@@ -165,19 +165,19 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
       {/* Coupon input */}
       <div className="mt-6 pt-4 border-t border-[#EEE]">
         {appliedCoupon ? (
-          <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+          <div className="flex items-center justify-between bg-[#F1F0ED] border border-[#DDDDDD] rounded-[12px] px-3 py-2">
             <div>
-              <p className="text-xs text-green-700 font-medium">
+              <p className="text-xs text-[#67645E] font-medium">
                 {ct.couponApplied}
               </p>
-              <p className="text-sm font-semibold text-green-800">
+              <p className="text-sm font-semibold text-[#67645E]">
                 {appliedCoupon}
               </p>
             </div>
             <button
               onClick={handleRemoveCoupon}
               disabled={couponLoading}
-              className="text-xs text-red-600 hover:text-red-700 underline"
+              className="text-xs text-[#67645E] hover:text-[#5A5853] underline"
             >
               {ct.couponRemove}
             </button>
@@ -195,12 +195,12 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
                 onKeyDown={handleCouponKeyDown}
                 placeholder={ct.couponPlaceholder}
                 disabled={couponLoading}
-                className="flex-1 px-3 py-2 border border-[#DDD] rounded text-sm text-[#222] placeholder:text-[#999] focus:outline-none focus:border-black disabled:opacity-50"
+                className="flex-1 px-3 py-2 border border-[#DDDDDD] rounded text-sm text-[#67645E] placeholder:text-[#84827E] focus:outline-none focus:border-[#67645E] focus:ring-2 focus:ring-[#7B7872]/70 disabled:opacity-50"
               />
               <button
                 onClick={handleCouponApply}
                 disabled={!couponInput.trim() || couponLoading}
-                className="px-4 py-2 bg-black text-white text-xs rounded hover:bg-[#333] disabled:opacity-40 transition-colors whitespace-nowrap"
+                className="px-4 py-2 bg-[#67645E] text-white text-xs rounded-full hover:bg-[#5A5853] disabled:opacity-40 transition-colors whitespace-nowrap"
               >
                 {couponLoading ? (
                   <span className="inline-flex items-center gap-1">

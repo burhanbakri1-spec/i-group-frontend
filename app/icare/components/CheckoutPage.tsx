@@ -15,7 +15,7 @@ import { CheckoutOrderSummary } from './checkout/CheckoutOrderSummary';
 import { CheckoutErrorBoundary } from './checkout/CheckoutErrorBoundary';
 
 const CONTROL_FOCUS_CLASS =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 const SHORT_TWEEN = { duration: 0.18, ease: 'easeOut' as const };
 
 interface CheckoutPageProps {
@@ -32,12 +32,12 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
   if (!checkout.isAuthenticated) {
     const { ct } = checkout;
     return (
-      <div className="min-h-screen bg-[#FAFAFA] py-8 md:py-12">
+      <div className="min-h-screen bg-[#F1F0ED] py-8 md:py-12">
         <div className="max-w-3xl mx-auto px-4 md:px-6">
           <div className="text-center mb-8 md:mb-12">
             <button
               onClick={() => onNavigate('shop')}
-              className={`inline-flex items-center gap-2 text-xs md:text-sm text-[#5F5D59] hover:text-black mb-4 transition-colors ${CONTROL_FOCUS_CLASS}`}
+              className={`inline-flex items-center gap-2 text-xs md:text-sm text-[#67645E] hover:text-black mb-4 transition-colors ${CONTROL_FOCUS_CLASS}`}
             >
               <ArrowLeft size={16} />
               {siteContent.checkoutBackToShop}
@@ -50,14 +50,14 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
             initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
             animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
             transition={SHORT_TWEEN}
-            className="bg-white p-8 md:p-10 rounded-lg shadow-sm text-center"
+            className="bg-white p-8 md:p-10 rounded-[12px] text-center"
           >
-            <Lock size={36} className="mx-auto mb-5 text-[#5F5D59]" />
+            <Lock size={36} className="mx-auto mb-5 text-[#67645E]" />
             <h2 className="text-2xl md:text-3xl font-light mb-4">{ct.authRequiredTitle}</h2>
-            <p className="text-sm md:text-base text-[#5F5D59] mb-8">{ct.authRequiredMessage}</p>
+            <p className="text-sm md:text-base text-[#67645E] mb-8">{ct.authRequiredMessage}</p>
             <button
               onClick={() => onNavigate('account')}
-              className={`px-8 py-3 bg-black text-white rounded-full text-[12px] font-black uppercase tracking-[0.2em] hover:bg-[#333] transition-colors ${CONTROL_FOCUS_CLASS}`}
+              className={`px-8 py-3 bg-[#67645E] text-white rounded-full text-[12px] font-black uppercase tracking-[0.2em] hover:bg-[#5A5853] transition-colors ${CONTROL_FOCUS_CLASS}`}
             >
               {ct.signInToCheckout}
             </button>
@@ -69,13 +69,13 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
 
   return (
     <CheckoutErrorBoundary lang={lang} onNavigate={onNavigate}>
-      <div className="min-h-screen bg-[#FAFAFA] py-8 md:py-12">
+      <div className="min-h-screen bg-[#F1F0ED] py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           {/* Header */}
           <div className="text-center mb-8 md:mb-12">
             <button
               onClick={() => onNavigate('shop')}
-              className={`inline-flex items-center gap-2 text-xs md:text-sm text-[#5F5D59] hover:text-black mb-4 transition-colors ${CONTROL_FOCUS_CLASS}`}
+              className={`inline-flex items-center gap-2 text-xs md:text-sm text-[#67645E] hover:text-black mb-4 transition-colors ${CONTROL_FOCUS_CLASS}`}
             >
               <ArrowLeft size={16} />
               {siteContent.checkoutBackToShop}
@@ -101,7 +101,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                 initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
                 animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
                 transition={SHORT_TWEEN}
-                className="bg-white p-8 rounded-lg shadow-sm"
+                className="bg-white p-8 rounded-[12px]"
               >
                 {/* Step 1: Shipping */}
                 {checkout.step === 1 && (
@@ -167,14 +167,14 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                     {checkout.step > 1 && (
                       <button
                         onClick={checkout.previousStep}
-                        className={`flex-1 px-6 py-3 border border-black rounded-full hover:bg-[#FAFAFA] transition-colors ${CONTROL_FOCUS_CLASS}`}
+                        className={`flex-1 px-6 py-3 border border-[#67645E] rounded-full hover:bg-[#F1F0ED] transition-colors ${CONTROL_FOCUS_CLASS}`}
                       >
                         {siteContent.checkoutNavBack}
                       </button>
                     )}
                     <button
                       onClick={checkout.nextStep}
-                      className={`flex-1 px-6 py-3 bg-black text-white rounded-full hover:bg-[#333] transition-colors flex items-center justify-center gap-2 ${CONTROL_FOCUS_CLASS}`}
+                      className={`flex-1 px-6 py-3 bg-[#67645E] text-white rounded-full hover:bg-[#5A5853] transition-colors flex items-center justify-center gap-2 ${CONTROL_FOCUS_CLASS}`}
                     >
                       {siteContent.checkoutNavContinue}
                       <ChevronRight size={18} />

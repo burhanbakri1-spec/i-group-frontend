@@ -21,7 +21,7 @@ interface ProductPageProps {
   onProductSelect?: (product: Product) => void;
 }
 
-const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872] focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 
 interface ReviewItemProps {
   review: ProductReview;
@@ -31,12 +31,12 @@ interface ReviewItemProps {
 }
 
 const ReviewItem = ({ review, content, helpfulCount = 0, onHelpfulVote }: ReviewItemProps) => (
-  <div className="py-12 border-b border-black/5 grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12">
+  <div className="py-12 border-b border-[#DDDDDD] grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12">
     {/* Left Sidebar */}
     <div className="space-y-6">
       <div className="space-y-1">
         <div className="flex items-center gap-2">
-          <span className="text-[14px] font-bold text-[#333]">{review.name}</span>
+          <span className="text-[14px] font-bold text-[#67645E]">{review.name}</span>
           {review.verified && (
             <div className="flex items-center gap-1 text-[11px] font-bold text-[#555]">
               {content.verifiedLabel} <CheckCircle2 size={12} className="fill-black text-white" />
@@ -53,8 +53,8 @@ const ReviewItem = ({ review, content, helpfulCount = 0, onHelpfulVote }: Review
           { label: "What are your favorite features about this product?", value: review.favorites },
         ].map((item, idx) => (
           <div key={idx} className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-widest text-[#333]">{item.label}</p>
-            <p className="text-[12px] text-[#555] leading-relaxed">{item.value}</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#67645E]">{item.label}</p>
+            <p className="text-[12px] text-[#84827E] leading-relaxed">{item.value}</p>
           </div>
         ))}
       </div>
@@ -73,16 +73,16 @@ const ReviewItem = ({ review, content, helpfulCount = 0, onHelpfulVote }: Review
         </div>
 
         <div className="space-y-3">
-          <h4 className="text-[16px] font-bold text-[#333]">{review.title}</h4>
-          <p className="text-[15px] text-[#333] leading-relaxed max-w-2xl">{review.content}</p>
+          <h4 className="text-[16px] font-bold text-[#67645E]">{review.title}</h4>
+          <p className="text-[15px] text-[#67645E] leading-relaxed max-w-2xl">{review.content}</p>
         </div>
 
         <div className="space-y-4 max-w-sm pt-4">
-          <p className="text-[11px] font-bold text-[#333]">{content.hydrationQuestion}</p>
+          <p className="text-[11px] font-bold text-[#67645E]">{content.hydrationQuestion}</p>
           <div className="relative pt-2">
             <div className="h-0.5 w-full bg-black/10 rounded-full">
               <div 
-                className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-[#66635F] rounded-full shadow-sm border-2 border-white"
+                className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-[#67645E] rounded-full border-2 border-white"
                 style={{ left: `${review.hydration}%` }}
               />
             </div>
@@ -311,13 +311,13 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
   }, []);
 
   return (
-    <div className={`bg-white min-h-screen overflow-x-hidden selection:bg-black selection:text-white ${isRtl ? 'rtl' : 'ltr'}`}>
+    <div className={`bg-[#F1F0ED] min-h-screen overflow-x-hidden selection:bg-[#67645E] selection:text-white ${isRtl ? 'rtl' : 'ltr'}`}>
       
       {/* 1. HERO SECTION - REFINED FOR MOBILE */}
       <section className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 p-4 md:p-6 overflow-hidden">
         
         {/* LEFT COLUMN: IMAGE SLIDER */}
-        <div className="relative aspect-[4/5] rounded-[24px] md:rounded-[32px] group z-0 overflow-hidden shadow-sm bg-[#F2F1ED]">
+        <div className="relative aspect-[4/5] rounded-[12px] group z-0 overflow-hidden bg-[#F1F0ED]">
           <div className="absolute inset-0 overflow-hidden">
             <AnimatePresence initial={false}>
               <motion.div
@@ -349,7 +349,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                 <button 
                   key={img.url}
                   onClick={() => setActiveImageSelection({ index: idx, galleryKey: displayImagesKey, resetKey: activeImageResetKey })}
-                    className={`w-9 h-9 md:w-11 md:h-11 rounded-lg overflow-hidden border-2 transition-colors relative ${CONTROL_FOCUS_CLASS} ${safeActiveImageIndex === idx ? 'border-white ring-2 ring-black/20 shadow-md opacity-100' : 'border-white/40 opacity-70 hover:opacity-100'}`}
+                    className={`w-9 h-9 md:w-11 md:h-11 rounded-lg overflow-hidden border-2 transition-colors relative ${CONTROL_FOCUS_CLASS} ${safeActiveImageIndex === idx ? 'border-white ring-2 ring-[#7B7872]/40 opacity-100' : 'border-white/40 opacity-70 hover:opacity-100'}`}
                 >
                     <ImageWithFallback src={img.url} alt={img.altText || `${displayProduct.name} thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
                 </button>
@@ -367,14 +367,14 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
         </div>
 
         {/* RIGHT COLUMN: PRODUCT INFO - REFINED MOBILE DENSITY */}
-        <div className="bg-[#F2F1ED] rounded-[24px] md:rounded-[32px] p-6 md:p-14 flex flex-col space-y-6 md:space-y-8 md:h-full md:overflow-y-auto no-scrollbar relative z-10 shadow-[-20px_0_40px_rgba(0,0,0,0.01)]">
+        <div className="bg-white rounded-[12px] p-6 md:p-14 flex flex-col space-y-6 md:space-y-8 md:h-full md:overflow-y-auto no-scrollbar relative z-10">
           
           <div className="space-y-3 md:space-y-4">
                <h1 className="text-[42px] md:text-[72px] font-black tracking-[-0.04em] leading-[0.85] lowercase">
                 {displayProduct.name}
               </h1>
              <div className="flex items-center gap-4 md:gap-6">
-                 <p className="text-[9px] md:text-[12px] font-black uppercase tracking-[0.2em] text-black/70">{displayProduct.brand ?? displayProduct.category ?? 'icare essentials'}</p>
+                  <p className="text-[9px] md:text-[12px] font-black uppercase tracking-[0.2em] text-[#84827E]">{displayProduct.brand ?? displayProduct.category ?? 'icare essentials'}</p>
                <div className="flex items-center gap-1">
                   <div className="flex text-black">
                     {[...Array(5)].map((_, i) => <Star key={i} size={8} className="md:size-[10px]" fill="currentColor" />)}
@@ -385,12 +385,12 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
           </div>
 
           <div className="space-y-4 md:space-y-6">
-            <p className="text-[14px] md:text-[15px] leading-relaxed text-[#444] font-medium">
+            <p className="text-[14px] md:text-[15px] leading-relaxed text-[#84827E] font-medium">
                   {displayProduct.description ?? (productDetailsFallback || 'Product details coming soon')}
             </p>
             
-            <div className="space-y-3 text-[13px] md:text-[14px] border-t border-black/5 pt-6">
-                <p className="text-[#444] leading-relaxed"><span className="font-black lowercase">category:</span> {displayProduct.category ?? 'icare'} {displayProduct.stockStatus ? `— ${displayProduct.stockStatus.replaceAll('_', ' ')}` : ''}</p>
+            <div className="space-y-3 text-[13px] md:text-[14px] border-t border-[#DDDDDD] pt-6">
+                <p className="text-[#84827E] leading-relaxed"><span className="font-black lowercase">category:</span> {displayProduct.category ?? 'icare'} {displayProduct.stockStatus ? `— ${displayProduct.stockStatus.replaceAll('_', ' ')}` : ''}</p>
                 <div className="flex justify-between items-center py-2">
                   <p className="font-black lowercase">{purchasableProduct.originalPrice ? <>original value: <span className="text-black/55 line-through ml-1">{purchasableProduct.originalPrice}</span></> : purchasableProduct.badge ?? 'selected care'}</p>
                   <p className="font-black text-[15px] md:text-[18px]">{purchasableProduct.price}</p>
@@ -401,13 +401,13 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
           <div className="pt-4 space-y-6 md:space-y-8">
               {displayProduct.variants && displayProduct.variants.length > 0 && (
                 <div className="flex flex-wrap items-center gap-2 text-[12px] md:text-[13px]">
-                  <span className="text-black/60 lowercase">{productSelectOption || 'Select option'}</span>
+                  <span className="text-[#84827E] lowercase">{productSelectOption || 'Select option'}</span>
                   {displayProduct.variants.map((variant) => (
                     <button
                       key={variant.id}
                       onClick={() => setSelectedVariant(variant)}
                       disabled={!isPurchasableStock(variant.stockStatus, variant.stockQuantity)}
-                      className={`font-black underline underline-offset-4 flex items-center gap-1 rounded-md lowercase ${CONTROL_FOCUS_CLASS} ${selectedVariant?.id === variant.id ? 'text-black' : 'text-black/60 hover:text-black'} disabled:text-black/30 disabled:cursor-not-allowed`}
+                      className={`font-black underline underline-offset-4 flex items-center gap-1 rounded-md lowercase ${CONTROL_FOCUS_CLASS} ${selectedVariant?.id === variant.id ? 'text-[#67645E]' : 'text-[#84827E] hover:text-[#67645E]'} disabled:text-black/30 disabled:cursor-not-allowed`}
                     >
                       {variant.name}
                       {variant.isDefault && <ChevronDown size={14} />}
@@ -422,14 +422,14 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                    whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
                    onClick={() => isSelectedVariantPurchasable && addToCart(purchasableProduct)}
                   disabled={!isSelectedVariantPurchasable}
-                  className={`w-full bg-black text-white py-5 rounded-full text-[12px] md:text-[13px] font-black uppercase tracking-[0.2em] hover:bg-black/90 transition-colors duration-200 shadow-lg shadow-black/10 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${CONTROL_FOCUS_CLASS}`}
+                   className={`w-full bg-[#67645E] text-white py-5 rounded-full text-[12px] md:text-[13px] font-black uppercase tracking-[0.2em] hover:bg-[#67645E]/90 transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${CONTROL_FOCUS_CLASS}`}
                 >
                   <ShoppingBag size={16} />
                     {isSelectedVariantPurchasable
                       ? (lang === 'en' ? `${productAddToBag || 'Add to Bag'} — ${purchasableProduct.price}` : `أضف للسلة — ${purchasableProduct.price}`)
                       : (lang === 'en' ? (productSoldOut || 'Sold Out') : 'نفد المخزون')}
                 </motion.button>
-                <div className="flex items-center justify-center gap-2 text-[9px] md:text-[10px] font-bold text-black/55">
+                <div className="flex items-center justify-center gap-2 text-[9px] md:text-[10px] font-bold text-[#84827E]">
                   {lang === 'en' ? (productAfterpayText || 'Or 4 interest-free payments with') : 'أو 4 دفعات بدون فوائد مع'} <span className="text-black font-black bg-[#ACEBFF] px-1.5 py-0.5 rounded italic">Afterpay</span>
                </div>
              </div>
@@ -442,7 +442,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
 
       {/* 2. REVIEWS SECTION */}
       <section className="px-4 lg:px-6 pb-32">
-        <div className="max-w-[1600px] mx-auto bg-[#FAF9F6] rounded-[24px] p-8 lg:p-16">
+        <div className="max-w-[1600px] mx-auto bg-white rounded-[12px] p-8 lg:p-16">
           
           <div className="border-b border-black/10 pb-8 space-y-8">
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
@@ -454,8 +454,8 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[12px] font-black uppercase tracking-widest text-[#333]">{productRatingLabel || 'Customer reviews'}</p>
-                  <p className="text-[12px] text-[#555]">Based on {reviewCount} reviews</p>
+                  <p className="text-[12px] font-black uppercase tracking-widest text-[#67645E]">{productRatingLabel || 'Customer reviews'}</p>
+                  <p className="text-[12px] text-[#84827E]">Based on {reviewCount} reviews</p>
                 </div>
                 {/* Rating distribution */}
                 <div className="space-y-2 w-full max-w-xs">
@@ -468,7 +468,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                         <span className="text-[11px] font-bold text-black/55 w-3 text-right">{star}</span>
                         <Star size={10} fill="black" className="text-black shrink-0" />
                         <div className="flex-1 h-1.5 bg-black/5 rounded-full overflow-hidden">
-                          <div className="h-full bg-black rounded-full transition-all" style={{ width: `${pct}%` }} />
+                          <div className="h-full bg-[#67645E] rounded-full transition-all" style={{ width: `${pct}%` }} />
                         </div>
                         <span className="text-[10px] font-bold text-black/40 w-6 text-right">{count}</span>
                       </div>
@@ -480,24 +480,24 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setIsWriteReviewOpen(true)}
-                  className={`flex items-center gap-2 px-6 py-2.5 rounded-full bg-black text-white text-[10px] font-black uppercase tracking-widest hover:bg-black/90 transition-colors ${CONTROL_FOCUS_CLASS}`}
+                  className={`flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#67645E] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#67645E]/90 transition-colors ${CONTROL_FOCUS_CLASS}`}
                 >
                   write a review
                 </button>
                 <div ref={filterDropdownRef} className="relative">
                   <button
                     onClick={() => { setIsFilterDropdownOpen((prev) => !prev); setIsSortDropdownOpen(false); }}
-                    className={`flex items-center gap-2 px-6 py-2.5 rounded-full border text-[10px] font-black uppercase tracking-widest transition-colors ${CONTROL_FOCUS_CLASS} ${reviewRatingFilter ? 'bg-black text-white border-black' : 'border-black/15 hover:bg-black hover:text-white'}`}
+                    className={`flex items-center gap-2 px-6 py-2.5 rounded-full border text-[10px] font-black uppercase tracking-widest transition-colors ${CONTROL_FOCUS_CLASS} ${reviewRatingFilter ? 'bg-[#67645E] text-white border-[#67645E]' : 'border-[#DDDDDD] hover:bg-[#67645E] hover:text-white'}`}
                   >
                     {reviewRatingFilter ? `${reviewRatingFilter} stars` : (reviewFilterButton || 'Filter')}
                     <ChevronDown size={12} className={`transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
                   {isFilterDropdownOpen && (
-                    <div className="absolute top-full mt-2 left-0 bg-white rounded-xl border border-black/10 shadow-lg py-1 z-20 min-w-[140px]">
+                    <div className="absolute top-full mt-2 left-0 bg-white rounded-[12px] border border-[#DDDDDD] py-1 z-20 min-w-[140px]">
                       {reviewRatingFilter && (
                         <button
                           onClick={() => { setReviewRatingFilter(undefined); setIsFilterDropdownOpen(false); }}
-                          className={`w-full px-4 py-2 text-left text-[11px] font-bold hover:bg-black/5 transition-colors text-black/40`}
+                          className={`w-full px-4 py-2 text-left text-[11px] font-bold hover:bg-[#F1F0ED] transition-colors text-[#84827E]`}
                         >
                           all ratings
                         </button>
@@ -506,7 +506,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                         <button
                           key={r}
                           onClick={() => { setReviewRatingFilter(r); setIsFilterDropdownOpen(false); }}
-                          className={`w-full px-4 py-2 text-left text-[11px] font-bold hover:bg-black/5 transition-colors flex items-center gap-2 ${reviewRatingFilter === r ? 'text-black' : 'text-black/55'}`}
+                          className={`w-full px-4 py-2 text-left text-[11px] font-bold hover:bg-[#F1F0ED] transition-colors flex items-center gap-2 ${reviewRatingFilter === r ? 'text-[#67645E]' : 'text-[#84827E]'}`}
                         >
                           {r} star{r !== 1 ? 's' : ''}
                         </button>
@@ -517,13 +517,13 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                 <div ref={sortDropdownRef} className="relative">
                   <button
                     onClick={() => { setIsSortDropdownOpen((prev) => !prev); setIsFilterDropdownOpen(false); }}
-                    className={`flex items-center gap-2 px-6 py-2.5 rounded-full border border-black/15 text-[10px] font-black uppercase tracking-widest hover:border-black transition-colors bg-white ${CONTROL_FOCUS_CLASS}`}
+                    className={`flex items-center gap-2 px-6 py-2.5 rounded-full border border-[#DDDDDD] text-[10px] font-black uppercase tracking-widest hover:border-[#67645E] transition-colors bg-white ${CONTROL_FOCUS_CLASS}`}
                   >
                     {reviewSortBy === 'recent' ? 'Most recent' : reviewSortBy === 'highest' ? 'Highest rated' : reviewSortBy === 'lowest' ? 'Lowest rated' : 'Most helpful'}
                     <ChevronDown size={12} className={`transition-transform ${isSortDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
                   {isSortDropdownOpen && (
-                    <div className="absolute top-full mt-2 right-0 bg-white rounded-xl border border-black/10 shadow-lg py-1 z-20 min-w-[160px]">
+                    <div className="absolute top-full mt-2 right-0 bg-white rounded-[12px] border border-[#DDDDDD] py-1 z-20 min-w-[160px]">
                       {[
                         { value: 'recent', label: 'Most recent' },
                         { value: 'highest', label: 'Highest rated' },
@@ -533,7 +533,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                         <button
                           key={opt.value}
                           onClick={() => { setReviewSortBy(opt.value); setIsSortDropdownOpen(false); }}
-                          className={`w-full px-4 py-2 text-left text-[11px] font-bold hover:bg-black/5 transition-colors ${reviewSortBy === opt.value ? 'text-black' : 'text-black/55'}`}
+                          className={`w-full px-4 py-2 text-left text-[11px] font-bold hover:bg-[#F1F0ED] transition-colors ${reviewSortBy === opt.value ? 'text-[#67645E]' : 'text-[#84827E]'}`}
                         >
                           {opt.label}
                         </button>
@@ -575,7 +575,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
               {!isReviewsExpanded && (
                 <button 
                   onClick={() => setIsReviewsExpanded(true)}
-                  className={`px-12 py-3 rounded-full border border-black/15 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors duration-200 bg-white ${CONTROL_FOCUS_CLASS}`}
+                  className={`px-12 py-3 rounded-full border border-[#DDDDDD] text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#67645E] hover:text-white transition-colors duration-200 bg-white ${CONTROL_FOCUS_CLASS}`}
                 >
                   {reviewShowMore || 'Show more'}
                 </button>
@@ -583,7 +583,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
               {isReviewsExpanded && hasMoreReviews && (
                 <button 
                   onClick={loadMoreReviews}
-                  className={`px-12 py-3 rounded-full border border-black/15 text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors duration-200 bg-white ${CONTROL_FOCUS_CLASS}`}
+                  className={`px-12 py-3 rounded-full border border-[#DDDDDD] text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#67645E] hover:text-white transition-colors duration-200 bg-white ${CONTROL_FOCUS_CLASS}`}
                 >
                   load more reviews
                 </button>
@@ -591,7 +591,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
               {isReviewsExpanded && (
                 <button 
                   onClick={() => { setIsReviewsExpanded(false); setAdditionalReviews([]); setReviewPage(1); }}
-                  className={`px-8 py-2 rounded-full border border-black/10 text-[10px] font-bold uppercase tracking-widest hover:border-black transition-colors ${CONTROL_FOCUS_CLASS}`}
+                  className={`px-8 py-2 rounded-full border border-[#DDDDDD] text-[10px] font-bold uppercase tracking-widest hover:border-[#67645E] transition-colors ${CONTROL_FOCUS_CLASS}`}
                 >
                   {reviewShowLess || 'Show less'}
                 </button>
@@ -613,13 +613,13 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
             opacity: showBottomBar ? 1 : 0 
           }}
           transition={{ duration: shouldReduceMotion ? 0 : 0.28, ease: [0.32, 0.72, 0, 1] }}
-          className="fixed bottom-0 left-0 w-full bg-[#EEEEEE]/95 backdrop-blur-md px-4 md:px-8 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex items-center justify-between gap-4 z-50 border-t border-black/10 shadow-[0_-12px_30px_rgba(0,0,0,0.06)]"
+          className="fixed bottom-0 left-0 w-full bg-[#F1F0ED] px-4 md:px-8 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex items-center justify-between gap-4 z-50 border-t border-[#DDDDDD]"
         >
           <div className="flex min-w-0 items-center gap-3 md:gap-4">
-            <div className="w-11 h-11 bg-white rounded-md flex items-center justify-center p-1.5 shadow-sm">
+            <div className="w-11 h-11 bg-white rounded-md flex items-center justify-center p-1.5">
                <ImageWithFallback src={displayProduct.image} alt={displayProduct.name} className="w-full h-full object-contain mix-blend-multiply" />
             </div>
-            <span className="min-w-0 truncate text-[11px] md:text-[12px] font-black uppercase tracking-[0.14em] md:tracking-[0.2em] text-[#333]">{displayProduct.name}</span>
+            <span className="min-w-0 truncate text-[11px] md:text-[12px] font-black uppercase tracking-[0.14em] md:tracking-[0.2em] text-[#67645E]">{displayProduct.name}</span>
           </div>
 
           <motion.button 
@@ -627,7 +627,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
             whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
             onClick={() => isSelectedVariantPurchasable && addToCart(purchasableProduct)}
             disabled={!isSelectedVariantPurchasable}
-            className={`shrink-0 bg-[#66635F] text-white px-5 md:px-8 py-3 rounded-full text-[10px] md:text-[11px] font-black uppercase tracking-[0.16em] md:tracking-[0.2em] hover:bg-black transition-colors duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${CONTROL_FOCUS_CLASS}`}
+            className={`shrink-0 bg-[#67645E] text-white px-5 md:px-8 py-3 rounded-full text-[10px] md:text-[11px] font-black uppercase tracking-[0.16em] md:tracking-[0.2em] hover:bg-[#67645E]/90 transition-colors duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${CONTROL_FOCUS_CLASS}`}
           >
             <ShoppingBag size={14} />
             {isSelectedVariantPurchasable

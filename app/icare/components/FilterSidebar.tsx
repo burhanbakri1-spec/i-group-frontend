@@ -30,16 +30,16 @@ export function FilterSidebar({ selectedCategory, onCategoryChange, selectedSort
   ];
 
   return (
-    <div className="w-full space-y-12">
+    <div className="w-full space-y-12 bg-[#F1F0ED] p-6 rounded-[12px]">
       {/* Category Filter */}
       <div>
         <button
           onClick={() => setCategoryOpen(!categoryOpen)}
           className="flex items-center justify-between w-full mb-8 group"
         >
-          <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-400">Shop By</h3>
-          <div className="h-[1px] flex-1 bg-[#e8e3dc] mx-4 group-hover:bg-black transition-colors" />
-          {categoryOpen ? <ChevronUp className="w-3 h-3 text-gray-400" /> : <ChevronDown className="w-3 h-3 text-gray-400" />}
+          <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#84827E]">Shop By</h3>
+          <div className="h-[1px] flex-1 bg-[#DDDDDD] mx-4 group-hover:bg-[#67645E] transition-colors" />
+          {categoryOpen ? <ChevronUp className="w-3 h-3 text-[#84827E]" /> : <ChevronDown className="w-3 h-3 text-[#84827E]" />}
         </button>
         <AnimatePresence initial={false}>
           {categoryOpen && (
@@ -56,8 +56,8 @@ export function FilterSidebar({ selectedCategory, onCategoryChange, selectedSort
                     onClick={() => onCategoryChange(category.id)}
                     className={`text-[13px] text-left tracking-wide transition-all uppercase font-medium ${
                       selectedCategory === category.id 
-                        ? 'text-black translate-x-1' 
-                        : 'text-gray-400 hover:text-black'
+                        ? 'text-[#67645E] translate-x-1' 
+                        : 'text-[#84827E] hover:text-[#67645E]'
                     }`}
                   >
                     {category.name}
@@ -75,9 +75,9 @@ export function FilterSidebar({ selectedCategory, onCategoryChange, selectedSort
           onClick={() => setSortOpen(!sortOpen)}
           className="flex items-center justify-between w-full mb-8 group"
         >
-          <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-gray-400">Sort By</h3>
-          <div className="h-[1px] flex-1 bg-[#e8e3dc] mx-4 group-hover:bg-black transition-colors" />
-          {sortOpen ? <ChevronUp className="w-3 h-3 text-gray-400" /> : <ChevronDown className="w-3 h-3 text-gray-400" />}
+          <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#84827E]">Sort By</h3>
+          <div className="h-[1px] flex-1 bg-[#DDDDDD] mx-4 group-hover:bg-[#67645E] transition-colors" />
+          {sortOpen ? <ChevronUp className="w-3 h-3 text-[#84827E]" /> : <ChevronDown className="w-3 h-3 text-[#84827E]" />}
         </button>
         <AnimatePresence initial={false}>
           {sortOpen && (
@@ -94,8 +94,8 @@ export function FilterSidebar({ selectedCategory, onCategoryChange, selectedSort
                     onClick={() => onSortChange(option.id)}
                     className={`text-[13px] text-left tracking-wide transition-all uppercase font-medium ${
                       selectedSort === option.id 
-                        ? 'text-black translate-x-1' 
-                        : 'text-gray-400 hover:text-black'
+                        ? 'text-[#67645E] translate-x-1' 
+                        : 'text-[#84827E] hover:text-[#67645E]'
                     }`}
                   >
                     {option.name}
@@ -108,8 +108,8 @@ export function FilterSidebar({ selectedCategory, onCategoryChange, selectedSort
       </div>
 
       {/* Product Count Display for Desktop */}
-      <div className="pt-12 border-t border-[#e8e3dc]">
-        <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400">
+      <div className="pt-12 border-t border-[#DDDDDD]">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-[#84827E]">
           Showing {productCount} results
         </p>
       </div>

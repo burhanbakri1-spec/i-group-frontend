@@ -127,7 +127,7 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
   const heroImage = normalizeVlogHeroImageUrl(vlogHeroImage);
 
   return (
-    <div className="min-h-screen bg-[#FFFFFF] pb-32">
+    <div className="min-h-screen bg-[#F1F0ED] pb-32">
       {/* 1. Hero Section */}
       <section className="relative h-[60vh] md:h-[70vh] w-full overflow-hidden">
         <ImageWithFallback 
@@ -153,7 +153,7 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
             <p className="text-[13px] text-red-600 font-medium">{error}</p>
             <button
               onClick={loadVlogs}
-              className="px-6 py-2 bg-black text-white rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black/90 transition-colors"
+              className="px-6 py-2 bg-[#67645E] text-white rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#7B7872] transition-colors"
             >
               Retry
             </button>

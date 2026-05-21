@@ -122,7 +122,7 @@ export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-32">
+    <div className="min-h-screen bg-[#F1F0ED] pb-32">
       {/* Header Banner */}
       <section className="relative w-full h-[30vh] md:h-[40vh] overflow-hidden rounded-b-[32px]">
         <ImageWithFallback 

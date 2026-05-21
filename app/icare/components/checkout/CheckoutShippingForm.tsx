@@ -8,13 +8,13 @@ import { CartItem, UserAddress } from '../../types';
 import { validateCheckout, ValidationResult } from '../../lib/checkout/validate-checkout';
 
 const MAP_PICKER_FRAME_CLASS =
-  'w-full h-64 md:h-80 rounded-lg overflow-hidden border border-gray-300 mb-4';
+  'w-full h-64 md:h-80 rounded-[12px] overflow-hidden border border-[#DDDDDD] mb-4';
 const CONTROL_FOCUS_CLASS =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 const INPUT_FOCUS_CLASS =
-  'focus-visible:outline-none focus-visible:border-black focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
-const CHECKOUT_INPUT_CLASS = `w-full px-4 py-3 border border-[#8A867E] rounded text-[#222] placeholder:text-[#666] transition-[border-color,box-shadow] duration-200 ${INPUT_FOCUS_CLASS}`;
-const INPUT_ERROR_CLASS = `w-full px-4 py-3 border rounded text-[#222] placeholder:text-[#666] transition-[border-color,box-shadow] duration-200 border-red-500 ${INPUT_FOCUS_CLASS}`;
+  'focus-visible:outline-none focus-visible:border-[#67645E] focus-visible:ring-2 focus-visible:ring-[#7B7872]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+const CHECKOUT_INPUT_CLASS = `w-full px-4 py-3 border border-[#DDDDDD] rounded text-[#67645E] placeholder:text-[#84827E] transition-[border-color,box-shadow] duration-200 ${INPUT_FOCUS_CLASS}`;
+const INPUT_ERROR_CLASS = `w-full px-4 py-3 border rounded text-[#67645E] placeholder:text-[#84827E] transition-[border-color,box-shadow] duration-200 border-red-500 ${INPUT_FOCUS_CLASS}`;
 
 const MapAddressPicker = dynamic(() => import('../MapAddressPicker'), {
   ssr: false,
@@ -217,7 +217,7 @@ export const CheckoutShippingForm = forwardRef<
         {/* Map Section */}
         {mapLat !== null && mapLng !== null ? (
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-[#67645E] mb-2">
               {ct.deliveryLocation}
             </label>
             <MapAddressPicker
@@ -228,14 +228,14 @@ export const CheckoutShippingForm = forwardRef<
               lang={lang}
             />
             {process.env.NODE_ENV !== 'production' && (
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-[#84827E] mt-1">
                 Lat: {mapLat.toFixed(6)}, Lng: {mapLng.toFixed(6)}
               </p>
             )}
           </div>
         ) : (
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-[#67645E] mb-2">
               {ct.deliveryLocation}
             </label>
             <MapAddressPicker
@@ -243,14 +243,14 @@ export const CheckoutShippingForm = forwardRef<
               onAddressResolved={handleAddressResolved}
               lang={lang}
             />
-            <p className="text-xs text-gray-500 mt-1">{ct.clickMapToSetLocation}</p>
+            <p className="text-xs text-[#84827E] mt-1">{ct.clickMapToSetLocation}</p>
           </div>
         )}
 
         {/* Saved Addresses */}
         {savedAddresses.length > 0 && (
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-[#67645E] mb-2">
               {ct.savedAddresses}
             </label>
             <div className="space-y-2">
@@ -259,27 +259,27 @@ export const CheckoutShippingForm = forwardRef<
                   key={addr.id}
                   type="button"
                   onClick={() => handleSelectSavedAddress(addr)}
-                  className={`w-full p-3 border rounded-lg text-left transition-colors ${CONTROL_FOCUS_CLASS} ${
+                  className={`w-full p-3 border rounded-[12px] text-left transition-colors ${CONTROL_FOCUS_CLASS} ${
                     selectedAddress?.id === addr.id
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-[#67645E] bg-[#F1F0ED]'
+                      : 'border-[#DDDDDD] hover:border-[#67645E]'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-sm">{addr.label}</span>
                     {addr.isDefault && (
-                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
+                      <span className="text-xs bg-[#E6E5E2] text-[#67645E] px-2 py-0.5 rounded">
                         {ct.defaultLabel}
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-[#84827E] mt-1">
                     {[addr.street, addr.building, addr.apartment]
                       .filter(Boolean)
                       .join(', ')}
                     {addr.area ? `, ${addr.area}` : ''}
                   </p>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-[#84827E]">
                     {addr.city}, {addr.governorate || addr.country}
                   </p>
                 </button>

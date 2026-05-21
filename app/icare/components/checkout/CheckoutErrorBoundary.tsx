@@ -4,7 +4,7 @@ import React from 'react';
 import { Language, checkoutTranslations } from '../../translations';
 
 const CONTROL_FOCUS_CLASS =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 
 interface CheckoutErrorBoundaryProps {
   children: React.ReactNode;
@@ -47,23 +47,23 @@ export class CheckoutErrorBoundary extends React.Component<
     if (this.state.hasError) {
       const ct = checkoutTranslations[this.props.lang];
       return (
-        <div className="min-h-[60vh] flex items-center justify-center bg-[#FAFAFA] py-16 px-4">
-          <div className="max-w-md w-full bg-white rounded-lg shadow-sm p-8 text-center">
+        <div className="min-h-[60vh] flex items-center justify-center bg-[#F1F0ED] py-16 px-4">
+          <div className="max-w-md w-full bg-white rounded-[12px] p-8 text-center">
             <div className="text-5xl mb-6">⚠️</div>
             <h2 className="text-2xl font-light mb-3">{ct.errorBoundaryTitle}</h2>
-            <p className="text-sm text-[#5F5D59] mb-8">
+            <p className="text-sm text-[#84827E] mb-8">
               {ct.errorBoundaryMessage}
             </p>
             <div className="flex flex-col gap-3">
               <button
                 onClick={this.handleRetry}
-                className={`w-full px-6 py-3 bg-black text-white rounded-full hover:bg-[#333] transition-colors text-sm font-medium ${CONTROL_FOCUS_CLASS}`}
+                className={`w-full px-6 py-3 bg-[#67645E] text-white rounded-full hover:bg-[#5A5853] transition-colors text-sm font-medium ${CONTROL_FOCUS_CLASS}`}
               >
                 {ct.errorBoundaryRetry}
               </button>
               <button
                 onClick={this.handleBackToShop}
-                className={`w-full px-6 py-3 border border-[#DDD] rounded-full hover:bg-[#FAFAFA] transition-colors text-sm ${CONTROL_FOCUS_CLASS}`}
+                className={`w-full px-6 py-3 border border-[#DDDDDD] rounded-full hover:bg-[#F1F0ED] transition-colors text-sm ${CONTROL_FOCUS_CLASS}`}
               >
                 {ct.errorBoundaryBack}
               </button>

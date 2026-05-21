@@ -15,8 +15,8 @@ interface WishlistPageProps {
   onNavigate?: (page: string) => void;
 }
 
-const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
-const SURFACE_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAFAFA]';
+const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+const SURFACE_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F1F0ED]';
 const SHORT_TWEEN = { duration: 0.18, ease: 'easeOut' as const };
 
 export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelect, onNavigate }) => {
@@ -65,19 +65,19 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] py-8 md:py-12">
+    <div className="min-h-screen bg-[#F1F0ED] py-8 md:py-12">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         {/* Header */}
         <div className="text-center mb-8 md:mb-12">
           <div className="flex items-center justify-center gap-2 md:gap-3 mb-4">
-            <Heart size={28} className="text-[#FF6B6B] md:w-8 md:h-8" fill="#FF6B6B" />
+            <Heart size={28} className="text-[#67645E] md:w-8 md:h-8" fill="#67645E" />
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight">{text.wishlist}</h1>
           </div>
-          <p className="text-sm md:text-base text-[#5F5D59] mb-4 px-4">{text.saveForLater}</p>
+          <p className="text-sm md:text-base text-[#67645E] mb-4 px-4">{text.saveForLater}</p>
           {wishlistItems.length > 0 && (
             <div className="flex items-center justify-center gap-4 md:gap-6">
-              <p className="text-xs md:text-sm text-[#5F5D59]">{wishlistItems.length} {text.items}</p>
-              <button className={`flex items-center gap-2 text-xs md:text-sm text-[#5F5D59] hover:text-black transition-colors ${SURFACE_FOCUS_CLASS}`}>
+              <p className="text-xs md:text-sm text-[#67645E]">{wishlistItems.length} {text.items}</p>
+              <button className={`flex items-center gap-2 text-xs md:text-sm text-[#67645E] hover:text-black transition-colors ${SURFACE_FOCUS_CLASS}`}>
                 <Share2 size={14} className="md:w-4 md:h-4" />
                 {text.share}
               </button>
@@ -97,8 +97,8 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
               <Heart size={48} className="text-[#DDD] md:w-16 md:h-16" />
             </div>
             <h2 className="text-xl md:text-2xl font-light mb-2">{wishlistEmpty}</h2>
-            <p className="text-sm md:text-base text-[#5F5D59] mb-8">{wishlistEmptySubtext}</p>
-            <button onClick={() => onNavigate?.('shop')} className={`px-6 md:px-8 py-3 bg-black text-white text-sm md:text-base rounded-full hover:bg-[#333] transition-colors ${CONTROL_FOCUS_CLASS}`}>
+            <p className="text-sm md:text-base text-[#84827E] mb-8">{wishlistEmptySubtext}</p>
+            <button onClick={() => onNavigate?.('shop')} className={`px-6 md:px-8 py-3 bg-[#67645E] text-white text-sm md:text-base rounded-full hover:bg-[#7B7872] transition-colors ${CONTROL_FOCUS_CLASS}`}>
               {text.shopNow}
             </button>
           </motion.div>
@@ -111,12 +111,12 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
                 initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
                 animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
                 transition={{ ...SHORT_TWEEN, delay: shouldReduceMotion ? 0 : Math.min(index * 0.04, 0.16) }}
-                className="group relative bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                className="group relative bg-white rounded-[12px] overflow-hidden border border-[#DDDDDD]"
               >
                 {/* Remove Button */}
                 <button
                   onClick={() => removeFromWishlist(product.id)}
-                  className={`absolute top-4 right-4 z-10 w-10 h-10 md:w-8 md:h-8 bg-white rounded-full flex items-center justify-center opacity-100 transition-opacity shadow-lg hover:bg-[#C81E3A] hover:text-white ${CONTROL_FOCUS_CLASS}`}
+                  className={`absolute top-4 right-4 z-10 w-10 h-10 md:w-8 md:h-8 bg-white rounded-full flex items-center justify-center opacity-100 transition-opacity border border-[#DDDDDD] hover:bg-[#67645E] hover:text-white ${CONTROL_FOCUS_CLASS}`}
                   aria-label={`${text.remove} ${product.name}`}
                 >
                   <X size={16} />
@@ -141,16 +141,16 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
 
                 {/* Product Info */}
                 <div className="p-6">
-                  <p className="text-xs text-[#5F5D59] uppercase tracking-wider mb-1">{product.category}</p>
+                  <p className="text-xs text-[#67645E] uppercase tracking-wider mb-1">{product.category}</p>
                   <h3 className="font-medium mb-2">{product.name}</h3>
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       {product.originalPrice && (
-                        <span className="text-sm text-[#5F5D59]/50 line-through">{product.originalPrice}</span>
+                        <span className="text-sm text-[#84827E]/50 line-through">{product.originalPrice}</span>
                       )}
                       <p className="text-lg font-medium">{product.price}</p>
                     </div>
-                    <div className="flex items-center gap-1 text-xs text-[#5F5D59]">
+                    <div className="flex items-center gap-1 text-xs text-[#84827E]">
                       <span>★</span>
                       <span>{product.rating}</span>
                       <span>({product.reviews})</span>
@@ -160,7 +160,7 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
                   {/* Add to Bag Button */}
                   <button 
                     onClick={(e) => handleAddToBag(product, e)}
-                    className={`w-full py-3 bg-black text-white text-sm uppercase tracking-wider rounded-full hover:bg-[#333] transition-colors flex items-center justify-center gap-2 ${CONTROL_FOCUS_CLASS}`}
+                    className={`w-full py-3 bg-[#67645E] text-white text-sm uppercase tracking-wider rounded-full hover:bg-[#7B7872] transition-colors flex items-center justify-center gap-2 ${CONTROL_FOCUS_CLASS}`}
                   >
                     <ShoppingBag size={16} />
                     {text.addToBag}

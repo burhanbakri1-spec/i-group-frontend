@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 const Marquee = ({ text }: { text: string }) => {
   return (
-    <div className="bg-[#EBEBEB] py-2 overflow-hidden border-y border-[#D1D1D1]">
+    <div className="bg-[#F1F0ED] py-2 overflow-hidden border-y border-[#DDDDDD]">
       <motion.div
         animate={{ x: [0, -1000] }}
         transition={{
@@ -14,7 +14,7 @@ const Marquee = ({ text }: { text: string }) => {
         className="whitespace-nowrap flex"
       >
         {[...Array(10)].map((_, i) => (
-          <span key={i} className="text-[10px] tracking-[0.2em] font-medium uppercase px-8 text-[#555]">
+          <span key={i} className="text-[10px] tracking-[0.2em] font-medium uppercase px-8 text-[#67645E]">
             {text}
           </span>
         ))}

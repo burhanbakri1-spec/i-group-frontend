@@ -15,7 +15,7 @@ interface ShopPageProps {
 }
 
 const SORT_OPTIONS = ['all', 'newest', 'price: low to high', 'price: high to low'];
-const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872] focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 
 const getProductTimestamp = (product: Product) => {
   const timestamp = new Date(product.date ?? '').getTime();
@@ -174,7 +174,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
 
   if (loading && !catalogProducts) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FFFFFF] px-4">
+      <div className="min-h-screen flex items-center justify-center bg-[#F1F0ED] px-4">
         <div className="w-full max-w-screen-xl">
           <ProductGridSkeleton count={12} />
         </div>
@@ -183,7 +183,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
   }
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#FFFFFF]">
+    <div className="min-h-screen overflow-x-hidden bg-[#F1F0ED]">
       {/* Banner */}
       <section className="relative w-full h-[30vh] md:h-[40vh] overflow-hidden rounded-b-[24px]">
         <ImageWithFallback
@@ -212,7 +212,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
           <div className="flex md:justify-center justify-start gap-3 px-1 md:px-4 min-w-max">
             <button
               onClick={() => selectRoot(null)}
-              className={`px-6 md:px-8 py-2.5 rounded-full text-[12px] font-black uppercase tracking-widest transition-colors ${CONTROL_FOCUS_CLASS} ${!activeMain ? 'bg-black text-white shadow-md' : 'bg-white text-black/65 border border-black/10 hover:text-black hover:border-black/20'}`}
+              className={`px-6 md:px-8 py-2.5 rounded-full text-[12px] font-black uppercase tracking-widest transition-colors ${CONTROL_FOCUS_CLASS} ${!activeMain ? 'bg-[#67645E] text-white' : 'bg-white text-[#67645E] border border-[#DDDDDD]'}`}
             >
               {lang === 'en' ? 'shop all' : 'تسوق الكل'}
             </button>
@@ -220,7 +220,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
               <button
                 key={cat.slug}
                 onClick={() => selectRoot(cat.slug)}
-                className={`px-6 md:px-8 py-2.5 rounded-full text-[12px] font-black uppercase tracking-widest transition-colors ${CONTROL_FOCUS_CLASS} ${activeMain === cat.slug ? 'bg-black text-white shadow-md' : 'bg-white text-black/65 border border-black/10 hover:text-black hover:border-black/20'}`}
+                className={`px-6 md:px-8 py-2.5 rounded-full text-[12px] font-black uppercase tracking-widest transition-colors ${CONTROL_FOCUS_CLASS} ${activeMain === cat.slug ? 'bg-[#67645E] text-white' : 'bg-white text-[#67645E] border border-[#DDDDDD]'}`}
               >
                 {cat.name}
               </button>
@@ -242,7 +242,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
               <div className="flex md:justify-center justify-start gap-3 px-1 md:px-4 min-w-max">
                 <button
                   onClick={() => setActiveChild(null)}
-                  className={`px-6 py-2 rounded-full text-[11px] font-bold uppercase transition-colors ${CONTROL_FOCUS_CLASS} ${!activeChild ? 'bg-black text-white shadow-sm' : 'bg-[#EFEEEC] text-black/70 hover:bg-[#E4E2DD] hover:text-black'}`}
+                  className={`px-6 py-2 rounded-full text-[11px] font-bold uppercase transition-colors ${CONTROL_FOCUS_CLASS} ${!activeChild ? 'bg-[#67645E] text-white' : 'bg-white text-[#84827E] border border-[#DDDDDD]'}`}
                 >
                   {lang === 'en' ? 'all' : 'الكل'}
                 </button>
@@ -250,7 +250,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
                   <button
                     key={child.slug}
                     onClick={() => selectChild(child.slug)}
-                    className={`px-6 py-2 rounded-full text-[11px] font-bold uppercase transition-colors ${CONTROL_FOCUS_CLASS} ${activeChild === child.slug ? 'bg-black text-white shadow-sm' : 'bg-[#EFEEEC] text-black/70 hover:bg-[#E4E2DD] hover:text-black'}`}
+                    className={`px-6 py-2 rounded-full text-[11px] font-bold uppercase transition-colors ${CONTROL_FOCUS_CLASS} ${activeChild === child.slug ? 'bg-[#67645E] text-white' : 'bg-white text-[#84827E] border border-[#DDDDDD]'}`}
                   >
                     {child.name}
                   </button>
@@ -263,10 +263,10 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
         {/* Active Filter Badges — multi-level with per-level dismiss */}
         {activeMain && (
           <div className="flex flex-wrap items-center gap-3 px-4">
-            <span className="text-[11px] font-bold text-black/60 uppercase tracking-widest">{shopActiveFilters}</span>
+            <span className="text-[11px] font-bold text-[#84827E] uppercase tracking-widest">{shopActiveFilters}</span>
 
             {/* Root badge — X dismisses to Shop All */}
-              <div className="flex items-center gap-2 bg-black text-white px-3 py-1 rounded-full text-[10px] font-black uppercase">
+              <div className="flex items-center gap-2 bg-[#67645E] text-white px-3 py-1 rounded-full text-[10px] font-black uppercase">
                 {selectedRoot?.name}
                 <button type="button" onClick={resetFilters} className={`rounded-full ${CONTROL_FOCUS_CLASS}`} aria-label="Remove root filter">
                   <X size={12} />
@@ -275,7 +275,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
 
             {/* Child badge — X dismisses only child level, keeping root active (drill-up) */}
             {activeChild && (
-                <div className="flex items-center gap-2 bg-black text-white px-3 py-1 rounded-full text-[10px] font-black uppercase">
+                <div className="flex items-center gap-2 bg-[#67645E] text-white px-3 py-1 rounded-full text-[10px] font-black uppercase">
                   {selectedChild?.name}
                   <button type="button" onClick={() => { setActiveChild(null); setVisibleCount(12); }} className={`rounded-full ${CONTROL_FOCUS_CLASS}`} aria-label="Remove child filter">
                     <X size={12} />
@@ -283,7 +283,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
                 </div>
             )}
 
-            <button onClick={resetFilters} className={`text-[10px] font-bold text-black/60 underline underline-offset-4 hover:text-black transition-colors uppercase ${CONTROL_FOCUS_CLASS}`}>
+            <button onClick={resetFilters} className={`text-[10px] font-bold text-[#84827E] underline underline-offset-4 hover:text-[#67645E] transition-colors uppercase ${CONTROL_FOCUS_CLASS}`}>
               {shopClearAll}
             </button>
           </div>
@@ -291,11 +291,11 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
       </div>
 
       {/* Toolbar */}
-      <div className={`max-w-[1600px] mx-auto px-4 md:px-6 py-4 md:py-5 flex justify-between items-center border border-black/10 mb-8 md:mb-10 md:sticky md:top-3 bg-[#FFFFFF]/90 backdrop-blur-md rounded-2xl shadow-sm shadow-black/5 ${isSortOpen ? 'z-[65]' : 'z-40'}`}>
+      <div className={`max-w-[1600px] mx-auto px-4 md:px-6 py-4 md:py-5 flex justify-between items-center border border-[#DDDDDD] mb-8 md:mb-10 md:sticky md:top-3 bg-white rounded-[12px] ${isSortOpen ? 'z-[65]' : 'z-40'}`}>
         <div className="relative z-[66]">
           <button type="button" className={`flex items-center gap-2 cursor-pointer group ${CONTROL_FOCUS_CLASS}`} onClick={() => setIsSortOpen(!isSortOpen)} aria-expanded={isSortOpen}>
-            <span className="text-[14px] text-black/65 lowercase font-medium">{shopSortLabel}</span>
-            <span className="text-[14px] text-black font-black lowercase">{activeSort}</span>
+            <span className="text-[14px] text-[#84827E] lowercase font-medium">{shopSortLabel}</span>
+            <span className="text-[14px] text-[#67645E] font-black lowercase">{activeSort}</span>
             <ChevronDown size={16} className={`transition-transform duration-300 ${isSortOpen ? 'rotate-180' : ''}`} />
           </button>
           <AnimatePresence>
@@ -305,13 +305,13 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 6 }}
                 transition={{ duration: 0.18 }}
-                className="absolute left-0 mt-4 w-56 bg-white rounded-[16px] shadow-2xl z-[66] py-3 border border-black/5"
+                className="absolute left-0 mt-4 w-56 bg-white rounded-[12px] z-[66] py-3 border border-[#DDDDDD]"
               >
                 {SORT_OPTIONS.map((opt) => (
                   <button
                     key={opt}
                     onClick={() => { setActiveSort(opt); setIsSortOpen(false); }}
-                    className={`w-full text-left px-6 py-3 text-[13px] font-medium hover:bg-[#F2F1ED] transition-colors lowercase ${CONTROL_FOCUS_CLASS}`}
+                    className={`w-full text-left px-6 py-3 text-[13px] font-medium hover:bg-[#F1F0ED] transition-colors lowercase ${CONTROL_FOCUS_CLASS}`}
                   >
                     {opt}
                   </button>
@@ -322,8 +322,8 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
         </div>
 
         <div className="flex items-center gap-6">
-          <button onClick={() => setCols(2)} className={`rounded-md transition-colors ${CONTROL_FOCUS_CLASS} ${cols === 2 ? 'text-black' : 'text-black/45 hover:text-black/70'}`} aria-label="Use two column grid"><LayoutGrid size={22} /></button>
-          <button onClick={() => setCols(3)} className={`rounded-md transition-colors hidden lg:block ${CONTROL_FOCUS_CLASS} ${cols === 3 ? 'text-black' : 'text-black/45 hover:text-black/70'}`} aria-label="Use three column grid"><Grid2X2 size={22} /></button>
+          <button onClick={() => setCols(2)} className={`rounded-md transition-colors ${CONTROL_FOCUS_CLASS} ${cols === 2 ? 'text-[#67645E]' : 'text-[#84827E] hover:text-[#67645E]'}`} aria-label="Use two column grid"><LayoutGrid size={22} /></button>
+          <button onClick={() => setCols(3)} className={`rounded-md transition-colors hidden lg:block ${CONTROL_FOCUS_CLASS} ${cols === 3 ? 'text-[#67645E]' : 'text-[#84827E] hover:text-[#67645E]'}`} aria-label="Use three column grid"><Grid2X2 size={22} /></button>
         </div>
       </div>
 
@@ -339,7 +339,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
           <div className="mt-12 md:mt-20 flex justify-center">
             <button
               onClick={() => setVisibleCount(prev => prev + 12)}
-              className={`px-12 py-4 bg-black text-white text-[12px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-black/90 transition-colors shadow-lg active:scale-[0.99] ${CONTROL_FOCUS_CLASS}`}
+              className={`px-12 py-4 bg-[#67645E] text-white text-[12px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-[#67645E]/90 transition-colors active:scale-[0.99] ${CONTROL_FOCUS_CLASS}`}
             >
               {shopShowMore}
             </button>
@@ -348,13 +348,13 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
 
         {filteredProducts.length === 0 && (
           <div className="py-32 text-center">
-            <h3 className="text-[24px] font-brand lowercase italic text-black/40">
+            <h3 className="text-[24px] font-brand lowercase italic text-[#84827E]">
               {allProducts.length === 0 && !activeMain
                 ? shopEmptyAll
                 : shopEmptyFiltered}
             </h3>
             {(activeMain) && (
-              <button onClick={resetFilters} className={`mt-6 text-[12px] font-black uppercase tracking-widest underline underline-offset-8 ${CONTROL_FOCUS_CLASS}`}>{shopBackToAll}</button>
+              <button onClick={resetFilters} className={`mt-6 text-[12px] font-black uppercase tracking-widest underline underline-offset-8 text-[#67645E] ${CONTROL_FOCUS_CLASS}`}>{shopBackToAll}</button>
             )}
           </div>
         )}

@@ -10,7 +10,7 @@ export const PrivacyPolicy: React.FC<PolicyPageProps> = ({ lang }) => {
   const isEn = lang === 'en';
   
   return (
-    <div className="min-h-screen bg-white pt-32 pb-24 px-6 md:px-12 max-w-[800px] mx-auto">
+    <div className="min-h-screen bg-[#F1F0ED] pt-32 pb-24 px-6 md:px-12 max-w-[800px] mx-auto">
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -74,7 +74,7 @@ export const TermsOfService: React.FC<PolicyPageProps> = ({ lang }) => {
   const isEn = lang === 'en';
   
   return (
-    <div className="min-h-screen bg-white pt-32 pb-24 px-6 md:px-12 max-w-[800px] mx-auto">
+    <div className="min-h-screen bg-[#F1F0ED] pt-32 pb-24 px-6 md:px-12 max-w-[800px] mx-auto">
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -138,7 +138,7 @@ export const AccessibilityStatement: React.FC<PolicyPageProps> = ({ lang }) => {
   const isEn = lang === 'en';
   
   return (
-    <div className="min-h-screen bg-white pt-32 pb-24 px-6 md:px-12 max-w-[800px] mx-auto">
+    <div className="min-h-screen bg-[#F1F0ED] pt-32 pb-24 px-6 md:px-12 max-w-[800px] mx-auto">
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}

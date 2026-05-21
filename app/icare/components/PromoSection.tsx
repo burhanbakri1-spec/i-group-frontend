@@ -14,7 +14,7 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) 
   const { promoBadge, promoHeadline, promoDescription, promoCtaLabel, promoImage } = useSiteContent();
   return (
     <section className="px-4 md:px-8 py-4 md:py-8 bg-white">
-      <div className="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-2 overflow-hidden rounded-[16px] md:rounded-[24px] bg-[#F2F2F0]">
+      <div className="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-2 overflow-hidden rounded-[12px] bg-[#EDECEB]">
         
         {/* Left Side: Content Section */}
         <div className="flex flex-col justify-center p-8 sm:p-10 md:p-20 min-h-[420px] md:min-h-[680px]">
@@ -26,7 +26,7 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) 
             className="max-w-md"
           >
             <span
-              className="text-[10px] md:text-[12px] font-bold tracking-[0.3em] uppercase text-[#5E5E5E] mb-6 block"
+              className="text-[10px] md:text-[12px] font-bold tracking-[0.3em] uppercase text-[#84827E] mb-6 block"
             >
               {lang === 'en' ? promoBadge : 'وصول جديد'}
             </span>
@@ -34,7 +34,7 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) 
             {/* Main Title - Lowercase and Bold */}
             <div className="overflow-hidden mb-8">
               <motion.h2 
-                className="text-[42px] md:text-[64px] font-[900] leading-[0.95] tracking-[-0.04em] text-[#222] lowercase"
+                className="text-[42px] md:text-[64px] font-[900] leading-[0.95] tracking-[-0.04em] text-[#67645E] lowercase"
                 initial={shouldReduceMotion ? false : { y: 24, opacity: 0 }}
                 whileInView={shouldReduceMotion ? undefined : { y: 0, opacity: 1 }}
                 viewport={{ once: true }}
@@ -54,7 +54,7 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) 
             
             {/* Description */}
             <motion.p 
-              className="text-[15px] md:text-[18px] leading-relaxed text-[#4F4F4F] font-medium mb-10 md:mb-12 max-w-[92%]"
+              className="text-[15px] md:text-[18px] leading-relaxed text-[#84827E] font-medium mb-10 md:mb-12 max-w-[92%]"
               initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
               whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -70,7 +70,7 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) 
             <div className="flex flex-wrap gap-4">
               <motion.button 
                 onClick={() => onNavigate('shop')}
-                className="border-2 border-[#222] rounded-full px-12 py-4 text-[11px] font-[900] tracking-[0.15em] uppercase text-[#222] transition-all duration-200 ease-out cursor-pointer hover:bg-[#222] hover:text-white hover:shadow-lg hover:scale-[1.02] active:scale-[0.99] motion-reduce:hover:scale-100 motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
+                className="border-2 border-[#67645E] rounded-full px-12 py-4 text-[11px] font-[900] tracking-[0.15em] uppercase text-[#67645E] transition-all duration-200 ease-out cursor-pointer hover:bg-[#67645E] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDECEB]"
                 initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
                 whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
                 viewport={{ once: true }}

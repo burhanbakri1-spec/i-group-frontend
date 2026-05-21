@@ -18,11 +18,11 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ lang, onNa
         <ImageWithFallback 
           src={philosophyImage} 
           alt="icare clean product texture" 
-          className="w-full h-full object-cover object-center scale-110"
+          className="w-full h-full object-cover object-center"
           priority
         />
         {/* Soft overlay for clarity */}
-        <div className="absolute inset-0 bg-white/20 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-white/30" />
       </div>
 
       {/* Content Overlay */}
@@ -32,7 +32,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ lang, onNa
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-[28px] md:text-[36px] font-bold tracking-tight text-[#222] lowercase mb-8"
+          className="text-[28px] md:text-[36px] font-bold tracking-tight text-[#67645E] lowercase mb-8"
         >
           {philosophyHeadline}
         </motion.h2>
@@ -42,7 +42,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ lang, onNa
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-[16px] md:text-[18px] leading-[1.7] text-[#444] font-medium tracking-wide mb-12 max-w-2xl"
+          className="text-[16px] md:text-[18px] leading-[1.7] text-[#84827E] font-medium tracking-wide mb-12 max-w-2xl"
         >
           {philosophyText}
         </motion.p>
@@ -54,7 +54,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ lang, onNa
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="border border-[#222] rounded-full px-12 py-4 text-[11px] font-[900] tracking-[0.2em] uppercase text-[#222] hover:bg-black hover:text-white transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
+          className="border border-[#67645E] rounded-full px-12 py-4 text-[11px] font-[900] tracking-[0.2em] uppercase text-[#67645E] hover:bg-[#67645E] hover:text-white transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDECEB]"
         >
           {philosophyCta}
         </motion.button>

@@ -38,8 +38,8 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
 
   if (displayProducts.length === 0) {
     return (
-      <div className="bg-[#FFFFFF] py-16 text-center">
-        <p className="text-[14px] font-bold uppercase tracking-[0.2em] text-black/40">
+      <div className="bg-[#F1F0ED] py-16 text-center">
+        <p className="text-[14px] font-bold uppercase tracking-[0.2em] text-[#84827E]">
           {lang === 'en' ? 'No products available' : 'لا توجد منتجات متاحة'}
         </p>
       </div>
@@ -47,7 +47,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
   }
 
   return (
-    <div className="bg-[#FFFFFF]">
+    <div className="bg-[#F1F0ED]">
       {/* Mobile: Horizontal scroll with snap */}
       <motion.div 
         className="md:hidden no-scrollbar mobile-trending-scroll"
@@ -94,7 +94,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
       
       {/* Desktop: Original layout with stagger */}
       <motion.div 
-        className="hidden md:grid md:grid-cols-3 gap-6 lg:gap-8 pb-10 px-6 md:px-8 max-w-[1440px] mx-auto"
+        className="hidden md:grid md:grid-cols-3 gap-6 md:gap-8 pb-10 px-6 md:px-8 max-w-[1440px] mx-auto"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}

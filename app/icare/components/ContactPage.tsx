@@ -27,7 +27,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
   } = useSiteContent();
 
   return (
-    <div className="min-h-screen bg-white pb-32">
+    <div className="min-h-screen bg-[#F1F0ED] pb-32">
       {/* Hero Banner - More minimal and cleaner */}
       <section className="relative w-full h-[35vh] md:h-[50vh] overflow-hidden bg-[#F8F7F4]">
         <ImageWithFallback 

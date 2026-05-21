@@ -8,7 +8,7 @@ import { Language, checkoutTranslations } from '../../translations';
 import { CreatedOrder } from '../../types';
 
 const CONTROL_FOCUS_CLASS =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 const SHORT_TWEEN = { duration: 0.18, ease: 'easeOut' as const };
 
 export type PaymentStatus = 'idle' | 'processing' | 'success' | 'failed' | 'not_applicable';
@@ -76,13 +76,13 @@ export const CheckoutConfirmation: React.FC<CheckoutConfirmationProps> = ({
             <p className="text-red-600 text-sm font-medium mb-2">
               {ct.paymentFailed}
             </p>
-            <p className="text-[#5F5D59] text-sm mb-3">
+            <p className="text-[#84827E] text-sm mb-3">
               {ct.paymentFailedMessage}
             </p>
             {onSwitchToCod && (
               <button
                 onClick={onSwitchToCod}
-                className={`text-sm px-4 py-2 border border-[#DDD] rounded-lg hover:bg-[#F5F5F5] transition-colors ${CONTROL_FOCUS_CLASS}`}
+                className={`text-sm px-4 py-2 border border-[#DDDDDD] rounded-[12px] hover:bg-[#F1F0ED] transition-colors ${CONTROL_FOCUS_CLASS}`}
               >
                 {ct.switchToCod}
               </button>
@@ -91,7 +91,7 @@ export const CheckoutConfirmation: React.FC<CheckoutConfirmationProps> = ({
         );
       case 'not_applicable':
         return (
-          <p className="text-[#5F5D59] text-sm font-medium mb-4">
+          <p className="text-[#84827E] text-sm font-medium mb-4">
             {ct.codPaymentMessage}
           </p>
         );
@@ -123,12 +123,12 @@ export const CheckoutConfirmation: React.FC<CheckoutConfirmationProps> = ({
         {checkoutConfirmedHeading || ct.orderConfirmedHeading}
       </h2>
       {isPaymentPending && paymentStatus === 'processing' && (
-        <p className="text-[#5F5D59] mb-4">{ct.verifyingPayment}</p>
+        <p className="text-[#84827E] mb-4">{ct.verifyingPayment}</p>
       )}
       {statusMessage()}
       {!isPaymentPending && paymentStatus !== 'failed' && (
         <>
-        <p className="text-[#5F5D59] mb-4">
+        <p className="text-[#84827E] mb-4">
           {(checkoutConfirmedMessage || ct.orderConfirmedMessage)}{' '}
           {order?.orderNumber
             ? `${ct.orderWord} ${order.orderNumber} ${ct.orderCreatedSuffix}`
@@ -142,7 +142,7 @@ export const CheckoutConfirmation: React.FC<CheckoutConfirmationProps> = ({
         </>
       )}
       {paymentStatus === 'failed' && (
-        <p className="text-[#5F5D59] mb-8">
+        <p className="text-[#84827E] mb-8">
           {(checkoutConfirmedMessage || ct.orderConfirmedMessage)}{' '}
           {order?.orderNumber
             ? `${ct.orderWord} ${order.orderNumber} ${ct.orderCreatedSuffix}`
@@ -151,7 +151,7 @@ export const CheckoutConfirmation: React.FC<CheckoutConfirmationProps> = ({
       )}
       <button
         onClick={() => onNavigate('shop')}
-        className={`px-8 py-3 bg-black text-white rounded-full hover:bg-[#333] transition-colors ${CONTROL_FOCUS_CLASS}`}
+        className={`px-8 py-3 bg-[#67645E] text-white rounded-full hover:bg-[#5A5853] transition-colors ${CONTROL_FOCUS_CLASS}`}
       >
         {ct.continueShopping}
       </button>
@@ -159,7 +159,7 @@ export const CheckoutConfirmation: React.FC<CheckoutConfirmationProps> = ({
         <div className="mt-4">
           <Link
             href={`/icare/track-order?orderNumber=${order.orderNumber}`}
-            className={`inline-block text-sm text-[#E11D48] hover:underline ${CONTROL_FOCUS_CLASS}`}
+            className={`inline-block text-sm text-[#67645E] hover:underline ${CONTROL_FOCUS_CLASS}`}
           >
             {ct.trackYourOrder}
           </Link>

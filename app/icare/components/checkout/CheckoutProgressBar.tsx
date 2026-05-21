@@ -35,8 +35,8 @@ export const CheckoutProgressBar: React.FC<CheckoutProgressBarProps> = ({
             <div
               className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all ${
                 currentStep >= s.number
-                  ? 'bg-black border-black text-white'
-                  : 'border-[#DDD] text-[#888]'
+                  ? 'bg-[#67645E] border-[#67645E] text-white'
+                  : 'border-[#DDDDDD] text-[#84827E]'
               }`}
             >
               {currentStep > s.number ? (
@@ -45,14 +45,14 @@ export const CheckoutProgressBar: React.FC<CheckoutProgressBarProps> = ({
                 <s.icon size={20} />
               )}
             </div>
-            <span className="text-xs mt-2 text-[#5F5D59] hidden md:block">
+            <span className="text-xs mt-2 text-[#67645E] hidden md:block">
               {s.title}
             </span>
           </div>
           {idx < steps.length - 1 && (
             <div
               className={`w-20 h-[2px] ${
-                currentStep > s.number ? 'bg-black' : 'bg-[#DDD]'
+                currentStep > s.number ? 'bg-[#67645E]' : 'bg-[#DDDDDD]'
               }`}
             />
           )}

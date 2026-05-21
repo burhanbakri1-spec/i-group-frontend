@@ -8,7 +8,7 @@ import { icareApi } from '../lib/api-client';
 import { Language, checkoutTranslations } from '../translations';
 
 const CONTROL_FOCUS_CLASS =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 const SHORT_TWEEN = { duration: 0.18, ease: 'easeOut' as const };
 
 interface TrackOrderPageProps {
@@ -138,23 +138,23 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
     : [];
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] py-12">
+    <div className="min-h-screen bg-[#F1F0ED] py-12">
       <div className="max-w-2xl mx-auto px-4">
         <motion.div
           initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={SHORT_TWEEN}
-          className="bg-white p-8 md:p-10 rounded-lg shadow-sm"
+          className="bg-white p-8 md:p-10 rounded-[12px] border border-[#DDDDDD]"
         >
           {/* Header */}
           <div className="text-center mb-8">
             <div className="w-14 h-14 bg-[#FAFAFA] rounded-full flex items-center justify-center mx-auto mb-4">
-              <Truck size={24} className="text-[#E11D48]" />
+              <Truck size={24} className="text-[#67645E]" />
             </div>
             <h1 className="text-2xl md:text-3xl font-light mb-2">
               {lang === 'ar' ? 'تتبع طلبك' : 'Track Your Order'}
             </h1>
-            <p className="text-sm text-[#5F5D59]">
+            <p className="text-sm text-[#84827E]">
               {lang === 'ar'
                 ? 'أدخل رقم الطلب والبريد الإلكتروني للتحقق من حالة طلبك'
                 : 'Enter your order number and email to check your order status'}
@@ -164,7 +164,7 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4 mb-8">
             <div>
-              <label className="block text-sm font-medium text-[#5F5D59] mb-1.5">
+              <label className="block text-sm font-medium text-[#67645E] mb-1.5">
                 {lang === 'ar' ? 'رقم الطلب' : 'Order Number'}
               </label>
               <input
@@ -173,14 +173,14 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
                 onChange={(e) => setOrderNumber(e.target.value)}
                 placeholder="ORD-YYYYMMDD-XXXX"
                 required
-                className={`w-full px-4 py-3 border border-[#DDD] rounded-lg text-sm
-                  placeholder:text-[#BBB] focus:outline-none focus:border-[#E11D48]
+                className={`w-full px-4 py-3 border border-[#DDDDDD] rounded-[12px] text-sm bg-white
+                  placeholder:text-[#BBB] focus:outline-none focus:border-[#7B7872] focus:ring-1 focus:ring-[#7B7872]/30
                   ${isRtl ? 'text-right' : 'text-left'}`}
                 dir="ltr"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#5F5D59] mb-1.5">
+              <label className="block text-sm font-medium text-[#67645E] mb-1.5">
                 {lang === 'ar' ? 'البريد الإلكتروني' : 'Email'}
               </label>
               <input
@@ -189,8 +189,8 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className={`w-full px-4 py-3 border border-[#DDD] rounded-lg text-sm
-                  placeholder:text-[#BBB] focus:outline-none focus:border-[#E11D48]
+                className={`w-full px-4 py-3 border border-[#DDDDDD] rounded-[12px] text-sm bg-white
+                  placeholder:text-[#BBB] focus:outline-none focus:border-[#7B7872] focus:ring-1 focus:ring-[#7B7872]/30
                   ${isRtl ? 'text-right' : 'text-left'}`}
                 dir="ltr"
               />
@@ -198,8 +198,8 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
             <button
               type="submit"
               disabled={loadState === 'loading'}
-              className={`w-full px-6 py-3.5 bg-black text-white rounded-full
-                hover:bg-[#333] transition-colors disabled:opacity-50 flex items-center
+              className={`w-full px-6 py-3.5 bg-[#67645E] text-white rounded-full
+                hover:bg-[#7B7872] transition-colors disabled:opacity-50 flex items-center
                 justify-center gap-2 text-sm font-medium ${CONTROL_FOCUS_CLASS}`}
             >
               {loadState === 'loading' ? (
@@ -266,10 +266,10 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
 
               {/* Tracking info */}
               {(result.trackingNumber || result.carrier) && (
-                <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-[#FAFAFA] rounded-lg text-sm">
+                <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-[#F1F0ED] rounded-[12px] text-sm">
                   {result.trackingNumber && (
                     <div>
-                      <p className="text-[#5F5D59] mb-0.5">
+                      <p className="text-[#84827E] mb-0.5">
                         {lang === 'ar' ? 'رقم التتبع' : 'Tracking Number'}
                       </p>
                       <p className="font-medium">{result.trackingNumber}</p>
@@ -277,7 +277,7 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
                   )}
                   {result.carrier && (
                     <div>
-                      <p className="text-[#5F5D59] mb-0.5">
+                      <p className="text-[#84827E] mb-0.5">
                         {lang === 'ar' ? 'شركة الشحن' : 'Carrier'}
                       </p>
                       <p className="font-medium">{result.carrier}</p>
@@ -288,7 +288,7 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
 
               {/* Shipping destination */}
               {result.shippingCity && (
-                <div className="flex items-center gap-2 text-sm text-[#5F5D59] mb-6">
+                <div className="flex items-center gap-2 text-sm text-[#84827E] mb-6">
                   <MapPin size={14} />
                   <span>{result.shippingCity}</span>
                 </div>
@@ -297,7 +297,7 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
               {/* Status timeline */}
               {statusTimeline.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-medium text-[#5F5D59] mb-4">
+                  <h3 className="text-sm font-medium text-[#67645E] mb-4">
                     {lang === 'ar' ? 'سجل الحالة' : 'Status History'}
                   </h3>
                   <div className="space-y-0">
@@ -320,7 +320,7 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
                               </span>
                             </p>
                             {entry.comment && (
-                              <p className="text-xs text-[#5F5D59] mt-1">{entry.comment}</p>
+                              <p className="text-xs text-[#84827E] mt-1">{entry.comment}</p>
                             )}
                             <p className="text-xs text-[#AAA] mt-1">
                               {new Date(entry.createdAt).toLocaleString(lang === 'ar' ? 'ar' : 'en', {
@@ -347,7 +347,7 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
               <div className="text-center mt-6 pt-4 border-t border-[#EEE]">
                 <Link
                   href="/icare/contact"
-                  className={`text-sm text-[#E11D48] hover:underline ${CONTROL_FOCUS_CLASS}`}
+                  className={`text-sm text-[#67645E] hover:underline ${CONTROL_FOCUS_CLASS}`}
                 >
                   {lang === 'ar' ? 'بحاجة لمساعدة؟ اتصل بنا' : 'Need help? Contact support'}
                 </Link>

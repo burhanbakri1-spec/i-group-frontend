@@ -35,7 +35,7 @@ export const IcareProductRoutePage = ({ slug }: { slug: string }) => {
 
   if (isLoading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center bg-white">
+      <div className="min-h-[60vh] flex items-center justify-center bg-[#F1F0ED]">
         <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -43,7 +43,7 @@ export const IcareProductRoutePage = ({ slug }: { slug: string }) => {
 
   if (isUnavailable || !product) {
     return (
-      <div className="min-h-[60vh] bg-white flex items-center justify-center px-6 text-center">
+      <div className="min-h-[60vh] bg-[#F1F0ED] flex items-center justify-center px-6 text-center">
         <div className="max-w-xl space-y-6">
           <p className="text-[11px] font-black uppercase tracking-[0.25em] text-black/40">product unavailable</p>
           <h1 className="text-[42px] md:text-[64px] font-black tracking-[-0.04em] lowercase text-[#333]">
@@ -54,7 +54,7 @@ export const IcareProductRoutePage = ({ slug }: { slug: string }) => {
           </p>
           <button
             onClick={() => navigateToPage('shop')}
-            className="px-10 py-4 bg-black text-white rounded-full text-[12px] font-black uppercase tracking-[0.2em] hover:bg-black/90 transition-colors"
+            className="px-10 py-4 bg-[#67645E] text-white rounded-full text-[12px] font-black uppercase tracking-[0.2em] hover:bg-[#7B7872] transition-colors"
           >
             back to shop
           </button>

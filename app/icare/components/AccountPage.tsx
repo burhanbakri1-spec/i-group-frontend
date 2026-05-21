@@ -12,9 +12,9 @@ interface AccountPageProps {
   lang?: Language;
 }
 
-const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F1ED]';
-const INPUT_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:border-black focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F1ED]';
-const ACCOUNT_INPUT_CLASS = `w-full bg-white border border-[#8A867E] rounded-[12px] px-6 py-4 text-[14px] text-[#5C5A56] placeholder:text-[#666] transition-[border-color,box-shadow] duration-200 ${INPUT_FOCUS_CLASS}`;
+const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F1F0ED]';
+const INPUT_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:border-[#7B7872] focus-visible:ring-2 focus-visible:ring-[#7B7872]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F1F0ED]';
+const ACCOUNT_INPUT_CLASS = `w-full bg-white border border-[#DDDDDD] rounded-[12px] px-6 py-4 text-[14px] text-[#67645E] placeholder:text-[#84827E] transition-[border-color,box-shadow] duration-200 ${INPUT_FOCUS_CLASS}`;
 const SHORT_TWEEN = { duration: 0.18, ease: 'easeOut' as const };
 
 export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) => {
@@ -133,7 +133,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
   };
 
   return (
-    <div className="min-h-screen md:h-screen bg-white p-4 md:p-6 lg:p-12 mb-12 md:mb-0 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 lg:gap-8 overflow-y-auto md:overflow-hidden">
+    <div className="min-h-screen md:h-screen bg-[#F1F0ED] p-4 md:p-6 lg:p-12 mb-12 md:mb-0 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 lg:gap-8 overflow-y-auto md:overflow-hidden">
       {/* Left Section: Image and Message */}
       <div className="md:w-1/2 relative h-[45vh] md:h-[80vh] w-full overflow-hidden rounded-[32px]">
         <ImageWithFallback 
@@ -453,7 +453,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
           )}
 
           {!isAuthenticated && <div className="mt-8 flex flex-col items-center gap-3">
-            <div className="text-[12px] text-[#5F5D59] font-medium">
+            <div className="text-[12px] text-[#67645E] font-medium">
               {mode === 'login' ? authToggleToRegister : authToggleToLogin}{' '}
               <button onClick={() => setMode(mode === 'login' ? 'register' : 'login')} className={`underline underline-offset-4 hover:text-black transition-colors ${CONTROL_FOCUS_CLASS}`}>
                 {mode === 'login' ? 'Sign up!' : 'Sign in!'}

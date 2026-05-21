@@ -32,14 +32,14 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, onProductSelect })
       <ProductShowcase products={[]} lang={lang} onProductSelect={onProductSelect} />
 
       {/* 4. Trending Products Grid */}
-      <div className="py-6 md:py-8 bg-white overflow-hidden">
+      <div className="py-6 md:py-8 bg-[#F1F0ED] overflow-hidden">
         <div className="max-w-[1600px] mx-auto px-3 md:px-10 mb-3 md:mb-8 flex justify-between items-end">
-          <h2 className="text-[28px] md:text-[42px] font-black tracking-tight text-[#222] lowercase leading-tight">
+          <h2 className="text-[28px] md:text-[42px] font-black tracking-tight text-[#67645E] lowercase leading-tight">
             {lang === 'en' ? trendingTitle : 'أساسيات رائجة'}
           </h2>
           <button 
             onClick={() => onNavigate('shop')}
-            className="text-[10px] md:text-[12px] font-black uppercase tracking-widest border-b-2 border-black pb-1 hover:opacity-50 transition-opacity whitespace-nowrap"
+            className="text-[10px] md:text-[12px] font-black uppercase tracking-widest border-b-2 border-[#67645E] text-[#67645E] pb-1 hover:opacity-50 transition-opacity whitespace-nowrap"
           >
             {t.categories.all}
           </button>

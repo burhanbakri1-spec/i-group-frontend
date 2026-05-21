@@ -17,11 +17,11 @@ import { Language } from '../translations';
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const MAP_FRAME_CLASS =
-  'w-full h-64 md:h-80 rounded-lg overflow-hidden border border-gray-300';
+  'w-full h-64 md:h-80 rounded-[12px] overflow-hidden border border-[#DDDDDD]';
 const CONTROL_FOCUS_CLASS =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 const INPUT_FOCUS_CLASS =
-  'focus-visible:outline-none focus-visible:border-blue-700 focus-visible:ring-2 focus-visible:ring-[#E11D48]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+  'focus-visible:outline-none focus-visible:border-[#7B7872] focus-visible:ring-2 focus-visible:ring-[#7B7872]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 const DEFAULT_CENTER: [number, number] = [0, 0];
 
 const NOMINATIM_BASE = 'https://nominatim.openstreetmap.org';
@@ -763,14 +763,14 @@ export default function MapAddressPicker({
                 setSearchError(null);
               }}
               onKeyDown={handleSearchKeyDown}
-              className={`flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-600 transition-[border-color,box-shadow] duration-200 ${INPUT_FOCUS_CLASS}`}
+              className={`flex-1 px-4 py-2.5 border border-[#DDDDDD] rounded-[12px] text-sm text-[#67645E] placeholder:text-[#84827E] bg-white transition-[border-color,box-shadow] duration-200 ${INPUT_FOCUS_CLASS}`}
               dir={lang === 'ar' ? 'rtl' : 'ltr'}
             />
             <button
               type="button"
               onClick={handleSearch}
               disabled={searching || !searchQuery.trim()}
-              className={`px-4 py-2.5 bg-blue-700 text-white rounded-lg text-sm hover:bg-blue-800 disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors whitespace-nowrap ${CONTROL_FOCUS_CLASS}`}
+              className={`px-4 py-2.5 bg-[#67645E] text-white rounded-[12px] text-sm hover:bg-[#7B7872] disabled:bg-[#B0AEA9] disabled:cursor-not-allowed transition-colors whitespace-nowrap ${CONTROL_FOCUS_CLASS}`}
             >
               {searching ? (
                 <span className="flex items-center gap-1.5">
@@ -788,7 +788,7 @@ export default function MapAddressPicker({
             type="button"
             onClick={handleLocateMe}
             disabled={locateState === 'locating-gps' || locateState === 'locating-wifi' || locateState === 'locating-ip'}
-            className={`w-full px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${CONTROL_FOCUS_CLASS}`}
+            className={`w-full px-4 py-2 bg-white border border-[#DDDDDD] rounded-[12px] text-sm text-[#67645E] hover:bg-[#F1F0ED] disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${CONTROL_FOCUS_CLASS}`}
           >
             {labels.locateButton}
           </button>
@@ -797,7 +797,7 @@ export default function MapAddressPicker({
           <button
             type="button"
             onClick={handleGoogleMapsOpen}
-            className={`w-full px-4 py-2 bg-white border border-dashed border-blue-400 rounded-lg text-sm text-blue-700 hover:bg-blue-50 transition-colors ${CONTROL_FOCUS_CLASS}`}
+            className={`w-full px-4 py-2 bg-white border border-dashed border-[#DDDDDD] rounded-[12px] text-sm text-[#67645E] hover:bg-[#F1F0ED] transition-colors ${CONTROL_FOCUS_CLASS}`}
           >
             {labels.googleMapsButton}
           </button>
@@ -818,7 +818,7 @@ export default function MapAddressPicker({
                   onChange={(e) => { setGoogleMapsInput(e.target.value); setGoogleMapsError(null); }}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleGoogleMapsPaste(); }}
                   placeholder={labels.googleMapsPlaceholder}
-                  className={`flex-1 px-3 py-2 border border-blue-300 rounded text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 ${INPUT_FOCUS_CLASS}`}
+                  className={`flex-1 px-3 py-2 border border-[#DDDDDD] rounded-[8px] text-sm text-[#67645E] focus:border-[#7B7872] focus:outline-none focus:ring-1 focus:ring-[#7B7872]/30 ${INPUT_FOCUS_CLASS}`}
                   dir={lang === 'ar' ? 'rtl' : 'ltr'}
                   autoFocus
                 />
@@ -826,7 +826,7 @@ export default function MapAddressPicker({
                   type="button"
                   onClick={handleGoogleMapsPaste}
                   disabled={!googleMapsInput.trim()}
-                  className={`px-3 py-2 bg-blue-700 text-white rounded text-sm hover:bg-blue-800 disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors whitespace-nowrap ${CONTROL_FOCUS_CLASS}`}
+                  className={`px-3 py-2 bg-[#67645E] text-white rounded-[8px] text-sm hover:bg-[#7B7872] disabled:bg-[#B0AEA9] disabled:cursor-not-allowed transition-colors whitespace-nowrap ${CONTROL_FOCUS_CLASS}`}
                 >
                   {labels.googleMapsSet}
                 </button>
@@ -875,8 +875,8 @@ export default function MapAddressPicker({
             onClick={() => setSatelliteView(!satelliteView)}
             className={`px-3 py-1 text-xs rounded-full border transition-colors ${
               satelliteView
-                ? 'bg-blue-700 text-white border-blue-700'
-                : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
+                ? 'bg-[#67645E] text-white border-[#67645E]'
+                : 'bg-white text-[#67645E] border-[#DDDDDD] hover:border-[#7B7872]'
             } ${CONTROL_FOCUS_CLASS}`}
           >
             {satelliteView ? labels.satelliteLayer : labels.mapLayer}

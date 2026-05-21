@@ -262,7 +262,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
             className="fixed inset-0 z-[101] flex items-center justify-center p-4 pointer-events-none"
           >
             <div
-              className="bg-white rounded-[24px] w-full max-w-[560px] max-h-[90vh] overflow-y-auto pointer-events-auto relative"
+              className="bg-white rounded-[12px] w-full max-w-[560px] max-h-[90vh] overflow-y-auto pointer-events-auto relative"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close button */}
@@ -291,7 +291,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                     </p>
                     <button
                       onClick={onLoginRequest}
-                      className={`bg-black text-white px-8 py-3.5 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black/90 transition-colors ${CONTROL_FOCUS_CLASS}`}
+                      className={`bg-[#67645E] text-white px-8 py-3.5 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#7B7872] transition-colors ${CONTROL_FOCUS_CLASS}`}
                     >
                       {label('loginButton')}
                     </button>
@@ -368,10 +368,10 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                         onChange={(e) => setTitle(e.target.value)}
                         placeholder={label('titlePlaceholder')}
                         maxLength={MAX_TITLE_LENGTH}
-                        className={`w-full px-4 py-3 rounded-xl border border-black/10 bg-transparent text-[14px] text-[#333] placeholder:text-black/30 placeholder:text-[12px] transition-colors hover:border-black/20 ${CONTROL_FOCUS_CLASS}`}
+                        className={`w-full px-4 py-3 rounded-[12px] border border-[#DDDDDD] bg-[#F9F8F6] text-[14px] text-[#67645E] placeholder:text-[#84827E] placeholder:text-[12px] transition-colors hover:border-[#7B7872] ${CONTROL_FOCUS_CLASS}`}
                       />
                       {title.length > 0 && (
-                        <p className="text-[10px] text-black/35 text-right">
+                        <p className="text-[10px] text-[#84827E] text-right">
                           {title.length}/{MAX_TITLE_LENGTH}
                         </p>
                       )}
@@ -391,7 +391,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                         placeholder={label('commentPlaceholder')}
                         maxLength={MAX_COMMENT_LENGTH}
                         rows={4}
-                        className={`w-full px-4 py-3 rounded-xl border border-black/10 bg-transparent text-[14px] text-[#333] placeholder:text-black/30 placeholder:text-[12px] resize-none transition-colors hover:border-black/20 ${CONTROL_FOCUS_CLASS}`}
+                        className={`w-full px-4 py-3 rounded-[12px] border border-[#DDDDDD] bg-[#F9F8F6] text-[14px] text-[#67645E] placeholder:text-[#84827E] placeholder:text-[12px] resize-none transition-colors hover:border-[#7B7872] ${CONTROL_FOCUS_CLASS}`}
                       />
                       {comment.length > 0 && (
                         <p className="text-[10px] text-black/35 text-right">
@@ -413,7 +413,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                         <select
                           value={ageRange}
                           onChange={(e) => setAgeRange(e.target.value)}
-                          className={`w-full px-4 py-3 rounded-xl border border-black/10 bg-transparent text-[14px] text-[#333] appearance-none transition-colors hover:border-black/20 ${CONTROL_FOCUS_CLASS}`}
+                          className={`w-full px-4 py-3 rounded-[12px] border border-[#DDDDDD] bg-[#F9F8F6] text-[14px] text-[#67645E] appearance-none transition-colors hover:border-[#7B7872] ${CONTROL_FOCUS_CLASS}`}
                         >
                           <option value="" disabled>
                             {label('ageRangePlaceholder')}
@@ -437,7 +437,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                         <select
                           value={skinType}
                           onChange={(e) => setSkinType(e.target.value)}
-                          className={`w-full px-4 py-3 rounded-xl border border-black/10 bg-transparent text-[14px] text-[#333] appearance-none transition-colors hover:border-black/20 ${CONTROL_FOCUS_CLASS}`}
+                          className={`w-full px-4 py-3 rounded-[12px] border border-[#DDDDDD] bg-[#F9F8F6] text-[14px] text-[#67645E] appearance-none transition-colors hover:border-[#7B7872] ${CONTROL_FOCUS_CLASS}`}
                         >
                           <option value="" disabled>
                             {label('skinTypePlaceholder')}
@@ -558,7 +558,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                         whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
                         onClick={handleSubmit}
                         disabled={isSubmitting}
-                        className={`w-full bg-black text-white py-4 rounded-full text-[12px] font-black uppercase tracking-[0.2em] hover:bg-black/90 transition-colors duration-200 shadow-lg shadow-black/10 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed ${CONTROL_FOCUS_CLASS}`}
+                        className={`w-full bg-[#67645E] text-white py-4 rounded-full text-[12px] font-black uppercase tracking-[0.2em] hover:bg-[#7B7872] transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed ${CONTROL_FOCUS_CLASS}`}
                       >
                         {isSubmitting ? (
                           <>

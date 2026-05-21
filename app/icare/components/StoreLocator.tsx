@@ -132,11 +132,11 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFFFF] pt-24 pb-8 md:pb-0 overflow-hidden">
+    <div className="min-h-screen bg-[#F1F0ED] pt-24 pb-8 md:pb-0 overflow-hidden">
       <div className="flex flex-col md:flex-row h-[calc(100vh-96px)]">
         
         {/* Sidebar: List */}
-        <div className="w-full md:w-[320px] lg:w-[450px] flex flex-col border-r border-black/5 h-[45vh] md:h-full overflow-hidden bg-white z-10 shadow-xl md:shadow-none">
+        <div className="w-full md:w-[320px] lg:w-[450px] flex flex-col border-r border-[#DDDDDD] h-[45vh] md:h-full overflow-hidden bg-white z-10">
           <div className="p-4 lg:p-8 space-y-4 lg:space-y-8">
             <header>
               <h1 className="text-[24px] lg:text-[42px] font-brand lowercase italic leading-none mb-1 lg:mb-2">{t.title}</h1>
@@ -223,7 +223,7 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
                         href={getDirectionsUrl(store)}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-black text-white rounded-full text-[8px] lg:text-[10px] font-black uppercase tracking-widest hover:opacity-90 transition-all active:scale-95"
+                        className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#67645E] text-white rounded-full text-[8px] lg:text-[10px] font-black uppercase tracking-widest hover:opacity-90 transition-all active:scale-95"
                       >
                         <Navigation size={10} />
                         {t.directions}
@@ -275,10 +275,10 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
               }}
             >
               <div className="relative flex flex-col items-center">
-                <div className="bg-black text-white px-3 py-1.5 lg:px-4 lg:py-2 rounded-full text-[8px] lg:text-[10px] font-black uppercase tracking-tighter mb-1.5 lg:mb-2 whitespace-nowrap shadow-2xl">
+                <div className="bg-[#67645E] text-white px-3 py-1.5 lg:px-4 lg:py-2 rounded-full text-[8px] lg:text-[10px] font-black uppercase tracking-tighter mb-1.5 lg:mb-2 whitespace-nowrap">
                   {store.name}
                 </div>
-                <div className="w-6 h-6 lg:w-8 lg:h-8 bg-black rounded-full border-[3px] lg:border-4 border-white shadow-xl flex items-center justify-center">
+                <div className="w-6 h-6 lg:w-8 lg:h-8 bg-[#67645E] rounded-full border-[3px] lg:border-4 border-white flex items-center justify-center">
                   <div className="w-1 h-1 lg:w-1.5 lg:h-1.5 bg-white rounded-full animate-ping" />
                 </div>
               </div>

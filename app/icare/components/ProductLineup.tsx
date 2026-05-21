@@ -26,7 +26,7 @@ interface LineupItemProps {
   onSelect?: (product: Product) => void;
 }
 
-const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872] focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 
 const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, badge, name, description, price, originalPrice, image, reviews, onSelect }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -46,15 +46,15 @@ const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, badge, n
       }}
       role="button"
       tabIndex={product ? 0 : -1}
-      className={`w-[min(84vw,320px)] shrink-0 md:w-[420px] bg-[#F6F6F6] rounded-[24px] md:rounded-[32px] p-6 md:p-8 flex flex-col justify-between group cursor-pointer relative overflow-hidden h-[440px] md:h-[500px] transition-shadow duration-300 hover:shadow-lg hover:shadow-black/5 ${CONTROL_FOCUS_CLASS}`}
+      className={`w-[min(84vw,320px)] shrink-0 md:w-[420px] bg-white rounded-[12px] p-6 md:p-8 flex flex-col justify-between group cursor-pointer relative overflow-hidden h-[440px] md:h-[500px] ${CONTROL_FOCUS_CLASS}`}
     >
       {/* Top Section: Category and Badge */}
       <div className="flex justify-between items-start z-10">
-        <h3 className="text-[28px] md:text-[38px] font-bold lowercase tracking-tight text-black leading-none">
+        <h3 className="text-[28px] md:text-[38px] font-bold lowercase tracking-tight text-[#67645E] leading-none">
           {category}
         </h3>
         {badge && (
-          <div className="bg-[#66635F] px-4 py-1.5 rounded-full">
+          <div className="bg-[#67645E] px-4 py-1.5 rounded-full">
             <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] text-white">
               {badge}
             </span>
@@ -76,7 +76,7 @@ const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, badge, n
             <ImageWithFallback 
               src={image} 
               alt={name} 
-              className="h-full max-h-[210px] md:max-h-[260px] w-full object-contain drop-shadow-[0_16px_32px_rgba(0,0,0,0.08)]"
+              className="h-full max-h-[210px] md:max-h-[260px] w-full object-contain"
             />
             
             {/* Quick Add Button Overlay */}
@@ -89,7 +89,7 @@ const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, badge, n
                   transition={{ duration: shouldReduceMotion ? 0 : 0.18 }}
                   className="absolute inset-0 flex items-center justify-center z-20"
                 >
-                  <button type="button" className={`bg-black text-white px-8 py-3.5 rounded-full flex items-center gap-2 shadow-xl ${CONTROL_FOCUS_CLASS}`} onClick={(event) => { event.stopPropagation(); selectProduct(); }}>
+                  <button type="button" className={`bg-[#67645E] text-white px-8 py-3.5 rounded-full flex items-center gap-2 ${CONTROL_FOCUS_CLASS}`} onClick={(event) => { event.stopPropagation(); selectProduct(); }}>
                     <Plus size={16} strokeWidth={3} />
                     <span className="text-[11px] font-black uppercase tracking-[0.2em]">Quick Add</span>
                   </button>
@@ -109,25 +109,25 @@ const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, badge, n
               <Star key={i} size={11} fill="black" className="text-black" />
             ))}
           </div>
-          <span className="text-[10px] font-bold text-black/55">({reviews})</span>
+          <span className="text-[10px] font-bold text-[#84827E]">({reviews})</span>
         </div>
 
         {/* Name and Price */}
         <div className="flex justify-between items-baseline gap-4">
-          <h4 className="text-[12px] md:text-[14px] font-black uppercase tracking-[0.05em] text-black leading-tight flex-1">
+          <h4 className="text-[12px] md:text-[14px] font-black uppercase tracking-[0.05em] text-[#67645E] leading-tight flex-1">
             {name}
           </h4>
           <div className="flex items-center gap-2">
             {originalPrice && (
               <span className="text-[13px] md:text-[15px] font-black text-black/40 line-through">{originalPrice}</span>
             )}
-            <span className="text-[13px] md:text-[15px] font-black text-black">
+            <span className="text-[13px] md:text-[15px] font-black text-[#67645E]">
               {price}
             </span>
           </div>
         </div>
         
-        <p className="text-[11px] md:text-[12px] text-[#5f5f5f] font-medium leading-relaxed">
+        <p className="text-[11px] md:text-[12px] text-[#84827E] font-medium leading-relaxed">
           {description}
         </p>
       </div>
@@ -180,9 +180,9 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ onProductSelect, p
 
   if (remoteProducts === null) {
     return (
-      <section className="bg-white pt-12 pb-24 lg:pb-32 overflow-hidden">
+      <section className="bg-[#F1F0ED] pt-12 pb-24 lg:pb-32 overflow-hidden">
         <div className="max-w-[1600px] mx-auto px-4 lg:px-12">
-          <div className="rounded-[24px] bg-[#F6F6F6] p-12">
+          <div className="rounded-[12px] bg-white p-12">
             <div className="flex gap-5 md:gap-8 overflow-hidden">
               {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="flex-shrink-0 w-[280px] space-y-3">
@@ -200,13 +200,13 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ onProductSelect, p
 
   if (error) {
     return (
-      <section className="bg-white pt-12 pb-24 lg:pb-32 overflow-hidden">
+      <section className="bg-[#F1F0ED] pt-12 pb-24 lg:pb-32 overflow-hidden">
         <div className="max-w-[1600px] mx-auto px-4 lg:px-12">
-          <div className="rounded-[24px] bg-[#F6F6F6] p-12 text-center space-y-4">
+          <div className="rounded-[12px] bg-white p-12 text-center space-y-4">
             <p className="text-[13px] text-red-600 font-medium">{error}</p>
             <button
               onClick={loadProducts}
-              className={`px-6 py-2 bg-black text-white rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black/90 transition-colors ${CONTROL_FOCUS_CLASS}`}
+              className={`px-6 py-2 bg-[#67645E] text-white rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#67645E]/90 transition-colors ${CONTROL_FOCUS_CLASS}`}
             >
               Retry
             </button>
@@ -218,9 +218,9 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ onProductSelect, p
 
   if (items.length === 0) {
     return (
-      <section className="bg-white pt-12 pb-24 lg:pb-32 overflow-hidden">
+      <section className="bg-[#F1F0ED] pt-12 pb-24 lg:pb-32 overflow-hidden">
         <div className="max-w-[1600px] mx-auto px-4 lg:px-12">
-          <div className="rounded-[24px] bg-[#F6F6F6] p-12 text-center text-[12px] font-bold uppercase tracking-[0.2em] text-black/60">
+          <div className="rounded-[12px] bg-white p-12 text-center text-[12px] font-bold uppercase tracking-[0.2em] text-[#84827E]">
             no related products are available yet
           </div>
         </div>
@@ -229,7 +229,7 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ onProductSelect, p
   }
 
   return (
-    <section className="bg-white pt-12 pb-24 lg:pb-32 overflow-hidden">
+    <section className="bg-[#F1F0ED] pt-12 pb-24 lg:pb-32 overflow-hidden">
       <div className="max-w-[1600px] mx-auto px-4 lg:px-12 relative group">
         <div 
           ref={scrollRef}
@@ -257,14 +257,14 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ onProductSelect, p
         <div className="hidden lg:block">
             <button 
             onClick={() => scroll('left')}
-            className={`absolute top-[40%] left-0 -translate-y-1/2 w-14 h-14 bg-white rounded-full shadow-lg border border-black/10 flex items-center justify-center z-30 hover:bg-black hover:text-white transition-colors opacity-0 group-hover:opacity-100 ${CONTROL_FOCUS_CLASS}`}
+            className={`absolute top-[40%] left-0 -translate-y-1/2 w-14 h-14 bg-white rounded-full border border-[#DDDDDD] flex items-center justify-center z-30 hover:bg-[#67645E] hover:text-white transition-colors opacity-0 group-hover:opacity-100 ${CONTROL_FOCUS_CLASS}`}
             aria-label="Scroll related products left"
             >
             <ChevronRight size={24} className="rotate-180" />
             </button>
             <button 
             onClick={() => scroll('right')}
-            className={`absolute top-[40%] right-0 -translate-y-1/2 w-14 h-14 bg-white rounded-full shadow-lg border border-black/10 flex items-center justify-center z-30 hover:bg-black hover:text-white transition-colors opacity-0 group-hover:opacity-100 ${CONTROL_FOCUS_CLASS}`}
+            className={`absolute top-[40%] right-0 -translate-y-1/2 w-14 h-14 bg-white rounded-full border border-[#DDDDDD] flex items-center justify-center z-30 hover:bg-[#67645E] hover:text-white transition-colors opacity-0 group-hover:opacity-100 ${CONTROL_FOCUS_CLASS}`}
             aria-label="Scroll related products right"
             >
             <ChevronRight size={24} />

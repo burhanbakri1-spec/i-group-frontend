@@ -72,7 +72,7 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNa
       <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
         
         {/* Left Side: Info Box */}
-        <div className="bg-[#F2F2F0] rounded-[16px] p-8 md:p-14 lg:p-16 flex flex-col justify-between min-h-[460px] md:min-h-[650px]">
+        <div className="bg-[#EDECEB] rounded-[12px] p-8 md:p-14 lg:p-16 flex flex-col justify-between min-h-[460px] md:min-h-[650px]">
           <div>
             <motion.div
               initial={shouldReduceMotion ? false : { opacity: 0, y: 14 }}
@@ -80,20 +80,20 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNa
               viewport={{ once: true }}
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             >
-              <h2 className="text-[22px] md:text-[36px] font-[500] leading-[1.25] text-[#4F4D49] mb-10 max-w-lg">
+              <h2 className="text-[22px] md:text-[36px] font-[500] leading-[1.25] text-[#67645E] mb-10 max-w-lg">
                 {commitmentHeadline ? (
                   <span>{commitmentHeadline}</span>
                 ) : (
                   lang === 'en' 
-                    ? <>From consciously-sourced ingredients to packaging made with post-consumer recycled materials, we&apos;re committed to <span className="text-black font-[900]">MINDFUL SKINCARE.</span></>
-                    : <>من المكونات المختارة بوعي إلى التغليف المصنوع من مواد معاد تدويرها، نحن ملتزمون بـ<span className="text-black font-[900]">العناية الواعية بالبشرة.</span></>
+                    ? <>From consciously-sourced ingredients to packaging made with post-consumer recycled materials, we&apos;re committed to <span className="text-[#67645E] font-[900]">MINDFUL SKINCARE.</span></>
+                    : <>من المكونات المختارة بوعي إلى التغليف المصنوع من مواد معاد تدويرها، نحن ملتزمون بـ<span className="text-[#67645E] font-[900]">العناية الواعية بالبشرة.</span></>
                 )}
               </h2>
               
               <motion.button 
                 onClick={() => onNavigate('story')}
                 whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
-                className="border border-black/10 bg-white/60 backdrop-blur-sm rounded-full px-8 py-3 text-[10px] font-black tracking-[0.2em] uppercase text-black hover:bg-black hover:text-white transition-colors duration-300 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
+                className="border border-[#DDDDDD] bg-white rounded-full px-8 py-3 text-[10px] font-black tracking-[0.2em] uppercase text-[#67645E] hover:bg-[#67645E] hover:text-white transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDECEB]"
               >
                 {commitmentCta || (lang === 'en' ? 'OUR FOOTPRINT' : 'بصمتنا')}
               </motion.button>
@@ -118,7 +118,7 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNa
                   duration: 0.3,
                   ease: [0.22, 1, 0.36, 1]
                 }}
-                className={`border-t border-black/10 ${index === commitmentItems.length - 1 ? 'border-b' : ''}`}
+                className={`border-t border-[#DDDDDD] ${index === commitmentItems.length - 1 ? 'border-b' : ''}`}
               >
                 <button
                   id={buttonId}
@@ -126,15 +126,15 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNa
                   aria-expanded={isOpen}
                   aria-controls={panelId}
                   onClick={() => toggleItem(item.id)}
-                  className="group flex w-full items-center justify-between gap-6 rounded-[12px] py-6 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F2F2F0]"
+                  className="group flex w-full items-center justify-between gap-6 rounded-[12px] py-6 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDECEB]"
                 >
                   <span
-                    className="text-[20px] md:text-[28px] font-[900] text-black/55 group-hover:text-black group-focus-visible:text-black transition-colors duration-300 lowercase"
+                    className="text-[20px] md:text-[28px] font-[900] text-[#84827E] group-hover:text-[#67645E] group-focus-visible:text-[#67645E] transition-colors duration-300 lowercase"
                   >
                     {item.title}
                   </span>
                   <span
-                    className="w-8 h-8 shrink-0 rounded-full border border-black/10 flex items-center justify-center bg-white group-hover:bg-black group-hover:text-white group-focus-visible:bg-black group-focus-visible:text-white transition-colors duration-300"
+                    className="w-8 h-8 shrink-0 rounded-full border border-[#DDDDDD] flex items-center justify-center bg-white group-hover:bg-[#67645E] group-hover:text-white group-focus-visible:bg-[#67645E] group-focus-visible:text-white transition-colors duration-300"
                   >
                     <svg
                       aria-hidden="true"
@@ -162,7 +162,7 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNa
                     hidden={!isOpen}
                     className="pb-6 pe-12"
                   >
-                    <p className="max-w-xl text-[14px] md:text-[15px] leading-[1.8] text-black/60">
+                    <p className="max-w-xl text-[14px] md:text-[15px] leading-[1.8] text-[#84827E]">
                       {item.detail}
                     </p>
                   </div>
@@ -178,7 +178,7 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNa
                     className="overflow-hidden"
                   >
                     <div className="pb-6 pe-12">
-                      <p className="max-w-xl text-[14px] md:text-[15px] leading-[1.8] text-black/60">
+                      <p className="max-w-xl text-[14px] md:text-[15px] leading-[1.8] text-[#84827E]">
                         {item.detail}
                       </p>
                     </div>
@@ -192,7 +192,7 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNa
 
         {/* Right Side: Visual Box */}
         <motion.div 
-          className="relative aspect-square md:aspect-auto h-[400px] md:h-full overflow-hidden rounded-[16px]"
+          className="relative aspect-square md:aspect-auto h-[400px] md:h-full overflow-hidden rounded-[12px]"
         >
           <motion.div
             initial={shouldReduceMotion ? false : { opacity: 0 }}
