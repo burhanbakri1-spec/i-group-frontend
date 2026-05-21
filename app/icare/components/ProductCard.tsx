@@ -109,7 +109,7 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
         <p className="text-xs text-[var(--rb-gray-84827E)] uppercase tracking-wider mb-1">
           {product.category}
         </p>
-        <h3 className="font-bold text-base text-[var(--rb-primary-text)] mb-1 line-clamp-1 lowercase">
+        <h3 className="font-bold text-base text-[var(--rb-primary-text)] mb-1 line-clamp-1 uppercase tracking-[0.28px]">
           {product.name}
         </h3>
         <div className="flex items-center justify-between mb-4">
@@ -119,8 +119,8 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
             )}
             <p className="text-lg font-bold text-[var(--rb-primary-text)]">{product.price}</p>
           </div>
-          <div className="flex items-center gap-1 text-[11px] text-neutral-500">
-            <span className="text-amber-500">&#9733;</span>
+          <div className="flex items-center gap-1 text-[11px] text-[var(--rb-gray-84827E)]">
+            <span className="text-[var(--rb-primary-text)]">&#9733;</span>
             <span>{product.rating}</span>
             <span>({product.reviews})</span>
           </div>
