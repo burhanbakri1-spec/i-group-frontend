@@ -46,60 +46,37 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
         onMouseLeave={() => setIsHovered(false)}
         tabIndex={0}
         role="link"
-        className="block w-full bg-white rounded-[12px] overflow-hidden font-sans cursor-pointer"
+        className="relative block w-full bg-white rounded-[12px] overflow-hidden font-sans cursor-pointer"
       >
-        {/* Image: full-bleed, at top of card */}
-        <div className="pt-[26px]">
-          <div className="relative overflow-hidden">
-            <div className="aspect-square bg-[var(--rb-bg-surface)] relative overflow-hidden">
-              <motion.div
-                className="absolute inset-0"
-                animate={{ opacity: isHovered && hoverImage ? 0 : 1 }}
-                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <ImageWithFallback
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              </motion.div>
-              {hoverImage && (
-                <motion.div
-                  className="absolute inset-0"
-                  animate={{ opacity: isHovered ? 1 : 0 }}
-                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  <ImageWithFallback
-                    src={hoverImage}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                </motion.div>
-              )}
-            </div>
-
-            {/* Badges */}
-            {product.badge && (
-              <span className="absolute top-3 left-3 px-3 py-1 bg-white text-[10px] font-bold uppercase tracking-wider rounded-full shadow-sm">
-                {product.badge}
-              </span>
-            )}
-            {!isPurchasable && (
-              <span className="absolute top-3 left-3 px-3 py-1 bg-black/70 text-white text-[10px] font-bold uppercase tracking-wider rounded-full">
-                sold out
-              </span>
-            )}
+        {/* Primary content: image + text — visible at rest */}
+        <div className="relative z-10 transition-opacity duration-500 ease-out group-hover:opacity-0">
+          {/* Main image */}
+          <div className="aspect-square bg-[var(--rb-bg-surface)] overflow-hidden">
+            <ImageWithFallback
+              src={product.image}
+              alt={product.name}
+              className="w-full h-full object-cover"
+            />
           </div>
-        </div>
 
-        {/* Content area: text + hover button, with horizontal padding */}
-        <div className="relative px-[16px] pt-[10px] pb-[14px] min-h-[60px]">
-          {/* Text content — visible at rest, hides on hover */}
-          <div className="transition-all duration-300 ease-out group-hover:opacity-0 group-hover:-translate-y-2">
+          {/* Badges */}
+          {product.badge && (
+            <span className="absolute top-3 left-3 z-20 px-3 py-1 bg-white text-[10px] font-bold uppercase tracking-wider rounded-full shadow-sm">
+              {product.badge}
+            </span>
+          )}
+          {!isPurchasable && (
+            <span className="absolute top-3 left-3 z-20 px-3 py-1 bg-black/70 text-white text-[10px] font-bold uppercase tracking-wider rounded-full">
+              sold out
+            </span>
+          )}
+
+          {/* Text */}
+          <div className="pt-[10px] pb-[14px] flex flex-col gap-[10px]">
             <h3 className="font-bold text-sm text-[var(--rb-primary-text)] uppercase tracking-[0.28px] leading-[16.8px]">
               {product.name}
             </h3>
-            <div className="flex items-center gap-2 mt-1">
+            <div className="flex items-center gap-2">
               <p className="text-sm font-normal text-[var(--rb-primary-text)] tracking-[0.313835px]">
                 {product.price}
               </p>
@@ -110,26 +87,52 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
               )}
             </div>
           </div>
+        </div>
 
-          {/* Quick Add button — hidden at rest, shows from bottom on hover */}
-          <div className="absolute inset-x-[16px] bottom-[14px] transition-all duration-300 ease-out opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                if (isPurchasable && onSelect) {
-                  onSelect();
-                }
-              }}
-              disabled={!isPurchasable}
-              className="w-full py-2.5 bg-[var(--rb-primary-text)] text-white text-[13px] font-medium rounded-full hover:bg-[var(--rb-gray-525252)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-            >
+        {/* Hover overlay: alternate image fills entire card body */}
+        {hoverImage && (
+          <motion.div
+            className="absolute inset-0 z-20"
+            initial={false}
+            animate={{
+              opacity: isHovered ? 1 : 0,
+            }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <ImageWithFallback
+              src={hoverImage}
+              alt={product.name}
+              className="w-full h-full object-cover"
+            />
+          </motion.div>
+        )}
+
+        {/* Quick Add button — visible on hover, stays on top of everything */}
+        <motion.div
+          className="absolute bottom-[14px] left-3 right-3 z-30"
+          initial={false}
+          animate={{
+            y: isHovered ? 0 : 60,
+            opacity: isHovered ? 1 : 0,
+          }}
+          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              if (isPurchasable && onSelect) {
+                onSelect();
+              }
+            }}
+            disabled={!isPurchasable}
+            className="w-full py-2.5 bg-[var(--rb-primary-text)] text-white text-[13px] font-medium rounded-full hover:bg-[var(--rb-gray-525252)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
               {isPurchasable
                 ? (lang === 'en' ? 'Quick Add' : 'إضافة سريعة')
                 : (lang === 'en' ? 'Sold Out' : 'نفد المخزون')}
             </button>
-          </div>
-        </div>
+        </motion.div>
       </a>
     </motion.div>
   );
