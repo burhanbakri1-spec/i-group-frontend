@@ -46,9 +46,9 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
         onMouseLeave={() => setIsHovered(false)}
         tabIndex={0}
         role="link"
-        className="relative block w-full bg-white rounded-[12px] overflow-hidden font-sans cursor-pointer"
+        className="relative block w-full bg-white rounded-[12px] overflow-hidden font-sans cursor-pointer p-[16px]"
       >
-        {/* Primary content: image + text — visible at rest */}
+        {/* Primary content: image + text — visible at rest, with padding on all sides */}
         <div className="relative z-10 transition-opacity duration-500 ease-out group-hover:opacity-0">
           {/* Main image */}
           <div className="aspect-square bg-[var(--rb-bg-surface)] overflow-hidden">
