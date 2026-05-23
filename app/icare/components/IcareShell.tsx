@@ -56,7 +56,7 @@ export const IcareShell = ({ children }: { children: React.ReactNode }) => {
 
   const navigateToPath = useCallback((path: string) => {
     router.push(path);
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [router]);
 
   const contextValue = useMemo<IcareShellContextValue>(() => ({

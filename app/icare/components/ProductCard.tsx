@@ -130,7 +130,7 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
               }
             }}
             disabled={!isPurchasable}
-            className="w-full py-2.5 bg-[var(--rb-primary-text)] text-white text-[13px] font-medium rounded-full hover:bg-[#525252] active:scale-[0.98] hover:shadow-lg transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full py-2.5 bg-white text-[var(--rb-primary-text)] border border-white text-[13px] font-medium rounded-full hover:bg-[var(--rb-primary-text)] hover:text-white hover:border-[var(--rb-primary-text)] active:scale-[0.98] hover:shadow-lg transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {isPurchasable
               ? (lang === 'en' ? 'Quick Add' : 'إضافة سريعة')

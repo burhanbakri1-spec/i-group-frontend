@@ -191,10 +191,12 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
     || pathname === '/icare/contact'
     || pathname === '/icare/story'
     || pathname === '/icare/vlog'
-    || pathname === '/icare/find-us';
-  const radiusClass = !isScrolled && isStandardHero
+    || pathname === '/icare/find-us'
+    || pathname === '/icare/faq';
+  const isConnected = isStandardHero && !isScrolled && !isShopHovered;
+  const radiusClass = isConnected
     ? 'rounded-t-[var(--rb-radius-card)] rounded-b-[0px] border-b-0'
-    : 'rounded-[var(--rb-radius-pill)]';
+    : 'rounded-[var(--rb-radius-card)]';
   const wrapperBg = isShopHovered || isScrolled || !isStandardHero
     ? 'bg-[var(--rb-bg-warm-gray)]'
     : 'bg-transparent';
