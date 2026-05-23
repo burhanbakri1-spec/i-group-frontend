@@ -132,7 +132,30 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F1F0ED] pt-24 pb-8 md:pb-0 overflow-hidden">
+    <div className="min-h-screen bg-[#F1F0ED] overflow-hidden">
+      {/* Hero Section */}
+      <section className="bg-white px-4 md:px-8">
+        <div className="relative h-[80vh] md:h-[85vh] w-full overflow-hidden shadow-sm">
+          <ImageWithFallback
+            src={storeLocatorMapImage || FALLBACK_MAP_IMAGE}
+            alt="Store Map"
+            className="w-full h-full object-cover opacity-60 mix-blend-multiply grayscale"
+          />
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-[32px] md:text-[56px] lg:text-[64px] font-brand lowercase italic leading-none mb-2 text-white drop-shadow-sm"
+            >
+              {t.title}
+            </motion.h1>
+            <p className="text-[10px] md:text-[12px] font-bold uppercase tracking-[0.4em] text-white/90">
+              {lang === 'en' ? storeLocatorTagline : 'ابحث عن آي كير بالقرب منك'}
+            </p>
+          </div>
+        </div>
+      </section>
+
       <div className="flex flex-col md:flex-row h-[calc(100vh-96px)]">
         
         {/* Sidebar: List */}

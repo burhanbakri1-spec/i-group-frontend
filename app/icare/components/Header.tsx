@@ -5,6 +5,7 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { translations, Language } from '../translations';
 import { useShop } from '../context/ShopContext';
 import { useSiteContent } from '../hooks/useSiteContent';
+import { usePathname } from 'next/navigation';
 import { BackendCategory, Product } from '../types';
 import { fetchCatalogProducts, fetchCategoryRoots, fetchCategoryChildren } from '../lib/catalog-client';
 
@@ -37,6 +38,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
   const [activeRootSlug, setActiveRootSlug] = useState<string | null>(null);
   const { scrollY } = useScroll();
   const shouldReduceMotion = useReducedMotion();
+  const pathname = usePathname();
   const headerRef = useRef<HTMLDivElement | null>(null);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shopButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -184,6 +186,18 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
 
   const headerY = !isVisible || isDrawerOpen ? -128 : 0;
   const headerOpacity = isDrawerOpen ? 0 : 1;
+  const isStandardHero = pathname === '/icare'
+    || pathname === '/icare/shop'
+    || pathname === '/icare/contact'
+    || pathname === '/icare/story'
+    || pathname === '/icare/vlog'
+    || pathname === '/icare/find-us';
+  const radiusClass = !isScrolled && isStandardHero
+    ? 'rounded-t-[var(--rb-radius-card)] rounded-b-[0px] border-b-0'
+    : 'rounded-[var(--rb-radius-pill)]';
+  const wrapperBg = isShopHovered || isScrolled || !isStandardHero
+    ? 'bg-[var(--rb-bg-warm-gray)]'
+    : 'bg-transparent';
 
   return (
     <motion.div 
@@ -204,11 +218,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
       </div>
 
       <div className="mx-4 md:mx-8 lg:mx-8 mt-2 md:mt-3">
-        <header 
-          className={`transition-colors duration-200 rounded-t-[var(--rb-radius-card)] rounded-b-[0px] px-4 md:px-6 py-3 flex min-h-[64px] items-center justify-between border border-[var(--rb-border-light)] border-b-0 ${
-            isScrolled ? 'bg-[var(--rb-bg-warm-gray)]' : 'bg-transparent'
-          }`}
-        >
+        <div className={`overflow-hidden transition-all duration-200 border border-[var(--rb-border-light)] ${radiusClass} ${wrapperBg}`}>
+          <header 
+            className="px-4 md:px-6 py-3 flex min-h-[64px] items-center justify-between"
+          >
           {/* Navigation */}
           <div className="flex items-center gap-10">
             <button 
@@ -333,11 +346,11 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
             <motion.div
               id={SHOP_MEGA_MENU_ID}
               ref={shopMenuRef}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={calmTween}
-              className="absolute top-[calc(100%-8px)] left-0 z-[55] w-full bg-[var(--rb-bg-warm-gray)] rounded-[var(--rb-radius-card)] pt-5 pb-6 shadow-xl overflow-hidden border border-[var(--rb-border-light)]"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              className="overflow-hidden px-4 md:px-6 pb-4"
               onMouseEnter={showShop}
             >
               <div className="max-w-[1440px] mx-auto px-10">
@@ -455,6 +468,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
       </div>
     </motion.div>
   );

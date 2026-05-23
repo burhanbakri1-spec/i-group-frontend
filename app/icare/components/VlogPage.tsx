@@ -129,19 +129,21 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
   return (
     <div className="min-h-screen bg-[#F1F0ED] pb-32">
       {/* 1. Hero Section */}
-      <section className="relative h-[60vh] md:h-[70vh] w-full overflow-hidden">
-        <ImageWithFallback 
-          src={heroImage} 
-          alt="Hero Vlog" 
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/10 flex flex-col items-center justify-center text-white p-4">
+      <section className="bg-white px-4 md:px-8">
+        <div className="relative h-[80vh] md:h-[85vh] w-full overflow-hidden shadow-sm">
+          <ImageWithFallback 
+            src={heroImage} 
+            alt="Hero Vlog" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/10 flex flex-col items-center justify-center text-white p-4">
           <div className="space-y-4 md:space-y-6 text-center">
             <h1 className="text-[24px] md:text-[48px] font-black uppercase tracking-tighter drop-shadow-sm">
               {heroTitle}
             </h1>
           </div>
         </div>
+      </div>
       </section>
 
       {/* 2. Vlog Grid */}
