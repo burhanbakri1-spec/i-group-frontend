@@ -9,6 +9,7 @@ import CartPage from "./pages/CartPage.jsx";
 import CheckoutPage from "./pages/CheckoutPage.jsx";
 import EmployeeDashboardPage from "./pages/EmployeeDashboardPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
+import HowItWorksPage from "./pages/HowItWorksPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import ProductDetailsPage from "./pages/ProductDetailsPage.jsx";
 import ProductsPage from "./pages/ProductsPage.jsx";
@@ -704,7 +705,16 @@ function App() {
           />
         )}
 
-        {activePage === "about" && <AboutPage t={t} />}
+        {activePage === "about" && <AboutPage language={language} onNavigate={navigate} t={t} />}
+
+        {activePage === "how" && (
+          <HowItWorksPage
+            language={language}
+            onNavigate={navigate}
+            onViewProduct={handleViewProduct}
+            products={demoProducts}
+          />
+        )}
 
         {activePage === "social" && <SocialPage t={t} />}
 

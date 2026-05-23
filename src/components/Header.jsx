@@ -43,6 +43,39 @@ const shopLinks = [
   },
 ];
 
+const aboutLinks = [
+  { key: "about", labelEn: "About EB Chemical", labelAr: "عن EB Chemical", action: "about" },
+  { key: "mission", labelEn: "Mission", labelAr: "رسالتنا", action: "about" },
+  { key: "how", labelEn: "How it Works", labelAr: "كيف يعمل", action: "how" },
+  { key: "sustainability", labelEn: "Sustainability", labelAr: "الاستدامة", action: "about" },
+  { key: "contact", labelEn: "Contact", labelAr: "تواصل معنا", action: "social" },
+];
+
+const aboutFeatureCards = [
+  {
+    key: "start",
+    titleEn: "New to EB Chemical? Start here",
+    titleAr: "جديد على EB Chemical؟ ابدأ من هنا",
+    image: "/images/products/multi-surface-cleaner.svg",
+    action: "about",
+  },
+  {
+    key: "shop",
+    titleEn: "Shop cleaning essentials",
+    titleAr: "تسوق أساسيات التنظيف",
+    image: "/images/products/fabric-cleaner.svg",
+    categoryId: "home-cleaning",
+  },
+];
+
+const aboutMenuLinks = [
+  { key: "about", labelEn: "About EB Chemical", labelAr: "عن EB Chemical", action: "about" },
+  { key: "how", labelEn: "How it Works", labelAr: "كيف يعمل", action: "how" },
+  { key: "sustainability", labelEn: "Sustainability", labelAr: "الاستدامة", action: "about" },
+  { key: "reviews", labelEn: "Reviews", labelAr: "التقييمات", action: "reviews" },
+  { key: "contact", labelEn: "Contact", labelAr: "تواصل معنا", action: "social" },
+];
+
 function Icon({ name }) {
   const icons = {
     search: (
@@ -194,6 +227,24 @@ function Header({
     goTo(link.action || "products");
   }
 
+  function handleAboutLink(link) {
+    if (link.action === "how") {
+      goToHow();
+      return;
+    }
+
+    if (link.action === "reviews") {
+      closeAllMenus();
+      onNavigate("home");
+      window.setTimeout(() => {
+        document.querySelector(".reviews-section")?.scrollIntoView({ behavior: "smooth" });
+      }, 0);
+      return;
+    }
+
+    goTo(link.action || "about");
+  }
+
   function handleFeatureCard(card) {
     if (card.categoryId) {
       goToCategory(card.categoryId);
@@ -223,10 +274,7 @@ function Header({
 
   function goToHow() {
     closeAllMenus();
-    onNavigate("home");
-    window.setTimeout(() => {
-      document.querySelector(".how-section")?.scrollIntoView({ behavior: "smooth" });
-    }, 0);
+    onNavigate("how");
   }
 
   function toggleAccount() {
@@ -338,7 +386,7 @@ function Header({
             onMouseLeave={scheduleCloseAboutMenu}
           >
             <button
-              className={activePage === "about" ? "nav-link active" : "nav-link"}
+              className={activePage === "about" || activePage === "how" ? "nav-link active" : "nav-link"}
               onClick={() => {
                 setIsAboutOpen((open) => !open);
                 setIsMegaOpen(false);
@@ -349,19 +397,37 @@ function Header({
               {aboutLabel}
               <Icon name="chevron" />
             </button>
-            <div className={isAboutOpen ? "about-menu open" : "about-menu"}>
-              <button onClick={() => goTo("about")} type="button">
-                {aboutLabel}
-              </button>
-              <button onClick={goToHow} type="button">
-                {howLabel}
-              </button>
-              <button onClick={() => goTo("social")} type="button">
-                {socialLabel}
-              </button>
+            <div className={isAboutOpen ? "about-menu about-mega-menu open" : "about-menu about-mega-menu"}>
+              <nav className="about-link-column" aria-label={aboutLabel}>
+                {aboutMenuLinks.map((link) => (
+                  <button
+                    className={activePage === link.action ? "active" : ""}
+                    key={link.key}
+                    onClick={() => handleAboutLink(link)}
+                    type="button"
+                  >
+                    {language === "ar" ? link.labelAr : link.labelEn}
+                  </button>
+                ))}
+              </nav>
+              <div className="about-feature-grid">
+                {aboutFeatureCards.map((card) => (
+                  <button
+                    className="about-image-card"
+                    key={card.key}
+                    onClick={() => handleFeatureCard(card)}
+                    type="button"
+                  >
+                    <span>
+                      <img alt={language === "ar" ? card.titleAr : card.titleEn} src={card.image} />
+                    </span>
+                    <strong>{language === "ar" ? card.titleAr : card.titleEn}</strong>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-          <button className="nav-link" onClick={goToHow} type="button">
+          <button className={activePage === "how" ? "nav-link active" : "nav-link"} onClick={goToHow} type="button">
             {howLabel}
           </button>
         </nav>

@@ -60,6 +60,10 @@ function FloatingProductCollage({ language, products, onViewProduct }) {
   const reduceMotion = useReducedMotion();
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
   const [isMobile, setIsMobile] = useState(false);
+  const [wordIndex, setWordIndex] = useState(0);
+  const dynamicWords = isArabic
+    ? ["فعّالة", "عملية", "منعشة", "موثوقة", "سهلة الاستخدام"]
+    : ["powerful", "practical", "fresh", "reliable", "easy-to-use"];
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 820px)");
@@ -68,6 +72,14 @@ function FloatingProductCollage({ language, products, onViewProduct }) {
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
   }, []);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setWordIndex((current) => (current + 1) % dynamicWords.length);
+    }, 2000);
+
+    return () => window.clearInterval(intervalId);
+  }, [dynamicWords.length]);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -104,8 +116,13 @@ function FloatingProductCollage({ language, products, onViewProduct }) {
     >
       <div className="floating-collage-heading">
         <p className="eyebrow">{isArabic ? "مختارات EB Chemical" : "EB Chemical picks"}</p>
-        <h2>
-          {isArabic ? "منتجات مميزة من EB Chemical" : "Featured EB Chemical Products"}
+        <h2 className="floating-dynamic-title">
+          <span className="floating-title-fixed">{isArabic ? "منتجاتنا" : "Our products are"}</span>
+          <span className="floating-word-window" aria-live="polite">
+            <span className="floating-word" key={dynamicWords[wordIndex]}>
+              {dynamicWords[wordIndex]}
+            </span>
+          </span>
         </h2>
         <p>
           {isArabic

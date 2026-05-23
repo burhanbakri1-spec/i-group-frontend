@@ -32,11 +32,10 @@ export const translations = {
         "EB Chemical offers practical cleaning and care solutions for homes, cars, furniture, floors, fragrances, and radiator water. Our products are designed for reliable daily use, clear results, and a smooth shopping experience.",
     },
     home: {
-      heroHeadline: "Cleaning and care products made to a higher standard.",
-      heroSubheadline:
-        "Practical solutions for home and car care, designed for a clean result, a fresh scent, and an easier daily routine.",
-      shopProducts: "Shop Products",
-      exploreCategories: "Explore Categories",
+      heroHeadline: "Cleaning and care, made simple.",
+      heroSubheadline: "Practical solutions for home and car care.",
+      shopProducts: "Shop products",
+      exploreCategories: "Explore categories",
       categoryEyebrow: "Shop by category",
       categoryTitle: "Four simple ranges for everyday care",
       bestEyebrow: "Best sellers",
@@ -380,9 +379,8 @@ export const translations = {
         "EB Chemical تقدم حلول تنظيف وعناية عملية للمنزل والسيارة والأثاث والأرضيات والمعطرات وماء الرديتر، بمنتجات مصممة للاستخدام اليومي ونتائج واضحة وتجربة تسوق سهلة.",
     },
     home: {
-      heroHeadline: "منتجات تنظيف وعناية بمعايير أعلى",
-      heroSubheadline:
-        "حلول عملية للعناية بالمنزل والسيارة، مصممة لتمنحك نتيجة نظيفة، رائحة منعشة، وتجربة استخدام أسهل كل يوم.",
+      heroHeadline: "منتجات تنظيف وعناية ببساطة",
+      heroSubheadline: "حلول عملية للعناية بالمنزل والسيارة.",
       shopProducts: "تسوق المنتجات",
       exploreCategories: "استكشف الأقسام",
       categoryEyebrow: "تسوق حسب القسم",

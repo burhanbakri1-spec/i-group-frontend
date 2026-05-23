@@ -1,6 +1,5 @@
 import React, { useRef } from "react";
 import CategoryCard from "../components/CategoryCard.jsx";
-import ProductCard from "../components/ProductCard.jsx";
 import FloatingProductCollage from "../components/FloatingProductCollage.jsx";
 import { brand } from "../data/brand.js";
 import { categories } from "../data/categories.js";
@@ -28,112 +27,135 @@ function getPromotedProducts(products) {
     );
   });
 
-  return (promoted.length ? promoted : products).slice(0, 6);
+  const seen = new Set();
+  return [...promoted, ...products]
+    .filter((product) => {
+      if (seen.has(product.id)) return false;
+      seen.add(product.id);
+      return true;
+    })
+    .slice(0, 10);
 }
 
-function FeaturedProductsCarousel({ language, onAddToCart, onViewProduct, products, t }) {
-  const carouselRef = useRef(null);
-  const promotedProducts = getPromotedProducts(products);
+function ProductShowcaseSlider({ language, onViewProduct, products, title, variant = "primary" }) {
+  const trackRef = useRef(null);
   const isArabic = language === "ar";
+  const [progress, setProgress] = React.useState(0);
+  const badgeLabels = isArabic
+    ? ["إصدار محدود", "عرض خاص", "الأكثر مبيعًا", "جديد"]
+    : ["Limited Edition", "Subscribe & Save 50%", "Best seller", "New arrival"];
 
-  function scrollCarousel(direction) {
-    const carousel = carouselRef.current;
-    if (!carousel) return;
+  function updateProgress() {
+    const track = trackRef.current;
+    if (!track) return;
 
-    const card = carousel.querySelector(".featured-offer-card");
-    const distance = card ? card.getBoundingClientRect().width + 18 : carousel.clientWidth * 0.8;
-    carousel.scrollBy({
-      left: direction * distance,
+    const maxScroll = track.scrollWidth - track.clientWidth;
+    const currentScroll = Math.abs(track.scrollLeft);
+    setProgress(maxScroll > 0 ? Math.min(1, Math.max(0, currentScroll / maxScroll)) : 1);
+  }
+
+  function scrollSlider(direction) {
+    const track = trackRef.current;
+    if (!track) return;
+
+    const card = track.querySelector(".home-product-slide-card");
+    const distance = card ? card.getBoundingClientRect().width + 18 : track.clientWidth * 0.85;
+    track.scrollBy({
+      left: (isArabic ? -direction : direction) * distance,
       behavior: "smooth",
     });
   }
 
-  if (!promotedProducts.length) return null;
+  if (!products.length) return null;
 
   return (
-    <section className="featured-offers-section storefront-wide-section">
-      <div className="featured-offers-heading">
-        <div>
-          <p className="eyebrow">{isArabic ? "منتجات مميزة" : "Featured products"}</p>
-          <h2>{isArabic ? "عروض ومنتجات عليها طلب كبير" : "Offers and high-demand products"}</h2>
-          <p>
-            {isArabic
-              ? "اكتشف المنتجات الأكثر طلبًا من EB Chemical للعناية والتنظيف، مختارة لتناسب الاستخدام اليومي بجودة عالية وتجربة عملية."
-              : "Discover high-demand EB Chemical cleaning and care products selected for daily use, reliable quality, and a practical experience."}
-          </p>
-        </div>
-        <div className="carousel-controls" aria-label={isArabic ? "التحكم بالمنتجات" : "Carousel controls"}>
+    <section className={`home-product-showcase home-product-showcase-${variant} storefront-wide-section`}>
+      <div className="home-product-showcase-head">
+        <h2>{title}</h2>
+        <div className="home-product-slider-controls" aria-label={isArabic ? "التحكم بالمنتجات" : "Product slider controls"}>
           <button
             aria-label={isArabic ? "السابق" : "Previous"}
-            className="carousel-arrow"
-            onClick={() => scrollCarousel(isArabic ? 1 : -1)}
+            onClick={() => scrollSlider(-1)}
             type="button"
           >
-            ‹
+            <span aria-hidden="true">‹</span>
           </button>
           <button
             aria-label={isArabic ? "التالي" : "Next"}
-            className="carousel-arrow"
-            onClick={() => scrollCarousel(isArabic ? -1 : 1)}
+            onClick={() => scrollSlider(1)}
             type="button"
           >
-            ›
+            <span aria-hidden="true">›</span>
           </button>
         </div>
       </div>
 
-      <div className="featured-offers-track" ref={carouselRef}>
-        {promotedProducts.map((product, index) => {
+      <div className="home-product-slider-track" onScroll={updateProgress} ref={trackRef}>
+        {products.map((product, index) => {
           const firstSize = product.sizes?.[0] || { size: "", price: 0 };
-          const label =
-            getLocalized(product.badge, language) ||
-            [
-              isArabic ? "الأكثر طلبًا" : "High demand",
-              isArabic ? "عرض خاص" : "Special offer",
-              isArabic ? "منتج مميز" : "Featured",
-              isArabic ? "جديد" : "New",
-              isArabic ? "مناسب للاستخدام اليومي" : "Made for daily use",
-            ][index % 5];
+          const category = categories.find((item) => item.id === product.categoryId);
+          const mainImage = product.image || product.fallbackImage || "/images/products/product-placeholder.svg";
+          const hoverImage =
+            product.hoverImage ||
+            product.secondaryImage ||
+            product.gallery?.[1] ||
+            product.images?.[1] ||
+            mainImage;
+          const hasHoverImage = hoverImage && hoverImage !== mainImage;
+          const label = getLocalized(product.badge, language) || badgeLabels[index % badgeLabels.length];
+          const details =
+            getLocalized(product.shortDescription, language) ||
+            getLocalized(category?.name, language) ||
+            (isArabic ? "حل عملي للعناية اليومية." : "A practical daily-care solution.");
 
           return (
             <article
-              className="featured-offer-card"
+              className="home-product-slide-card"
               key={product.id}
               style={{ "--stagger": `${index * 70}ms` }}
             >
               <button
-                className="featured-offer-link"
+                className="home-product-image-wrap"
                 onClick={() => onViewProduct(product.slug)}
                 type="button"
               >
+                <span className="home-product-badge">{label}</span>
                 <img
+                  className="home-product-image-main"
                   alt={getLocalized(product.name, language)}
                   loading="lazy"
                   onError={(event) => {
                     event.currentTarget.src = product.fallbackImage || "/images/products/product-placeholder.svg";
                   }}
-                  src={product.image || product.fallbackImage || "/images/products/product-placeholder.svg"}
+                  src={mainImage}
                 />
-                <span className="featured-offer-overlay" />
-                <span className="featured-offer-copy">
-                  <small>{label}</small>
-                  <strong>{getLocalized(product.name, language)}</strong>
-                  <em>{getLocalized(product.shortDescription, language)}</em>
-                  <b>
-                    {t("common.from")} {firstSize.price} {t("common.ils")}
-                  </b>
-                </span>
+                {hasHoverImage && (
+                  <img
+                    aria-hidden="true"
+                    alt=""
+                    className="home-product-image-hover"
+                    loading="lazy"
+                    onError={(event) => {
+                      event.currentTarget.style.display = "none";
+                    }}
+                    src={hoverImage}
+                  />
+                )}
               </button>
-              <button
-                className="featured-offer-cta"
-                onClick={() => onAddToCart(product, firstSize.size)}
-                type="button"
-              >
-                {isArabic ? "تسوق الآن" : "Shop now"}
+              <button className="home-product-slide-copy" onClick={() => onViewProduct(product.slug)} type="button">
+                <strong>{getLocalized(product.name, language)}</strong>
+                <span>{details}</span>
+                <b>
+                  {isArabic ? "من" : "From"} {firstSize.price} {isArabic ? "شيكل" : "ILS"}
+                </b>
               </button>
             </article>
           );
         })}
+      </div>
+
+      <div className="home-product-slider-progress" aria-hidden="true">
+        <span style={{ transform: `scaleX(${Math.max(progress, 0.18)})` }} />
       </div>
     </section>
   );
@@ -199,6 +221,298 @@ function HowItWorksSplit({ language, onNavigate }) {
   );
 }
 
+const systemCards = [
+  {
+    key: "home",
+    image: "/images/products/multi-surface-cleaner.svg",
+    label: { en: "Home care", ar: "العناية بالمنزل" },
+    title: { en: "Daily cleaning made easier", ar: "تنظيف يومي أسهل" },
+  },
+  {
+    key: "car",
+    image: "/images/products/car-interior-cleaner.svg",
+    label: { en: "Car care", ar: "العناية بالسيارة" },
+    title: { en: "Fresh finish for every ride", ar: "لمسة نظيفة لكل رحلة" },
+  },
+  {
+    key: "kitchen",
+    image: "/images/products/grease-oil-remover.svg",
+    label: { en: "Kitchen", ar: "المطبخ" },
+    title: { en: "Cuts grease with less effort", ar: "إزالة الدهون بجهد أقل" },
+  },
+  {
+    key: "bathroom",
+    image: "/images/products/limescale-remover.svg",
+    label: { en: "Bathroom", ar: "الحمام" },
+    title: { en: "Shine for sinks and tiles", ar: "لمعان للأحواض والبلاط" },
+  },
+  {
+    key: "laundry",
+    image: "/images/products/fabric-cleaner.svg",
+    label: { en: "Laundry", ar: "الغسيل" },
+    title: { en: "Care for fabrics every day", ar: "عناية يومية بالأقمشة" },
+  },
+];
+
+function CleaningSystemShowcase({ language }) {
+  const isArabic = language === "ar";
+  const trackRef = useRef(null);
+  const words = isArabic
+    ? ["العناية بالمنزل", "العناية بالسيارة", "المطبخ", "الحمام", "الغسيل"]
+    : ["home care", "car care", "kitchen", "bathroom", "laundry"];
+  const [wordIndex, setWordIndex] = React.useState(0);
+
+  React.useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setWordIndex((current) => (current + 1) % words.length);
+    }, 2000);
+
+    return () => window.clearInterval(intervalId);
+  }, [words.length]);
+
+  function scrollCards(direction) {
+    const track = trackRef.current;
+    if (!track) return;
+
+    const card = track.querySelector(".cleaning-system-card");
+    const distance = card ? card.getBoundingClientRect().width + 20 : track.clientWidth * 0.8;
+    track.scrollBy({
+      left: (isArabic ? -direction : direction) * distance,
+      behavior: "smooth",
+    });
+  }
+
+  return (
+    <section className="cleaning-system-section storefront-wide-section">
+      <div className="cleaning-system-heading-row">
+        <h2 className="cleaning-system-title">
+          <span className="system-title-fixed">
+            {isArabic ? "نظام تنظيف لـ" : "A cleaning system for"}
+          </span>
+          <span className="system-word-window" aria-live="polite">
+            <span className="system-word" key={words[wordIndex]}>
+              {words[wordIndex]}
+            </span>
+          </span>
+        </h2>
+        <div className="cleaning-system-controls" aria-label={isArabic ? "التحكم بالبطاقات" : "Card controls"}>
+          <button
+            aria-label={isArabic ? "السابق" : "Previous"}
+            onClick={() => scrollCards(-1)}
+            type="button"
+          >
+            ‹
+          </button>
+          <button
+            aria-label={isArabic ? "التالي" : "Next"}
+            onClick={() => scrollCards(1)}
+            type="button"
+          >
+            ›
+          </button>
+        </div>
+      </div>
+
+      <div className="cleaning-system-track" ref={trackRef}>
+        {systemCards.map((card) => (
+          <article className="cleaning-system-card" key={card.key}>
+            <img
+              alt={card.title[language]}
+              loading="lazy"
+              src={card.image}
+            />
+            <span className="cleaning-system-card-overlay" />
+            <div className="cleaning-system-card-copy">
+              <small>{card.label[language]}</small>
+              <strong>{card.title[language]}</strong>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PurchaseExperienceShowcase({ language, onAddToCart, onViewProduct, product }) {
+  const isArabic = language === "ar";
+  const fallbackSizes = [
+    { size: "500ml", price: 15 },
+    { size: "1L", price: 25 },
+    { size: "5L", price: 85 },
+  ];
+  const options = (product?.sizes?.length ? product.sizes : fallbackSizes).slice(0, 3);
+  const [selectedSize, setSelectedSize] = React.useState(options[0]?.size || "500ml");
+  const [purchaseType, setPurchaseType] = React.useState("once");
+  const selectedOption = options.find((option) => option.size === selectedSize) || options[0];
+  const image = product?.image || "/images/products/multi-surface-cleaner.svg";
+  const name =
+    getLocalized(product?.name, language) ||
+    (isArabic ? "منظف متعدد الاستخدامات" : "Every Surface Cleaner");
+  const description =
+    getLocalized(product?.shortDescription, language) ||
+    (isArabic
+      ? "منظف عملي للعناية اليومية بالمنزل والسيارة."
+      : "A practical cleaner for daily home and car care.");
+  const sellingPoints = isArabic
+    ? ["مناسب لعدة أسطح", "رائحة نظيفة ومنعشة", "عناية يومية سهلة"]
+    : ["Multi-surface use", "Fresh clean scent", "Easy daily care"];
+
+  function handleAddToCart() {
+    if (product && onAddToCart) {
+      onAddToCart(product, selectedOption?.size || product.sizes?.[0]?.size);
+      return;
+    }
+    if (product?.slug) onViewProduct(product.slug);
+  }
+
+  return (
+    <section className="purchase-showcase-section storefront-wide-section">
+      <div className="purchase-showcase-copy">
+        <p className="eyebrow">{isArabic ? "تجربة شراء سهلة" : "Purchase experience"}</p>
+        <h2>{name}</h2>
+        <p>{description}</p>
+
+        <div className="purchase-option-group">
+          <span>{isArabic ? "الأحجام" : "Options"}</span>
+          <div className="purchase-option-row">
+            {options.map((option) => (
+              <button
+                className={option.size === selectedSize ? "purchase-choice active" : "purchase-choice"}
+                key={option.size}
+                onClick={() => setSelectedSize(option.size)}
+                type="button"
+              >
+                <strong>{option.size}</strong>
+                <small>
+                  {option.price} {isArabic ? "شيكل" : "ILS"}
+                </small>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="purchase-option-group">
+          <span>{isArabic ? "طريقة الشراء" : "Purchase"}</span>
+          <div className="purchase-option-row two">
+            <button
+              className={purchaseType === "once" ? "purchase-choice active" : "purchase-choice"}
+              onClick={() => setPurchaseType("once")}
+              type="button"
+            >
+              {isArabic ? "شراء مرة واحدة" : "One-time purchase"}
+            </button>
+            <button
+              className={purchaseType === "bundle" ? "purchase-choice active" : "purchase-choice"}
+              onClick={() => setPurchaseType("bundle")}
+              type="button"
+            >
+              {isArabic ? "وفّر مع العرض" : "Save with bundle"}
+            </button>
+          </div>
+        </div>
+
+        <div className="purchase-showcase-action">
+          <strong>
+            {selectedOption?.price || 0} {isArabic ? "شيكل" : "ILS"}
+          </strong>
+          <button className="primary-action large" onClick={handleAddToCart} type="button">
+            {isArabic ? "أضف إلى السلة" : "Add to cart"}
+          </button>
+        </div>
+
+        <ul className="purchase-selling-points">
+          {sellingPoints.map((point) => (
+            <li key={point}>{point}</li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="purchase-showcase-image" aria-label={name}>
+        <img
+          alt={name}
+          loading="lazy"
+          onError={(event) => {
+            event.currentTarget.src = "/images/products/product-placeholder.svg";
+          }}
+          src={image}
+        />
+      </div>
+    </section>
+  );
+}
+
+function WidePromoBanner({ language, onNavigate, image }) {
+  const isArabic = language === "ar";
+
+  return (
+    <section className="wide-promo-banner storefront-wide-section">
+      <img
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        onError={(event) => {
+          event.currentTarget.src = "/images/products/product-placeholder.svg";
+        }}
+        src={image || "/images/products/car-shampoo-gloss.svg"}
+      />
+      <div className="wide-promo-copy">
+        <h2>{isArabic ? "عناية منعشة لكل مساحة" : "Fresh care for every space"}</h2>
+        <p>{isArabic ? "حلول تنظيف فعّالة للمنزل والسيارة." : "Powerful cleaning solutions for your home and car."}</p>
+        <button className="primary-action large" onClick={() => onNavigate("products")} type="button">
+          {isArabic ? "تسوق الآن" : "Shop now"}
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function SplitCategoryBanner({ language, onCategorySelect, products }) {
+  const isArabic = language === "ar";
+  const panels = [
+    {
+      id: "home-cleaning",
+      title: isArabic ? "العناية بالمنزل" : "Home Care",
+      image:
+        products.find((product) => product.categoryId === "home-cleaning")?.image ||
+        "/images/products/multi-surface-cleaner.svg",
+    },
+    {
+      id: "car-care",
+      title: isArabic ? "العناية بالسيارة" : "Car Care",
+      image:
+        products.find((product) => product.categoryId === "car-care")?.image ||
+        "/images/products/car-interior-cleaner.svg",
+    },
+  ];
+
+  return (
+    <section className="split-category-banner storefront-wide-section">
+      {panels.map((panel) => (
+        <button
+          className="split-category-panel"
+          key={panel.id}
+          onClick={() => onCategorySelect(panel.id)}
+          type="button"
+        >
+          <img
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            onError={(event) => {
+              event.currentTarget.src = "/images/products/product-placeholder.svg";
+            }}
+            src={panel.image}
+          />
+          <span>
+            <strong>{panel.title}</strong>
+            <em>{isArabic ? "اكتشف" : "Discover"}</em>
+          </span>
+        </button>
+      ))}
+    </section>
+  );
+}
+
 function HomePage({
   homepageOffers = [],
   language,
@@ -210,16 +524,22 @@ function HomePage({
   reviews = [],
   t,
 }) {
-  const bestSellers = products
-    .filter((product) =>
-      ["Best Seller", "New", "Gloss Finish"].includes(product.badge.en)
-    )
-    .slice(0, 4);
+  const starterProducts = getPromotedProducts(products);
+  const essentialsProducts =
+    products
+      .filter((product) => ["home-cleaning", "car-care"].includes(product.categoryId))
+      .slice(0, 10) || products.slice(0, 10);
   const featuredProducts = products.slice(8, 11);
-  const heroImages = [products[0], products[1]].filter(Boolean);
+  const showcaseProduct =
+    products.find((product) => product.categoryId === "home-cleaning") ||
+    products[0];
   const activeOffers = homepageOffers
     .filter((offer) => offer.isActive !== false)
     .sort((a, b) => Number(a.displayOrder || 0) - Number(b.displayOrder || 0));
+  const promoImage =
+    activeOffers[0]?.image ||
+    products.find((product) => product.categoryId === "car-care")?.image ||
+    products[0]?.image;
   const siteReviews = reviews.filter(
     (review) =>
       (review.type === "store" || review.type === "site" || !review.employeeId) &&
@@ -259,26 +579,13 @@ function HomePage({
 
         <div className="hero-panel hero-panel-visual" aria-label={brand.name}>
           <div className="hero-image-duo hero-visuals">
-            {heroImages.map((product, index) => (
-              <button
-                className="hero-image-panel hero-visual-panel"
-                key={product.id}
-                onClick={() => onViewProduct(product.slug)}
-                type="button"
-              >
-                <img
-                  alt={product.name?.[language] || product.name?.en}
-                  src={product.image || product.fallbackImage || "/images/products/product-placeholder.svg"}
-                  onError={(event) => {
-                    event.currentTarget.src = "/images/products/product-placeholder.svg";
-                  }}
-                />
-                <span>{index === 0 ? t("home.bestEyebrow") : t("home.highlightEyebrow")}</span>
-              </button>
-            ))}
+            <div className="hero-image-panel hero-visual-panel hero-visual-panel-soft" aria-hidden="true" />
+            <div className="hero-image-panel hero-visual-panel hero-visual-panel-fresh" aria-hidden="true" />
           </div>
         </div>
       </section>
+
+      <CleaningSystemShowcase language={language} />
 
       {activeOffers.length > 0 && (
         <section className="homepage-offers-section storefront-section">
@@ -332,41 +639,21 @@ function HomePage({
         </div>
       </section>
 
-      <FeaturedProductsCarousel
+      <ProductShowcaseSlider
         language={language}
-        onAddToCart={onAddToCart}
         onViewProduct={onViewProduct}
-        products={products}
-        t={t}
+        products={starterProducts}
+        title={language === "ar" ? "مجموعات التنظيف الأساسية" : "Cleaning starter kits"}
+        variant="starter"
       />
 
-      <section className="section-block storefront-section">
-        <div className="section-heading split-heading">
-          <div>
-            <p className="eyebrow">{t("home.bestEyebrow")}</p>
-            <h2>{t("home.bestTitle")}</h2>
-          </div>
-          <button
-            className="text-action"
-            onClick={() => onNavigate("products")}
-            type="button"
-          >
-            {t("home.viewAll")}
-          </button>
-        </div>
-        <div className="product-grid">
-          {bestSellers.map((product) => (
-            <ProductCard
-              key={product.id}
-              language={language}
-              onAddToCart={onAddToCart}
-              onViewProduct={onViewProduct}
-              product={product}
-              t={t}
-            />
-          ))}
-        </div>
-      </section>
+      <ProductShowcaseSlider
+        language={language}
+        onViewProduct={onViewProduct}
+        products={essentialsProducts.length ? essentialsProducts : products.slice(0, 10)}
+        title={language === "ar" ? "أساسيات العناية بالمنزل والسيارة" : "Home & car care essentials"}
+        variant="essentials"
+      />
 
       <section className="collection-highlight storefront-section">
         <div className="collection-copy">
@@ -398,13 +685,64 @@ function HomePage({
 
       <HowItWorksSplit language={language} onNavigate={onNavigate} />
 
-      <FloatingProductCollage
-        language={language}
-        products={products}
-        onViewProduct={onViewProduct}
-      />
+      <section className="why-section storefront-section">
+        <div>
+          <p className="eyebrow">{t("home.whyEyebrow")}</p>
+          <h2>{t("home.whyTitle")}</h2>
+        </div>
+        <div className="why-grid">
+          {t("home.whyItems").map((item) => (
+            <p key={item}>{item}</p>
+          ))}
+        </div>
+      </section>
 
       {siteReviews.length > 0 && (
+        <section className="reviews-section storefront-section">
+          <div className="section-heading split-heading">
+            <div>
+              <p className="eyebrow">{t("reviews.storeReview")}</p>
+              <h2>{t("reviews.title")}</h2>
+              <p>{t("reviews.subtitle")}</p>
+            </div>
+          </div>
+          <div className="reviews-track">
+            {siteReviews.map((review) => (
+              <article className="review-card" key={review.id}>
+                <div className="review-stars" aria-label={`${review.rating} stars`}>
+                  {"\u2605".repeat(Number(review.rating || 0))}
+                </div>
+                <p>{getLocalized(review.comment, language)}</p>
+                <div>
+                  <strong>{review.customerName}</strong>
+                  {review.relatedProductName && <span>{review.relatedProductName}</span>}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <PurchaseExperienceShowcase
+        language={language}
+        onAddToCart={onAddToCart}
+        onViewProduct={onViewProduct}
+        product={showcaseProduct}
+      />
+
+      <WidePromoBanner
+        image={promoImage}
+        language={language}
+        onNavigate={onNavigate}
+      />
+
+      <SplitCategoryBanner
+        language={language}
+        onCategorySelect={onCategorySelect}
+        products={products}
+      />
+
+      {false && siteReviews.length > 0 && (
         <section className="reviews-section storefront-section">
           <div className="section-heading split-heading">
             <div>
@@ -430,17 +768,11 @@ function HomePage({
         </section>
       )}
 
-      <section className="why-section storefront-section">
-        <div>
-          <p className="eyebrow">{t("home.whyEyebrow")}</p>
-          <h2>{t("home.whyTitle")}</h2>
-        </div>
-        <div className="why-grid">
-          {t("home.whyItems").map((item) => (
-            <p key={item}>{item}</p>
-          ))}
-        </div>
-      </section>
+      <FloatingProductCollage
+        language={language}
+        products={products}
+        onViewProduct={onViewProduct}
+      />
 
       <section className="newsletter-band storefront-section">
         <div>
