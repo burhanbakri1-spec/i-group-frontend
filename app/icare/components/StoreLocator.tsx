@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Navigation, ExternalLink } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -89,6 +89,7 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [stores, setStores] = useState<Store[]>([]);
   const [fetchState, setFetchState] = useState<'loading' | 'success' | 'error' | 'empty'>('loading');
+  const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
 
   const loadStores = async () => {
     setFetchState('loading');
@@ -126,6 +127,14 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
   const filteredStores = stores.filter((store) => matchesStoreSearch(store, searchQuery));
   const noResultsText = storeLocatorNoResults?.trim() || (lang === 'en' ? 'no locations found in this area.' : 'لم يتم العثور على مواقع في هذه المنطقة.');
 
+  const handleStoreClick = useCallback((storeId: string) => {
+    setSelectedStoreId(storeId);
+    const element = document.getElementById(`store-card-${storeId}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, []);
+
   const t = {
     title: lang === 'en' ? 'where to find us' : 'أماكن تواجدنا',
     searchPlaceholder: lang === 'en' ? 'search by city, address, phone, or email' : 'ابحث بالمدينة أو العنوان أو الهاتف أو البريد',
@@ -137,7 +146,7 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
   return (
     <div className="min-h-screen bg-[#F1F0ED] overflow-hidden">
       <div className="flex flex-col md:flex-row h-[calc(100vh-96px)]">
-        
+
         {/* Sidebar: List */}
         <div className="w-full md:w-[320px] lg:w-[450px] flex flex-col border-r border-[#DDDDDD] h-[45vh] md:h-full overflow-hidden bg-white z-10">
           <div className="p-4 lg:p-8 space-y-4 lg:space-y-8">
@@ -184,7 +193,7 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
 
               {fetchState === 'empty' && (
                 <div className="text-center py-20">
-                  <p className="text-[14px] font-brand lowercase italic text-black/30">
+                  <p className="text-[14px] font-brands lowercase italic text-black/30">
                     {noResultsText}
                   </p>
                 </div>
@@ -196,7 +205,13 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                   key={store.id}
-                  className="group p-4 lg:p-6 rounded-[16px] lg:rounded-[24px] border border-black/5 hover:border-black transition-all cursor-pointer bg-white"
+                  id={`store-card-${store.id}`}
+                  onClick={() => handleStoreClick(store.id)}
+                  className={`group p-4 lg:p-6 rounded-[16px] lg:rounded-[24px] border cursor-pointer bg-white transition-all ${
+                    selectedStoreId === store.id
+                      ? 'border-black shadow-md'
+                      : 'border-black/5 hover:border-black'
+                  }`}
                 >
                   <div className="flex justify-between items-start mb-2 lg:mb-4">
                     <div className="flex-1 pr-4">
@@ -220,12 +235,13 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
                         {t.contact}: {[store.phone, store.email].filter(Boolean).join(' • ')}
                       </p>
                     )}
-                    
+
                     <div className="flex gap-2 lg:gap-3 pt-1">
                       <a
                         href={getDirectionsUrl(store)}
                         target="_blank"
                         rel="noreferrer"
+                        onClick={(e) => e.stopPropagation()}
                         className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#67645E] text-white rounded-full text-[8px] lg:text-[10px] font-black uppercase tracking-widest hover:opacity-90 transition-all active:scale-95"
                       >
                         <Navigation size={10} />
@@ -236,6 +252,7 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
                         target="_blank"
                         rel="noreferrer"
                         aria-label={`${store.name} Google Maps`}
+                        onClick={(e) => e.stopPropagation()}
                         className="w-8 h-8 lg:w-12 lg:h-12 flex items-center justify-center border border-black/10 rounded-full hover:border-black transition-all active:scale-95"
                       >
                         <ExternalLink size={12} className="text-black/40" />
@@ -258,11 +275,24 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
 
         {/* Map Area */}
         <div className="flex-1 relative overflow-hidden h-[55vh] md:h-full">
-          {fetchState === 'success' && filteredStores.length > 0 ? (
-            <StoreLocatorMap stores={filteredStores} />
-          ) : (
-            <div className="w-full h-full bg-[#F2F1ED] flex items-center justify-center">
-              <p className="text-sm text-black/30 font-medium">Map unavailable</p>
+          <StoreLocatorMap
+            stores={filteredStores}
+            selectedStoreId={selectedStoreId}
+            onMarkerClick={handleStoreClick}
+            getDirectionsUrl={getDirectionsUrl}
+          />
+          {fetchState === 'loading' && (
+            <div className="absolute inset-0 bg-[#F2F1ED]/70 flex items-center justify-center z-[400] pointer-events-none">
+              <p className="text-sm text-black/30 font-medium">
+                {lang === 'en' ? 'Loading map...' : 'جاري تحميل الخريطة...'}
+              </p>
+            </div>
+          )}
+          {fetchState === 'error' && (
+            <div className="absolute inset-0 bg-[#F2F1ED]/70 flex items-center justify-center z-[400] pointer-events-none">
+              <p className="text-sm text-black/30 font-medium">
+                {lang === 'en' ? 'Map temporarily unavailable' : 'الخريطة غير متوفرة مؤقتاً'}
+              </p>
             </div>
           )}
         </div>
