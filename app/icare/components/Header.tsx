@@ -191,7 +191,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
     || pathname === '/icare/contact'
     || pathname === '/icare/story'
     || pathname === '/icare/vlog'
-    || pathname === '/icare/find-us'
     || pathname === '/icare/faq';
   const isConnected = isStandardHero && !isScrolled && !isShopHovered;
   const radiusClass = isConnected

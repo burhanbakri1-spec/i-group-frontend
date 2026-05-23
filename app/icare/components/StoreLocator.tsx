@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Navigation, ExternalLink } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { Language } from '../translations';
-import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { icareApi, IcareApiError } from '../lib/api-client';
 import { BackendStore, PaginatedData } from '../types';
 import { StoreLocatorSkeleton } from './ui/skeletons';
+
+// Leaflet map — client-side only
+import 'leaflet/dist/leaflet.css';
+
+const StoreLocatorMap = dynamic(() => import('./StoreLocatorMap'), { ssr: false });
 
 interface Store {
   id: string;
@@ -25,8 +30,6 @@ interface Store {
 interface StoreLocatorProps {
   lang: Language;
 }
-
-const FALLBACK_MAP_IMAGE = 'https://images.unsplash.com/photo-1768353088400-d9fcdd222441?q=80&w=2000';
 
 const isPaginatedStoreResponse = (value: PaginatedData<BackendStore> | BackendStore[]): value is PaginatedData<BackendStore> => (
   !Array.isArray(value) && Array.isArray(value.data)
@@ -82,7 +85,7 @@ const matchesStoreSearch = (store: Store, query: string) => {
 const fetchActiveStores = async () => normalizeStores(await icareApi.stores.list({ isActive: true }));
 
 export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
-  const { storeLocatorTagline, storeLocatorMapImage, storeLocatorNoResults } = useSiteContent();
+  const { storeLocatorTagline, storeLocatorNoResults } = useSiteContent();
   const [searchQuery, setSearchQuery] = useState('');
   const [stores, setStores] = useState<Store[]>([]);
   const [fetchState, setFetchState] = useState<'loading' | 'success' | 'error' | 'empty'>('loading');
@@ -133,29 +136,6 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
 
   return (
     <div className="min-h-screen bg-[#F1F0ED] overflow-hidden">
-      {/* Hero Section */}
-      <section className="bg-white px-4 md:px-8">
-        <div className="relative h-[80vh] md:h-[85vh] w-full overflow-hidden shadow-sm">
-          <ImageWithFallback
-            src={storeLocatorMapImage || FALLBACK_MAP_IMAGE}
-            alt="Store Map"
-            className="w-full h-full object-cover opacity-60 mix-blend-multiply grayscale"
-          />
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-[32px] md:text-[56px] lg:text-[64px] font-brand lowercase italic leading-none mb-2 text-white drop-shadow-sm"
-            >
-              {t.title}
-            </motion.h1>
-            <p className="text-[10px] md:text-[12px] font-bold uppercase tracking-[0.4em] text-white/90">
-              {lang === 'en' ? storeLocatorTagline : 'ابحث عن آي كير بالقرب منك'}
-            </p>
-          </div>
-        </div>
-      </section>
-
       <div className="flex flex-col md:flex-row h-[calc(100vh-96px)]">
         
         {/* Sidebar: List */}
@@ -277,36 +257,14 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
         </div>
 
         {/* Map Area */}
-        <div className="flex-1 bg-[#F2F1ED] relative overflow-hidden h-[55vh] md:h-full">
-          <ImageWithFallback
-            src={storeLocatorMapImage || FALLBACK_MAP_IMAGE}
-            alt="Store Map"
-            className="w-full h-full object-cover opacity-60 mix-blend-multiply grayscale border-t border-black/10 md:border-t-0"
-          />
-          
-          {/* Map Markers */}
-          {fetchState === 'success' && filteredStores.map((store, index) => (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', delay: index * 0.2 }}
-              key={`marker-${store.id}`}
-              className="absolute pointer-events-none"
-              style={{
-                top: `${25 + (index * 12)}%`,
-                left: `${35 + (index * 8)}%`,
-              }}
-            >
-              <div className="relative flex flex-col items-center">
-                <div className="bg-[#67645E] text-white px-3 py-1.5 lg:px-4 lg:py-2 rounded-full text-[8px] lg:text-[10px] font-black uppercase tracking-tighter mb-1.5 lg:mb-2 whitespace-nowrap">
-                  {store.name}
-                </div>
-                <div className="w-6 h-6 lg:w-8 lg:h-8 bg-[#67645E] rounded-full border-[3px] lg:border-4 border-white flex items-center justify-center">
-                  <div className="w-1 h-1 lg:w-1.5 lg:h-1.5 bg-white rounded-full animate-ping" />
-                </div>
-              </div>
-            </motion.div>
-          ))}
+        <div className="flex-1 relative overflow-hidden h-[55vh] md:h-full">
+          {fetchState === 'success' && filteredStores.length > 0 ? (
+            <StoreLocatorMap stores={filteredStores} />
+          ) : (
+            <div className="w-full h-full bg-[#F2F1ED] flex items-center justify-center">
+              <p className="text-sm text-black/30 font-medium">Map unavailable</p>
+            </div>
+          )}
         </div>
       </div>
 
