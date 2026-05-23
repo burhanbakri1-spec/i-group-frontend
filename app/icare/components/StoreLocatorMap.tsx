@@ -130,23 +130,38 @@ const StoreLocatorMap: React.FC<StoreLocatorMapProps> = ({ stores, selectedStore
               {store.name}
             </Tooltip>
 
-            <Popup>
-              <div className="text-sm min-w-[200px] space-y-1">
-                <p className="font-bold text-gray-900">{store.name}</p>
-                <p className="text-gray-600 text-xs leading-relaxed">
-                  {[store.address, store.city, store.country].filter(Boolean).join(', ')}
-                </p>
-                {getDirectionsUrl && (
-                  <a
-                    href={getDirectionsUrl(store)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-block mt-2 px-3 py-1.5 bg-[#67645E] text-white text-[11px] font-bold uppercase tracking-wider rounded-full hover:opacity-90 transition-opacity"
-                  >
-                    Get Directions
-                  </a>
-                )}
-              </div>
+            <Popup className="store-popup">
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: (() => {
+                    const dirUrl = getDirectionsUrl ? getDirectionsUrl(store) : null;
+                    const addr = [store.address, store.city, store.country].filter(Boolean).join(', ');
+
+                    const label = (key: string, val: string) =>
+                      `<div style="display:flex;gap:6px;margin-bottom:3px;font-size:12px;line-height:1.5">
+                        <span style="color:#888;flex-shrink:0;font-weight:500">${key}:</span>
+                        <span style="color:#1a1a1a">${val}</span>
+                      </div>`;
+
+                    return `
+                      <div style="min-width:200px;font-family:sans-serif;padding:2px">
+                        <p style="margin:0 0 8px;font-weight:800;font-size:14px;color:#1a1a1a;line-height:1.3">${store.name}</p>
+                        ${store.address ? label('address', store.address) : ''}
+                        ${store.city    ? label('city',    store.city)    : ''}
+                        ${store.country ? label('country', store.country) : ''}
+                        ${dirUrl
+                          ? `<a
+                              href="${dirUrl}"
+                              target="_blank"
+                              rel="noreferrer"
+                              style="display:inline-block;margin-top:8px;padding:6px 14px;background:#67645E;color:#fff;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;border-radius:999px;text-decoration:none;white-space:nowrap"
+                            >Get Directions</a>`
+                          : ''}
+                      </div>
+                    `;
+                  })(),
+                }}
+              />
             </Popup>
           </Marker>
         );
