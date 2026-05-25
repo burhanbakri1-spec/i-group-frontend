@@ -1,12 +1,11 @@
 import React from 'react';
-import Marquee from './Marquee';
 import { ProductShowcase } from './ProductShowcase';
 import { PromoSection } from './PromoSection';
 import { ProductGrid } from './ProductSection';
 import { CommitmentSection } from './CommitmentSection';
 import { SocialGrid } from './SocialGrid';
 import { PhilosophySection } from './PhilosophySection';
-import { Language, translations } from '../translations';
+import { Language } from '../translations';
 import { Hero } from './Hero';
 import { Product } from '../types';
 import { useSiteContent } from '../hooks/useSiteContent';
@@ -18,51 +17,32 @@ interface HomeProps {
 }
 
 export const Home: React.FC<HomeProps> = ({ onNavigate, lang, onProductSelect }) => {
-  const t = translations[lang];
-  const { trendingTitle, marqueeText } = useSiteContent();
+  const { trendingTitle } = useSiteContent();
   return (
-    <div className="space-y-0">
-      {/* 1. Hero Section */}
+    <div>
       <Hero onNavigate={onNavigate} lang={lang} />
 
-      {/* 2. Scrolling Marquee */}
-      <Marquee text={marqueeText} />
-
-      {/* 3. Featured Product Showcase (Carousel) */}
-      <ProductShowcase products={[]} lang={lang} onProductSelect={onProductSelect} />
-
-      {/* 4. Trending Products Grid */}
-      <div className="py-6 md:py-8 bg-[#F1F0ED] overflow-hidden">
-        <div className="max-w-[1600px] mx-auto px-3 md:px-10 mb-3 md:mb-8 flex justify-between items-end">
-          <h2 className="text-[28px] md:text-[42px] font-black tracking-tight text-[#67645E] lowercase leading-tight">
+      <section className="icare-index-section icare-product-rail-section">
+        <div className="sr-only">
+          <span className="hidden text-[12px] font-bold uppercase leading-[1.5] text-[#67645E] md:block">
+            {lang === 'en' ? 'swipe' : 'اسحب'}
+          </span>
+          <h2 className="text-[clamp(2rem,5vw,2.5rem)] font-black tracking-[-0.04em] text-[#67645E] lowercase leading-none">
             {lang === 'en' ? trendingTitle : 'أساسيات رائجة'}
           </h2>
-          <button 
-            onClick={() => onNavigate('shop')}
-            className="text-[10px] md:text-[12px] font-black uppercase tracking-widest border-b-2 border-[#67645E] text-[#67645E] pb-1 hover:opacity-50 transition-opacity whitespace-nowrap"
-          >
-            {t.categories.all}
-          </button>
         </div>
-        <div className="max-w-[1600px] mx-auto px-0 md:px-10">
-          <ProductGrid lang={lang} onProductSelect={onProductSelect} />
-        </div>
-      </div>
+        <ProductGrid lang={lang} onProductSelect={onProductSelect} />
+      </section>
 
-      {/* 5. New Arrival Promo Section */}
       <PromoSection lang={lang} onNavigate={onNavigate} />
 
-      {/* 6. Philosophy Section */}
       <PhilosophySection lang={lang} onNavigate={onNavigate} />
 
-      {/* 7. Commitment Section */}
-      <CommitmentSection lang={lang} onNavigate={onNavigate} />
+      <ProductShowcase products={[]} lang={lang} onProductSelect={onProductSelect} />
 
-      {/* 8. Social Grid / Community Section */}
       <SocialGrid lang={lang} onNavigate={onNavigate} />
 
-      {/* 9. Spacing before footer */}
-      <div className="h-12 md:h-20" />
+      <CommitmentSection lang={lang} onNavigate={onNavigate} />
     </div>
   );
 };

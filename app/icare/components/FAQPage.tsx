@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Language } from '../translations';
-import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Plus, Minus } from 'lucide-react';
 import { FAQCategoryGroup } from '../types';
+import { PageHero } from './PageHero';
 
 interface FAQPageProps {
   lang: Language;
@@ -123,27 +123,14 @@ export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
 
   return (
     <div className="min-h-screen bg-[#F1F0ED] pb-32">
-      {/* Header Banner */}
-      <section className="bg-white px-4 md:px-8">
-        <div className="relative h-[80vh] md:h-[85vh] w-full overflow-hidden shadow-sm">
-          <ImageWithFallback 
-            src="https://images.unsplash.com/photo-1768483018807-bd0b9ab86539?q=80&w=2000" 
-            alt="FAQ Hero" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/10 flex flex-col items-center justify-center text-white text-center px-4">
-            <motion.h1 
-              initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}
-              className="text-[42px] md:text-[68px] font-black lowercase tracking-tighter"
-            >
-              {lang === 'en' ? 'how can we help?' : 'كيف يمكننا مساعدتك؟'}
-            </motion.h1>
-            <p className="text-[12px] font-bold uppercase tracking-[0.3em] mt-4 opacity-80">
-              {lang === 'en' ? 'frequently asked questions' : 'الأسئلة الشائعة'}
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        image="https://images.unsplash.com/photo-1768483018807-bd0b9ab86539?q=80&w=2000"
+        fallbackImage="https://images.unsplash.com/photo-1768483018807-bd0b9ab86539?q=80&w=2000"
+        alt="FAQ iCare"
+        title={lang === 'en' ? 'how can we help?' : 'كيف يمكننا مساعدتك؟'}
+        subtitle={lang === 'en' ? 'frequently asked questions' : 'الأسئلة الشائعة'}
+        priority
+      />
 
       <div className="max-w-[1400px] mx-auto grid grid-cols-12 gap-4 mt-12 px-2 md:px-8 lg:px-12">
         

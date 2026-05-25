@@ -44,6 +44,13 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
   const shouldReduceMotion = useReducedMotion();
   const calmTween = shouldReduceMotion ? { duration: 0 } : { duration: 0.24, ease: 'easeOut' as const };
 
+  const handleNewsletterSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!newsletterEmail.trim()) return;
+    alert(lang === 'en' ? 'Thank you for subscribing!' : 'شكراً لاشتراكك!');
+    setNewsletterEmail('');
+  };
+
   const socialLinks = rawSocialLinks.map(({ platform, url }) => {
     const name = getSocialPlatformLabel(platform);
     const Icon = getSocialPlatformIcon(platform);
@@ -69,7 +76,7 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
       <div className="max-w-full mx-auto grid grid-cols-1 lg:grid-cols-12">
         
         {/* Newsletter Section */}
-        <div className="lg:col-span-4 p-8 md:p-12 lg:p-16 space-y-8 border-b lg:border-b-0 border-[#D9D7D2]">
+        <div className="lg:col-span-5 p-8 md:p-12 space-y-8 border-b lg:border-b-0 border-[#D9D7D2]">
           <div className="space-y-4">
             <p className="text-[15px] text-[#67645E] leading-tight font-medium">
               {footerNewsletterText}
@@ -80,18 +87,24 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
           </div>
           
           <div className="space-y-4">
-            <div className="flex rounded-full border border-[#67645E] bg-white overflow-hidden">
-                <input 
-                  type="email" 
-                  placeholder={footerEmailPlaceholder} 
-                  value={newsletterEmail}
-                  onChange={(e) => setNewsletterEmail(e.target.value)}
-                  className={`bg-transparent border-none outline-none flex-1 text-[13px] px-4 py-3 placeholder:text-[#ACA9A5] ${FOCUS_VISIBLE_CLASS}`}
-                />
-                <button onClick={() => { if (newsletterEmail.trim()) { alert(lang === 'en' ? 'Thank you for subscribing!' : 'شكراً لاشتراكك!'); setNewsletterEmail(''); } }} className={`text-[11px] font-bold uppercase tracking-widest px-6 py-3 bg-[#67645E] text-white hover:bg-[#5C5A56] transition-colors ${FOCUS_VISIBLE_CLASS}`}>
-                  {footerSubscribeBtn}
-                </button>
-            </div>
+            <form className="icare-footer-newsletter-form" onSubmit={handleNewsletterSubmit}>
+              <label className="sr-only" htmlFor="icare-footer-newsletter-email">
+                {footerEmailPlaceholder}
+              </label>
+              <input
+                id="icare-footer-newsletter-email"
+                type="email"
+                autoComplete="email"
+                required
+                placeholder={footerEmailPlaceholder}
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                className={`icare-footer-newsletter-input ${FOCUS_VISIBLE_CLASS}`}
+              />
+              <button type="submit" className={`icare-footer-newsletter-button ${FOCUS_VISIBLE_CLASS}`}>
+                {footerSubscribeBtn}
+              </button>
+            </form>
             <p className="text-[11px] text-[#84827E] leading-tight">
                 {footerPrivacyNotice}
             </p>
@@ -99,7 +112,7 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
         </div>
 
         {/* Links Grid */}
-        <div className="lg:col-span-8 grid grid-cols-2 md:grid-cols-4 divide-x divide-[#D9D7D2] border-l border-[#D9D7D2]">
+        <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-4 divide-x divide-[#D9D7D2] border-l border-[#D9D7D2]">
           
           {/* Navigate */}
           <div className="p-8 md:p-12 space-y-6">

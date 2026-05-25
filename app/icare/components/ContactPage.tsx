@@ -2,8 +2,8 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Language } from '../translations';
-import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useSiteContent } from '../hooks/useSiteContent';
+import { PageHero } from './PageHero';
 
 interface ContactPageProps {
   lang: Language;
@@ -28,30 +28,14 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
 
   return (
     <div className="min-h-screen bg-[#F1F0ED] pb-32">
-      {/* Hero Banner */}
-      <section className="bg-white px-4 md:px-8">
-        <div className="relative h-[80vh] md:h-[85vh] w-full overflow-hidden shadow-sm">
-          <ImageWithFallback 
-            src={contactHeroImage || "https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=2000"} 
-            alt="Contact Hero" 
-            className="w-full h-full object-cover opacity-90"
-          />
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-4"
-          >
-            <h1 className="text-[48px] md:text-[84px] font-black lowercase tracking-tighter leading-none text-white drop-shadow-sm">
-              {isEn ? contactHeroHeading : 'ابقي على تواصل'}
-            </h1>
-            <p className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.4em] text-white/90">
-              {isEn ? 'customer experience' : 'تجربة العملاء'}
-            </p>
-          </motion.div>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        image={contactHeroImage}
+        fallbackImage="https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=2000"
+        alt="Contact iCare"
+        title={isEn ? contactHeroHeading : 'ابقي على تواصل'}
+        subtitle={isEn ? 'customer experience' : 'تجربة العملاء'}
+        priority
+      />
 
       {/* Main Content Layout */}
       <div className="max-w-[1200px] mx-auto px-4 md:px-12 -mt-20 md:-mt-32 relative z-10 pb-20">

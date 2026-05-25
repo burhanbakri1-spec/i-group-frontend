@@ -33,8 +33,8 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
 
   if (remoteProducts === null) {
     return (
-      <section className="px-4 md:px-8 py-6 md:py-8 bg-white">
-        <div className="max-w-[1440px] mx-auto rounded-[12px] bg-[#EDECEB] p-8 md:p-12">
+      <section className="icare-index-section icare-morning-section">
+        <div className="rounded-[8px] bg-white p-8 md:p-12">
           <div className="flex gap-6 md:gap-8">
             <SkeletonPulse className="flex-1 aspect-[4/3] rounded-xl" />
             <div className="flex-1 flex flex-col justify-center space-y-4">
@@ -51,8 +51,8 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
 
   if (showcaseProducts.length === 0) {
     return (
-      <section className="px-4 md:px-8 py-6 md:py-8 bg-white">
-        <div className="max-w-[1440px] mx-auto rounded-[12px] bg-[#EDECEB] p-12 text-center text-[12px] font-bold uppercase tracking-[0.2em] text-[#84827E]">
+      <section className="icare-index-section icare-morning-section">
+        <div className="rounded-[8px] bg-white p-12 text-center text-[12px] font-bold uppercase tracking-[0.2em] text-[#84827E]">
           {productShowcaseEmpty}
         </div>
       </section>
@@ -70,11 +70,16 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
   const current = showcaseProducts[currentIndex];
 
   return (
-    <section className="px-4 md:px-8 py-4 md:py-8 bg-white">
-      <div className="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+    <section className="icare-index-section icare-morning-section">
+      <div className="icare-morning-header">
+        <h2 className="text-center text-[clamp(1rem,1.45vw,1.25rem)] font-bold uppercase leading-[1.2] tracking-normal text-[#67645E]">
+          {lang === 'en' ? 'featured skincare essentials' : 'أساسيات عناية مختارة'}
+        </h2>
+      </div>
+      <div className="icare-morning-grid">
         
         {/* Left Column: Lifestyle Image */}
-        <div className="relative aspect-[4/5] md:aspect-auto h-auto sm:h-[500px] md:h-[680px] rounded-[12px] md:rounded-[12px] overflow-hidden bg-[#EDECEB] group">
+        <div className="icare-morning-panel relative aspect-[4/5] md:aspect-auto">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentIndex}
@@ -105,7 +110,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
         </div>
 
         {/* Right Column: Product Info Box */}
-        <div className="bg-[#EDECEB] rounded-[12px] md:rounded-[12px] p-5 sm:p-8 md:p-14 flex flex-col justify-between relative min-h-[440px] sm:h-[500px] md:h-[680px] overflow-hidden">
+        <div className="icare-morning-panel relative flex flex-col justify-between p-5 sm:p-8 md:p-8">
           
           <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 flex justify-between px-1 md:px-8 z-20 pointer-events-none">
             <motion.button 

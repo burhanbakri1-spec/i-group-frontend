@@ -13,20 +13,20 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) 
   const shouldReduceMotion = useReducedMotion();
   const { promoBadge, promoHeadline, promoDescription, promoCtaLabel, promoImage } = useSiteContent();
   return (
-    <section className="px-4 md:px-8 py-4 md:py-8 bg-white">
-      <div className="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-2 overflow-hidden rounded-[12px] bg-[#EDECEB]">
+    <section className="icare-index-section icare-split-banner">
+      <div className="contents">
         
         {/* Left Side: Content Section */}
-        <div className="flex flex-col justify-center p-8 sm:p-10 md:p-20 min-h-[420px] md:min-h-[680px]">
+        <div className="icare-split-banner__copy">
           <motion.div
             initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
             whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
-            className="max-w-md"
+            className="max-w-2xl"
           >
             <span
-              className="text-[10px] md:text-[12px] font-bold tracking-[0.3em] uppercase text-[#84827E] mb-6 block"
+              className="mb-6 block text-[10px] font-bold uppercase tracking-[0.16em] text-[#84827E] md:text-[12px]"
             >
               {lang === 'en' ? promoBadge : 'وصول جديد'}
             </span>
@@ -34,7 +34,7 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) 
             {/* Main Title - Lowercase and Bold */}
             <div className="overflow-hidden mb-8">
               <motion.h2 
-                className="text-[42px] md:text-[64px] font-[900] leading-[0.95] tracking-[-0.04em] text-[#67645E] lowercase"
+                className="text-[clamp(1.5rem,2vw,2rem)] font-bold leading-[1.15] tracking-normal text-[#67645E]"
                 initial={shouldReduceMotion ? false : { y: 24, opacity: 0 }}
                 whileInView={shouldReduceMotion ? undefined : { y: 0, opacity: 1 }}
                 viewport={{ once: true }}
@@ -54,7 +54,7 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) 
             
             {/* Description */}
             <motion.p 
-              className="text-[15px] md:text-[18px] leading-relaxed text-[#84827E] font-medium mb-10 md:mb-12 max-w-[92%]"
+              className="mx-auto mb-8 max-w-[34.5rem] text-[15px] font-medium leading-[1.5] text-[#84827E] md:text-[16px]"
               initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
               whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -67,10 +67,10 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) 
             </motion.p>
             
             {/* Button Styling */}
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap justify-center gap-4">
               <motion.button 
                 onClick={() => onNavigate('shop')}
-                className="border-2 border-[#67645E] rounded-full px-12 py-4 text-[11px] font-[900] tracking-[0.15em] uppercase text-[#67645E] transition-all duration-200 ease-out cursor-pointer hover:bg-[#67645E] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDECEB]"
+                className="relative isolate overflow-hidden rounded-full px-8 py-2.5 text-[13px] font-bold uppercase text-[#67645E] shadow-[inset_0_0_0_1px_#67645E] transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] before:absolute before:inset-0 before:-z-10 before:origin-bottom before:scale-y-0 before:rounded-full before:bg-[#67645E] before:transition-transform before:duration-500 before:ease-[cubic-bezier(0.76,0,0.24,1)] hover:-translate-y-px hover:text-white hover:before:scale-y-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDECEB]"
                 initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
                 whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -84,7 +84,7 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) 
 
         {/* Right Side: Visual Section */}
         <motion.div 
-          className="relative aspect-square md:aspect-auto h-full overflow-hidden group"
+          className="icare-split-banner__media"
         >
           <motion.div
             initial={shouldReduceMotion ? false : { opacity: 0 }}

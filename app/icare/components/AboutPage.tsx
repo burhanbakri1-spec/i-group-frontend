@@ -4,6 +4,7 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { ChevronDown } from 'lucide-react';
 import { Language } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
+import { PageHero } from './PageHero';
 
 interface AboutPageProps {
   onNavigate?: (page: string) => void;
@@ -86,39 +87,15 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
 
   return (
     <div className="bg-[#F1F0ED]">
-      {/* 1. CINEMATIC HERO SECTION */}
-      <section className="bg-white px-4 md:px-8">
-        <div className="relative h-[80vh] md:h-[85vh] w-full overflow-hidden shadow-sm">
-        <ImageWithFallback 
-          src={aboutHeroImage || DEFAULT_HERO_IMAGE} 
-          alt="icare Philosophy" 
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/10" />
-        
-        <div className="absolute inset-0 flex flex-col items-center justify-end pb-32 px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-            className="space-y-10"
-          >
-            <h1 className="text-white text-[32px] md:text-[56px] lg:text-[64px] font-[400] tracking-tight leading-tight">
-              {aboutHeroHeadline}
-            </h1>
-            
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => onNavigate?.('shop')}
-              className="border border-white text-white px-12 py-3 rounded-full text-[11px] font-bold tracking-[0.2em] uppercase hover:bg-white hover:text-black transition-all duration-500"
-            >
-              {aboutHeroCta}
-            </motion.button>
-          </motion.div>
-        </div>
-        </div>
-      </section>
+      <PageHero
+        image={aboutHeroImage}
+        fallbackImage={DEFAULT_HERO_IMAGE}
+        alt="iCare philosophy"
+        title={aboutHeroHeadline}
+        ctaLabel={aboutHeroCta}
+        onCtaClick={() => onNavigate?.('shop')}
+        priority
+      />
 
       {/* 2. INTENTIONAL SKINCARE SECTION */}
       <section className="bg-[#F1F0ED] py-8 px-4 md:px-8">

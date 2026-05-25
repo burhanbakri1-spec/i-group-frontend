@@ -47,7 +47,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
   }
 
   return (
-    <div className="bg-[#F1F0ED]">
+    <div className="bg-white">
       {/* Mobile: Horizontal scroll with snap */}
       <motion.div 
         className="md:hidden no-scrollbar mobile-trending-scroll"
@@ -78,9 +78,9 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
             key={product.id}
             className="snap-start mobile-trending-item"
             style={{
-              flex: '0 0 78vw',
-              width: '78vw',
-              maxWidth: '360px',
+              flex: '0 0 86vw',
+              width: '86vw',
+              maxWidth: '420px',
             }}
             variants={{
               hidden: shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 12 },
@@ -92,9 +92,8 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
         ))}
       </motion.div>
       
-      {/* Desktop: Original layout with stagger */}
-      <motion.div 
-        className="hidden md:grid md:grid-cols-3 gap-6 md:gap-8 pb-10 px-6 md:px-8 max-w-[1440px] mx-auto"
+      <motion.div
+        className="hidden md:flex no-scrollbar gap-3 overflow-x-auto pb-[0.35rem] scroll-smooth snap-x snap-mandatory"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
@@ -109,7 +108,8 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
         {displayProducts.map((product) => (
           <motion.div 
             key={product.id} 
-            className="min-w-[85vw] md:min-w-0 snap-center"
+            className="snap-start shrink-0 grow-0"
+            style={{ flexBasis: 'calc((100vw - 8rem) / 3)' }}
             variants={{
               hidden: shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 16 },
               visible: { opacity: 1, y: 0, scale: 1 }

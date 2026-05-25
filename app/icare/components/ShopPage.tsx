@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ImageWithFallback } from './figma/ImageWithFallback';
 import { ProductCard } from './ProductCard';
 import { ChevronDown, Grid2X2, LayoutGrid, X } from 'lucide-react';
 import { fetchCatalogProducts, fetchCategoryRoots, fetchCategoryChildren } from '../lib/catalog-client';
@@ -8,6 +7,7 @@ import { Language } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { Product, BackendCategory } from '../types';
 import { ProductGridSkeleton } from './ui/skeletons';
+import { PageHero } from './PageHero';
 
 interface ShopPageProps {
   lang: Language;
@@ -174,7 +174,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
 
   if (loading && !catalogProducts) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F1F0ED] px-4">
+      <div className="min-h-screen flex items-center justify-center bg-white px-4">
         <div className="w-full max-w-screen-xl">
           <ProductGridSkeleton count={12} />
         </div>
@@ -183,28 +183,15 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
   }
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#F1F0ED]">
-      {/* Banner */}
-      <section className="bg-white px-4 md:px-8">
-        <div className="relative h-[80vh] md:h-[85vh] w-full overflow-hidden shadow-sm">
-          <ImageWithFallback
-            src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1920"
-            alt="Shop Hero"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/15 flex flex-col items-center justify-center text-white text-center px-4">
-          <motion.h1
-            initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}
-            className="text-[42px] md:text-[68px] font-brand lowercase italic leading-tight"
-          >
-            {lang === 'en' ? 'curated care' : 'عناية مختارة'}
-          </motion.h1>
-          <p className="text-[12px] font-bold uppercase tracking-[0.3em] mt-4 opacity-80">
-            {lang === 'en' ? 'exploration of beauty' : 'استكشاف الجمال'}
-          </p>
-          </div>
-        </div>
-      </section>
+    <div className="min-h-screen overflow-x-hidden bg-white">
+      <PageHero
+        image="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1920"
+        fallbackImage="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1920"
+        alt="Shop iCare"
+        title={lang === 'en' ? 'curated care' : 'عناية مختارة'}
+        subtitle={lang === 'en' ? 'exploration of beauty' : 'استكشاف الجمال'}
+        priority
+      />
 
       {/* Navigation & Hierarchy */}
       <div className="max-w-[1600px] mx-auto px-6 py-10 flex flex-col gap-8">

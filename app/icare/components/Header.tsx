@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { motion, AnimatePresence, useScroll, useMotionValueEvent, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Menu, Search, ShoppingBag, Globe, Heart } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { translations, Language } from '../translations';
 import { useShop } from '../context/ShopContext';
-import { useSiteContent } from '../hooks/useSiteContent';
 import { usePathname } from 'next/navigation';
 import { BackendCategory, Product } from '../types';
 import { fetchCatalogProducts, fetchCategoryRoots, fetchCategoryChildren } from '../lib/catalog-client';
+import { hasIcareStandardHero } from '../lib/hero-routes';
 
 interface HeaderProps {
   onOpenCart: () => void;
@@ -23,26 +23,28 @@ interface HeaderProps {
 const FOCUS_VISIBLE_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67645E]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--rb-bg-warm-gray)]';
 const MUTED_TEXT_CLASS = 'text-[var(--rb-primary-text)] hover:text-[var(--rb-near-black)]';
 const SHOP_MEGA_MENU_ID = 'icare-shop-mega-menu';
+const HEADER_HIDE_SCROLL_THRESHOLD = 32;
+const HEADER_SCROLL_DELTA = 4;
 
 export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavigate, onProductSelect, onOpenMenu, isDrawerOpen, lang, onToggleLang }) => {
   const t = translations[lang];
   const { cartCount, wishlistItems } = useShop();
-  const { announcementText, shopEmptyAll } = useSiteContent();
   const [isShopHovered, setIsShopHovered] = useState(false);
   const [activeCategory, setActiveCategory] = useState(t.categories.all);
+  const [isMounted, setIsMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
   const [previewProducts, setPreviewProducts] = useState<Product[]>([]);
   const [rootCategories, setRootCategories] = useState<BackendCategory[]>([]);
   const [categoryChildren, setCategoryChildren] = useState<Record<string, BackendCategory[]>>({});
   const [activeRootSlug, setActiveRootSlug] = useState<string | null>(null);
-  const { scrollY } = useScroll();
   const shouldReduceMotion = useReducedMotion();
   const pathname = usePathname();
   const headerRef = useRef<HTMLDivElement | null>(null);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shopButtonRef = useRef<HTMLButtonElement | null>(null);
   const shopMenuRef = useRef<HTMLDivElement | null>(null);
+  const lastScrollYRef = useRef(0);
   const calmTween = shouldReduceMotion ? { duration: 0 } : { duration: 0.2, ease: 'easeOut' as const };
 
   const cancelHideTimer = () => {
@@ -166,72 +168,74 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
     return previewProducts.filter((product) => product.category?.trim().toLowerCase() === activePreviewCategory.trim().toLowerCase());
   }, [activePreviewCategory, previewProducts, t.categories.all]);
 
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    const previous = scrollY.getPrevious() ?? 0;
-    
-    // Hide/Show header on scroll
-    if (latest > previous && latest > 150) {
-      setIsVisible(false);
-    } else {
-      setIsVisible(true);
-    }
+  useEffect(() => {
+    const updateHeaderState = () => {
+      const currentScrollY = window.scrollY;
+      const delta = currentScrollY - lastScrollYRef.current;
+      const isStandardHeroRoute = hasIcareStandardHero(pathname);
 
-    // Switch to warm beige surface after scroll
-    if (latest > 100) {
-      setIsScrolled(true);
-    } else {
-      setIsScrolled(false);
-    }
-  });
+      setIsMounted(true);
+      setIsScrolled(currentScrollY > 40 || !isStandardHeroRoute);
 
-  const headerY = !isVisible || isDrawerOpen ? -128 : 0;
-  const headerOpacity = isDrawerOpen ? 0 : 1;
-  const isStandardHero = pathname === '/icare'
-    || pathname === '/icare/shop'
-    || pathname === '/icare/contact'
-    || pathname === '/icare/story'
-    || pathname === '/icare/vlog'
-    || pathname === '/icare/faq';
+      if (currentScrollY <= HEADER_HIDE_SCROLL_THRESHOLD) {
+        setIsVisible(true);
+      } else if (delta > HEADER_SCROLL_DELTA) {
+        setIsVisible(false);
+      } else if (delta < -HEADER_SCROLL_DELTA) {
+        setIsVisible(true);
+      }
+
+      lastScrollYRef.current = currentScrollY;
+    };
+
+    lastScrollYRef.current = window.scrollY;
+    updateHeaderState();
+    window.addEventListener('scroll', updateHeaderState, { passive: true });
+    window.addEventListener('resize', updateHeaderState);
+
+    return () => {
+      window.removeEventListener('scroll', updateHeaderState);
+      window.removeEventListener('resize', updateHeaderState);
+    };
+  }, [pathname]);
+
+  const headerY = !isVisible || isDrawerOpen ? 'calc(-100% - 2rem)' : 0;
+  const headerOpacity = !isVisible || isDrawerOpen ? 0 : 1;
+  const isStandardHero = hasIcareStandardHero(pathname);
   const isConnected = isStandardHero && !isScrolled && !isShopHovered;
-  const radiusClass = isConnected
-    ? 'rounded-t-[var(--rb-radius-card)] rounded-b-[0px] border-b-0'
-    : 'rounded-[var(--rb-radius-card)]';
+  const radiusClass = isShopHovered ? 'rounded-t-[var(--rb-radius-card)] rounded-b-[0px] border-b-0' : 'rounded-[var(--rb-radius-card)]';
   const wrapperBg = isShopHovered || isScrolled || !isStandardHero
-    ? 'bg-[var(--rb-bg-warm-gray)]'
+    ? 'bg-[var(--rb-bg-warm-gray)] shadow-[0_1rem_2rem_rgba(103,100,94,0.06)]'
     : 'bg-transparent';
+  const navTextClass = isConnected ? 'text-white hover:text-white/75' : MUTED_TEXT_CLASS;
+  const logoToneClass = isConnected ? 'brightness-0 invert' : '';
 
   return (
     <motion.div 
       ref={headerRef}
-      initial={{ y: 0, opacity: 1 }}
-      animate={{ y: headerY, opacity: headerOpacity }}
+      initial={shouldReduceMotion ? { y: 0, opacity: 1 } : { y: -6, opacity: 0 }}
+      animate={{ y: headerY, opacity: isMounted ? headerOpacity : 0 }}
       transition={calmTween}
       onMouseLeave={hideShop}
       onBlur={handleHeaderBlur}
       onKeyDown={handleHeaderKeyDown}
-      className={`fixed top-0 left-0 right-0 z-[60] ${isDrawerOpen ? 'pointer-events-none' : ''}`}
+      data-icare-header
+      className={`icare-header-shell ${isDrawerOpen ? 'pointer-events-none' : ''}`}
     >
-      {/* Announcement Bar — warm beige strip, brown microcopy */}
-      <div className="bg-[var(--rb-bg-warm-gray)] text-[var(--rb-primary-text)] py-2 text-center border-b border-[var(--rb-border-light)]">
-        <span className="text-[10px] font-bold uppercase tracking-[0.12em]">
-          {announcementText}
-        </span>
-      </div>
-
-      <div className="mx-4 md:mx-8 lg:mx-8 mt-2 md:mt-3">
-        <div className={`overflow-hidden transition-all duration-200 border border-[var(--rb-border-light)] ${radiusClass} ${wrapperBg}`}>
+      <div>
+        <div className={`overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] border ${isConnected ? 'border-transparent' : 'border-[var(--rb-border-light)]'} ${radiusClass} ${wrapperBg}`}>
           <header 
-            className="px-4 md:px-6 py-3 flex min-h-[64px] items-center justify-between"
+            className="flex min-h-[64px] items-center justify-between px-4 py-4 md:px-8 md:py-5"
           >
           {/* Navigation */}
           <div className="flex items-center gap-10">
             <button 
               onClick={onOpenMenu}
               onMouseEnter={closeShopMenu}
-              className={`p-2 hover:bg-black/5 rounded-full transition-colors lg:hidden ${FOCUS_VISIBLE_CLASS}`}
+              className={`p-2 rounded-full transition-colors lg:hidden ${FOCUS_VISIBLE_CLASS} ${isConnected ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}
               aria-label="Open menu"
             >
-              <Menu size={20} className="text-[var(--rb-primary-text)]" />
+              <Menu size={20} className={isConnected ? 'text-white' : 'text-[var(--rb-primary-text)]'} />
             </button>
             <nav className="hidden lg:flex items-center gap-7">
               <button 
@@ -247,7 +251,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                     onNavigate('shop');
                   }
                 }}
-                className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors ${FOCUS_VISIBLE_CLASS} ${MUTED_TEXT_CLASS}`}
+                className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
                 aria-haspopup="true"
                 aria-expanded={isShopHovered}
                 aria-controls={SHOP_MEGA_MENU_ID}
@@ -257,14 +261,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
               <button 
                 onClick={() => onNavigate('story')}
                 onMouseEnter={closeShopMenu}
-                className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors ${FOCUS_VISIBLE_CLASS} ${MUTED_TEXT_CLASS}`}
+                className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
               >
                 {t.story}
               </button>
               <button 
                 onClick={onToggleLang}
                 onMouseEnter={closeShopMenu}
-                className={`text-[12px] font-bold flex items-center gap-2 border border-[var(--rb-border-light)] px-3 py-1.5 rounded-full hover:bg-black/5 transition-colors ${FOCUS_VISIBLE_CLASS} text-[var(--rb-primary-text)]`}
+                className={`text-[12px] font-bold flex items-center gap-2 border px-3 py-1.5 rounded-full transition-colors ${FOCUS_VISIBLE_CLASS} ${isConnected ? 'border-white/35 text-white hover:bg-white/10' : 'border-[var(--rb-border-light)] text-[var(--rb-primary-text)] hover:bg-black/5'}`}
               >
                 <Globe size={14} />
                 {lang === 'en' ? 'العربية' : 'EN'}
@@ -284,7 +288,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
             <img 
               src="/icare-logo.png" 
               alt="icare beauty" 
-              className="h-full w-auto object-contain transition-all duration-200"
+              className={`h-full w-auto object-contain transition-all duration-300 ${logoToneClass}`}
             />
           </motion.button>
 
@@ -293,7 +297,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
             <button 
                 onClick={onOpenSearch}
                 onMouseEnter={closeShopMenu}
-                className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors ${FOCUS_VISIBLE_CLASS} ${MUTED_TEXT_CLASS}`}
+                className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
                 aria-label={t.search}
             >
               <span className="hidden md:inline">{t.search}</span>
@@ -302,14 +306,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
             <button 
               onClick={() => onNavigate('wishlist')}
               onMouseEnter={closeShopMenu}
-              className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors relative ${FOCUS_VISIBLE_CLASS} ${MUTED_TEXT_CLASS}`}
+              className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors relative ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
               aria-label={t.wishlist}
             >
               <span className="hidden md:inline">{t.wishlist}</span>
               <div className="md:hidden relative">
                 <Heart size={20} />
                 {wishlistItems.length > 0 && (
-                  <span className="absolute -top-2 -right-2 w-5 h-5 bg-[var(--rb-primary-text)] text-white text-[10px] font-black rounded-full flex items-center justify-center">
+                  <span className={`absolute -top-2 -right-2 w-5 h-5 text-[10px] font-black rounded-full flex items-center justify-center ${isConnected ? 'bg-white text-[var(--rb-primary-text)]' : 'bg-[var(--rb-primary-text)] text-white'}`}>
                     {wishlistItems.length}
                   </span>
                 )}
@@ -318,21 +322,21 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
             <button 
               onClick={() => onNavigate('account')}
               onMouseEnter={closeShopMenu}
-              className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors hidden md:block ${FOCUS_VISIBLE_CLASS} ${MUTED_TEXT_CLASS}`}
+              className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors hidden md:block ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
             >
               {t.account}
             </button>
             <button 
               onClick={onOpenCart}
               onMouseEnter={closeShopMenu}
-              className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors relative ${FOCUS_VISIBLE_CLASS} ${MUTED_TEXT_CLASS}`}
+              className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors relative ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
               aria-label={t.cart}
             >
               <span className="hidden md:inline">{t.cart} ({cartCount})</span>
               <div className="md:hidden flex items-center gap-1 relative">
                 <ShoppingBag size={20} />
                 {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 w-5 h-5 bg-black text-white text-[10px] font-black rounded-full flex items-center justify-center">
+                  <span className={`absolute -top-2 -right-2 w-5 h-5 text-[10px] font-black rounded-full flex items-center justify-center ${isConnected ? 'bg-white text-[var(--rb-primary-text)]' : 'bg-black text-white'}`}>
                     {cartCount}
                   </span>
                 )}

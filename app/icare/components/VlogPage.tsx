@@ -7,6 +7,7 @@ import { fetchProductMediaVlogs } from '../lib/catalog-client';
 import { VlogContentItem } from '../types';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { VlogGridSkeleton } from './ui/skeletons';
+import { PageHero } from './PageHero';
 
 interface VlogPageProps {
   lang: Language;
@@ -128,23 +129,13 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
 
   return (
     <div className="min-h-screen bg-[#F1F0ED] pb-32">
-      {/* 1. Hero Section */}
-      <section className="bg-white px-4 md:px-8">
-        <div className="relative h-[80vh] md:h-[85vh] w-full overflow-hidden shadow-sm">
-          <ImageWithFallback 
-            src={heroImage} 
-            alt="Hero Vlog" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/10 flex flex-col items-center justify-center text-white p-4">
-          <div className="space-y-4 md:space-y-6 text-center">
-            <h1 className="text-[24px] md:text-[48px] font-black uppercase tracking-tighter drop-shadow-sm">
-              {heroTitle}
-            </h1>
-          </div>
-        </div>
-      </div>
-      </section>
+      <PageHero
+        image={heroImage}
+        fallbackImage={VLOG_HERO_FALLBACK_IMAGE}
+        alt="iCare product stories"
+        title={heroTitle}
+        priority
+      />
 
       {/* 2. Vlog Grid */}
       <section className="max-w-[1400px] mx-auto px-4 md:px-6 pt-8 md:pt-12">

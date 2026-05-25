@@ -4,6 +4,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import { usePathname, useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Header } from './Header';
+import { AnnouncementBar } from './AnnouncementBar';
 import { MobileMenu } from './MobileMenu';
 import { Cart } from './Cart';
 import { SearchDrawer } from './SearchDrawer';
@@ -12,6 +13,7 @@ import { ShopProvider } from '../context/ShopContext';
 import { Language } from '../translations';
 import { Product } from '../types';
 import { getIcarePagePath, getIcareProductPath } from '../lib/routes';
+import { hasIcareStandardHero } from '../lib/hero-routes';
 
 interface IcareShellContextValue {
   lang: Language;
@@ -29,17 +31,29 @@ export const useIcareShell = () => {
   return context;
 };
 
-const PageTransition = ({ children, pageKey }: { children: React.ReactNode; pageKey: string }) => (
-  <motion.div
-    key={pageKey}
-    initial={{ opacity: 0, y: 16 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -12 }}
-    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-  >
-    {children}
-  </motion.div>
-);
+const PageTransition = ({
+  children,
+  lockTop,
+  pageKey,
+}: {
+  children: React.ReactNode;
+  lockTop: boolean;
+  pageKey: string;
+}) => {
+  const yOffset = lockTop ? 0 : 16;
+
+  return (
+    <motion.div
+      key={pageKey}
+      initial={{ opacity: 0, y: yOffset }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: lockTop ? 0 : -12 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
 export const IcareShell = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
@@ -48,6 +62,7 @@ export const IcareShell = ({ children }: { children: React.ReactNode }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [lang, setLang] = useState<Language>('en');
+  const hasStandardHero = hasIcareStandardHero(pathname);
 
   useEffect(() => {
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
@@ -79,7 +94,9 @@ export const IcareShell = ({ children }: { children: React.ReactNode }) => {
   return (
     <ShopProvider>
       <IcareShellContext.Provider value={contextValue}>
-        <div className={`min-h-screen bg-[#F1F0ED] font-sans selection:bg-[#7B7872] selection:text-white text-[#67645E] ${lang === 'ar' ? 'font-arabic' : ''}`}>
+        <div className={`min-h-screen bg-[var(--rb-pure-white)] font-sans selection:bg-[#7B7872] selection:text-white text-[#67645E] ${lang === 'ar' ? 'font-arabic' : ''}`}>
+          <AnnouncementBar />
+
           <Header
             onOpenCart={() => setIsCartOpen(true)}
             onOpenSearch={() => setIsSearchOpen(true)}
@@ -102,9 +119,9 @@ export const IcareShell = ({ children }: { children: React.ReactNode }) => {
             onToggleLang={() => setLang((currentLang) => currentLang === 'en' ? 'ar' : 'en')}
           />
 
-          <main className="pt-[120px]">
+          <main className={hasStandardHero ? '' : 'pt-24'}>
             <AnimatePresence>
-              <PageTransition pageKey={pathname}>{children}</PageTransition>
+              <PageTransition lockTop={hasStandardHero} pageKey={pathname}>{children}</PageTransition>
             </AnimatePresence>
           </main>
 
