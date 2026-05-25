@@ -203,7 +203,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
   const headerOpacity = !isVisible || isDrawerOpen ? 0 : 1;
   const isStandardHero = hasIcareStandardHero(pathname);
   const isConnected = isStandardHero && !isScrolled && !isShopHovered;
-  const radiusClass = isShopHovered ? 'rounded-t-[var(--rb-radius-card)] rounded-b-[0px] border-b-0' : 'rounded-[var(--rb-radius-card)]';
+  const radiusClass = isShopHovered ? 'rounded-[var(--rb-radius-card)] border-b-0' : 'rounded-[var(--rb-radius-card)]';
   const wrapperBg = isShopHovered || isScrolled || !isStandardHero
     ? 'bg-[var(--rb-bg-warm-gray)] shadow-[0_1rem_2rem_rgba(103,100,94,0.06)]'
     : 'bg-transparent';

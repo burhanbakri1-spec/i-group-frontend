@@ -3,7 +3,6 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { icareApi } from '../lib/api-client';
 import { useSiteContent } from '../hooks/useSiteContent';
 
-const SLIDE_INTERVAL_MS = 4200;
 const SENTENCE_SPLIT_PATTERN = /\s*(?:\||\n|•|؛)\s*/;
 
 const readAnnouncementValue = (announcement: Record<string, unknown>) => {
@@ -94,12 +93,12 @@ export const AnnouncementBar: React.FC = () => {
 
     const intervalId = window.setInterval(() => {
       setActiveSlideIndex((currentIndex) => (currentIndex + 1) % slides.length);
-    }, SLIDE_INTERVAL_MS);
+    }, 4200);
 
     return () => window.clearInterval(intervalId);
   }, [hasMultipleSlides, isPaused, shouldReduceMotion, slides.length]);
 
-  if (!activeSlide) return null;
+  if (slides.length === 0) return null;
 
   return (
     <section data-icare-announcement className="icare-announcement" aria-label="Announcements">
@@ -109,9 +108,9 @@ export const AnnouncementBar: React.FC = () => {
             <motion.p
               key={`${activeSlideIndex}-${activeSlide}`}
               className="icare-announcement__slide"
-              initial={shouldReduceMotion ? false : { y: 12, opacity: 0 }}
-              animate={shouldReduceMotion ? undefined : { y: 0, opacity: 1 }}
-              exit={shouldReduceMotion ? undefined : { y: -12, opacity: 0 }}
+              initial={shouldReduceMotion ? false : { x: 12, opacity: 0 }}
+              animate={shouldReduceMotion ? undefined : { x: 0, opacity: 1 }}
+              exit={shouldReduceMotion ? undefined : { x: -12, opacity: 0 }}
               transition={{ duration: 0.32, ease: [0.76, 0, 0.24, 1] }}
             >
               {activeSlide}

@@ -113,7 +113,7 @@
     --icare-header-top-gap: 0.625rem;
     --icare-header-top: calc(var(--icare-announcement-margin-top) + var(--icare-announcement-padding-top) + var(--icare-announcement-height) + var(--icare-header-top-gap));
     --icare-hero-inset: 2rem;
-    --icare-hero-flow-offset: calc(var(--icare-header-top) - (var(--icare-announcement-margin-top) + var(--icare-announcement-height)));
+    --icare-hero-flow-offset: calc(var(--icare-header-top) - (var(--icare-announcement-margin-top) + var(--icare-announcement-padding-top) + var(--icare-announcement-height)));
     --icare-hero-top-gap: 0rem;
     --icare-hero-bottom-gap: 1rem;
     --icare-hero-height: calc(100vh - 11.875rem);
@@ -225,7 +225,7 @@
   }
 
   .icare-announcement__slide {
-    grid-area: 1 / 1;
+    width: 100%;
     margin: 0;
     max-width: calc(100% - 1.5rem);
     color: inherit;
@@ -234,6 +234,7 @@
     line-height: 0.875rem;
     text-align: center;
     text-transform: uppercase;
+    white-space: nowrap;
   }
 
   .icare-header-shell {
@@ -478,6 +479,7 @@
     color: var(--rb-pure-white);
     transform: translateY(-1px);
   }
+
 }
 
 @media (max-width: 980px) {
@@ -487,7 +489,7 @@
     --icare-header-top-gap: 0.625rem;
     --icare-announcement-padding-top: 0.75rem;
     --icare-hero-inset: 0.75rem;
-    --icare-hero-flow-offset: calc(var(--icare-header-top) - (var(--icare-announcement-margin-top) + var(--icare-announcement-height)));
+    --icare-hero-flow-offset: calc(var(--icare-header-top) - (var(--icare-announcement-margin-top) + var(--icare-announcement-padding-top) + var(--icare-announcement-height)));
     --icare-hero-height: calc(100vh - 22.25rem);
     --icare-hero-min-height: 30.5rem;
     --icare-hero-radius: 10px;
