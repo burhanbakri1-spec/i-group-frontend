@@ -2,6 +2,116 @@ import React from "react";
 import QuantityControl from "../components/QuantityControl.jsx";
 import { placeholderImage } from "../data/products.js";
 
+const cartCopy = {
+  en: {
+    addToCart: "Add to cart",
+    cartTitle: "Your Cart",
+    checkout: "Proceed to Checkout",
+    continueShopping: "Continue Shopping",
+    emptyCart: "Empty cart",
+    emptyTitle: "There is nothing in your cart",
+    featured: "Featured",
+    freeShipping: "Congratulations! You've unlocked free shipping!",
+    loginToAccount: "Login to your account",
+    needAnythingElse: "Need anything else?",
+    quickIntro: "Selected products that pair well with your order.",
+    quickTitle: "Grab it before it's gone",
+    remove: "Remove",
+    shippingInfo: "Shipping information",
+    size: "Size",
+    totalDue: "Total (due today)",
+    unlockShipping: (amount, currency) => `Add ${amount} ${currency} to unlock free shipping`,
+    youMightAlsoLike: "You might also like",
+  },
+  ar: {
+    addToCart: "أضف إلى السلة",
+    cartTitle: "سلتك",
+    checkout: "المتابعة إلى الدفع",
+    continueShopping: "متابعة التسوق",
+    emptyCart: "إفراغ السلة",
+    emptyTitle: "سلتك فارغة حاليًا",
+    featured: "منتج مميز",
+    freeShipping: "تهانينا! حصلت على شحن مجاني!",
+    loginToAccount: "تسجيل الدخول إلى حسابك",
+    needAnythingElse: "هل تحتاج شيئًا آخر؟",
+    quickIntro: "منتجات مختارة تناسب طلبك الحالي.",
+    quickTitle: "لا تفوّت هذه المنتجات",
+    remove: "إزالة",
+    shippingInfo: "معلومات الشحن",
+    size: "الحجم",
+    totalDue: "الإجمالي المستحق اليوم",
+    unlockShipping: (amount, currency) => `أضف ${amount} ${currency} للحصول على شحن مجاني`,
+    youMightAlsoLike: "قد يعجبك أيضًا",
+  },
+};
+
+function RecommendedProductCard({
+  compact = false,
+  currency,
+  getLocalized,
+  language,
+  onAdd,
+  onViewProduct,
+  product,
+}) {
+  const text = cartCopy[language] || cartCopy.en;
+  const mainImage = product.image || placeholderImage;
+  const hoverImage =
+    product.hoverImage ||
+    product.secondaryImage ||
+    product.secondImage ||
+    product.galleryImages?.[1] ||
+    product.images?.[1] ||
+    mainImage;
+  const name = getLocalized(product.name, product.slug);
+  const badge = getLocalized(product.badge, text.featured);
+  const detail = getLocalized(product.shortDescription, "");
+  const price = product.sizes?.[0]?.price || 0;
+
+  function handleAdd(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    onAdd(product);
+  }
+
+  return (
+    <article className={compact ? "cart-reco-card compact" : "cart-reco-card"}>
+      <div className="cart-reco-image">
+        <button className="cart-reco-media-button" onClick={() => onViewProduct?.(product.slug)} type="button">
+          <span className="cart-reco-badge">{badge}</span>
+          <img
+            alt={name}
+            className="cart-reco-img-main"
+            onError={(event) => {
+              event.currentTarget.src = product.fallbackImage || placeholderImage;
+            }}
+            src={mainImage}
+          />
+          <img
+            alt=""
+            aria-hidden="true"
+            className="cart-reco-img-hover"
+            onError={(event) => {
+              event.currentTarget.src = mainImage;
+            }}
+            src={hoverImage}
+          />
+        </button>
+        <button className="cart-reco-overlay" onClick={handleAdd} type="button">
+          {text.addToCart}
+        </button>
+      </div>
+      <button className="cart-reco-copy" onClick={() => onViewProduct?.(product.slug)} type="button">
+        <strong>{name}</strong>
+        {!compact && detail && <span>{detail}</span>}
+        <small>
+          {price} {currency}
+        </small>
+      </button>
+    </article>
+  );
+}
+
 function CartPage({
   cartItems,
   currentUser,
@@ -16,22 +126,19 @@ function CartPage({
   total,
 }) {
   const isArabic = language === "ar";
+  const text = cartCopy[language] || cartCopy.en;
   const currency = t("common.ils");
+  const cartTotal =
+    typeof total === "number"
+      ? total
+      : cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const shippingGoal = 120;
-  const shippingProgress = Math.min(100, Math.round((total / shippingGoal) * 100));
-  const remainingForShipping = Math.max(0, shippingGoal - total);
+  const shippingProgress = Math.min(100, Math.round((cartTotal / shippingGoal) * 100));
+  const remainingForShipping = Math.max(0, shippingGoal - cartTotal);
 
   function getProduct(item) {
-    return products.find((product) => product.id === item.productId);
+    return products.find((product) => product.id === item.productId || product.slug === item.slug);
   }
-
-  const cartProductIds = new Set(cartItems.map((item) => item.productId));
-  const recommendedProducts = products
-    .filter((product) => !cartProductIds.has(product.id))
-    .slice(0, 4);
-  const urgentProducts = products
-    .filter((product) => !cartProductIds.has(product.id))
-    .slice(4, 6);
 
   function getLocalized(value, fallback = "") {
     if (!value) return fallback;
@@ -39,13 +146,10 @@ function CartPage({
     return value[language] || value.en || value.ar || fallback;
   }
 
-  function getProductPrice(product) {
-    return product?.sizes?.[0]?.price || 0;
-  }
-
   function addRecommended(product) {
-    if (!product?.sizes?.length) return;
-    onAddToCart?.(product, product.sizes[0].size);
+    const firstSize = product?.sizes?.[0]?.size;
+    if (!firstSize) return;
+    onAddToCart?.(product, firstSize);
   }
 
   function handleCheckout() {
@@ -57,18 +161,23 @@ function CartPage({
     onNavigate("checkout");
   }
 
+  const cartProductIds = new Set(cartItems.map((item) => item.productId));
+  const productPool = products.filter((product) => !cartProductIds.has(product.id));
+  const compactRecommendations = productPool.slice(0, 3);
+  const largeRecommendations = productPool.slice(0, 6);
+
   if (cartItems.length === 0) {
     return (
       <section className="cart-empty-hero">
         <div className="cart-empty-overlay">
-          <h1>{isArabic ? "سلتك فارغة حاليًا" : "There is nothing in your cart"}</h1>
+          <h1>{text.emptyTitle}</h1>
           <div className="cart-empty-actions">
             <button className="light-action" onClick={() => onNavigate("products")} type="button">
-              {isArabic ? "متابعة التسوق" : "Continue Shopping"}
+              {text.continueShopping}
             </button>
             {!currentUser && (
               <button className="outline-light-action" onClick={() => onNavigate("login")} type="button">
-                {isArabic ? "تسجيل الدخول إلى حسابك" : "Login to your account"}
+                {text.loginToAccount}
               </button>
             )}
           </div>
@@ -81,93 +190,89 @@ function CartPage({
     <section className="cart-kinfill-page">
       <div className="cart-kinfill-grid">
         <div className="cart-main-column">
-          <header className="cart-title-row">
-            <h1>{isArabic ? "سلة التسوق" : "Your Cart"}</h1>
-            <button className="cart-empty-button" onClick={() => cartItems.forEach((item) => onRemoveItem(item.cartId))} type="button">
-              {isArabic ? "إفراغ السلة" : "Empty cart"}
-            </button>
-          </header>
+          <div className="cart-main-sticky">
+            <header className="cart-title-row">
+              <h1>{text.cartTitle}</h1>
+              <button
+                className="cart-empty-button"
+                onClick={() => cartItems.forEach((item) => onRemoveItem(item.cartId))}
+                type="button"
+              >
+                {text.emptyCart}
+              </button>
+            </header>
 
-          {urgentProducts.length > 0 && (
-            <section className="cart-upsell-strip" aria-label={isArabic ? "اقتراحات سريعة" : "Quick suggestions"}>
-              <div className="cart-upsell-heading">
-                <strong>{isArabic ? "لا تفوّت هذه المنتجات" : "Grab it before it's gone"}</strong>
-                <span>{isArabic ? "منتجات مختارة عليها طلب مرتفع" : "Our seasonal scent is almost sold out!"}</span>
-              </div>
-              <div className="cart-upsell-inline">
-                {urgentProducts.map((product) => (
-                  <article className="cart-mini-offer" key={product.id}>
-                    <button className="mini-offer-image" onClick={() => onViewProduct?.(product.slug)} type="button">
+            {compactRecommendations.length > 0 && (
+              <section className="cart-upsell-strip" aria-label={isArabic ? "اقتراحات سريعة" : "Quick suggestions"}>
+                <div className="cart-upsell-heading">
+                  <strong>{text.quickTitle}</strong>
+                  <span>{text.quickIntro}</span>
+                </div>
+                <div className="cart-upsell-inline">
+                  {compactRecommendations.slice(0, 2).map((product) => (
+                    <RecommendedProductCard
+                      compact
+                      currency={currency}
+                      getLocalized={getLocalized}
+                      key={product.id}
+                      language={language}
+                      onAdd={addRecommended}
+                      onViewProduct={onViewProduct}
+                      product={product}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            <div className="cart-items-panel">
+              {cartItems.map((item) => {
+                const product = getProduct(item);
+                const productName = getLocalized(product?.name, item.productName || item.slug);
+                const productBadge = getLocalized(product?.badge, text.featured);
+                const lineTotal = item.price * item.quantity;
+
+                return (
+                  <article className="cart-line-item" key={item.cartId}>
+                    <button className="cart-line-image" onClick={() => onViewProduct?.(item.slug)} type="button">
                       <img
-                        alt={getLocalized(product.name)}
+                        alt={productName}
                         onError={(event) => {
-                          event.currentTarget.src = product.fallbackImage || placeholderImage;
+                          event.currentTarget.src = item.fallbackImage || placeholderImage;
                         }}
-                        src={product.image || placeholderImage}
+                        src={item.image || placeholderImage}
                       />
                     </button>
-                    <div>
-                      <h3>{getLocalized(product.name)}</h3>
+
+                    <div className="cart-line-info">
+                      <span className="cart-line-badge">{productBadge}</span>
+                      <h2>{productName}</h2>
                       <p>
-                        {getProductPrice(product)} {currency}
+                        {text.size}: {item.size}
                       </p>
-                      <button className="mini-add-button" onClick={() => addRecommended(product)} type="button">
-                        {isArabic ? "أضف للسلة" : "Add to cart"}
-                      </button>
+                      <div className="cart-line-actions">
+                        <QuantityControl
+                          onDecrease={() => onUpdateQuantity(item.cartId, item.quantity - 1)}
+                          onIncrease={() => onUpdateQuantity(item.cartId, item.quantity + 1)}
+                          quantity={item.quantity}
+                        />
+                        <button
+                          className="cart-remove-button"
+                          onClick={() => onRemoveItem(item.cartId)}
+                          type="button"
+                        >
+                          {text.remove}
+                        </button>
+                      </div>
                     </div>
+
+                    <strong className="cart-line-price">
+                      {lineTotal} {currency}
+                    </strong>
                   </article>
-                ))}
-              </div>
-            </section>
-          )}
-
-          <div className="cart-items-panel">
-            {cartItems.map((item) => {
-              const product = getProduct(item);
-              const productName = getLocalized(product?.name, item.productName || item.slug);
-              const productBadge = getLocalized(product?.badge, isArabic ? "منتج مميز" : "Featured");
-              const lineTotal = item.price * item.quantity;
-
-              return (
-                <article className="cart-line-item" key={item.cartId}>
-                  <button className="cart-line-image" onClick={() => onViewProduct?.(item.slug)} type="button">
-                    <img
-                      alt={productName}
-                      onError={(event) => {
-                        event.currentTarget.src = item.fallbackImage || placeholderImage;
-                      }}
-                      src={item.image || placeholderImage}
-                    />
-                  </button>
-
-                  <div className="cart-line-info">
-                    <span className="cart-line-badge">{productBadge}</span>
-                    <h2>{productName}</h2>
-                    <p>
-                      {isArabic ? "الحجم" : "Size"}: {item.size}
-                    </p>
-                    <div className="cart-line-actions">
-                      <QuantityControl
-                        onDecrease={() => onUpdateQuantity(item.cartId, item.quantity - 1)}
-                        onIncrease={() => onUpdateQuantity(item.cartId, item.quantity + 1)}
-                        quantity={item.quantity}
-                      />
-                      <button
-                        className="cart-remove-button"
-                        onClick={() => onRemoveItem(item.cartId)}
-                        type="button"
-                      >
-                        {isArabic ? "إزالة" : "Remove"}
-                      </button>
-                    </div>
-                  </div>
-
-                  <strong className="cart-line-price">
-                    {lineTotal} {currency}
-                  </strong>
-                </article>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
 
@@ -177,14 +282,10 @@ function CartPage({
               <div className="shipping-progress-copy">
                 <strong>
                   {remainingForShipping === 0
-                    ? isArabic
-                      ? "تهانينا! حصلت على شحن مجاني"
-                      : "Congratulations! You've unlocked free shipping!"
-                    : isArabic
-                      ? `أضف ${remainingForShipping} ${currency} للحصول على شحن مجاني`
-                      : `Add ${remainingForShipping} ${currency} to unlock free shipping`}
+                    ? text.freeShipping
+                    : text.unlockShipping(remainingForShipping, currency)}
                 </strong>
-                <button type="button">{isArabic ? "معلومات الشحن" : "Shipping information"}</button>
+                <button type="button">{text.shippingInfo}</button>
               </div>
               <div className="shipping-progress-track">
                 <span style={{ width: `${shippingProgress}%` }} />
@@ -194,48 +295,58 @@ function CartPage({
             {!currentUser && <div className="message-panel soft">{t("auth.loginRequiredToBuy")}</div>}
 
             <div className="cart-summary-total">
-              <span>{isArabic ? "الإجمالي المستحق اليوم" : "Total (due today)"}</span>
+              <span>{text.totalDue}</span>
               <strong>
-                {total} {currency}
+                {cartTotal} {currency}
               </strong>
             </div>
             <button className="checkout-wide-button" onClick={handleCheckout} type="button">
-              {currentUser ? (isArabic ? "إتمام الطلب" : "Proceed to Checkout") : t("auth.login")}
+              {currentUser ? text.checkout : t("auth.login")}
             </button>
           </section>
 
-          {recommendedProducts.length > 0 && (
-            <section className="cart-recommendations">
-              <h2>{isArabic ? "قد يعجبك أيضًا" : "You might also like"}</h2>
+          {compactRecommendations.length > 0 && (
+            <section className="cart-recommendations compact-list">
+              <h2>{text.youMightAlsoLike}</h2>
               <div className="cart-recommendation-grid">
-                {recommendedProducts.map((product) => (
-                  <article className="cart-recommendation-card" key={product.id}>
-                    <button className="recommendation-image" onClick={() => onViewProduct?.(product.slug)} type="button">
-                      <span>{getLocalized(product.badge, isArabic ? "منتج مميز" : "Featured")}</span>
-                      <img
-                        alt={getLocalized(product.name)}
-                        onError={(event) => {
-                          event.currentTarget.src = product.fallbackImage || placeholderImage;
-                        }}
-                        src={product.image || placeholderImage}
-                      />
-                    </button>
-                    <div className="recommendation-copy">
-                      <h3>{getLocalized(product.name)}</h3>
-                      <p>
-                        {getProductPrice(product)} {currency}
-                      </p>
-                      <button onClick={() => addRecommended(product)} type="button">
-                        {isArabic ? "أضف للسلة" : "Add to cart"}
-                      </button>
-                    </div>
-                  </article>
+                {compactRecommendations.map((product) => (
+                  <RecommendedProductCard
+                    compact
+                    currency={currency}
+                    getLocalized={getLocalized}
+                    key={product.id}
+                    language={language}
+                    onAdd={addRecommended}
+                    onViewProduct={onViewProduct}
+                    product={product}
+                  />
                 ))}
               </div>
             </section>
           )}
         </aside>
       </div>
+
+      {largeRecommendations.length > 0 && (
+        <section className="cart-more-products">
+          <header>
+            <h2>{text.needAnythingElse}</h2>
+          </header>
+          <div className="cart-more-grid">
+            {largeRecommendations.map((product) => (
+              <RecommendedProductCard
+                currency={currency}
+                getLocalized={getLocalized}
+                key={product.id}
+                language={language}
+                onAdd={addRecommended}
+                onViewProduct={onViewProduct}
+                product={product}
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </section>
   );
 }

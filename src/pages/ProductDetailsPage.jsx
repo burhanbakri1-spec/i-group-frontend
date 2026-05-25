@@ -165,7 +165,8 @@ function ProductDetailsPage({
   const [activeStatement, setActiveStatement] = React.useState(0);
   const [dragStart, setDragStart] = React.useState(null);
   const [parallax, setParallax] = React.useState(0);
-  const heroGalleryRef = React.useRef(null);
+  const heroRef = React.useRef(null);
+  const galleryTrackRef = React.useRef(null);
   const reviewsRef = React.useRef(null);
   const relatedRef = React.useRef(null);
   const impactRef = React.useRef(null);
@@ -204,6 +205,41 @@ function ProductDetailsPage({
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  React.useEffect(() => {
+    const hero = heroRef.current;
+    const track = galleryTrackRef.current;
+    if (!hero || !track || !product) return undefined;
+
+    let frameId = 0;
+
+    function updateGalleryPosition() {
+      if (window.matchMedia("(max-width: 1180px)").matches) {
+        track.style.transform = "";
+        return;
+      }
+
+      const rect = hero.getBoundingClientRect();
+      const scrollRange = Math.max(hero.offsetHeight - window.innerHeight, 1);
+      const moveRange = Math.max(track.scrollHeight - window.innerHeight, 0);
+      const progress = Math.min(1, Math.max(0, -rect.top / scrollRange));
+      track.style.transform = `translate3d(0, ${-progress * moveRange}px, 0)`;
+    }
+
+    function requestUpdate() {
+      window.cancelAnimationFrame(frameId);
+      frameId = window.requestAnimationFrame(updateGalleryPosition);
+    }
+
+    updateGalleryPosition();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+    };
+  }, [product, selectedType]);
 
   if (!product) {
     return (
@@ -350,31 +386,13 @@ function ProductDetailsPage({
     setDragStart(null);
   }
 
-  function handleHeroWheel(event) {
-    const gallery = heroGalleryRef.current;
-    if (!gallery || gallery.scrollHeight <= gallery.clientHeight + 2) return;
-
-    const rect = gallery.getBoundingClientRect();
-    const galleryIsActive =
-      rect.top <= window.innerHeight * 0.12 &&
-      rect.bottom >= window.innerHeight * 0.5;
-
-    if (!galleryIsActive) return;
-
-    const scrollingDown = event.deltaY > 0;
-    const atTop = gallery.scrollTop <= 1;
-    const atBottom =
-      gallery.scrollTop + gallery.clientHeight >= gallery.scrollHeight - 2;
-
-    if ((scrollingDown && !atBottom) || (!scrollingDown && !atTop)) {
-      event.preventDefault();
-      gallery.scrollTop += event.deltaY;
-    }
-  }
-
   return (
     <main className="product-detail-redesign">
-      <section className="detail-hero-grid" onWheel={handleHeroWheel}>
+      <section
+        className="detail-hero-grid"
+        ref={heroRef}
+        style={{ "--detail-gallery-frames": Math.max(uniqueGallery.slice(0, 5).length, 1) }}
+      >
         <div className="detail-packshot-column">
           {product.badge && <span className="detail-subscribe-badge">{localized(product.badge, language)}</span>}
           <div className="detail-packshot-card">
@@ -385,13 +403,14 @@ function ProductDetailsPage({
         <div
           className="detail-scroll-gallery"
           aria-label={`${productName} gallery`}
-          ref={heroGalleryRef}
         >
-          {uniqueGallery.slice(0, 5).map((image, index) => (
-            <figure className="detail-gallery-frame" key={`${image}-${index}`}>
-              <ProductImage alt={`${productName} ${index + 1}`} src={image} />
-            </figure>
-          ))}
+          <div className="detail-gallery-track" ref={galleryTrackRef}>
+            {uniqueGallery.slice(0, 5).map((image, index) => (
+              <figure className="detail-gallery-frame" key={`${image}-${index}`}>
+                <ProductImage alt={`${productName} ${index + 1}`} src={image} />
+              </figure>
+            ))}
+          </div>
         </div>
 
         <aside className="detail-purchase-panel">
