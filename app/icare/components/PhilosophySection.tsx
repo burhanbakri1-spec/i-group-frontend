@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { Language } from '../translations';
@@ -10,16 +10,25 @@ interface PhilosophySectionProps {
 }
 
 export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ lang, onNavigate }) => {
+  const shouldReduceMotion = useReducedMotion();
   const { philosophyHeadline, philosophyText, philosophyCta, philosophyImage } = useSiteContent();
   return (
     <section className="icare-index-section icare-full-banner">
       <div className="icare-full-banner__media">
-        <ImageWithFallback 
-          src={philosophyImage} 
-          alt="icare clean product texture" 
-          className="w-full h-full object-cover object-center"
-          priority
-        />
+        <motion.div
+          className="w-full h-full"
+          initial={shouldReduceMotion ? false : { opacity: 0, scale: 1.04 }}
+          whileInView={shouldReduceMotion ? undefined : { opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <ImageWithFallback 
+            src={philosophyImage} 
+            alt="icare clean product texture" 
+            className="w-full h-full object-cover object-center"
+            priority
+          />
+        </motion.div>
         <div className="icare-full-banner__shade" />
       </div>
 

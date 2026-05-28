@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
@@ -7,6 +7,7 @@ import { Product } from '../types';
 import { fetchProductShortcut } from '../lib/catalog-client';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { SkeletonPulse } from './ui/skeletons';
+import { ScrollReveal } from './ui/ScrollReveal';
 
 interface ProductShowcaseProps {
   products: Product[];
@@ -71,46 +72,51 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
 
   return (
     <section className="icare-index-section icare-morning-section">
-      <div className="icare-morning-header">
-        <h2 className="text-center text-[clamp(1rem,1.45vw,1.25rem)] font-bold uppercase leading-[1.2] tracking-normal text-[#67645E]">
-          {lang === 'en' ? 'featured skincare essentials' : 'أساسيات عناية مختارة'}
-        </h2>
-      </div>
+      <ScrollReveal direction="bottom" viewportMargin="-60px">
+        <div className="icare-morning-header">
+          <h2 className="text-center text-[clamp(1rem,1.45vw,1.25rem)] font-bold uppercase leading-[1.2] tracking-normal text-[#67645E]">
+            {lang === 'en' ? 'featured skincare essentials' : 'أساسيات عناية مختارة'}
+          </h2>
+        </div>
+      </ScrollReveal>
       <div className="icare-morning-grid">
         
         {/* Left Column: Lifestyle Image */}
-        <div className="icare-morning-panel relative aspect-[4/5] md:aspect-auto">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentIndex}
-              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 1.03 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              className="w-full h-full"
-            >
-              <ImageWithFallback 
-                src={current.images?.[1] ?? current.images?.[0] ?? current.image}
-                alt={current.title ?? current.name}
-                className="w-full h-full object-cover"
-              />
-            </motion.div>
-          </AnimatePresence>
-          
-          <div className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 flex gap-1.5 md:gap-2 z-10 bg-black/10 px-2 md:px-4 py-1 md:py-2 rounded-full">
-            {showcaseProducts.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentIndex(i)}
-                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/20 ${i === currentIndex ? 'bg-white w-5 md:w-6' : 'bg-white/55'}`}
-                aria-label={`Show product ${i + 1}`}
-              />
-            ))}
+        <ScrollReveal direction="left" viewportMargin="-80px">
+          <div className="icare-morning-panel relative aspect-[4/5] md:aspect-auto">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentIndex}
+                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 1.03 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                className="w-full h-full"
+              >
+                <ImageWithFallback 
+                  src={current.images?.[1] ?? current.images?.[0] ?? current.image}
+                  alt={current.title ?? current.name}
+                  className="w-full h-full object-cover"
+                />
+              </motion.div>
+            </AnimatePresence>
+            
+            <div className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 flex gap-1.5 md:gap-2 z-10 bg-black/10 px-2 md:px-4 py-1 md:py-2 rounded-full">
+              {showcaseProducts.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentIndex(i)}
+                  className={`w-1.5 h-1.5 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/20 ${i === currentIndex ? 'bg-white w-5 md:w-6' : 'bg-white/55'}`}
+                  aria-label={`Show product ${i + 1}`}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
 
         {/* Right Column: Product Info Box */}
-        <div className="icare-morning-panel relative flex flex-col justify-between p-5 sm:p-8 md:p-8">
+        <ScrollReveal direction="right" viewportMargin="-80px">
+          <div className="icare-morning-panel relative flex flex-col justify-between p-5 sm:p-8 md:p-8">
           
           <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 flex justify-between px-1 md:px-8 z-20 pointer-events-none">
             <motion.button 
@@ -208,7 +214,8 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
               </div>
             </div>
           </div>
-        </div>
+          </div>
+        </ScrollReveal>
       </div>
     </section>
   );

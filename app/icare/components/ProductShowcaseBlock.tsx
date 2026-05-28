@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { ChevronRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { fetchProductShowcase } from '../lib/catalog-client';

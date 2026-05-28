@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { X, Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 import { Language, translations } from '../translations';
 import { useShop } from '../context/ShopContext';

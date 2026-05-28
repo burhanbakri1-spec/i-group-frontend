@@ -1,8 +1,9 @@
 import React from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
+import { ScrollReveal } from './ui/ScrollReveal';
 
 interface PromoSectionProps {
   lang: Language;
@@ -83,9 +84,8 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) 
         </div>
 
         {/* Right Side: Visual Section */}
-        <motion.div 
-          className="icare-split-banner__media"
-        >
+        <ScrollReveal direction="right" viewportMargin="-100px">
+          <motion.div className="icare-split-banner__media">
           <motion.div
             initial={shouldReduceMotion ? false : { opacity: 0 }}
             whileInView={shouldReduceMotion ? undefined : { opacity: 1 }}
@@ -103,6 +103,7 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) 
           {/* Subtle Overlay for Premium feel */}
           <div className="absolute inset-0 bg-black/5 mix-blend-multiply pointer-events-none" />
         </motion.div>
+        </ScrollReveal>
       </div>
     </section>
   );

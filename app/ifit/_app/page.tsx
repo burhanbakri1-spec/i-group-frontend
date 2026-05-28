@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { motion, AnimatePresence, useInView } from 'motion/react';
 import {
   Activity, Dumbbell, Users, Star, ArrowRight, ChevronRight,
   Check, Zap, Target, TrendingUp, Shield, Clock, Award,

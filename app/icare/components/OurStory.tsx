@@ -1,6 +1,7 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
 
 export const OurStory = () => {
   return (
@@ -45,20 +46,26 @@ export const OurStory = () => {
 
       {/* Values */}
       <section className="bg-white py-24 px-6">
-        <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
-          <div className="space-y-4">
-            <h3 className="font-black tracking-widest text-[12px] uppercase">Curated</h3>
-            <p className="text-[14px] text-[#84827E] leading-relaxed">Only what is necessary. One of everything really good.</p>
-          </div>
-          <div className="space-y-4">
-            <h3 className="font-black tracking-widest text-[12px] uppercase">Effective</h3>
-            <p className="text-[14px] text-[#84827E] leading-relaxed">High-performance ingredients that deliver real results.</p>
-          </div>
-          <div className="space-y-4">
-            <h3 className="font-black tracking-widest text-[12px] uppercase">Mindful</h3>
-            <p className="text-[14px] text-[#84827E] leading-relaxed">Consciously formulated and packaged with the planet in mind.</p>
-          </div>
-        </div>
+        <StaggerContainer className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-12" staggerDelay={0.1} viewportMargin="-60px">
+          <ScrollReveal direction="bottom" delay={0}>
+            <div className="space-y-4">
+              <h3 className="font-black tracking-widest text-[12px] uppercase">Curated</h3>
+              <p className="text-[14px] text-[#84827E] leading-relaxed">Only what is necessary. One of everything really good.</p>
+            </div>
+          </ScrollReveal>
+          <ScrollReveal direction="bottom" delay={0.1}>
+            <div className="space-y-4">
+              <h3 className="font-black tracking-widest text-[12px] uppercase">Effective</h3>
+              <p className="text-[14px] text-[#84827E] leading-relaxed">High-performance ingredients that deliver real results.</p>
+            </div>
+          </ScrollReveal>
+          <ScrollReveal direction="bottom" delay={0.2}>
+            <div className="space-y-4">
+              <h3 className="font-black tracking-widest text-[12px] uppercase">Mindful</h3>
+              <p className="text-[14px] text-[#84827E] leading-relaxed">Consciously formulated and packaged with the planet in mind.</p>
+            </div>
+          </ScrollReveal>
+        </StaggerContainer>
       </section>
     </div>
   );

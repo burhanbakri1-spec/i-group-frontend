@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { Menu, Search, ShoppingBag, Globe, Heart } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { translations, Language } from '../translations';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { ShoppingBag, Trash2, Minus, Plus, ArrowLeft } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import { useIcareShell } from './IcareShell';

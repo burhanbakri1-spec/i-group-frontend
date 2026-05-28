@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from 'motion/react';
 import { Check, XCircle, Loader2, Banknote } from 'lucide-react';
 import { Language, checkoutTranslations } from '../../translations';
 import { CreatedOrder } from '../../types';

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { Language } from '../translations';
 import { Plus, Minus } from 'lucide-react';
 import { FAQCategoryGroup } from '../types';
 import { PageHero } from './PageHero';
+import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
 
 interface FAQPageProps {
   lang: Language;
@@ -136,42 +137,46 @@ export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
         
         {/* Sidebar */}
         <aside className="col-span-4 md:col-span-3">
-          <div className="bg-[#F2F1ED] p-4 md:p-10 rounded-[20px] sticky top-32">
-            <h1 className="text-[14px] md:text-[20px] font-[900] text-[#5C5A56] mb-4 md:mb-8 tracking-tight">FAQ</h1>
-            <nav className="flex flex-col space-y-3 md:space-y-4">
-              {faqGroups.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => scrollToSection(cat.id)}
-                  className="text-[9px] md:text-[11px] font-[800] text-[#5C5A56]/60 hover:text-black transition-colors text-left uppercase tracking-widest leading-tight"
-                >
-                  {cat.name}
-                  </button>
-              ))}
-            </nav>
-          </div>
+          <ScrollReveal direction="left" viewportMargin="-60px">
+            <div className="bg-[#F2F1ED] p-4 md:p-10 rounded-[20px] sticky top-32">
+              <h1 className="text-[14px] md:text-[20px] font-[900] text-[#5C5A56] mb-4 md:mb-8 tracking-tight">FAQ</h1>
+              <nav className="flex flex-col space-y-3 md:space-y-4">
+                {faqGroups.map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => scrollToSection(cat.id)}
+                    className="text-[9px] md:text-[11px] font-[800] text-[#5C5A56]/60 hover:text-black transition-colors text-left uppercase tracking-widest leading-tight"
+                  >
+                    {cat.name}
+                    </button>
+                ))}
+              </nav>
+            </div>
+          </ScrollReveal>
         </aside>
 
         {/* Content Area */}
         <main className="col-span-8 md:col-span-9 bg-[#F2F1ED] p-5 md:p-12 rounded-[20px]">
           <div className="space-y-16">
             {faqGroups.map((cat) => (
-            <section key={cat.id} id={cat.id} className="space-y-6">
-              <h2 className="text-[18px] md:text-[20px] font-[900] uppercase tracking-tight text-[#5C5A56]">
-                {cat.name}
-              </h2>
-              <div className="border-t border-black/10">
-                {cat.items.map((item, idx) => (
-                  <FAQAccordion 
-                    key={`${cat.id}-${idx}`}
-                    question={item.q}
-                    answer={item.a}
-                    isOpen={openId === `${cat.id}-${idx}`}
-                    onClick={() => setOpenId(openId === `${cat.id}-${idx}` ? null : `${cat.id}-${idx}`)}
-                  />
-                ))}
-              </div>
+            <ScrollReveal key={cat.id} direction="bottom" viewportMargin="-40px">
+              <section id={cat.id} className="space-y-6">
+                <h2 className="text-[18px] md:text-[20px] font-[900] uppercase tracking-tight text-[#5C5A56]">
+                  {cat.name}
+                </h2>
+                <div className="border-t border-black/10">
+                  {cat.items.map((item, idx) => (
+                    <FAQAccordion 
+                      key={`${cat.id}-${idx}`}
+                      question={item.q}
+                      answer={item.a}
+                      isOpen={openId === `${cat.id}-${idx}`}
+                      onClick={() => setOpenId(openId === `${cat.id}-${idx}` ? null : `${cat.id}-${idx}`)}
+                    />
+                  ))}
+                </div>
               </section>
+            </ScrollReveal>
             ))}
           </div>
         </main>

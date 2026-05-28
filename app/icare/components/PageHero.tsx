@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface PageHeroProps {
@@ -32,9 +32,9 @@ export const PageHero: React.FC<PageHeroProps> = ({
     <section data-icare-hero className="icare-page-hero">
       <motion.div
         className="icare-page-hero__frame"
-        initial={shouldReduceMotion ? false : { opacity: 0 }}
-        animate={shouldReduceMotion ? undefined : { opacity: 1 }}
-        transition={{ duration: 0.45, ease: HERO_EASE }}
+        initial={shouldReduceMotion ? false : { opacity: 0, scale: 1.04 }}
+        animate={shouldReduceMotion ? undefined : { opacity: 1, scale: 1 }}
+        transition={{ duration: 0.65, ease: HERO_EASE }}
       >
         <div className="icare-page-hero__media">
           <ImageWithFallback

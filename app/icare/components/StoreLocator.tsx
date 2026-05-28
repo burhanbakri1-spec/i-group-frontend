@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
 import { Search, Navigation, ExternalLink } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { Language } from '../translations';
@@ -199,20 +199,18 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
                 </div>
               )}
 
-              {fetchState === 'success' && filteredStores.map((store, index) => (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  key={store.id}
-                  id={`store-card-${store.id}`}
-                  onClick={() => handleStoreClick(store.id)}
-                  className={`group p-4 lg:p-6 rounded-[16px] lg:rounded-[24px] border cursor-pointer bg-white transition-all ${
-                    selectedStoreId === store.id
-                      ? 'border-black shadow-md'
-                      : 'border-black/5 hover:border-black'
-                  }`}
-                >
+              {fetchState === 'success' && (
+                <StaggerContainer staggerDelay={0.08} viewportMargin="-40px">
+                  {filteredStores.map((store, index) => (
+                    <ScrollReveal key={store.id} direction="bottom" delay={index * 0.08}>
+                      <div
+                        onClick={() => handleStoreClick(store.id)}
+                        className={`group p-4 lg:p-6 rounded-[16px] lg:rounded-[24px] border cursor-pointer bg-white transition-all ${
+                          selectedStoreId === store.id
+                            ? 'border-black shadow-md'
+                            : 'border-black/5 hover:border-black'
+                        }`}
+                      >
                   <div className="flex justify-between items-start mb-2 lg:mb-4">
                     <div className="flex-1 pr-4">
                       <h3 className="text-[14px] lg:text-[18px] font-black lowercase mb-1 group-hover:italic transition-all">{store.name}</h3>
@@ -259,15 +257,10 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
                       </a>
                     </div>
                   </div>
-                </motion.div>
+                  </div>
+                </ScrollReveal>
               ))}
-
-              {fetchState === 'success' && filteredStores.length === 0 && (
-                <div className="text-center py-20">
-                  <p className="text-[14px] font-brand lowercase italic text-black/30">
-                    {noResultsText}
-                  </p>
-                </div>
+            </StaggerContainer>
               )}
             </div>
           </div>

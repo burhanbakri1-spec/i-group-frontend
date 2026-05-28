@@ -1064,20 +1064,18 @@
   }
 }
 
-/* ─── Skeleton Animations ─── */
-@keyframes skeleton-pulse {
-  0%, 100% { opacity: 0.35; }
-  50%      { opacity: 1; }
+/* ─── Scroll Reveal Performance ─── */
+
+.scroll-reveal {
+  contain: layout paint style;
+  will-change: transform, opacity;
 }
 
-@keyframes skeleton-enter {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+.scroll-reveal.animate-done {
+  will-change: auto;
 }
 
-.skeleton-content {
-  animation: skeleton-enter 250ms ease-out;
-}
+/* ─── Reduced Motion Global ─── */
 
 @media (prefers-reduced-motion: reduce) {
   .skeleton-content {
@@ -1085,7 +1083,6 @@
   }
 }
 
-/* ─── Reduced Motion Global ─── */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

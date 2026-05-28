@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { ProductCard } from './ProductCard';
 import { ChevronDown, Grid2X2, LayoutGrid, X } from 'lucide-react';
 import { fetchCatalogProducts, fetchCategoryRoots, fetchCategoryChildren } from '../lib/catalog-client';
@@ -8,6 +8,7 @@ import { useSiteContent } from '../hooks/useSiteContent';
 import { Product, BackendCategory } from '../types';
 import { ProductGridSkeleton } from './ui/skeletons';
 import { PageHero } from './PageHero';
+import { ScrollReveal } from './ui/ScrollReveal';
 
 interface ShopPageProps {
   lang: Language;
@@ -318,11 +319,13 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
 
       {/* Grid */}
       <div className="max-w-[1600px] mx-auto px-3 md:px-6 pb-24">
-        <div className={`grid grid-cols-2 ${cols === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} gap-x-3 gap-y-6 md:gap-x-8 md:gap-y-14`}>
-          {filteredProducts.slice(0, visibleCount).map((p) => (
-            <ProductCard key={p.id} product={p} lang={lang} onSelect={() => onProductSelect(p)} />
-          ))}
-        </div>
+        <ScrollReveal direction="bottom" delay={0.05} viewportMargin="-40px">
+          <div className={`grid grid-cols-2 ${cols === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} gap-x-3 gap-y-6 md:gap-x-8 md:gap-y-14`}>
+            {filteredProducts.slice(0, visibleCount).map((p) => (
+              <ProductCard key={p.id} product={p} lang={lang} onSelect={() => onProductSelect(p)} />
+            ))}
+          </div>
+        </ScrollReveal>
 
         {visibleCount < filteredProducts.length && (
           <div className="mt-12 md:mt-20 flex justify-center">

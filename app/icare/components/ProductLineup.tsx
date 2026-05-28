@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { ChevronRight, Star, Plus } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Product } from '../types';

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from 'motion/react';
 import { Banknote, Check, Clock, CreditCard, Lock, Wallet } from 'lucide-react';
 import { Language, checkoutTranslations } from '../../translations';
 

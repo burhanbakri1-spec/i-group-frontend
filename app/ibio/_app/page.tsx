@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { motion, useInView, useScroll, useTransform, useSpring } from 'framer-motion';
+import { motion, useInView, useScroll, useTransform, useSpring } from 'motion/react';
 import { FeatureCard } from './components/FeatureCard';
 import {
   AreaChart, Area, LineChart, Line, BarChart, Bar,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from 'motion/react';
 import { Star } from 'lucide-react';
 import { Language } from '../translations';
 import { Product } from '../types';

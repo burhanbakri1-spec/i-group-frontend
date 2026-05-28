@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from 'motion/react';
+import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
 import { Heart, ShoppingBag, X, Share2 } from 'lucide-react';
 import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';

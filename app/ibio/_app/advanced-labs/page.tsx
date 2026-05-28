@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView } from 'motion/react';
 import { ArrowRight, ChevronDown, FlaskConical, Microscope, Dna, Lock, Star, Upload, Shield } from 'lucide-react';
 import Link from 'next/link';
 

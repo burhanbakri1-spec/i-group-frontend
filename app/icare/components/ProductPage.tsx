@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { Star, ChevronDown, ThumbsUp, ThumbsDown, CheckCircle2, ShoppingBag } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
@@ -13,6 +13,7 @@ import { fetchProductBySlug, fetchProductReviews, fetchRelatedProducts, submitPr
 import { cacheMiddleware } from '../lib/cache-middleware';
 import { WriteReviewDialog } from './WriteReviewDialog';
 import { useIcareShell } from './IcareShell';
+import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
 
 interface ProductPageProps {
   product: Product;
@@ -444,120 +445,123 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
       <section className="px-4 lg:px-6 pb-32">
         <div className="max-w-[1600px] mx-auto bg-white rounded-[12px] p-8 lg:p-16">
           
-          <div className="border-b border-black/10 pb-8 space-y-8">
-            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
-              <div className="space-y-4">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-[44px] font-black tracking-tighter">{averageRating}</span>
-                  <div className="flex text-black mb-1">
-                    {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
+          <ScrollReveal direction="bottom" viewportMargin="-60px">
+            <div className="border-b border-black/10 pb-8 space-y-8">
+              <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+                <div className="space-y-4">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-[44px] font-black tracking-tighter">{averageRating}</span>
+                    <div className="flex text-black mb-1">
+                      {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="currentColor" />)}
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[12px] font-black uppercase tracking-widest text-[#67645E]">{productRatingLabel || 'Customer reviews'}</p>
+                    <p className="text-[12px] text-[#84827E]">Based on {reviewCount} reviews</p>
+                  </div>
+                  {/* Rating distribution */}
+                  <div className="space-y-2 w-full max-w-xs">
+                    {[5, 4, 3, 2, 1].map((star) => {
+                      const count = Number(ratingDistribution[String(star)] ?? 0);
+                      const total = Object.values(ratingDistribution).reduce((sum, c) => sum + Number(c), 0);
+                      const pct = total > 0 ? (count / total) * 100 : 0;
+                      return (
+                        <div key={star} className="flex items-center gap-3">
+                          <span className="text-[11px] font-bold text-black/55 w-3 text-right">{star}</span>
+                          <Star size={10} fill="black" className="text-black shrink-0" />
+                          <div className="flex-1 h-1.5 bg-black/5 rounded-full overflow-hidden">
+                            <div className="h-full bg-[#67645E] rounded-full transition-all" style={{ width: `${pct}%` }} />
+                          </div>
+                          <span className="text-[10px] font-bold text-black/40 w-6 text-right">{count}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-[12px] font-black uppercase tracking-widest text-[#67645E]">{productRatingLabel || 'Customer reviews'}</p>
-                  <p className="text-[12px] text-[#84827E]">Based on {reviewCount} reviews</p>
-                </div>
-                {/* Rating distribution */}
-                <div className="space-y-2 w-full max-w-xs">
-                  {[5, 4, 3, 2, 1].map((star) => {
-                    const count = Number(ratingDistribution[String(star)] ?? 0);
-                    const total = Object.values(ratingDistribution).reduce((sum, c) => sum + Number(c), 0);
-                    const pct = total > 0 ? (count / total) * 100 : 0;
-                    return (
-                      <div key={star} className="flex items-center gap-3">
-                        <span className="text-[11px] font-bold text-black/55 w-3 text-right">{star}</span>
-                        <Star size={10} fill="black" className="text-black shrink-0" />
-                        <div className="flex-1 h-1.5 bg-black/5 rounded-full overflow-hidden">
-                          <div className="h-full bg-[#67645E] rounded-full transition-all" style={{ width: `${pct}%` }} />
-                        </div>
-                        <span className="text-[10px] font-bold text-black/40 w-6 text-right">{count}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
 
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setIsWriteReviewOpen(true)}
-                  className={`flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#67645E] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#67645E]/90 transition-colors ${CONTROL_FOCUS_CLASS}`}
-                >
-                  write a review
-                </button>
-                <div ref={filterDropdownRef} className="relative">
+                <div className="flex items-center gap-4">
                   <button
-                    onClick={() => { setIsFilterDropdownOpen((prev) => !prev); setIsSortDropdownOpen(false); }}
-                    className={`flex items-center gap-2 px-6 py-2.5 rounded-full border text-[10px] font-black uppercase tracking-widest transition-colors ${CONTROL_FOCUS_CLASS} ${reviewRatingFilter ? 'bg-[#67645E] text-white border-[#67645E]' : 'border-[#DDDDDD] hover:bg-[#67645E] hover:text-white'}`}
+                    onClick={() => setIsWriteReviewOpen(true)}
+                    className={`flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#67645E] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#67645E]/90 transition-colors ${CONTROL_FOCUS_CLASS}`}
                   >
-                    {reviewRatingFilter ? `${reviewRatingFilter} stars` : (reviewFilterButton || 'Filter')}
-                    <ChevronDown size={12} className={`transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`} />
+                    write a review
                   </button>
-                  {isFilterDropdownOpen && (
-                    <div className="absolute top-full mt-2 left-0 bg-white rounded-[12px] border border-[#DDDDDD] py-1 z-20 min-w-[140px]">
-                      {reviewRatingFilter && (
-                        <button
-                          onClick={() => { setReviewRatingFilter(undefined); setIsFilterDropdownOpen(false); }}
-                          className={`w-full px-4 py-2 text-left text-[11px] font-bold hover:bg-[#F1F0ED] transition-colors text-[#84827E]`}
-                        >
-                          all ratings
-                        </button>
-                      )}
-                      {[5, 4, 3, 2, 1].map((r) => (
-                        <button
-                          key={r}
-                          onClick={() => { setReviewRatingFilter(r); setIsFilterDropdownOpen(false); }}
-                          className={`w-full px-4 py-2 text-left text-[11px] font-bold hover:bg-[#F1F0ED] transition-colors flex items-center gap-2 ${reviewRatingFilter === r ? 'text-[#67645E]' : 'text-[#84827E]'}`}
-                        >
-                          {r} star{r !== 1 ? 's' : ''}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div ref={sortDropdownRef} className="relative">
-                  <button
-                    onClick={() => { setIsSortDropdownOpen((prev) => !prev); setIsFilterDropdownOpen(false); }}
-                    className={`flex items-center gap-2 px-6 py-2.5 rounded-full border border-[#DDDDDD] text-[10px] font-black uppercase tracking-widest hover:border-[#67645E] transition-colors bg-white ${CONTROL_FOCUS_CLASS}`}
-                  >
-                    {reviewSortBy === 'recent' ? 'Most recent' : reviewSortBy === 'highest' ? 'Highest rated' : reviewSortBy === 'lowest' ? 'Lowest rated' : 'Most helpful'}
-                    <ChevronDown size={12} className={`transition-transform ${isSortDropdownOpen ? 'rotate-180' : ''}`} />
-                  </button>
-                  {isSortDropdownOpen && (
-                    <div className="absolute top-full mt-2 right-0 bg-white rounded-[12px] border border-[#DDDDDD] py-1 z-20 min-w-[160px]">
-                      {[
-                        { value: 'recent', label: 'Most recent' },
-                        { value: 'highest', label: 'Highest rated' },
-                        { value: 'lowest', label: 'Lowest rated' },
-                        { value: 'helpful', label: 'Most helpful' },
-                      ].map((opt) => (
-                        <button
-                          key={opt.value}
-                          onClick={() => { setReviewSortBy(opt.value); setIsSortDropdownOpen(false); }}
-                          className={`w-full px-4 py-2 text-left text-[11px] font-bold hover:bg-[#F1F0ED] transition-colors ${reviewSortBy === opt.value ? 'text-[#67645E]' : 'text-[#84827E]'}`}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                  <div ref={filterDropdownRef} className="relative">
+                    <button
+                      onClick={() => { setIsFilterDropdownOpen((prev) => !prev); setIsSortDropdownOpen(false); }}
+                      className={`flex items-center gap-2 px-6 py-2.5 rounded-full border text-[10px] font-black uppercase tracking-widest transition-colors ${CONTROL_FOCUS_CLASS} ${reviewRatingFilter ? 'bg-[#67645E] text-white border-[#67645E]' : 'border-[#DDDDDD] hover:bg-[#67645E] hover:text-white'}`}
+                    >
+                      {reviewRatingFilter ? `${reviewRatingFilter} stars` : (reviewFilterButton || 'Filter')}
+                      <ChevronDown size={12} className={`transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {isFilterDropdownOpen && (
+                      <div className="absolute top-full mt-2 left-0 bg-white rounded-[12px] border border-[#DDDDDD] py-1 z-20 min-w-[140px]">
+                        {reviewRatingFilter && (
+                          <button
+                            onClick={() => { setReviewRatingFilter(undefined); setIsFilterDropdownOpen(false); }}
+                            className={`w-full px-4 py-2 text-left text-[11px] font-bold hover:bg-[#F1F0ED] transition-colors text-[#84827E]`}
+                          >
+                            all ratings
+                          </button>
+                        )}
+                        {[5, 4, 3, 2, 1].map((r) => (
+                          <button
+                            key={r}
+                            onClick={() => { setReviewRatingFilter(r); setIsFilterDropdownOpen(false); }}
+                            className={`w-full px-4 py-2 text-left text-[11px] font-bold hover:bg-[#F1F0ED] transition-colors flex items-center gap-2 ${reviewRatingFilter === r ? 'text-[#67645E]' : 'text-[#84827E]'}`}
+                          >
+                            {r} star{r !== 1 ? 's' : ''}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div ref={sortDropdownRef} className="relative">
+                    <button
+                      onClick={() => { setIsSortDropdownOpen((prev) => !prev); setIsFilterDropdownOpen(false); }}
+                      className={`flex items-center gap-2 px-6 py-2.5 rounded-full border border-[#DDDDDD] text-[10px] font-black uppercase tracking-widest hover:border-[#67645E] transition-colors bg-white ${CONTROL_FOCUS_CLASS}`}
+                    >
+                      {reviewSortBy === 'recent' ? 'Most recent' : reviewSortBy === 'highest' ? 'Highest rated' : reviewSortBy === 'lowest' ? 'Lowest rated' : 'Most helpful'}
+                      <ChevronDown size={12} className={`transition-transform ${isSortDropdownOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {isSortDropdownOpen && (
+                      <div className="absolute top-full mt-2 right-0 bg-white rounded-[12px] border border-[#DDDDDD] py-1 z-20 min-w-[160px]">
+                        {[
+                          { value: 'recent', label: 'Most recent' },
+                          { value: 'highest', label: 'Highest rated' },
+                          { value: 'lowest', label: 'Lowest rated' },
+                          { value: 'helpful', label: 'Most helpful' },
+                        ].map((opt) => (
+                          <button
+                            key={opt.value}
+                            onClick={() => { setReviewSortBy(opt.value); setIsSortDropdownOpen(false); }}
+                            className={`w-full px-4 py-2 text-left text-[11px] font-bold hover:bg-[#F1F0ED] transition-colors ${reviewSortBy === opt.value ? 'text-[#67645E]' : 'text-[#84827E]'}`}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </ScrollReveal>
 
           <div className={`relative transition-all duration-700 ease-in-out overflow-hidden ${!isReviewsExpanded ? 'max-h-[500px] md:max-h-none' : 'max-h-[5000px]'}`}>
             {hasReviews ? (
-              <div className="divide-y divide-black/5">
+              <StaggerContainer className="divide-y divide-black/5" staggerDelay={0.06} viewportMargin="-40px">
                 {displayReviews.map((review, idx) => (
-                  <ReviewItem
-                    key={review.id ?? idx}
-                    review={review}
-                    content={{ verifiedLabel: reviewVerifiedLabel, hydrationQuestion: reviewHydrationQuestion, hydrationLow: reviewHydrationLow, hydrationHigh: reviewHydrationHigh, helpfulQuestion: reviewHelpfulQuestion }}
-                    helpfulCount={helpfulVotes[review.id ?? 0] ?? 0}
-                    onHelpfulVote={handleHelpfulVote}
-                  />
+                  <ScrollReveal key={review.id ?? idx} direction="bottom" delay={idx * 0.06}>
+                    <ReviewItem
+                      review={review}
+                      content={{ verifiedLabel: reviewVerifiedLabel, hydrationQuestion: reviewHydrationQuestion, hydrationLow: reviewHydrationLow, hydrationHigh: reviewHydrationHigh, helpfulQuestion: reviewHelpfulQuestion }}
+                      helpfulCount={helpfulVotes[review.id ?? 0] ?? 0}
+                      onHelpfulVote={handleHelpfulVote}
+                    />
+                  </ScrollReveal>
                 ))}
-              </div>
+              </StaggerContainer>
             ) : (
               <div className="py-16 text-center text-[14px] font-bold uppercase tracking-[0.2em] text-[#67645E]/40">
                 {productNoReviews || 'No reviews yet'}

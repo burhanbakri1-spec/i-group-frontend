@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView } from 'motion/react';
 import { Check, X, ArrowRight, Shield, Award, RefreshCw, Zap, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 

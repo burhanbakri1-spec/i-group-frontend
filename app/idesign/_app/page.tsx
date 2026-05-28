@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'motion/react';
 import { ArrowRight, ArrowUpRight, Play, ChevronRight, MapPin, Phone, Mail, Check, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { apiRequest } from '@igroup/shared';

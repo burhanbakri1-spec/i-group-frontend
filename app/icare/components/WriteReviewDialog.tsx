@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { Star, X, Send, Loader2 } from 'lucide-react';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { CreateReviewInput } from '../types';

@@ -86,10 +86,16 @@ export const SwipeRail: React.FC<SwipeRailProps> = ({
       return;
     }
 
-    cursorPositionRef.current = {
-      x: event.clientX - currentBounds.left,
-      y: event.clientY - currentBounds.top,
-    };
+    const newX = event.clientX - currentBounds.left;
+    const newY = event.clientY - currentBounds.top;
+    const prev = cursorPositionRef.current;
+
+    // Skip update if cursor moved less than 1px — saves rAF cycles
+    if (Math.abs(newX - prev.x) < 1 && Math.abs(newY - prev.y) < 1) {
+      return;
+    }
+
+    cursorPositionRef.current = { x: newX, y: newY };
 
     if (cursorFrameRef.current === null) {
       cursorFrameRef.current = window.requestAnimationFrame(flushCursorPosition);
@@ -145,7 +151,8 @@ export const SwipeRail: React.FC<SwipeRailProps> = ({
     };
     setDragging(true);
     setCursorActive(true);
-    viewport.setPointerCapture(event.pointerId);
+    // Pointer capture deferred to handlePointerMove — only after drag threshold
+    // to allow click events to pass through to child elements on tap.
   };
 
   const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -161,8 +168,15 @@ export const SwipeRail: React.FC<SwipeRailProps> = ({
 
     const deltaX = event.clientX - dragState.startX;
     if (Math.abs(deltaX) > DRAG_THRESHOLD_PX) {
-      dragState.dragged = true;
-      suppressClickRef.current = true;
+      if (!dragState.dragged) {
+        dragState.dragged = true;
+        suppressClickRef.current = true;
+        // Capture pointer only once we've confirmed this is a drag gesture.
+        // This lets quick taps reach child elements (product cards, links).
+        if (!viewport.hasPointerCapture(dragState.pointerId!)) {
+          viewport.setPointerCapture(dragState.pointerId!);
+        }
+      }
     }
 
     if (dragState.dragged) {

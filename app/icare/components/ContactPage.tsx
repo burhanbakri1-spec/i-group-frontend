@@ -1,9 +1,9 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 import { Language } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { PageHero } from './PageHero';
+import { ScrollReveal } from './ui/ScrollReveal';
 
 interface ContactPageProps {
   lang: Language;
@@ -42,35 +42,35 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
         <div className="max-w-[600px] mx-auto space-y-12">
           
           {/* Info & Guidelines */}
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="space-y-8 md:space-y-16 pt-8 md:pt-24"
-          >
-            <div className="space-y-4 md:space-y-6 px-2 md:px-0">
-              <h2 className="text-[28px] md:text-[42px] font-bold lowercase tracking-tight text-[#67645E] leading-tight">
-                {isEn ? contactInfoTitle : "نحن هنا للمساعدة."}
-              </h2>
-              <div className="space-y-4 md:space-y-6 text-[13px] md:text-[16px] text-[#5C5A56] leading-relaxed font-medium">
-                <p className="opacity-80">
-                  {isEn 
-                    ? contactSupportInfo
-                    : "فريق تجربة العملاء متاح من الاثنين إلى الجمعة، من 9 صباحاً حتى 5 مساءً. نهدف للرد على جميع الاستفسارات خلال 24-48 ساعة عمل."}
-                </p>
-                <div className="pt-4 md:pt-6 border-t border-black/5 space-y-4 md:space-y-6">
-                  <div>
-                    <span className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/40 mb-1">{contactEmailLabel}</span>
-                    <a href={`mailto:${contactEmail}`} className="text-[14px] md:text-[18px] text-black font-black hover:opacity-50 transition-opacity lowercase">{contactEmail}</a>
-                  </div>
-                  <div>
-                    <span className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/40 mb-1">{contactWholesaleLabel}</span>
-                    <a href={`mailto:${contactWholesaleEmail}`} className="text-[14px] md:text-[18px] text-black font-black hover:opacity-50 transition-opacity lowercase">{contactWholesaleEmail}</a>
+          <ScrollReveal direction="left" viewportMargin="-60px">
+            <div className="space-y-8 md:space-y-16 pt-8 md:pt-24">
+              <div className="space-y-4 md:space-y-6 px-2 md:px-0">
+                <h2 className="text-[28px] md:text-[42px] font-bold lowercase tracking-tight text-[#67645E] leading-tight">
+                  {isEn ? contactInfoTitle : "نحن هنا للمساعدة."}
+                </h2>
+                <div className="space-y-4 md:space-y-6 text-[13px] md:text-[16px] text-[#5C5A56] leading-relaxed font-medium">
+                  <p className="opacity-80">
+                    {isEn 
+                      ? contactSupportInfo
+                      : "فريق تجربة العملاء متاح من الاثنين إلى الجمعة، من 9 صباحاً حتى 5 مساءً. نهدف للرد على جميع الاستفسارات خلال 24-48 ساعة عمل."}
+                  </p>
+                  <div className="pt-4 md:pt-6 border-t border-black/5 space-y-4 md:space-y-6">
+                    <div>
+                      <span className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/40 mb-1">{contactEmailLabel}</span>
+                      <a href={`mailto:${contactEmail}`} className="text-[14px] md:text-[18px] text-black font-black hover:opacity-50 transition-opacity lowercase">{contactEmail}</a>
+                    </div>
+                    <div>
+                      <span className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/40 mb-1">{contactWholesaleLabel}</span>
+                      <a href={`mailto:${contactWholesaleEmail}`} className="text-[14px] md:text-[18px] text-black font-black hover:opacity-50 transition-opacity lowercase">{contactWholesaleEmail}</a>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+          </ScrollReveal>
 
-            {/* FAQ Link */}
+          {/* FAQ Link */}
+          <ScrollReveal direction="bottom" delay={0.1} viewportMargin="-40px">
             <div className="bg-[#F2F1ED] p-6 md:p-10 rounded-[24px] md:rounded-[40px] space-y-4 border border-black/[0.03]">
               <h3 className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em]">{contactFaqTitle}</h3>
               <p className="text-[12px] md:text-[14px] text-[#5C5A56] leading-relaxed opacity-70">
@@ -83,7 +83,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
                 {isEn ? contactFaqCta : "زيارة الأسئلة الشائعة"}
               </button>
             </div>
-          </motion.div>
+          </ScrollReveal>
         </div>
       </div>
     </div>

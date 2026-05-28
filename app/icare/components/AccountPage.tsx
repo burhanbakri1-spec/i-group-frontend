@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';

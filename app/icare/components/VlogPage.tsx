@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'motion/react';
 import { Language } from '../translations';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Play } from 'lucide-react';

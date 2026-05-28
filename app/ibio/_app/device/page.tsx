@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView } from 'motion/react';
 import { ArrowRight, Check, Battery, Bluetooth, Shield, Thermometer, Activity, Heart, Zap, Wind } from 'lucide-react';
 import Link from 'next/link';
 const DEVICE_IMGS = {

@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from 'motion/react';
 import { Search, Loader2, Truck, Package, Clock, CheckCircle, XCircle, AlertCircle, MapPin } from 'lucide-react';
 import { icareApi } from '../lib/api-client';
 import { Language, checkoutTranslations } from '../translations';

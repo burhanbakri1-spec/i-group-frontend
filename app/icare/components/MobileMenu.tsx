@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { X, ShoppingBag, Heart, Globe } from 'lucide-react';
 import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';

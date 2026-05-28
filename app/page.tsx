@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring, useInView } from 'motion/react';
 import { 
   Sparkles, 
   Heart, 
