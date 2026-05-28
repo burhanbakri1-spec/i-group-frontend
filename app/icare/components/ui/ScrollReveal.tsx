@@ -86,7 +86,7 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
           ? undefined
           : { opacity: 1, x: 0, y: 0 }
       }
-      viewport={{ once: true, margin: viewportMargin }}
+      viewport={{ once: false, margin: viewportMargin }}
       transition={{
         delay: shouldReduceMotion ? 0 : safeDelay,
         duration: shouldReduceMotion ? 0 : scaledDuration,
@@ -140,7 +140,7 @@ export const StaggerContainer: React.FC<StaggerContainerProps> = ({
       className={`scroll-reveal ${className}`}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: viewportMargin }}
+      viewport={{ once: false, margin: viewportMargin }}
       variants={{
         hidden: {},
         visible: {
