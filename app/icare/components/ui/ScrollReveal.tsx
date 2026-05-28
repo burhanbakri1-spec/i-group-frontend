@@ -3,6 +3,20 @@
 import React, { useCallback, useRef } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 
+// ─── Centralized Animation Configuration ───
+// Tweak these values to globally control all scroll-reveal timing.
+// Every ScrollReveal and StaggerContainer multiplies delay/duration by these factors.
+// Adjust the multiplier once here — every animation on every page follows.
+
+export const ANIM = {
+  /** Multiplier applied to all delay values (stagger, per-element, delayChildren). Increase for slower reveals. */
+  delay: 1.5,
+  /** Multiplier applied to all duration values. Increase for smoother, more cinematic motion. */
+  duration: 1.2,
+} as const;
+
+// ───────────────────────────────────────────────────
+
 type Direction = 'bottom' | 'left' | 'right';
 
 interface ScrollRevealProps {
@@ -30,6 +44,7 @@ const MAX_DELAY = 1.2;
  * All animations use transform + opacity only (GPU-composited on the browser
  * compositor thread via Motion's WAAPI-first engine). Zero layout recalculations.
  *
+ * - Delay and duration are automatically scaled by ANIM multipliers.
  * - Respects prefers-reduced-motion (all animations become instant).
  * - Uses viewport.once to disconnect IntersectionObserver after first trigger.
  * - Manages will-change lifecycle to free GPU memory after animation completes.
@@ -46,7 +61,8 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
   const shouldReduceMotion = useReducedMotion();
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const vector = directionVectors[direction];
-  const safeDelay = Math.min(delay, MAX_DELAY);
+  const safeDelay = Math.min(delay * ANIM.delay, MAX_DELAY);
+  const scaledDuration = duration * ANIM.duration;
 
   const handleAnimationComplete = useCallback(() => {
     const el = wrapperRef.current;
@@ -73,7 +89,7 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
       viewport={{ once: true, margin: viewportMargin }}
       transition={{
         delay: shouldReduceMotion ? 0 : safeDelay,
-        duration: shouldReduceMotion ? 0 : duration,
+        duration: shouldReduceMotion ? 0 : scaledDuration,
         ease: STANDARD_EASE,
       }}
       onAnimationComplete={handleAnimationComplete}
@@ -87,6 +103,8 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
  * Stagger container — wraps children and sequences their entrance animations
  * using Motion's staggerChildren. Each child should be wrapped in ScrollReveal
  * for the actual animation while this parent controls the stagger rhythm.
+ *
+ * - staggerDelay and delayChildren are automatically scaled by ANIM multipliers.
  */
 interface StaggerContainerProps {
   children: React.ReactNode;
@@ -105,6 +123,8 @@ export const StaggerContainer: React.FC<StaggerContainerProps> = ({
 }) => {
   const shouldReduceMotion = useReducedMotion();
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const scaledStagger = staggerDelay * ANIM.delay;
+  const scaledDelayChildren = 0.02 * ANIM.delay;
 
   const handleAnimationComplete = useCallback(() => {
     const el = wrapperRef.current;
@@ -125,8 +145,8 @@ export const StaggerContainer: React.FC<StaggerContainerProps> = ({
         hidden: {},
         visible: {
           transition: {
-            staggerChildren: shouldReduceMotion ? 0 : staggerDelay,
-            delayChildren: 0.02,
+            staggerChildren: shouldReduceMotion ? 0 : scaledStagger,
+            delayChildren: shouldReduceMotion ? 0 : scaledDelayChildren,
           },
         },
       }}
