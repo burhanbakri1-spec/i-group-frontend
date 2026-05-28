@@ -367,10 +367,6 @@
     scroll-snap-type: none;
   }
 
-  .icare-swipe-rail.is-dragging .icare-swipe-rail__track {
-    pointer-events: none;
-  }
-
   .icare-landing-products {
     overflow: hidden;
     background: var(--rb-pure-white);
