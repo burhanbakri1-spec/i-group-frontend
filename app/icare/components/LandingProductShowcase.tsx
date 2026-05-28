@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ProductCard } from './ProductCard';
 import { SwipeRail } from './ui/SwipeRail';
+import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
 import { SkeletonPulse } from './ui/skeletons';
 import { fetchCatalogProducts, fetchProductShortcut } from '../lib/catalog-client';
 import { useSiteContent } from '../hooks/useSiteContent';
@@ -77,31 +78,35 @@ export const LandingProductShowcase: React.FC<LandingProductShowcaseProps> = ({ 
 
   return (
     <section className="icare-index-section icare-landing-products">
-      <div className="icare-landing-products__header">
-        <h2 className="icare-landing-products__title">
-          {lang === 'en' ? (trendingTitle || 'trending essentials') : 'أساسيات رائجة'}
-        </h2>
-      </div>
+      <ScrollReveal direction="bottom" viewportMargin="-60px">
+        <div className="icare-landing-products__header">
+          <h2 className="icare-landing-products__title">
+            {lang === 'en' ? (trendingTitle || 'trending essentials') : 'أساسيات رائجة'}
+          </h2>
+        </div>
+      </ScrollReveal>
 
-      <SwipeRail
-        ariaLabel={lang === 'en' ? 'Featured product showcase' : 'عرض المنتجات المختارة'}
-        cursorLabel={lang === 'en' ? 'swipe' : 'اسحب'}
-        className="icare-landing-products__rail"
-        trackClassName="icare-landing-products__track"
-      >
-        {products.map((product) => (
-          <div
-            key={product.id}
-            className="icare-landing-products__item"
-          >
-            <ProductCard
-              product={product}
-              lang={lang}
-              onSelect={() => onProductSelect(product)}
-            />
-          </div>
-        ))}
-      </SwipeRail>
+      <ScrollReveal direction="bottom" delay={0.1} viewportMargin="-40px">
+        <SwipeRail
+          ariaLabel={lang === 'en' ? 'Featured product showcase' : 'عرض المنتجات المختارة'}
+          cursorLabel={lang === 'en' ? 'swipe' : 'اسحب'}
+          className="icare-landing-products__rail"
+          trackClassName="icare-landing-products__track"
+        >
+          {products.map((product, index) => (
+            <ScrollReveal key={product.id} direction="bottom" delay={Math.min(index * 0.05, 0.5)}>
+              <div className="icare-landing-products__item">
+                <ProductCard
+                  product={product}
+                  lang={lang}
+                  onSelect={() => onProductSelect(product)}
+                  showQuickAdd={false}
+                />
+              </div>
+            </ScrollReveal>
+          ))}
+        </SwipeRail>
+      </ScrollReveal>
     </section>
   );
 };
