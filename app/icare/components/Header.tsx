@@ -25,6 +25,8 @@ const MUTED_TEXT_CLASS = 'text-[var(--rb-primary-text)] hover:text-[var(--rb-nea
 const SHOP_MEGA_MENU_ID = 'icare-shop-mega-menu';
 const HEADER_HIDE_SCROLL_THRESHOLD = 32;
 const HEADER_SCROLL_DELTA = 4;
+const HEADER_HIDE_DELAY_MS = 240;
+const HEADER_MOTION_EASE = [0.76, 0, 0.24, 1] as const;
 
 export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavigate, onProductSelect, onOpenMenu, isDrawerOpen, lang, onToggleLang }) => {
   const t = translations[lang];
@@ -42,16 +44,33 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
   const pathname = usePathname();
   const headerRef = useRef<HTMLDivElement | null>(null);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const headerHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shopButtonRef = useRef<HTMLButtonElement | null>(null);
   const shopMenuRef = useRef<HTMLDivElement | null>(null);
   const lastScrollYRef = useRef(0);
   const calmTween = shouldReduceMotion ? { duration: 0 } : { duration: 0.2, ease: 'easeOut' as const };
+  const headerMotion = shouldReduceMotion ? { duration: 0 } : { duration: 0.42, ease: HEADER_MOTION_EASE };
 
   const cancelHideTimer = () => {
     if (hideTimerRef.current !== null) {
       clearTimeout(hideTimerRef.current);
       hideTimerRef.current = null;
     }
+  };
+
+  const cancelHeaderHideTimer = () => {
+    if (headerHideTimerRef.current !== null) {
+      clearTimeout(headerHideTimerRef.current);
+      headerHideTimerRef.current = null;
+    }
+  };
+
+  const scheduleHeaderHide = () => {
+    if (headerHideTimerRef.current !== null) return;
+    headerHideTimerRef.current = setTimeout(() => {
+      setIsVisible(false);
+      headerHideTimerRef.current = null;
+    }, HEADER_HIDE_DELAY_MS);
   };
 
   const showShop = () => {
@@ -97,7 +116,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
     shopButtonRef.current?.focus();
   };
 
-  useEffect(() => () => { cancelHideTimer(); }, []);
+  useEffect(() => () => {
+    cancelHideTimer();
+    cancelHeaderHideTimer();
+  }, []);
 
   useEffect(() => {
     if (!isShopHovered) return;
@@ -178,10 +200,12 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
       setIsScrolled(currentScrollY > 40 || !isStandardHeroRoute);
 
       if (currentScrollY <= HEADER_HIDE_SCROLL_THRESHOLD) {
+        cancelHeaderHideTimer();
         setIsVisible(true);
       } else if (delta > HEADER_SCROLL_DELTA) {
-        setIsVisible(false);
+        scheduleHeaderHide();
       } else if (delta < -HEADER_SCROLL_DELTA) {
+        cancelHeaderHideTimer();
         setIsVisible(true);
       }
 
@@ -194,6 +218,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
     window.addEventListener('resize', updateHeaderState);
 
     return () => {
+      cancelHeaderHideTimer();
       window.removeEventListener('scroll', updateHeaderState);
       window.removeEventListener('resize', updateHeaderState);
     };
@@ -215,7 +240,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
       ref={headerRef}
       initial={shouldReduceMotion ? { y: 0, opacity: 1 } : { y: -6, opacity: 0 }}
       animate={{ y: headerY, opacity: isMounted ? headerOpacity : 0 }}
-      transition={calmTween}
+      transition={headerMotion}
       onMouseLeave={hideShop}
       onBlur={handleHeaderBlur}
       onKeyDown={handleHeaderKeyDown}

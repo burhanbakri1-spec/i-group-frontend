@@ -291,6 +291,470 @@
     padding-top: 1.25rem;
   }
 
+  .icare-swipe-rail {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .icare-swipe-rail__viewport {
+    overflow-x: auto;
+    overflow-y: hidden;
+    cursor: none;
+    scroll-behavior: auto;
+    scroll-snap-type: x proximity;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+  }
+
+  .icare-swipe-rail__viewport:focus-visible {
+    outline: 2px solid rgb(103 100 94 / 0.72);
+    outline-offset: 4px;
+    border-radius: var(--icare-section-radius);
+  }
+
+  .icare-swipe-rail__track {
+    display: flex;
+    width: max-content;
+    min-width: 100%;
+    gap: var(--icare-swipe-gap, 0.75rem);
+  }
+
+  .icare-swipe-rail__cursor {
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 40;
+    display: grid;
+    place-items: center;
+    width: 5.5rem;
+    height: 5.5rem;
+    border: 1px solid rgb(255 255 255 / 0.42);
+    border-radius: var(--rb-radius-full);
+    background:
+      radial-gradient(circle at 50% 50%, rgb(255 255 255 / 0.38), rgb(255 255 255 / 0.18) 58%, rgb(255 255 255 / 0.04) 78%);
+    box-shadow:
+      inset 0 0 1.6rem rgb(255 255 255 / 0.26),
+      0 1.25rem 3rem rgb(54 49 43 / 0.14);
+    contain: layout paint;
+    opacity: 0;
+    transform: translate3d(-9999px, -9999px, 0) translate(-50%, -50%);
+    transition: opacity 120ms var(--rb-ease-out);
+    will-change: transform, opacity;
+  }
+
+  .icare-swipe-rail__cursor-label {
+    color: var(--rb-gray-84827E);
+    font-size: 0.72rem;
+    font-weight: 900;
+    line-height: 1;
+    text-align: center;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .icare-swipe-rail.is-cursor-active .icare-swipe-rail__cursor {
+    opacity: 1;
+  }
+
+  .icare-swipe-rail.is-dragging,
+  .icare-swipe-rail.is-dragging .icare-swipe-rail__viewport {
+    user-select: none;
+  }
+
+  .icare-swipe-rail.is-dragging .icare-swipe-rail__viewport {
+    scroll-snap-type: none;
+  }
+
+  .icare-swipe-rail.is-dragging .icare-swipe-rail__track {
+    pointer-events: none;
+  }
+
+  .icare-landing-products {
+    overflow: hidden;
+    background: var(--rb-pure-white);
+    padding-top: clamp(1rem, 1.8vw, 1.5rem);
+  }
+
+  .icare-landing-products__header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: clamp(0.75rem, 1.4vw, 1rem);
+  }
+
+  .icare-landing-products__title {
+    margin: 0;
+    color: var(--rb-primary-text);
+    font-size: clamp(2.25rem, 4.8vw, 4.5rem);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: 0;
+    text-transform: lowercase;
+  }
+
+  .icare-landing-products__rail {
+    --icare-swipe-gap: 0.75rem;
+  }
+
+  .icare-landing-products__track {
+    padding-bottom: 0.25rem;
+  }
+
+  .icare-landing-products__item {
+    flex: 0 0 clamp(22rem, 31.2vw, 32rem);
+    width: clamp(22rem, 31.2vw, 32rem);
+    contain: layout paint style;
+    scroll-snap-align: start;
+  }
+
+  .icare-landing-products__empty {
+    border-radius: var(--icare-section-radius);
+    background: var(--rb-pure-white);
+    padding: 3rem 1.5rem;
+    color: var(--rb-muted-text);
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .icare-product-card {
+    position: relative;
+    display: block;
+    width: 100%;
+    color: var(--rb-primary-text);
+    contain: layout paint style;
+  }
+
+  .icare-product-card__surface {
+    position: relative;
+    display: grid;
+    width: 100%;
+    overflow: hidden;
+    border: 0;
+    border-radius: var(--icare-section-radius);
+    background: var(--rb-bg-warm-gray);
+  }
+
+  .icare-product-card--standard .icare-product-card__surface {
+    background: var(--rb-pure-white);
+    padding: 1rem;
+  }
+
+  .icare-product-card--showcase .icare-product-card__surface {
+    background: var(--rb-bg-warm-gray);
+    padding: 0;
+  }
+
+  .icare-product-card__main-action {
+    position: relative;
+    z-index: 10;
+    display: block;
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: var(--rb-primary-text);
+    padding: 0;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .icare-product-card__primary {
+    display: grid;
+    width: 100%;
+    transition: opacity 500ms var(--rb-ease-out);
+  }
+
+  .icare-product-card__surface.has-hover-media.is-hovered .icare-product-card__primary {
+    opacity: 0;
+  }
+
+  .icare-product-card--showcase .icare-product-card__primary {
+    min-height: clamp(36rem, 48vw, 46rem);
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .icare-product-card--showcase .icare-product-card__main-action {
+    cursor: none;
+  }
+
+  .icare-swipe-rail .icare-product-card__main-action {
+    cursor: none;
+  }
+
+  .icare-product-card--standard .icare-product-card__primary {
+    grid-template-rows: auto auto;
+  }
+
+  .icare-product-card.is-loading {
+    display: block;
+    min-height: clamp(36rem, 48vw, 46rem);
+  }
+
+  .icare-product-card.is-loading > * {
+    min-height: inherit;
+  }
+
+  .icare-product-card__main-action:focus-visible,
+  .icare-product-card__quick-add:focus-visible {
+    outline: 2px solid rgb(103 100 94 / 0.72);
+    outline-offset: 4px;
+  }
+
+  .icare-product-card__media {
+    position: relative;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border-radius: inherit;
+  }
+
+  .icare-product-card--standard .icare-product-card__media {
+    aspect-ratio: 1 / 1;
+    padding: 0;
+    border-radius: var(--rb-radius-card);
+  }
+
+  .icare-product-card--showcase .icare-product-card__media {
+    min-height: clamp(25rem, 35vw, 36rem);
+    padding: clamp(2rem, 4vw, 4rem);
+  }
+
+  .icare-product-card__label,
+  .icare-product-card__stock {
+    position: absolute;
+    top: 0.85rem;
+    z-index: 2;
+    color: var(--rb-gray-84827E);
+    font-size: clamp(0.68rem, 0.78vw, 0.78rem);
+    font-weight: 800;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .icare-product-card__label {
+    left: 0.85rem;
+  }
+
+  .icare-product-card__stock {
+    right: 0.85rem;
+  }
+
+  .icare-product-card__image {
+    object-fit: contain;
+    transform: scale(1.04);
+    transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .icare-product-card--standard .icare-product-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: none;
+  }
+
+  .icare-product-card--showcase .icare-product-card__image {
+    width: min(74%, 24rem);
+    height: min(78%, 29rem);
+  }
+
+  .icare-product-card:hover .icare-product-card__image,
+  .icare-swipe-rail:not(.is-dragging) .icare-product-card:hover .icare-product-card__image {
+    transform: scale(1.08);
+  }
+
+  .icare-product-card--standard:hover .icare-product-card__image {
+    transform: none;
+  }
+
+  .icare-product-card__hover-media {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+  }
+
+  .icare-product-card__hover-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .icare-product-card__body {
+    display: grid;
+    background: var(--rb-pure-white);
+  }
+
+  .icare-product-card--standard .icare-product-card__body {
+    gap: 0.55rem;
+    min-height: 8.25rem;
+    padding: 0.625rem 0 0.875rem;
+  }
+
+  .icare-product-card--showcase .icare-product-card__body {
+    gap: 0.75rem;
+    padding: clamp(1rem, 1.7vw, 1.5rem);
+  }
+
+  .icare-product-card__rating {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    color: var(--rb-primary-text);
+  }
+
+  .icare-product-card__rating svg {
+    fill: transparent;
+    stroke-width: 1.8;
+  }
+
+  .icare-product-card--standard .icare-product-card__rating svg {
+    width: clamp(0.72rem, 0.85vw, 0.9rem);
+    height: clamp(0.72rem, 0.85vw, 0.9rem);
+  }
+
+  .icare-product-card--showcase .icare-product-card__rating svg {
+    width: clamp(0.9rem, 1vw, 1rem);
+    height: clamp(0.9rem, 1vw, 1rem);
+  }
+
+  .icare-product-card__rating svg.is-filled {
+    fill: currentColor;
+  }
+
+  .icare-product-card__reviews {
+    margin-left: 0.35rem;
+    color: var(--rb-muted-text);
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .icare-product-card__summary {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .icare-product-card__copy {
+    display: grid;
+    min-width: 0;
+    gap: 0.3rem;
+  }
+
+  .icare-product-card__name {
+    display: block;
+    color: var(--rb-primary-text);
+    font-weight: 900;
+    letter-spacing: 0;
+    text-transform: lowercase;
+  }
+
+  .icare-product-card--standard .icare-product-card__name {
+    font-size: clamp(1rem, 1.45vw, 1.55rem);
+    line-height: 1;
+  }
+
+  .icare-product-card--showcase .icare-product-card__name {
+    font-size: clamp(1.45rem, 2.15vw, 2.35rem);
+    line-height: 0.96;
+  }
+
+  .icare-product-card__description {
+    display: -webkit-box;
+    overflow: hidden;
+    color: var(--rb-muted-text);
+    font-weight: 650;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .icare-product-card--standard .icare-product-card__description {
+    max-width: 28ch;
+    font-size: clamp(0.8rem, 0.95vw, 0.95rem);
+    line-height: 1.22;
+  }
+
+  .icare-product-card--showcase .icare-product-card__description {
+    max-width: 32ch;
+    font-size: clamp(0.95rem, 1.05vw, 1.1rem);
+    line-height: 1.24;
+  }
+
+  .icare-product-card__price {
+    display: grid;
+    flex: 0 0 auto;
+    justify-items: end;
+    margin-left: auto;
+    color: var(--rb-primary-text);
+    font-weight: 900;
+    line-height: 1;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .icare-product-card--standard .icare-product-card__price {
+    font-size: clamp(0.9rem, 1vw, 1rem);
+  }
+
+  .icare-product-card--showcase .icare-product-card__price {
+    font-size: clamp(1rem, 1.15vw, 1.2rem);
+  }
+
+  .icare-product-card__original-price {
+    color: var(--rb-muted-text);
+    font-size: 0.75em;
+    font-weight: 800;
+    text-decoration: line-through;
+  }
+
+  .icare-product-card__quick-add-wrap {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.875rem;
+    left: 0.75rem;
+    z-index: 30;
+  }
+
+  .icare-product-card__quick-add {
+    width: 100%;
+    min-height: 2.65rem;
+    border: 1px solid var(--rb-pure-white);
+    border-radius: var(--rb-radius-pill);
+    background: var(--rb-pure-white);
+    color: var(--rb-primary-text);
+    cursor: pointer;
+    font-size: 0.72rem;
+    font-weight: 900;
+    line-height: 1;
+    text-transform: uppercase;
+    transition:
+      background 180ms var(--rb-ease-out),
+      color 180ms var(--rb-ease-out),
+      transform 180ms var(--rb-ease-out),
+      box-shadow 180ms var(--rb-ease-out);
+  }
+
+  .icare-product-card__quick-add:hover {
+    background: var(--rb-primary-text);
+    border-color: var(--rb-primary-text);
+    color: var(--rb-pure-white);
+    box-shadow: 0 0.75rem 1.6rem rgb(54 49 43 / 0.12);
+  }
+
+  .icare-product-card__quick-add:active {
+    transform: scale(0.99);
+  }
+
+  .icare-product-card__quick-add:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+
   .icare-section-header {
     display: flex;
     align-items: end;
@@ -482,6 +946,17 @@
 
 }
 
+@media (hover: none), (pointer: coarse) {
+  .icare-swipe-rail__viewport,
+  .icare-product-card__main-action {
+    cursor: pointer;
+  }
+
+  .icare-swipe-rail__cursor {
+    display: none;
+  }
+}
+
 @media (max-width: 980px) {
   :root {
     --icare-header-inset: 1rem;
@@ -499,6 +974,35 @@
 
   .icare-morning-section {
     padding: 1rem;
+  }
+
+  .icare-landing-products {
+    padding-top: 1rem;
+  }
+
+  .icare-landing-products__header {
+    padding: 0 1rem;
+  }
+
+  .icare-landing-products__title {
+    font-size: clamp(2rem, 12vw, 3.5rem);
+  }
+
+  .icare-landing-products__track {
+    padding: 0 1rem 0.25rem;
+  }
+
+  .icare-landing-products__item {
+    flex-basis: min(84vw, 28rem);
+    width: min(84vw, 28rem);
+  }
+
+  .icare-product-card--showcase .icare-product-card__primary {
+    min-height: 36rem;
+  }
+
+  .icare-product-card--showcase .icare-product-card__media {
+    min-height: 25rem;
   }
 
   .icare-morning-header {

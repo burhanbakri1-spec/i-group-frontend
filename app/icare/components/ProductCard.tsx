@@ -1,31 +1,65 @@
 import React, { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { Star } from 'lucide-react';
 import { Language } from '../translations';
 import { Product } from '../types';
 import { isPurchasableStock } from '../lib/mappers';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useShop } from '../context/ShopContext';
 
+type ProductCardVariant = 'standard' | 'showcase';
+
 interface ProductCardProps {
   product: Product;
   lang: Language;
   onSelect?: () => void;
+  variant?: ProductCardVariant;
+  showQuickAdd?: boolean;
 }
 
-const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }) => {
+const getDisplayName = (product: Product) => product.title ?? product.name;
+
+const getDisplayDescription = (product: Product, lang: Language) => (
+  product.description
+  || product.sub
+  || product.main
+  || product.category
+  || (lang === 'en' ? 'daily skin essential' : 'أساسي للعناية اليومية')
+);
+
+const getCardLabel = (product: Product) => (
+  product.label
+  || product.brand
+  || product.category
+  || ''
+);
+
+const getFilledStars = (rating?: string) => {
+  const numericRating = Number.parseFloat(rating ?? '5');
+  if (!Number.isFinite(numericRating)) {
+    return 5;
+  }
+
+  return Math.max(0, Math.min(5, Math.round(numericRating)));
+};
+
+const ProductCardBase: React.FC<ProductCardProps> = ({
+  product,
+  lang,
+  onSelect,
+  variant = 'standard',
+  showQuickAdd = true,
+}) => {
   const [isHovered, setIsHovered] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const { addToCart } = useShop();
   const isPurchasable = isPurchasableStock(product.stockStatus, product.stock);
-
+  const displayName = getDisplayName(product);
+  const description = getDisplayDescription(product, lang);
+  const cardLabel = getCardLabel(product);
+  const filledStars = getFilledStars(product.rating);
   const hoverImage = product.images && product.images.length > 1 ? product.images[1] : null;
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      onSelect?.();
-    }
-  };
+  const shouldShowQuickAdd = showQuickAdd && variant === 'standard';
 
   const cardMotion = shouldReduceMotion
     ? {}
@@ -34,111 +68,132 @@ const ProductCardBase: React.FC<ProductCardProps> = ({ product, lang, onSelect }
         whileInView: { opacity: 1, y: 0 },
       };
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onSelect?.();
+    }
+  };
+
+  const handleQuickAdd = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (isPurchasable) {
+      addToCart(product);
+    }
+  };
+
   return (
-    <motion.div
-      className="group block w-full"
+    <motion.article
+      className={`icare-product-card icare-product-card--${variant}`}
       {...cardMotion}
       viewport={{ once: true, margin: '-50px' }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
     >
-      <a
-        onClick={onSelect}
-        onKeyDown={handleKeyDown}
+      <div
+        className={`icare-product-card__surface ${isHovered ? 'is-hovered' : ''} ${hoverImage ? 'has-hover-media' : ''}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        tabIndex={0}
-        role="link"
-        className="relative block w-full bg-white rounded-[12px] overflow-hidden font-sans cursor-pointer p-[16px]"
       >
-        {/* Primary content: image + text — visible at rest, with padding on all sides */}
-        <div className="relative z-10 transition-opacity duration-500 ease-out group-hover:opacity-0">
-          {/* Label — floating over image, categorization header */}
-          {product.label && (
-            <span className="absolute top-3 left-3 z-20 text-[16px] font-black uppercase tracking-[0.25em] text-[var(--rb-primary-text)]">
-              {product.label}
-            </span>
-          )}
-
-          {/* Main image */}
-          <div className="aspect-square rounded-[var(--rb-radius-card)] overflow-hidden">
-            <ImageWithFallback
-              src={product.image}
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
-          </div>
-
-          {/* Badges */}
-          {!isPurchasable && (
-            <span className="absolute top-3 right-3 z-20 px-3 py-1 bg-black/70 text-white text-[10px] font-bold uppercase tracking-wider rounded-full">
-              sold out
-            </span>
-          )}
-
-          {/* Text */}
-          <div className="pt-[10px] pb-[14px] flex flex-col gap-[12px]">
-            <h3 className="font-bold text-sm text-[var(--rb-primary-text)] uppercase tracking-[0.28px] leading-[16.8px]">
-              {product.name}
-            </h3>
-            <div className="flex items-center gap-2">
-              <p className="text-sm font-normal text-[var(--rb-primary-text)] tracking-[0.313835px]">
-                {product.price}
-              </p>
-              {product.originalPrice && (
-                <span className="text-xs text-[var(--rb-gray-ACA9A5)] line-through">
-                  {product.originalPrice}
+        <div
+          className="icare-product-card__main-action"
+          onClick={onSelect}
+          onKeyDown={handleKeyDown}
+          tabIndex={0}
+          role="link"
+          aria-label={`${lang === 'en' ? 'View' : 'عرض'} ${displayName}`}
+        >
+          <div className="icare-product-card__primary">
+            <span className="icare-product-card__media">
+              {cardLabel && (
+                <span className="icare-product-card__label">{cardLabel}</span>
+              )}
+              {!isPurchasable && (
+                <span className="icare-product-card__stock">
+                  {lang === 'en' ? 'sold out' : 'نفد المخزون'}
                 </span>
               )}
-            </div>
+              <ImageWithFallback
+                src={product.image}
+                alt={displayName}
+                className="icare-product-card__image"
+              />
+            </span>
+
+            <span className="icare-product-card__body">
+              <span
+                className="icare-product-card__rating"
+                aria-label={`${product.rating ?? '5'} ${lang === 'en' ? 'out of 5 stars' : 'من 5 نجوم'}`}
+              >
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <Star
+                    key={index}
+                    className={index < filledStars ? 'is-filled' : ''}
+                    aria-hidden="true"
+                  />
+                ))}
+                {product.reviews && (
+                  <span className="icare-product-card__reviews">({product.reviews})</span>
+                )}
+              </span>
+
+              <span className="icare-product-card__summary">
+                <span className="icare-product-card__copy">
+                  <span className="icare-product-card__name">{displayName}</span>
+                  <span className="icare-product-card__description">{description}</span>
+                </span>
+                <span className="icare-product-card__price">
+                  {product.originalPrice && (
+                    <span className="icare-product-card__original-price">{product.originalPrice}</span>
+                  )}
+                  {product.price}
+                </span>
+              </span>
+            </span>
           </div>
         </div>
 
-        {/* Hover overlay: alternate image fills entire card body */}
         {hoverImage && (
           <motion.div
-            className="absolute inset-0 z-20"
+            className="icare-product-card__hover-media"
             initial={false}
             animate={{
               opacity: isHovered ? 1 : 0,
             }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            aria-hidden="true"
           >
             <ImageWithFallback
               src={hoverImage}
-              alt={product.name}
-              className="w-full h-full object-cover"
+              alt=""
+              className="icare-product-card__hover-image"
             />
           </motion.div>
         )}
 
-        {/* Quick Add button — visible on hover, stays on top of everything */}
-        <motion.div
-          className="absolute bottom-[14px] left-3 right-3 z-30"
-          initial={false}
-          animate={{
-            y: isHovered ? 0 : 60,
-            opacity: isHovered ? 1 : 0,
-          }}
-          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              if (isPurchasable) {
-                addToCart(product);
-              }
+        {shouldShowQuickAdd && (
+          <motion.div
+            className="icare-product-card__quick-add-wrap"
+            initial={false}
+            animate={{
+              y: isHovered ? 0 : 60,
+              opacity: isHovered ? 1 : 0,
             }}
-            disabled={!isPurchasable}
-            className="w-full py-2.5 bg-white text-[var(--rb-primary-text)] border border-white text-[13px] font-medium rounded-full hover:bg-[var(--rb-primary-text)] hover:text-white hover:border-[var(--rb-primary-text)] active:scale-[0.98] hover:shadow-lg transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
           >
-            {isPurchasable
-              ? (lang === 'en' ? 'Quick Add' : 'إضافة سريعة')
-              : (lang === 'en' ? 'Sold Out' : 'نفد المخزون')}
-          </button>
-        </motion.div>
-      </a>
-    </motion.div>
+            <button
+              type="button"
+              className="icare-product-card__quick-add"
+              onClick={handleQuickAdd}
+              disabled={!isPurchasable}
+            >
+              {isPurchasable
+                ? (lang === 'en' ? 'Quick Add' : 'إضافة سريعة')
+                : (lang === 'en' ? 'Sold Out' : 'نفد المخزون')}
+            </button>
+          </motion.div>
+        )}
+      </div>
+    </motion.article>
   );
 };
 
