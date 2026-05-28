@@ -19,7 +19,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ lang, onNa
           className="w-full h-full"
           initial={shouldReduceMotion ? false : { opacity: 0, scale: 1.04 }}
           whileInView={shouldReduceMotion ? undefined : { opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
+viewport={{ once: false }}
           transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
         >
           <ImageWithFallback 

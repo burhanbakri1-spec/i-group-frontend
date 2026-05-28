@@ -65,7 +65,7 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
           className="text-[clamp(4rem,18vw,13rem)] leading-[0.82] font-[900] tracking-[-0.055em] text-[#84827E] lowercase select-none"
           initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: false }}
           transition={calmTween}
         >
           icare

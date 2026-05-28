@@ -88,7 +88,7 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNa
             key={item.id}
             initial={shouldReduceMotion ? false : { opacity: 0, x: scrollInInitialX }}
             whileInView={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-50px' }}
+            viewport={{ once: false, margin: '-50px' }}
             transition={{
               delay: shouldReduceMotion ? 0 : index * 0.05,
               duration: 0.3,
@@ -120,8 +120,7 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNa
           className="icare-mission-image relative"
           initial={shouldReduceMotion ? false : { opacity: 0 }}
           whileInView={shouldReduceMotion ? undefined : { opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+viewport={{ once: false }}
         >
           <ImageWithFallback
             src={commitmentImage || DEFAULT_COMMITMENT_IMAGE}

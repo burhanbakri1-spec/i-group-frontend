@@ -135,7 +135,7 @@ function renderMotionUnit(unit: ShowcaseUnit, idx: number, children: React.React
       key={unit.id}
       initial={shouldReduceMotion ? false : { opacity: 0, y: yOffset }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-80px' }}
+      viewport={{ once: false, margin: '-80px' }}
       transition={{ duration: shouldReduceMotion ? 0 : 0.5, delay: shouldReduceMotion ? 0 : idx * 0.06, ease: 'easeOut' }}
     >
       {children}

@@ -57,7 +57,7 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang, onNavigate }) => {
             key={image.id}
             initial={shouldReduceMotion ? false : { opacity: 0, y: 14 }}
             whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+viewport={{ once: false }}
             transition={{
               delay: shouldReduceMotion ? 0 : index * 0.05,
               duration: 0.32,

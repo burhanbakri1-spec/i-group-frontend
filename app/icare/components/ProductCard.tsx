@@ -86,7 +86,7 @@ const ProductCardBase: React.FC<ProductCardProps> = ({
     <motion.article
       className={`icare-product-card icare-product-card--${variant}`}
       {...cardMotion}
-      viewport={{ once: true, margin: '-50px' }}
+      viewport={{ once: false, margin: '-50px' }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
     >
       <div

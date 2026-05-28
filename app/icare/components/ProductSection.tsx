@@ -64,7 +64,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
         }}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
+viewport={{ once: false, margin: "-100px" }}
         variants={{
           visible: {
             transition: {
