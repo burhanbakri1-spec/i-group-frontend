@@ -67,6 +67,7 @@ export function ImageWithFallback({
           alt={alt ?? ''}
           className={visibleClass}
           style={style}
+          draggable={false}
           onLoad={() => setLoaded(true)}
           onError={() => setDidError(true)}
         />
@@ -87,6 +88,7 @@ export function ImageWithFallback({
           priority={priority}
           className={visibleClass}
           style={style}
+          draggable={false}
           onLoad={() => setLoaded(true)}
           onError={() => setDidError(true)}
         />
@@ -97,16 +99,18 @@ export function ImageWithFallback({
   return (
     <div className={`relative ${className ?? ''}`} style={style}>
       {skeletonOverlay}
-      <Image
-        src={imageSrc}
-        alt={alt ?? ''}
-        fill
-        sizes={sizes ?? '100vw'}
-        priority={priority}
-        className={visibleClass}
-        onLoad={() => setLoaded(true)}
-        onError={() => setDidError(true)}
-      />
+<Image
+          src={imageSrc}
+          alt={alt ?? ''}
+          fill
+          sizes={sizes ?? '100vw'}
+          priority={priority}
+          className={visibleClass}
+          style={style}
+          draggable={false}
+          onLoad={() => setLoaded(true)}
+          onError={() => setDidError(true)}
+        />
     </div>
   );
 }

@@ -22,7 +22,7 @@ export const CartDrawer = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 h-full w-full max-w-[400px] bg-[#F1F0ED] z-[101] p-8 flex flex-col"
+            className="fixed top-0 right-0 h-full w-[calc(100vw-1.5rem)] max-w-[400px] bg-[#F1F0ED] z-[101] p-8 flex flex-col"
           >
             <div className="flex justify-between items-center mb-12">
               <h2 className="text-[12px] tracking-[0.2em] uppercase font-medium">{cartBagLabel} (0)</h2>
