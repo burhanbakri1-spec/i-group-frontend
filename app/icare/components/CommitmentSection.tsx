@@ -118,19 +118,14 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNa
       </div>
 
       <ScrollReveal direction="right" viewportMargin="-80px">
-        <motion.div
-          className="icare-mission-image relative"
-          initial={shouldReduceMotion ? false : { opacity: 0 }}
-          whileInView={shouldReduceMotion ? undefined : { opacity: 1 }}
-viewport={{ once: false }}
-        >
+        <div className="icare-mission-image relative">
           <ImageWithFallback
             src={commitmentImage || DEFAULT_COMMITMENT_IMAGE}
             alt=""
             className="h-full w-full object-cover"
           />
           <div className="absolute inset-0 bg-black/5" />
-        </motion.div>
+        </div>
       </ScrollReveal>
     </section>
   );

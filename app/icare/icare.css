@@ -308,7 +308,7 @@
     scroll-snap-type: x proximity;
     overscroll-behavior-x: contain;
     -webkit-overflow-scrolling: touch;
-    touch-action: pan-x;
+    touch-action: pan-y;
   }
 
   .icare-swipe-rail__viewport:focus-visible {
@@ -794,7 +794,6 @@
   .icare-split-banner__copy {
     order: 1;
     display: grid;
-    min-height: 17.5rem;
     align-content: center;
     justify-items: center;
     padding: 2.5rem 2rem 1.25rem;
@@ -804,7 +803,11 @@
   .icare-split-banner__media {
     position: relative;
     order: 2;
-    min-height: 31rem;
+  }
+
+  .icare-split-banner__media {
+    position: relative;
+    order: 2;
   }
 
   .icare-full-banner {
@@ -899,6 +902,7 @@
 
   .icare-mission-panel,
   .icare-mission-image {
+    min-height: 34.5rem;
     overflow: hidden;
     border-radius: var(--icare-section-radius);
     background: var(--rb-bg-warm-gray);
@@ -908,10 +912,6 @@
     display: flex;
     flex-direction: column;
     padding: 2rem;
-  }
-
-  .icare-mission-image {
-    min-height: 34.5rem;
   }
 
   .icare-footer-newsletter-form {
@@ -1038,7 +1038,7 @@
   }
 
   .icare-morning-panel {
-    min-height: 32rem;
+    min-height: 22rem;
   }
 
   .icare-ugc-grid {
@@ -1050,7 +1050,6 @@
   }
 
   .icare-mission-image {
-    min-height: 24rem;
   }
 
   .icare-footer-newsletter-form {
@@ -1099,6 +1098,10 @@
     --icare-section-gap: 0.75rem;
     --icare-hero-height: calc(100vh - 14rem);
     --icare-hero-min-height: 28rem;
+  }
+
+  .icare-full-banner {
+    min-height: 24rem;
   }
 
   .mobile-trending-scroll {

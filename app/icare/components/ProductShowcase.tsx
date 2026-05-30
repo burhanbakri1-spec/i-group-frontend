@@ -83,7 +83,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
         
         {/* Left Column: Lifestyle Image */}
         <ScrollReveal direction="left" viewportMargin="-80px">
-          <div className="icare-morning-panel relative aspect-[4/5] md:aspect-auto">
+          <div className="icare-morning-panel relative aspect-[3/4] md:aspect-auto">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentIndex}

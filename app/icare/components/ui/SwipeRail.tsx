@@ -43,8 +43,54 @@ export const SwipeRail: React.FC<SwipeRailProps> = ({
   });
   const suppressClickRef = useRef(false);
   const suppressTimerRef = useRef<number | null>(null);
+  const touchRef = useRef({ startX: 0, startY: 0, decided: false, isHorizontal: false, scrollLeft: 0 });
   const [cursorActive, setCursorActive] = useState(false);
   const [dragging, setDragging] = useState(false);
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+
+    const onTouchStart = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      touchRef.current = {
+        startX: touch.clientX,
+        startY: touch.clientY,
+        decided: false,
+        isHorizontal: false,
+        scrollLeft: viewport.scrollLeft,
+      };
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      const state = touchRef.current;
+      const deltaX = touch.clientX - state.startX;
+      const deltaY = touch.clientY - state.startY;
+
+      if (!state.decided) {
+        if (Math.abs(deltaX) > 8 || Math.abs(deltaY) > 8) {
+          state.decided = true;
+          state.isHorizontal = Math.abs(deltaX) > Math.abs(deltaY);
+        }
+        return;
+      }
+
+      if (state.isHorizontal) {
+        e.preventDefault();
+        viewport.scrollLeft = state.scrollLeft - deltaX;
+      }
+      // Vertical: no preventDefault → browser scrolls page naturally
+    };
+
+    viewport.addEventListener('touchstart', onTouchStart, { passive: true });
+    viewport.addEventListener('touchmove', onTouchMove, { passive: false });
+
+    return () => {
+      viewport.removeEventListener('touchstart', onTouchStart);
+      viewport.removeEventListener('touchmove', onTouchMove);
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
