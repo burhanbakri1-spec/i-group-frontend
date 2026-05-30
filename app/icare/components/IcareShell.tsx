@@ -94,7 +94,7 @@ export const IcareShell = ({ children }: { children: React.ReactNode }) => {
   return (
     <ShopProvider>
       <IcareShellContext.Provider value={contextValue}>
-        <div className={`min-h-screen bg-[var(--rb-pure-white)] font-sans selection:bg-[#7B7872] selection:text-white text-[#67645E] ${lang === 'ar' ? 'font-arabic' : ''}`}>
+        <div className={`min-h-screen overflow-x-hidden bg-[var(--rb-pure-white)] font-sans selection:bg-[#7B7872] selection:text-white text-[#67645E] ${lang === 'ar' ? 'font-arabic' : ''}`}>
           <AnnouncementBar />
 
           <Header

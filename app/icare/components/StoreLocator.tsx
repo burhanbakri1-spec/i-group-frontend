@@ -144,7 +144,7 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F1F0ED] overflow-hidden">
+    <div className="min-h-screen bg-[#F1F0ED] overflow-hidden px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col md:flex-row h-[calc(100vh-96px)]">
 
         {/* Sidebar: List */}

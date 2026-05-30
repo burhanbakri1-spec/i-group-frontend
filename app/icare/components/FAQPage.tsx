@@ -123,7 +123,7 @@ export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F1F0ED] pb-32">
+    <div className="min-h-screen bg-[#F1F0ED] pb-32 px-4 sm:px-6 lg:px-8">
       <PageHero
         image="https://images.unsplash.com/photo-1768483018807-bd0b9ab86539?q=80&w=2000"
         fallbackImage="https://images.unsplash.com/photo-1768483018807-bd0b9ab86539?q=80&w=2000"

@@ -47,7 +47,7 @@ export const PageHero: React.FC<PageHeroProps> = ({
         <div className="icare-page-hero__overlay" />
 
         <motion.div
-          className="absolute inset-x-0 bottom-0 z-10 grid justify-items-start gap-4 p-3 text-left text-white"
+          className="icare-page-hero__content absolute inset-x-0 bottom-0 z-10 grid justify-items-start gap-4 text-left text-white"
           initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }}
           animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.8, ease: HERO_EASE }}

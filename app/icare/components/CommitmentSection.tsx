@@ -73,16 +73,6 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNa
   return (
     <section dir={lang === 'ar' ? 'rtl' : 'ltr'} className="icare-index-section icare-mission-section">
       <div className="icare-mission-panel">
-        <ScrollReveal direction="bottom" viewportMargin="-50px">
-          <motion.button
-            onClick={() => onNavigate('story')}
-            whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
-            className="relative isolate mb-[12.9rem] w-[10.5rem] overflow-hidden rounded-full bg-white px-8 py-2.5 text-[13px] font-bold uppercase text-[#67645E] shadow-[inset_0_0_0_1px_#67645E] transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] before:absolute before:inset-0 before:-z-10 before:origin-bottom before:scale-y-0 before:rounded-full before:bg-[#67645E] before:transition-transform before:duration-500 before:ease-[cubic-bezier(0.76,0,0.24,1)] hover:-translate-y-px hover:text-white hover:before:scale-y-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F1F0ED] max-[980px]:mb-32"
-          >
-            {commitmentCta || (lang === 'en' ? 'our values' : 'قيمنا')}
-          </motion.button>
-        </ScrollReveal>
-
         {commitmentItems.map((item, index) => (
           <motion.article
             key={item.id}
@@ -113,6 +103,18 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNa
             </button>
           </motion.article>
         ))}
+
+        <ScrollReveal direction="bottom" viewportMargin="-50px">
+          <div className="flex justify-center mt-8 md:mt-12">
+            <motion.button
+              onClick={() => onNavigate('story')}
+              whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
+              className="relative isolate overflow-hidden rounded-full bg-white px-8 py-2.5 text-[13px] font-bold uppercase text-[#67645E] shadow-[inset_0_0_0_1px_#67645E] transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] before:absolute before:inset-0 before:-z-10 before:origin-bottom before:scale-y-0 before:rounded-full before:bg-[#67645E] before:transition-transform before:duration-500 before:ease-[cubic-bezier(0.76,0,0.24,1)] hover:-translate-y-px hover:text-white hover:before:scale-y-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F1F0ED]"
+            >
+              {commitmentCta || (lang === 'en' ? 'our values' : 'قيمنا')}
+            </motion.button>
+          </div>
+        </ScrollReveal>
       </div>
 
       <ScrollReveal direction="right" viewportMargin="-80px">

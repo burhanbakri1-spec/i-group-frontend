@@ -182,7 +182,7 @@ const ProductCardBase: React.FC<ProductCardProps> = ({
           >
             <button
               type="button"
-              className="icare-product-card__quick-add"
+              className="icare-product-card__quick-add min-h-[44px]"
               onClick={handleQuickAdd}
               disabled={!isPurchasable}
             >

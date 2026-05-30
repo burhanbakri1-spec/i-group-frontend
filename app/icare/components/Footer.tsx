@@ -10,7 +10,7 @@ interface FooterProps {
 }
 
 const FOCUS_VISIBLE_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F1F0ED]';
-const FOOTER_LINK_CLASS = `rounded-sm text-[14px] text-[#84827E] hover:text-[#5C5A56] transition-colors text-left ${FOCUS_VISIBLE_CLASS}`;
+const FOOTER_LINK_CLASS = `min-h-[44px] flex items-center rounded-sm text-[14px] text-[#84827E] hover:text-[#5C5A56] transition-colors text-left ${FOCUS_VISIBLE_CLASS}`;
 
 export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
   const {
@@ -58,7 +58,7 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
   });
 
   return (
-    <footer className="bg-[#F1F0ED] font-sans mx-4 md:mx-8 mb-8 rounded-[24px] overflow-hidden border border-[#DDDDDD]">
+    <footer className="bg-[#F1F0ED] font-sans mx-4 sm:mx-6 lg:mx-8 mb-8 rounded-[24px] overflow-hidden border border-[#DDDDDD]">
       {/* 1. LOGO SECTION */}
       <div className="w-full py-16 md:py-24 overflow-hidden flex justify-center items-center">
         <motion.h2 
@@ -112,7 +112,7 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
         </div>
 
         {/* Links Grid */}
-        <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-4 divide-x divide-[#D9D7D2] border-l border-[#D9D7D2]">
+        <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 divide-x divide-[#D9D7D2] border-l border-[#D9D7D2]">
           
           {/* Navigate */}
           <div className="p-8 md:p-12 space-y-6">
@@ -136,7 +136,7 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
                       href={social.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`flex items-center gap-2 text-[14px] text-[#84827E] hover:text-[#5C5A56] transition-colors group ${FOCUS_VISIBLE_CLASS}`}
+                      className={`flex items-center gap-2 min-h-[44px] text-[14px] text-[#84827E] hover:text-[#5C5A56] transition-colors group ${FOCUS_VISIBLE_CLASS}`}
                       whileHover={shouldReduceMotion ? undefined : { x: 2 }}
                       transition={calmTween}
                     >

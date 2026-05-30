@@ -70,18 +70,18 @@
     --rb-space-0: 0;
     --rb-space-1: 0.25rem;
     --rb-space-2: 0.5rem;
-    --rb-space-3: 0.75rem;
-    --rb-space-4: 1rem;
-    --rb-space-5: 1.25rem;
-    --rb-space-6: 1.5rem;
-    --rb-space-8: 2rem;
-    --rb-space-10: 2.5rem;
-    --rb-space-12: 3rem;
-    --rb-space-16: 4rem;
-    --rb-space-20: 5rem;
-    --rb-space-24: 6rem;
-    --rb-space-32: 8rem;
-    --rb-space-40: 10rem;
+    --rb-space-3: clamp(0.5rem, 0.8vw, 0.75rem);
+    --rb-space-4: clamp(0.75rem, 1.2vw, 1rem);
+    --rb-space-5: clamp(1rem, 1.5vw, 1.25rem);
+    --rb-space-6: clamp(1.125rem, 1.8vw, 1.5rem);
+    --rb-space-8: clamp(1.5rem, 2.5vw, 2rem);
+    --rb-space-10: clamp(2rem, 3.2vw, 2.5rem);
+    --rb-space-12: clamp(2.25rem, 3.8vw, 3rem);
+    --rb-space-16: clamp(3rem, 5vw, 4rem);
+    --rb-space-20: clamp(3.75rem, 6.5vw, 5rem);
+    --rb-space-24: clamp(4.5rem, 8vw, 6rem);
+    --rb-space-32: clamp(6rem, 10vw, 8rem);
+    --rb-space-40: clamp(7.5rem, 13vw, 10rem);
     --rb-space-px: 1px;
 
     /* Border Radius Tokens */
@@ -105,14 +105,14 @@
     --rb-shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.10);
 
     /* Hero/header layout controls. Tune these to move every standard hero together. */
-    --icare-header-inset: 2rem;
+    --icare-header-inset: clamp(1rem, 3vw, 2rem);
     --icare-announcement-inset: var(--icare-header-inset);
     --icare-announcement-margin-top: 0rem;
     --icare-announcement-padding-top: 0.75rem;
     --icare-announcement-height: 2.5rem;
     --icare-header-top-gap: 0.625rem;
     --icare-header-top: calc(var(--icare-announcement-margin-top) + var(--icare-announcement-padding-top) + var(--icare-announcement-height) + var(--icare-header-top-gap));
-    --icare-hero-inset: 2rem;
+    --icare-hero-inset: clamp(1rem, 3vw, 2rem);
     --icare-hero-flow-offset: calc(var(--icare-header-top) - (var(--icare-announcement-margin-top) + var(--icare-announcement-padding-top) + var(--icare-announcement-height)));
     --icare-hero-top-gap: 0rem;
     --icare-hero-bottom-gap: 1rem;
@@ -120,8 +120,8 @@
     --icare-hero-min-height: 40rem;
     --icare-hero-radius: 12px;
     --icare-hero-media-scale: 1.018;
-    --icare-section-inset: 2rem;
-    --icare-section-gap: 1.25rem;
+    --icare-section-inset: clamp(1rem, 3vw, 2rem);
+    --icare-section-gap: clamp(0.75rem, 2vw, 1.25rem);
     --icare-section-radius: 12px;
     --icare-feature-radius: 8px;
   }
@@ -281,6 +281,10 @@
     background: linear-gradient(to top, rgb(0 0 0 / 0.25), transparent 48%);
   }
 
+  .icare-page-hero__content {
+    padding: clamp(1rem, 2.5vw, 2rem) var(--icare-hero-inset) var(--icare-hero-bottom-gap);
+  }
+
   .icare-index-section {
     margin: 0 var(--icare-section-inset) var(--icare-section-gap);
   }
@@ -371,6 +375,7 @@
     overflow: hidden;
     background: var(--rb-pure-white);
     padding-top: clamp(1rem, 1.8vw, 1.5rem);
+    border-radius: var(--icare-section-radius);
   }
 
   .icare-landing-products__header {
@@ -524,8 +529,8 @@
     position: absolute;
     top: 0.85rem;
     z-index: 2;
-    color: var(--rb-gray-84827E);
-    font-size: clamp(0.68rem, 0.78vw, 0.78rem);
+    color: var(--rb-pure-white);
+    font-size: clamp(0.95rem, 1.1vw, 1.1rem);
     font-weight: 800;
     line-height: 1;
     text-transform: uppercase;
@@ -774,6 +779,7 @@
     flex-direction: column;
     gap: 0.75rem;
     background: var(--rb-bg-warm-gray);
+    padding-top: var(--icare-section-gap);
   }
 
   .icare-split-banner__copy,
@@ -848,7 +854,7 @@
   .icare-morning-panel {
     min-height: 44.25rem;
     overflow: hidden;
-    border-radius: var(--icare-feature-radius);
+    border-radius: var(--icare-section-radius);
     background: var(--rb-pure-white);
   }
 
@@ -856,6 +862,26 @@
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0.75rem;
+  }
+
+  .icare-social-rail {
+    --icare-swipe-gap: 0.75rem;
+  }
+
+  .icare-social-rail__track {
+    display: flex;
+    width: max-content;
+    min-width: 100%;
+    gap: var(--icare-swipe-gap, 0.75rem);
+  }
+
+  .icare-social-rail__item {
+    flex: 0 0 clamp(16rem, 24vw, 24rem);
+    width: clamp(16rem, 24vw, 24rem);
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    border-radius: var(--icare-section-radius);
+    contain: layout paint style;
   }
 
   .icare-ugc-card {
@@ -874,13 +900,13 @@
   .icare-mission-panel,
   .icare-mission-image {
     overflow: hidden;
-    border-radius: var(--icare-feature-radius);
+    border-radius: var(--icare-section-radius);
     background: var(--rb-bg-warm-gray);
   }
 
   .icare-mission-panel {
-    display: grid;
-    align-content: start;
+    display: flex;
+    flex-direction: column;
     padding: 2rem;
   }
 
@@ -964,7 +990,7 @@
     --icare-hero-height: calc(100vh - 22.25rem);
     --icare-hero-min-height: 30.5rem;
     --icare-hero-radius: 10px;
-    --icare-section-inset: 0rem;
+    --icare-section-inset: 1rem;
     --icare-section-gap: 0.75rem;
   }
 
@@ -1036,8 +1062,45 @@
   }
 }
 
+/* ─── Tablet Breakpoint (768px–1023px) ─── */
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root {
+    --icare-section-gap: 1rem;
+    --icare-hero-height: calc(100vh - 18rem);
+    --icare-hero-min-height: 32rem;
+  }
+
+  .icare-landing-products__item {
+    flex-basis: min(44vw, 20rem);
+    width: min(44vw, 20rem);
+  }
+
+  .icare-product-card--showcase .icare-product-card__primary {
+    min-height: 30rem;
+  }
+
+  .icare-morning-grid,
+  .icare-mission-section {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .icare-ugc-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 /* ─── Mobile Trending Scroll (used in ProductSection) ─── */
 @media (max-width: 767px) {
+  :root {
+    --icare-header-inset: 0.75rem;
+    --icare-hero-inset: 0.75rem;
+    --icare-section-inset: 0.75rem;
+    --icare-section-gap: 0.75rem;
+    --icare-hero-height: calc(100vh - 14rem);
+    --icare-hero-min-height: 28rem;
+  }
+
   .mobile-trending-scroll {
     display: flex !important;
     flex-wrap: nowrap !important;

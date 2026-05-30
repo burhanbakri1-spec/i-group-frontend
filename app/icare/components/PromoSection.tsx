@@ -14,7 +14,7 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) 
   const shouldReduceMotion = useReducedMotion();
   const { promoBadge, promoHeadline, promoDescription, promoCtaLabel, promoImage } = useSiteContent();
   return (
-    <section className="icare-index-section icare-split-banner">
+    <section className="icare-index-section icare-split-banner overflow-hidden rounded-[var(--icare-section-radius)] p-[var(--icare-section-inset)]">
       <div className="contents">
         
         {/* Left Side: Content Section */}

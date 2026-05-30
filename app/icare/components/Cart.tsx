@@ -80,7 +80,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                     {lang === 'en' ? 'Start adding products you love' : 'ابدأ بإضافة المنتجات المفضلة'}
                   </p>
                   <button
-                    onClick={onClose}
+                    onClick={() => { onClose(); onNavigate('shop'); }}
                     className={`px-6 py-3 bg-[#67645E] text-white text-sm uppercase tracking-wider rounded-full hover:bg-[#5A5853] transition-colors ${CONTROL_FOCUS_CLASS}`}
                   >
                     {t.shopNow}

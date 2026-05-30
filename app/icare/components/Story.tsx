@@ -4,7 +4,7 @@ import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
 
 export const Story: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavigate }) => {
   return (
-    <div className="max-w-[1440px] mx-auto px-10 py-20">
+    <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-20">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
 
         {/* Left: Image slides in from the left */}

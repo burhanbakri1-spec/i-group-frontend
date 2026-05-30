@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { SwipeRail } from './ui/SwipeRail';
 import { Language } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
 
@@ -51,19 +52,24 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang, onNavigate }) => {
         </motion.button>
       </div>
 
-      <div className="icare-ugc-grid">
+      <SwipeRail
+        ariaLabel={lang === 'en' ? 'Social lifestyle images' : 'صور نمط الحياة الاجتماعية'}
+        cursorLabel={lang === 'en' ? 'swipe' : 'اسحب'}
+        className="icare-social-rail"
+        trackClassName="icare-social-rail__track"
+      >
         {lifestyleImages.map((image, index) => (
           <motion.div
             key={image.id}
             initial={shouldReduceMotion ? false : { opacity: 0, y: 14 }}
             whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
-viewport={{ once: false }}
+            viewport={{ once: false }}
             transition={{
               delay: shouldReduceMotion ? 0 : index * 0.05,
               duration: 0.32,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className="icare-ugc-card"
+            className="icare-social-rail__item"
           >
             <ImageWithFallback
               src={image.src}
@@ -72,11 +78,11 @@ viewport={{ once: false }}
             />
           </motion.div>
         ))}
-      </div>
+      </SwipeRail>
 
       <button
         onClick={() => onNavigate('vlog')}
-        className="mt-8 w-full rounded-full border border-[#67645E]/20 py-4 text-[10px] font-bold uppercase tracking-[0.1em] text-[#67645E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDECEB] md:hidden"
+        className="mt-8 w-full rounded-full border border-[#67645E]/20 py-4 text-[10px] font-bold uppercase tracking-[0.1em] text-[#67645E] hover:bg-[#67645E]/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDECEB] md:hidden"
       >
         {lang === 'en' ? socialGridCta : 'تابعنا على السوشيال'}
       </button>

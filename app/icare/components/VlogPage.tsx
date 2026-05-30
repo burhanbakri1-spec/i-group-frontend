@@ -138,7 +138,7 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
       />
 
       {/* 2. Vlog Grid */}
-      <section className="max-w-[1400px] mx-auto px-4 md:px-6 pt-8 md:pt-12">
+      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 md:pt-12">
         {isLoading ? (
           <VlogGridSkeleton count={6} />
         ) : error ? (

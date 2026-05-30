@@ -107,7 +107,7 @@ export const AnnouncementBar: React.FC = () => {
           <AnimatePresence initial={false} mode="wait">
             <motion.p
               key={`${activeSlideIndex}-${activeSlide}`}
-              className="icare-announcement__slide"
+              className="icare-announcement__slide overflow-hidden text-ellipsis whitespace-nowrap"
               initial={shouldReduceMotion ? false : { x: 12, opacity: 0 }}
               animate={shouldReduceMotion ? undefined : { x: 0, opacity: 1 }}
               exit={shouldReduceMotion ? undefined : { x: -12, opacity: 0 }}

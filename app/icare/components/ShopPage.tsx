@@ -195,7 +195,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
       />
 
       {/* Navigation & Hierarchy */}
-      <div className="max-w-[1600px] mx-auto px-6 py-10 flex flex-col gap-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col gap-8">
 
         {/* Level 1: Root Categories */}
         <div className="overflow-x-auto no-scrollbar border-b border-black/10 pb-4">
@@ -281,7 +281,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
       </div>
 
       {/* Toolbar */}
-      <div className={`max-w-[1600px] mx-auto px-4 md:px-6 py-4 md:py-5 flex justify-between items-center border border-[#DDDDDD] mb-8 md:mb-10 md:sticky md:top-3 bg-white rounded-[12px] ${isSortOpen ? 'z-[65]' : 'z-40'}`}>
+      <div className={`max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-5 flex justify-between items-center border border-[#DDDDDD] mb-8 md:mb-10 md:sticky md:top-3 bg-white rounded-[12px] ${isSortOpen ? 'z-[65]' : 'z-40'}`}>
         <div className="relative z-[66]">
           <button type="button" className={`flex items-center gap-2 cursor-pointer group ${CONTROL_FOCUS_CLASS}`} onClick={() => setIsSortOpen(!isSortOpen)} aria-expanded={isSortOpen}>
             <span className="text-[14px] text-[#84827E] lowercase font-medium">{shopSortLabel}</span>
@@ -318,9 +318,9 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
       </div>
 
       {/* Grid */}
-      <div className="max-w-[1600px] mx-auto px-3 md:px-6 pb-24">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pb-24">
         <ScrollReveal direction="bottom" delay={0.05} viewportMargin="-40px">
-          <div className={`grid grid-cols-2 ${cols === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} gap-x-3 gap-y-6 md:gap-x-8 md:gap-y-14`}>
+          <div className={`grid grid-cols-1 min-[375px]:grid-cols-2 ${cols === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} gap-x-3 gap-y-6 md:gap-x-6 md:gap-y-10 lg:gap-x-8 lg:gap-y-14`}>
             {filteredProducts.slice(0, visibleCount).map((p) => (
               <ProductCard key={p.id} product={p} lang={lang} onSelect={() => onProductSelect(p)} />
             ))}
@@ -331,7 +331,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
           <div className="mt-12 md:mt-20 flex justify-center">
             <button
               onClick={() => setVisibleCount(prev => prev + 12)}
-              className={`px-12 py-4 bg-[#67645E] text-white text-[12px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-[#67645E]/90 transition-colors active:scale-[0.99] ${CONTROL_FOCUS_CLASS}`}
+              className={`px-12 py-4 min-h-[44px] bg-[#67645E] text-white text-[12px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-[#67645E]/90 transition-colors active:scale-[0.99] ${CONTROL_FOCUS_CLASS}`}
             >
               {shopShowMore}
             </button>

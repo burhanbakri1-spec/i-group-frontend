@@ -137,7 +137,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
               <h2 className="text-[15px] font-black text-[#67645E] tracking-normal lowercase">{searchDrawerTitle}</h2>
               <button 
                 onClick={onClose} 
-                className={`absolute right-6 p-1 text-[#67645E] hover:text-black transition-colors ${CONTROL_FOCUS_CLASS}`}
+                className={`absolute right-6 p-1 text-[#67645E] hover:text-black transition-colors min-h-[44px] ${CONTROL_FOCUS_CLASS}`}
                 aria-label="Close search"
               >
                 <X size={24} strokeWidth={1.5} />
@@ -154,7 +154,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder={searchPlaceholder}
-                    className="w-full px-5 py-4 text-[16px] text-[#67645E] placeholder:text-[#84827E] bg-transparent outline-none border-none font-medium"
+                    className="w-full px-5 py-4 min-h-[44px] text-[16px] text-[#67645E] placeholder:text-[#84827E] bg-transparent outline-none border-none font-medium"
                     autoFocus
                   />
                   {searchQuery && (

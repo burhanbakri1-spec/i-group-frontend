@@ -16,7 +16,7 @@ interface LandingProductShowcaseProps {
 const SHOWCASE_PRODUCT_LIMIT = 10;
 
 const LandingProductShowcaseSkeleton = () => (
-  <section className="icare-index-section icare-landing-products">
+    <section className="icare-index-section icare-landing-products">
     <div className="icare-landing-products__header">
       <SkeletonPulse className="h-10 w-72 rounded-[8px]" />
     </div>
