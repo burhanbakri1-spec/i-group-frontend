@@ -73,8 +73,66 @@ function ensureArray(value, fallback) {
   return Array.isArray(value) ? value : clone(fallback);
 }
 
+function normalizeGalleryImages(product) {
+  const source = product.gallery_images || product.galleryImages || [];
+  return source
+    .map((entry, index) => {
+      const imageUrl = typeof entry === "string" ? entry : entry?.image_url || entry?.image || entry?.url;
+      if (!imageUrl) return null;
+      return {
+        id: typeof entry === "object" && entry?.id ? entry.id : `gallery-${index}-${Date.now()}`,
+        image_url: imageUrl,
+        sort_order: Number(typeof entry === "object" ? entry?.sort_order ?? entry?.sortOrder ?? index : index),
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.sort_order - b.sort_order);
+}
+
+function normalizeVariants(product) {
+  const variants = Array.isArray(product.variants) ? product.variants : [];
+  if (variants.length) {
+    return variants
+      .map((variant, index) => ({
+        id: variant.id || `${product.id || "product"}-variant-${index}-${Date.now()}`,
+        color_name: variant.color_name || variant.colorName || "Default",
+        color_value: variant.color_value || variant.colorValue || variant.colorHex || "",
+        size: variant.size || "500ml",
+        price: Number(variant.price || 0),
+        stock: Math.max(0, Number(variant.stock ?? variant.stockQty ?? product.stockQty ?? 0)),
+        image_url: variant.image_url || variant.imageUrl || variant.image || "",
+        sort_order: Number(variant.sort_order ?? variant.sortOrder ?? index),
+      }))
+      .sort((a, b) => a.sort_order - b.sort_order);
+  }
+
+  return (product.sizes || []).map((sizeOption, index) => ({
+    id: `${product.id || "product"}-variant-${index}`,
+    color_name: "Default",
+    color_value: "",
+    size: sizeOption.size || "500ml",
+    price: Number(sizeOption.price || 0),
+    stock: Math.max(0, Number(product.stockQty ?? 24)),
+    image_url: product.image || "",
+    sort_order: index,
+  }));
+}
+
+function sizesFromVariants(variants, fallbackSizes = []) {
+  const bySize = new Map();
+  variants.forEach((variant) => {
+    const current = bySize.get(variant.size);
+    if (!current || Number(variant.price) < Number(current.price)) {
+      bySize.set(variant.size, { size: variant.size, price: Number(variant.price || 0) });
+    }
+  });
+  return bySize.size ? Array.from(bySize.values()) : fallbackSizes;
+}
+
 function normalizeProduct(product, index = 0) {
   const image = product.image || "/images/products/product-placeholder.svg";
+  const galleryImages = normalizeGalleryImages(product);
+  const variants = normalizeVariants({ ...product, image });
   return {
     ...product,
     id: product.id || `product-${index}-${Date.now()}`,
@@ -84,6 +142,10 @@ function normalizeProduct(product, index = 0) {
       product.secondaryImage ||
       product.gallery?.[1] ||
       "",
+    variants,
+    sizes: sizesFromVariants(variants, product.sizes || []),
+    gallery_images: galleryImages,
+    galleryImages: galleryImages.map((entry) => entry.image_url),
     fallbackImage: product.fallbackImage || "/images/products/product-placeholder.svg",
   };
 }

@@ -83,6 +83,46 @@ function safeImage(image, fallback = placeholderImage) {
   return image || fallback;
 }
 
+function normalizeProductVariants(product = {}) {
+  if (Array.isArray(product.variants) && product.variants.length) {
+    return product.variants.map((variant, index) => ({
+      id: variant.id || `${product.id || "product"}-variant-${index}`,
+      colorName: variant.color_name || variant.colorName || "Default",
+      colorValue: variant.color_value || variant.colorValue || "",
+      size: variant.size || "500ml",
+      price: Number(variant.price || 0),
+      stock: Math.max(0, Number(variant.stock ?? variant.stockQty ?? product.stockQty ?? 24)),
+      image: variant.image_url || variant.imageUrl || variant.image || "",
+      sortOrder: Number(variant.sort_order ?? variant.sortOrder ?? index),
+    }));
+  }
+
+  return (product.sizes || []).map((sizeOption, index) => ({
+    id: `${product.id || "product"}-variant-${index}`,
+    colorName: "Default",
+    colorValue: "",
+    size: sizeOption.size || "500ml",
+    price: Number(sizeOption.price || 0),
+    stock: Math.max(0, Number(product.stockQty ?? 24)),
+    image: product.image || "",
+    sortOrder: index,
+  }));
+}
+
+function normalizeProductGallery(product = {}, selectedImage = "") {
+  const source = product.gallery_images || product.galleryImages || [];
+  const gallery = source
+    .map((entry, index) => ({
+      image: typeof entry === "string" ? entry : entry?.image_url || entry?.image || entry?.url || "",
+      sortOrder: Number(typeof entry === "object" ? entry?.sort_order ?? entry?.sortOrder ?? index : index),
+    }))
+    .filter((entry) => entry.image)
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map((entry) => entry.image);
+
+  return gallery.length ? gallery : [selectedImage || product.image || placeholderImage];
+}
+
 function ProductImage({ alt, className = "", src, ...imageProps }) {
   return (
     <img
@@ -155,7 +195,9 @@ function ProductDetailsPage({
   t,
 }) {
   const txt = productText[language] || productText.en;
+  const productVariants = React.useMemo(() => normalizeProductVariants(product), [product]);
   const [selectedSize, setSelectedSize] = React.useState(product?.sizes?.[0]?.size || "");
+  const [selectedColor, setSelectedColor] = React.useState(productVariants[0]?.colorName || "Default");
   const [quantity, setQuantity] = React.useState(1);
   const [selectedType, setSelectedType] = React.useState(product?.detailOptions?.productTypes?.[0]?.id || "standard");
   const [selectedUse, setSelectedUse] = React.useState(product?.detailOptions?.uses?.[0]?.id || "default");
@@ -173,7 +215,9 @@ function ProductDetailsPage({
   const impactRef = React.useRef(null);
 
   React.useEffect(() => {
-    setSelectedSize(product?.sizes?.[0]?.size || "");
+    const nextVariants = normalizeProductVariants(product);
+    setSelectedColor(nextVariants[0]?.colorName || "Default");
+    setSelectedSize(nextVariants[0]?.size || product?.sizes?.[0]?.size || "");
     setQuantity(1);
     setSelectedType(product?.detailOptions?.productTypes?.[0]?.id || "standard");
     setSelectedUse(product?.detailOptions?.uses?.[0]?.id || "default");
@@ -214,13 +258,17 @@ function ProductDetailsPage({
 
     let frameId = 0;
 
-    function applyGalleryPosition(progress = galleryProgressRef.current) {
+    function applyGalleryPosition() {
       if (window.matchMedia("(max-width: 520px)").matches) {
         track.style.transform = "";
         return;
       }
 
+      const heroRect = hero.getBoundingClientRect();
+      const scrollRange = Math.max(hero.offsetHeight - window.innerHeight, 1);
+      const progress = Math.max(0, Math.min(1, -heroRect.top / scrollRange));
       const moveRange = Math.max(track.scrollHeight - window.innerHeight, 0);
+      galleryProgressRef.current = progress;
       track.style.transform = `translate3d(0, ${-progress * moveRange}px, 0)`;
     }
 
@@ -229,60 +277,22 @@ function ProductDetailsPage({
       frameId = window.requestAnimationFrame(() => applyGalleryPosition());
     }
 
-    function syncProgressAtSectionEdges() {
-      const rect = hero.getBoundingClientRect();
-      if (rect.top > window.innerHeight * 0.35) {
-        galleryProgressRef.current = 0;
-      } else if (rect.bottom < window.innerHeight * 0.35) {
-        galleryProgressRef.current = 1;
-      }
-      requestUpdate();
-    }
-
-    function handleWindowWheel(event) {
-      if (window.matchMedia("(max-width: 520px)").matches) return;
-
-      const moveRange = Math.max(track.scrollHeight - window.innerHeight, 0);
-      if (moveRange <= 2) return;
-
-      const rect = hero.getBoundingClientRect();
-      const heroInView = rect.top < window.innerHeight && rect.bottom > 0;
-      if (!heroInView) return;
-
-      const currentProgress = galleryProgressRef.current;
-      const scrollingDown = event.deltaY > 0;
-      const atStart = currentProgress <= 0.001;
-      const atEnd = currentProgress >= 0.999;
-
-      if ((scrollingDown && atEnd) || (!scrollingDown && atStart)) {
-        return;
-      }
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      if (Math.abs(rect.top) > 1 && rect.top < window.innerHeight * 0.5) {
-        window.scrollTo({ top: window.scrollY + rect.top, behavior: "auto" });
-      }
-
-      const deltaProgress = event.deltaY / moveRange;
-      const nextProgress = Math.min(1, Math.max(0, currentProgress + deltaProgress));
-      galleryProgressRef.current = nextProgress;
-      track.style.transform = `translate3d(0, ${-nextProgress * moveRange}px, 0)`;
-    }
-
-    galleryProgressRef.current = 0;
-    applyGalleryPosition(0);
-    window.addEventListener("scroll", syncProgressAtSectionEdges, { passive: true });
-    window.addEventListener("wheel", handleWindowWheel, { passive: false, capture: true });
+    applyGalleryPosition();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
     window.addEventListener("resize", requestUpdate);
     return () => {
       window.cancelAnimationFrame(frameId);
-      window.removeEventListener("scroll", syncProgressAtSectionEdges);
-      window.removeEventListener("wheel", handleWindowWheel, { capture: true });
+      window.removeEventListener("scroll", requestUpdate);
       window.removeEventListener("resize", requestUpdate);
     };
-  }, [product, selectedType]);
+  }, [product, selectedType, selectedColor, selectedSize]);
+
+  React.useEffect(() => {
+    const availableForColor = productVariants.filter((variant) => variant.colorName === selectedColor);
+    if (availableForColor.length && !availableForColor.some((variant) => variant.size === selectedSize)) {
+      setSelectedSize(availableForColor[0].size);
+    }
+  }, [productVariants, selectedColor, selectedSize]);
 
   if (!product) {
     return (
@@ -299,8 +309,15 @@ function ProductDetailsPage({
   }
 
   const category = categories.find((item) => item.id === product.categoryId);
-  const selectedOption =
-    product.sizes?.find((option) => option.size === selectedSize) || product.sizes?.[0] || { size: "", price: 0 };
+  const colorOptions = Array.from(new Map(productVariants.map((variant) => [variant.colorName, variant])).values());
+  const sizeOptions = productVariants.filter((variant) => variant.colorName === selectedColor);
+  const selectedVariant =
+    sizeOptions.find((variant) => variant.size === selectedSize) ||
+    sizeOptions[0] ||
+    productVariants[0];
+  const selectedOption = selectedVariant
+    ? { size: selectedVariant.size, price: selectedVariant.price }
+    : product.sizes?.find((option) => option.size === selectedSize) || product.sizes?.[0] || { size: "", price: 0 };
   const typeOptions = product.detailOptions?.productTypes || [
     { id: "standard", label: { en: "Standard bottle", ar: "العبوة الأساسية" }, image: product.image },
   ];
@@ -309,7 +326,7 @@ function ProductDetailsPage({
     { id: "daily", label: { en: "Daily use", ar: "استخدام يومي" } },
   ];
   const selectedUseOption = useOptions.find((item) => item.id === selectedUse) || useOptions[0];
-  const selectedImage = selectedTypeOption?.image || product.image;
+  const selectedImage = selectedVariant?.image || selectedTypeOption?.image || product.image;
   const productName = localized(product.name, language, product.slug);
   const description = localized(
     product.longDescription,
@@ -317,13 +334,7 @@ function ProductDetailsPage({
     localized(product.shortDescription, language, "")
   );
   const features = localized(product.features, language, []);
-  const galleryImages = [
-    selectedImage,
-    ...(product.galleryImages || []),
-    product.hoverImage,
-    product.image,
-  ].filter(Boolean);
-  const uniqueGallery = [...new Set(galleryImages)];
+  const uniqueGallery = [...new Set(normalizeProductGallery(product, selectedImage))];
   const reviews = product.reviews || getFallbackReviews();
   const steps = product.usageSteps || getFallbackSteps();
   const safeSurfaces = product.safeSurfaces || getFallbackSurfaces();
@@ -331,7 +342,7 @@ function ProductDetailsPage({
   const faqItems = product.faq || getFallbackFaq();
   const productInfo = product.productInfo || getFallbackInfo();
   const relatedProducts = getRelatedProducts();
-  const floatingLabel = `${localized(selectedTypeOption?.label, language)} / ${selectedOption.size}`;
+  const floatingLabel = `${selectedColor !== "Default" ? `${selectedColor} / ` : ""}${selectedOption.size}`;
 
   function getStatements() {
     return localized(product?.statements, language, [
@@ -404,8 +415,12 @@ function ProductDetailsPage({
   }
 
   function handleAddSelectedToCart() {
+    if (selectedVariant?.stock <= 0) {
+      return;
+    }
+
     for (let count = 0; count < quantity; count += 1) {
-      onAddToCart(product, selectedOption.size);
+      onAddToCart(product, selectedOption.size, selectedVariant);
     }
   }
 
@@ -485,18 +500,42 @@ function ProductDetailsPage({
             </div>
           </div>
 
+          {colorOptions.length > 1 && (
+            <div className="detail-option-group">
+              <h2>{language === "ar" ? "اللون" : "Color"}</h2>
+              <div className="detail-color-row">
+                {colorOptions.map((option) => (
+                  <button
+                    className={selectedColor === option.colorName ? "detail-color-choice active" : "detail-color-choice"}
+                    key={option.colorName}
+                    onClick={() => setSelectedColor(option.colorName)}
+                    type="button"
+                  >
+                    <span
+                      aria-hidden="true"
+                      style={{ background: option.colorValue || "#1db7d8" }}
+                    />
+                    {option.colorName}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="detail-option-grid">
             <div className="detail-option-group">
               <h2>{txt.size}</h2>
               <div className="detail-pill-row">
-                {product.sizes?.map((option) => (
+                {sizeOptions.map((option) => (
                   <button
                     className={selectedSize === option.size ? "detail-pill active" : "detail-pill"}
+                    disabled={option.stock <= 0}
                     key={option.size}
                     onClick={() => setSelectedSize(option.size)}
                     type="button"
                   >
                     {option.size}
+                    {option.stock <= 0 ? ` ${language === "ar" ? "(غير متوفر)" : "(Out)"}` : ""}
                   </button>
                 ))}
               </div>
@@ -544,7 +583,7 @@ function ProductDetailsPage({
             <button onClick={() => setQuantity((value) => value + 1)} type="button">+</button>
           </div>
 
-          <button className="detail-add-main" onClick={handleAddSelectedToCart} type="button">
+          <button className="detail-add-main" disabled={selectedVariant?.stock <= 0} onClick={handleAddSelectedToCart} type="button">
             <ShoppingBag size={20} />
             {txt.addToCart}
           </button>

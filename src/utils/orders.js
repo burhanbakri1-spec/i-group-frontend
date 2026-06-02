@@ -25,6 +25,10 @@ export async function createOrder({
     slug: item.slug || item.productId,
     selectedSize: item.selectedSize || item.size,
     size: item.size || item.selectedSize,
+    variantId: item.variantId || "",
+    selectedColor: item.selectedColor || item.colorName || "",
+    colorName: item.colorName || item.selectedColor || "",
+    colorValue: item.colorValue || "",
     quantity: Number(item.quantity || 1),
     price: Number(item.price || 0),
     lineTotal:

@@ -2,9 +2,8 @@ import React from "react";
 import { Minus, Plus, Search, Upload } from "lucide-react";
 import AdminLayout from "../components/AdminLayout.jsx";
 import AdminOrdersTable from "../components/AdminOrdersTable.jsx";
-import HomeContentManager from "../components/HomeContentManager.jsx";
 import { categories as defaultCategories } from "../data/categories.js";
-import { uploadImage } from "../utils/api.js";
+import { uploadImage, uploadImages } from "../utils/api.js";
 
 const storageKeys = {
   brands: "ebAdminBrands",
@@ -27,7 +26,6 @@ const pageMeta = {
   "admin-brands-new": ["New Brand", "Create a brand profile"],
   "admin-vlogs": ["Vlogs", "Manage storefront vlog entries"],
   "admin-vlogs-new": ["New Vlog", "Create a storefront vlog entry"],
-  "admin-home-content": ["Home Content", "Manage homepage cards, offers, and reviews"],
   "admin-store-locator": ["Store Locator", "Manage physical store locations"],
   "admin-store-locator-new": ["New Store", "Create a retail location"],
   "admin-orders": ["Orders", "Manage and track customer orders"],
@@ -114,12 +112,82 @@ function createLocalizedCopy(en, ar) {
   return { en, ar };
 }
 
+function normalizeFormVariant(variant = {}, index = 0, product = {}) {
+  return {
+    id: variant.id || `${product.id || "product"}-variant-${index}`,
+    color_name: variant.color_name || variant.colorName || "Default",
+    color_value: variant.color_value || variant.colorValue || "",
+    size: variant.size || product.size || "500ml",
+    price: Number(variant.price ?? product.price ?? 0),
+    stock: Math.max(0, Number(variant.stock ?? variant.stockQty ?? product.stockQty ?? 0)),
+    image_url: variant.image_url || variant.imageUrl || variant.image || "",
+    sort_order: Number(variant.sort_order ?? variant.sortOrder ?? index),
+  };
+}
+
+function normalizeProductVariantsForForm(product = {}) {
+  if (Array.isArray(product.variants) && product.variants.length) {
+    return product.variants.map((variant, index) => normalizeFormVariant(variant, index, product));
+  }
+
+  return (product.sizes || []).map((sizeOption, index) =>
+    normalizeFormVariant(
+      {
+        color_name: "Default",
+        size: sizeOption.size,
+        price: sizeOption.price,
+        stock: product.stockQty ?? 24,
+        image_url: product.image || "",
+      },
+      index,
+      product,
+    ),
+  );
+}
+
+function normalizeGalleryImagesForForm(product = {}) {
+  const source = product.gallery_images || product.galleryImages || [];
+  return source
+    .map((entry, index) => ({
+      id: typeof entry === "object" && entry?.id ? entry.id : `gallery-${index}`,
+      image_url: typeof entry === "string" ? entry : entry?.image_url || entry?.image || entry?.url || "",
+      sort_order: Number(typeof entry === "object" ? entry?.sort_order ?? entry?.sortOrder ?? index : index),
+    }))
+    .filter((entry) => entry.image_url);
+}
+
+function sizesFromFormVariants(variants, fallbackSize, fallbackPrice) {
+  const bySize = new Map();
+  variants.forEach((variant) => {
+    if (!variant.size) return;
+    const current = bySize.get(variant.size);
+    if (!current || Number(variant.price) < Number(current.price)) {
+      bySize.set(variant.size, { size: variant.size, price: Number(variant.price || 0) });
+    }
+  });
+  return bySize.size
+    ? Array.from(bySize.values())
+    : [{ size: fallbackSize || "500ml", price: Number(fallbackPrice || 0) || 0 }];
+}
+
 function createProductFromForm(form) {
   const id = form.id || `product-${Date.now()}`;
   const slug = form.slug || makeSlug(form.nameEn);
-  const parsedSizes = form.size
-    ? [{ size: form.size, price: Number(form.price || 0) || 0 }]
-    : [{ size: "500ml", price: Number(form.price || 0) || 0 }];
+  const variants = (form.variants || [])
+    .filter((variant) => variant.color_name && variant.size)
+    .map((variant, index) => ({
+      ...normalizeFormVariant(variant, index, form),
+      id: variant.id || `${id}-variant-${index}`,
+      price: Number(variant.price || 0),
+      stock: Math.max(0, Number(variant.stock || 0)),
+      sort_order: index,
+    }));
+  const galleryImages = (form.galleryImages || []).map((image, index) => ({
+    id: image.id || `gallery-${index}`,
+    image_url: image.image_url,
+    sort_order: index,
+  }));
+  const parsedSizes = sizesFromFormVariants(variants, form.size, form.price);
 
   return {
     id,
@@ -138,6 +206,9 @@ function createProductFromForm(form) {
     image: form.image || "/images/products/product-placeholder.svg",
     hoverImage: form.hoverImage || form.image || "/images/products/product-placeholder.svg",
     fallbackImage: "/images/products/product-placeholder.svg",
+    variants,
+    gallery_images: galleryImages,
+    galleryImages: galleryImages.map((image) => image.image_url),
     sizes: parsedSizes,
     badge: createLocalizedCopy(form.label || "Featured", form.labelAr || "مميز"),
     status: form.active ? "Active" : "Inactive",
@@ -145,8 +216,15 @@ function createProductFromForm(form) {
     isFeatured: form.featured,
     isNewArrival: form.newArrival,
     isBestseller: form.bestseller,
-    stockQty: Number(form.stockQty || 0) || 0,
-    stockStatus: Number(form.stockQty || 0) > 0 ? "In Stock" : "Out of Stock",
+    stockQty: variants.length
+      ? variants.reduce((sum, variant) => sum + Number(variant.stock || 0), 0)
+      : Number(form.stockQty || 0) || 0,
+    stockStatus:
+      (variants.length
+        ? variants.reduce((sum, variant) => sum + Number(variant.stock || 0), 0)
+        : Number(form.stockQty || 0)) > 0
+        ? "In Stock"
+        : "Out of Stock",
     metaTitle: form.metaTitle,
     metaDescription: form.metaDescription,
     createdAt: form.createdAt || new Date().toISOString(),
@@ -422,6 +500,8 @@ function ProductWizard({ categories, editingProduct, onCancel, onSave }) {
     concerns: editingProduct?.concerns || "",
     image: editingProduct?.image || "",
     hoverImage: editingProduct?.hoverImage || "",
+    galleryImages: normalizeGalleryImagesForForm(editingProduct),
+    variants: normalizeProductVariantsForForm(editingProduct),
     videoUrl: editingProduct?.videoUrl || "",
     metaTitle: editingProduct?.metaTitle || "",
     metaDescription: editingProduct?.metaDescription || "",
@@ -439,6 +519,75 @@ function ProductWizard({ categories, editingProduct, onCancel, onSave }) {
   function change(event) {
     const { checked, name, type, value } = event.target;
     setForm((current) => ({ ...current, [name]: type === "checkbox" ? checked : value }));
+  }
+
+  function addVariant() {
+    setForm((current) => ({
+      ...current,
+      variants: [
+        ...(current.variants || []),
+        normalizeFormVariant(
+          {
+            color_name: "",
+            color_value: "#1db7d8",
+            size: "",
+            price: 0,
+            stock: 0,
+            image_url: current.image || "",
+          },
+          current.variants?.length || 0,
+          current,
+        ),
+      ],
+    }));
+  }
+
+  function updateVariant(index, field, value) {
+    setForm((current) => ({
+      ...current,
+      variants: (current.variants || []).map((variant, variantIndex) =>
+        variantIndex === index ? { ...variant, [field]: value } : variant,
+      ),
+    }));
+  }
+
+  function removeVariant(index) {
+    setForm((current) => ({
+      ...current,
+      variants: (current.variants || []).filter((_, variantIndex) => variantIndex !== index),
+    }));
+  }
+
+  async function uploadGallery(event) {
+    const files = event.target.files;
+    event.target.value = "";
+    if (!files?.length) return;
+    const uploaded = await uploadImages(files);
+    setForm((current) => {
+      const currentImages = current.galleryImages || [];
+      return {
+        ...current,
+        galleryImages: [
+          ...currentImages,
+          ...uploaded
+            .map((item, index) => ({
+              id: `gallery-${Date.now()}-${index}`,
+              image_url: item.path || item.url,
+              sort_order: currentImages.length + index,
+            }))
+            .filter((item) => item.image_url),
+        ],
+      };
+    });
+  }
+
+  function removeGalleryImage(index) {
+    setForm((current) => ({
+      ...current,
+      galleryImages: (current.galleryImages || [])
+        .filter((_, imageIndex) => imageIndex !== index)
+        .map((image, sortIndex) => ({ ...image, sort_order: sortIndex })),
+    }));
   }
 
   async function submit(event) {
@@ -484,21 +633,51 @@ function ProductWizard({ categories, editingProduct, onCancel, onSave }) {
           </>
         )}
         {step === "variants" && (
-          form.id ? (
-            <>
-              <label>Price<input name="price" type="number" value={form.price} onChange={change} /></label>
-              <label>Stock Qty<input name="stockQty" type="number" value={form.stockQty} onChange={change} /></label>
-            </>
-          ) : (
-            <EmptyState title="Save the product first to manage variants." />
-          )
+          <div className="full-field admin-variants-editor">
+            <div className="admin-inline-heading">
+              <strong>Color, size, price, and stock combinations</strong>
+              <button className="secondary-action compact-action" onClick={addVariant} type="button">
+                Add Variant
+              </button>
+            </div>
+            <div className="admin-variant-grid">
+              {(form.variants || []).map((variant, index) => (
+                <div className="admin-variant-row" key={variant.id || index}>
+                  <label>Color name<input required value={variant.color_name} onChange={(event) => updateVariant(index, "color_name", event.target.value)} /></label>
+                  <label>Color value<input value={variant.color_value} onChange={(event) => updateVariant(index, "color_value", event.target.value)} /></label>
+                  <label>Size<input required value={variant.size} onChange={(event) => updateVariant(index, "size", event.target.value)} /></label>
+                  <label>Price<input min="0" required type="number" value={variant.price} onChange={(event) => updateVariant(index, "price", event.target.value)} /></label>
+                  <label>Stock<input min="0" required type="number" value={variant.stock} onChange={(event) => updateVariant(index, "stock", event.target.value)} /></label>
+                  <label>Variant image<input value={variant.image_url} onChange={(event) => updateVariant(index, "image_url", event.target.value)} /></label>
+                  <button className="text-action danger" onClick={() => removeVariant(index)} type="button">Remove</button>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
         {step === "media" && (
           <>
             <MediaField label="Featured Image" name="image" value={form.image} onChange={change} />
             <MediaField label="Second / Hover Image" name="hoverImage" value={form.hoverImage} onChange={change} />
             <label>Video URL<input name="videoUrl" value={form.videoUrl} onChange={change} /></label>
-            <div className="full-field"><EmptyState title={form.id ? "Image gallery ready for product media." : "Save the product first to manage its image gallery."} /></div>
+            <div className="full-field admin-gallery-editor">
+              <div className="admin-inline-heading">
+                <strong>Vertical Gallery Images</strong>
+                <label className="admin-upload-button">
+                  <Upload size={14} />
+                  Upload Gallery Images
+                  <input accept="image/*" hidden multiple type="file" onChange={uploadGallery} />
+                </label>
+              </div>
+              <div className="admin-gallery-preview-grid">
+                {(form.galleryImages || []).map((image, index) => (
+                  <figure className="admin-gallery-preview" key={`${image.image_url}-${index}`}>
+                    <img alt="" src={image.image_url} />
+                    <button onClick={() => removeGalleryImage(index)} type="button">Remove</button>
+                  </figure>
+                ))}
+              </div>
+            </div>
           </>
         )}
         {step === "seo" && (
@@ -872,22 +1051,6 @@ function AdminDashboardPage({
         return renderSimpleTable("vlogs");
       case "admin-vlogs-new":
         return renderEntityForm("vlog");
-      case "admin-home-content":
-        return (
-          <HomeContentManager
-            canDelete={canManageSensitive}
-            categoryCards={homepageCategoryCards}
-            language={language}
-            offers={homepageOffers}
-            onDeleteOffer={onDeleteOffer}
-            onDeleteReview={onDeleteReview}
-            onModerateReview={onModerateReview}
-            onSaveCategoryCard={onSaveCategoryCard}
-            onSaveOffer={onSaveOffer}
-            reviews={reviews}
-            t={t}
-          />
-        );
       case "admin-store-locator":
         return renderSimpleTable("stores");
       case "admin-store-locator-new":

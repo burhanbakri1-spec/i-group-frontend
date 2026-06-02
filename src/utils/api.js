@@ -82,3 +82,30 @@ export async function uploadImage(file) {
 
   return data;
 }
+
+export async function uploadImages(files = []) {
+  const fileList = Array.from(files).filter(Boolean);
+  if (!fileList.length) {
+    return [];
+  }
+
+  const token = getToken();
+  const formData = new FormData();
+  fileList.forEach((file) => formData.append("images", file));
+
+  const response = await fetch(`${apiBaseUrl}/uploads`, {
+    method: "POST",
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: formData,
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.message || "Images upload failed.");
+  }
+
+  return data.files || (data.path || data.url ? [data] : []);
+}

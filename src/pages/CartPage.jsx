@@ -19,6 +19,7 @@ const cartCopy = {
     remove: "Remove",
     shippingInfo: "Shipping information",
     size: "Size",
+    color: "Color",
     totalDue: "Total (due today)",
     unlockShipping: (amount, currency) => `Add ${amount} ${currency} to unlock free shipping`,
     youMightAlsoLike: "You might also like",
@@ -147,9 +148,10 @@ function CartPage({
   }
 
   function addRecommended(product) {
-    const firstSize = product?.sizes?.[0]?.size;
+    const firstVariant = product?.variants?.find((variant) => Number(variant.stock ?? 1) > 0);
+    const firstSize = firstVariant?.size || product?.sizes?.[0]?.size;
     if (!firstSize) return;
-    onAddToCart?.(product, firstSize);
+    onAddToCart?.(product, firstSize, firstVariant);
   }
 
   function handleCheckout() {
@@ -249,6 +251,7 @@ function CartPage({
                       <h2>{productName}</h2>
                       <p>
                         {text.size}: {item.size}
+                        {item.colorName ? ` · ${(text.color || "Color")}: ${item.colorName}` : ""}
                       </p>
                       <div className="cart-line-actions">
                         <QuantityControl

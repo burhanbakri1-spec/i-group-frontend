@@ -8,7 +8,6 @@ import {
   Film,
   FolderTree,
   Grid3X3,
-  Image as ImageIcon,
   Languages,
   MapPin,
   Moon,
@@ -46,7 +45,6 @@ const navSections = [
     icon: Store,
     label: { en: "Storefront", ar: "واجهة المتجر" },
     items: [
-      { key: "admin-home-content", icon: ImageIcon, label: { en: "Home Content", ar: "محتوى الرئيسية" } },
       { key: "admin-vlogs", icon: Film, label: { en: "Vlogs", ar: "الفيديوهات" } },
       { key: "admin-store-locator", icon: MapPin, label: { en: "Store Locator", ar: "مواقع المتاجر" } },
     ],

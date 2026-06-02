@@ -2,7 +2,6 @@ import React from "react";
 import AdminOrdersTable from "../components/AdminOrdersTable.jsx";
 import AdminProductForm from "../components/AdminProductForm.jsx";
 import AdminProductTable from "../components/AdminProductTable.jsx";
-import HomeContentManager from "../components/HomeContentManager.jsx";
 import StatusBadge from "../components/StatusBadge.jsx";
 import WorkTimer from "../components/WorkTimer.jsx";
 import { hasPermission, permissionGroups } from "../data/permissions.js";
@@ -19,20 +18,15 @@ const emptyCustomer = {
 
 function EmployeeDashboardPage({
   currentUser,
-  homepageCategoryCards,
-  homepageOffers,
   language,
   onCreateOrder,
   onDeleteOrder,
   onDeleteProduct,
-  onSaveCategoryCard,
-  onSaveOffer,
   onNavigate,
   onSaveProduct,
   onStatusChange,
   orders,
   products,
-  reviews,
   t,
   workSession,
 }) {
@@ -73,7 +67,6 @@ function EmployeeDashboardPage({
     canViewProducts || canCreateProducts || canUpdateProducts || canDeleteProducts;
   const hasOrderPermission =
     canViewOrders || canCreateOrders || canUpdateOrderStatus || canDeleteOrders;
-  const canManageHomeContent = hasProductPermission || canCreateOrders;
   const hasAnyPermission = currentUser.permissions?.length > 0;
 
   const assignedOrders = orders.filter((order) => {
@@ -349,15 +342,6 @@ function EmployeeDashboardPage({
             {t("employee.createCustomerOrder")}
           </button>
         )}
-        {canManageHomeContent && (
-          <button
-            className={activeTab === "home-content" ? "nav-link active" : "nav-link"}
-            onClick={() => setActiveTab("home-content")}
-            type="button"
-          >
-            {t("homeContent.title")}
-          </button>
-        )}
       </div>
 
       {activeTab === "overview" && (
@@ -588,17 +572,6 @@ function EmployeeDashboardPage({
         </section>
       )}
 
-      {activeTab === "home-content" && canManageHomeContent && (
-        <HomeContentManager
-          categoryCards={homepageCategoryCards}
-          language={language}
-          offers={homepageOffers}
-          onSaveCategoryCard={onSaveCategoryCard}
-          onSaveOffer={onSaveOffer}
-          reviews={reviews.filter((review) => review.employeeId === currentUser.id)}
-          t={t}
-        />
-      )}
     </section>
   );
 }

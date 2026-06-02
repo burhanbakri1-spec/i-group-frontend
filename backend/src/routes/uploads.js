@@ -53,10 +53,11 @@ function safeFilename(filename, contentType) {
   return `${baseName || "image"}-${unique}${extension}`;
 }
 
-function parseMultipartImage(body, boundary) {
+function parseMultipartImages(body, boundary) {
   const boundaryBuffer = Buffer.from(`--${boundary}`);
   const headerSeparator = Buffer.from("\r\n\r\n");
   let cursor = body.indexOf(boundaryBuffer);
+  const uploads = [];
 
   while (cursor !== -1) {
     let headerStart = cursor + boundaryBuffer.length;
@@ -90,17 +91,17 @@ function parseMultipartImage(body, boundary) {
         dataEnd -= 2;
       }
 
-      return {
+      uploads.push({
         contentType,
         filename,
         data: body.slice(headerEnd + headerSeparator.length, dataEnd),
-      };
+      });
     }
 
     cursor = nextBoundary;
   }
 
-  return null;
+  return uploads;
 }
 
 function buildPublicUrl(req, filename) {
@@ -119,27 +120,35 @@ router.post(
   }),
   (req, res) => {
     const boundary = getBoundary(req.headers["content-type"]);
-    const upload = boundary ? parseMultipartImage(req.body, boundary) : null;
+    const uploads = boundary ? parseMultipartImages(req.body, boundary) : [];
 
-    if (!upload) {
+    if (!uploads.length) {
       return res.status(400).json({ message: "No image file was uploaded." });
     }
 
-    if (!imageTypes.has(upload.contentType)) {
-      return res.status(400).json({ message: "Only JPG, PNG, WEBP, and GIF images are allowed." });
-    }
-
-    const filename = safeFilename(upload.filename, upload.contentType);
-    if (!filename) {
-      return res.status(400).json({ message: "Unsupported image file type." });
-    }
-
     fs.mkdirSync(uploadsDir, { recursive: true });
-    fs.writeFileSync(path.join(uploadsDir, filename), upload.data);
+    const savedFiles = [];
+
+    for (const upload of uploads) {
+      if (!imageTypes.has(upload.contentType)) {
+        return res.status(400).json({ message: "Only JPG, PNG, WEBP, and GIF images are allowed." });
+      }
+
+      const filename = safeFilename(upload.filename, upload.contentType);
+      if (!filename) {
+        return res.status(400).json({ message: "Unsupported image file type." });
+      }
+
+      fs.writeFileSync(path.join(uploadsDir, filename), upload.data);
+      savedFiles.push({
+        path: `/uploads/${filename}`,
+        url: buildPublicUrl(req, filename),
+      });
+    }
 
     res.status(201).json({
-      path: `/uploads/${filename}`,
-      url: buildPublicUrl(req, filename),
+      ...savedFiles[0],
+      files: savedFiles,
     });
   },
 );

@@ -93,7 +93,6 @@ const pagePaths = {
   "admin-brands-new": "/admin/brands/new",
   "admin-vlogs": "/admin/vlogs",
   "admin-vlogs-new": "/admin/vlogs/new",
-  "admin-home-content": "/admin/home-content",
   "admin-store-locator": "/admin/store-locator",
   "admin-store-locator-new": "/admin/store-locator/new",
   "admin-orders": "/admin/orders",
@@ -117,7 +116,6 @@ const adminPageKeys = [
   "admin-brands-new",
   "admin-vlogs",
   "admin-vlogs-new",
-  "admin-home-content",
   "admin-store-locator",
   "admin-store-locator-new",
   "admin-orders",
@@ -405,20 +403,24 @@ function App() {
     navigate("product");
   }
 
-  function handleAddToCart(product, size) {
+  function handleAddToCart(product, size, variant = null) {
     if (!currentUser) {
       setLoginMessage(t("auth.loginRequiredToBuy"));
       navigate("login");
       return;
     }
 
-    const selectedSize = product.sizes.find((option) => option.size === size);
+    const selectedSize =
+      variant ||
+      product.variants?.find((option) => option.size === size) ||
+      product.sizes?.find((option) => option.size === size);
 
     if (!selectedSize) {
       return;
     }
 
-    const cartId = `${product.id}-${selectedSize.size}`;
+    const selectedVariantId = variant?.id || selectedSize.id || "";
+    const cartId = `${product.id}-${selectedVariantId || selectedSize.size}`;
 
     setCartItems((currentItems) => {
       const existingItem = currentItems.find((item) => item.cartId === cartId);
@@ -442,9 +444,13 @@ function App() {
           slug: product.slug,
           categoryId: product.categoryId,
           productName: product.name?.en || product.slug,
-          image: product.image,
+          image: variant?.image || variant?.image_url || product.image,
           fallbackImage: product.fallbackImage,
           size: selectedSize.size,
+          selectedSize: selectedSize.size,
+          variantId: selectedVariantId,
+          colorName: variant?.colorName || variant?.color_name || selectedSize.colorName || selectedSize.color_name || "",
+          colorValue: variant?.colorValue || variant?.color_value || selectedSize.colorValue || selectedSize.color_value || "",
           price: selectedSize.price,
           quantity: 1,
         },
