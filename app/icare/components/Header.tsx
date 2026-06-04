@@ -25,7 +25,7 @@ const MUTED_TEXT_CLASS = 'text-[var(--rb-primary-text)] hover:text-[var(--rb-nea
 const SHOP_MEGA_MENU_ID = 'icare-shop-mega-menu';
 const HEADER_HIDE_SCROLL_THRESHOLD = 32;
 const HEADER_SCROLL_DELTA = 4;
-const HEADER_HIDE_DELAY_MS = 240;
+const HEADER_HIDE_DELAY_MS = 80;
 const HEADER_MOTION_EASE = [0.76, 0, 0.24, 1] as const;
 
 export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavigate, onProductSelect, onOpenMenu, isDrawerOpen, lang, onToggleLang }) => {
@@ -33,9 +33,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
   const { cartCount, wishlistItems } = useShop();
   const [isShopHovered, setIsShopHovered] = useState(false);
   const [activeCategory, setActiveCategory] = useState(t.categories.all);
-  const [isMounted, setIsMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isScrollingUp, setIsScrollingUp] = useState(false);
+  const [hasScrolledPastHero, setHasScrolledPastHero] = useState(false);
   const [previewProducts, setPreviewProducts] = useState<Product[]>([]);
   const [rootCategories, setRootCategories] = useState<BackendCategory[]>([]);
   const [categoryChildren, setCategoryChildren] = useState<Record<string, BackendCategory[]>>({});
@@ -48,6 +49,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
   const shopButtonRef = useRef<HTMLButtonElement | null>(null);
   const shopMenuRef = useRef<HTMLDivElement | null>(null);
   const lastScrollYRef = useRef(0);
+  const scrollIdleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isShopHoveredRef = useRef(false);
+  useEffect(() => { isShopHoveredRef.current = isShopHovered; }, [isShopHovered]);
   const calmTween = shouldReduceMotion ? { duration: 0 } : { duration: 0.2, ease: 'easeOut' as const };
   const headerMotion = shouldReduceMotion ? { duration: 0 } : { duration: 0.42, ease: HEADER_MOTION_EASE };
 
@@ -196,18 +200,44 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
       const delta = currentScrollY - lastScrollYRef.current;
       const isStandardHeroRoute = hasIcareStandardHero(pathname);
 
-      setIsMounted(true);
       setIsScrolled(currentScrollY > 40 || !isStandardHeroRoute);
+
+      if (isStandardHeroRoute && currentScrollY > 40) {
+        setHasScrolledPastHero(true);
+      }
+
+      // While the shop mega menu is open, freeze the header in place.
+      if (isShopHoveredRef.current) {
+        cancelHeaderHideTimer();
+        setIsVisible(true);
+        lastScrollYRef.current = currentScrollY;
+        return;
+      }
 
       if (currentScrollY <= HEADER_HIDE_SCROLL_THRESHOLD) {
         cancelHeaderHideTimer();
         setIsVisible(true);
+        setIsScrollingUp(false);
+        if (scrollIdleTimerRef.current !== null) {
+          clearTimeout(scrollIdleTimerRef.current);
+          scrollIdleTimerRef.current = null;
+        }
       } else if (delta > HEADER_SCROLL_DELTA) {
+        setIsScrollingUp(false);
         scheduleHeaderHide();
       } else if (delta < -HEADER_SCROLL_DELTA) {
         cancelHeaderHideTimer();
         setIsVisible(true);
+        setIsScrollingUp(true);
       }
+
+      if (scrollIdleTimerRef.current !== null) {
+        clearTimeout(scrollIdleTimerRef.current);
+      }
+      scrollIdleTimerRef.current = setTimeout(() => {
+        setIsScrollingUp(false);
+        scrollIdleTimerRef.current = null;
+      }, 600);
 
       lastScrollYRef.current = currentScrollY;
     };
@@ -224,32 +254,69 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
     };
   }, [pathname]);
 
-  const headerY = !isVisible || isDrawerOpen ? 'calc(-100% - 2rem)' : 0;
-  const headerOpacity = !isVisible || isDrawerOpen ? 0 : 1;
   const isStandardHero = hasIcareStandardHero(pathname);
-  const isConnected = isStandardHero && !isScrolled && !isShopHovered;
-  const radiusClass = isShopHovered ? 'rounded-[var(--rb-radius-card)] border-b-0' : 'rounded-[var(--rb-radius-card)]';
-  const wrapperBg = isShopHovered || isScrolled || !isStandardHero
-    ? 'bg-[var(--rb-bg-warm-gray)] shadow-[0_1rem_2rem_rgba(103,100,94,0.06)]'
-    : 'bg-transparent';
+  // home-only, one-shot transparency: armed-off for the rest of the session after the first scroll past the hero
+  const isConnected =
+    isStandardHero
+    && pathname === '/icare'
+    && !isScrolled
+    && !isShopHovered
+    && !hasScrolledPastHero;
+  // Condensed mode: header sits above the hero with a solid white pill and a tighter top gap.
+  // Activates as soon as the user has scrolled past the hero height (or on non-standard routes).
+  const isCondensed = !isConnected && isScrolled;
+  const radiusClass = isShopHovered
+    ? 'rounded-[var(--rb-radius-card)]'
+    : 'rounded-t-[var(--rb-radius-card)] rounded-b-none';
+  const wrapperBg = isConnected
+    ? 'bg-transparent'
+    : 'bg-[var(--rb-bg-warm-gray)] shadow-[0_1rem_2rem_rgba(103,100,94,0.06)]';
   const navTextClass = isConnected ? 'text-white hover:text-white/75' : MUTED_TEXT_CLASS;
   const logoToneClass = isConnected ? 'brightness-0 invert' : '';
 
+  // When condensed, lift the header up so the white plate shows as a gap above it.
+  // Left/right positions stay tied to --icare-header-inset (no horizontal shift).
+  const condensedLift = -32;
+
   return (
-    <motion.div 
-      ref={headerRef}
-      initial={shouldReduceMotion ? { y: 0, opacity: 1 } : { y: -6, opacity: 0 }}
-      animate={{ y: headerY, opacity: isMounted ? headerOpacity : 0 }}
-      transition={headerMotion}
-      onMouseLeave={hideShop}
-      onBlur={handleHeaderBlur}
-      onKeyDown={handleHeaderKeyDown}
-      data-icare-header
-      className={`icare-header-shell ${isDrawerOpen ? 'pointer-events-none' : ''}`}
-    >
+    <>
+      <motion.div
+        aria-hidden="true"
+        initial={false}
+        animate={{
+          y: !isVisible || isDrawerOpen
+            ? '-200%'
+            : 0,
+        }}
+        transition={headerMotion}
+        className="fixed left-0 right-0 top-0 bg-white pointer-events-none rounded-b-[var(--rb-radius-card)]"
+        style={{
+          height: `calc(var(--icare-header-top) - ${Math.abs(condensedLift)}px + 2rem)`,
+          opacity: isCondensed ? 1 : 0,
+          transition: shouldReduceMotion ? 'none' : 'opacity 0.2s linear',
+          zIndex: 55,
+        }}
+      />
+      <motion.div
+        ref={headerRef}
+        initial={shouldReduceMotion ? { y: 0 } : { y: -6 }}
+        animate={{
+          y: !isVisible || isDrawerOpen
+            ? '-200%'
+            : (isCondensed ? condensedLift : 0),
+        }}
+        transition={headerMotion}
+        onMouseLeave={hideShop}
+        onBlur={handleHeaderBlur}
+        onKeyDown={handleHeaderKeyDown}
+        data-icare-header
+        className={`icare-header-shell ${isDrawerOpen ? 'pointer-events-none' : ''}`}
+      >
       <div>
-        <div className={`overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] border ${isConnected ? 'border-transparent' : 'border-[var(--rb-border-light)]'} ${radiusClass} ${wrapperBg}`}>
-          <header 
+        <div
+          className={`overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] border ${isConnected ? 'border-transparent' : 'border-[var(--rb-border-light)]'} ${radiusClass} ${wrapperBg}`}
+        >
+          <header
             className="flex min-h-[64px] items-center justify-between px-4 py-4 md:px-8 md:py-5"
           >
           {/* Navigation */}
@@ -263,7 +330,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
               <Menu size={20} className={isConnected ? 'text-white' : 'text-[var(--rb-primary-text)]'} />
             </button>
             <nav className="hidden lg:flex items-center gap-7">
-              <button 
+              <button
                 ref={shopButtonRef}
                 onMouseEnter={showShop}
                 onFocus={showShop}
@@ -276,21 +343,22 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                     onNavigate('shop');
                   }
                 }}
-                className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
+                /* Match Rhode header nav links: 12.8px / 700 / 19.2px / 0.256px ls / uppercase. */
+                className={`rounded-full px-1 text-[12.8px] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
                 aria-haspopup="true"
                 aria-expanded={isShopHovered}
                 aria-controls={SHOP_MEGA_MENU_ID}
               >
                 {t.shop}
               </button>
-              <button 
+              <button
                 onClick={() => onNavigate('story')}
                 onMouseEnter={closeShopMenu}
-                className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
+                className={`rounded-full px-1 text-[12.8px] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
               >
                 {t.story}
               </button>
-              <button 
+              <button
                 onClick={onToggleLang}
                 onMouseEnter={closeShopMenu}
                 className={`text-[12px] font-bold flex items-center gap-2 border px-3 py-1.5 rounded-full transition-colors ${FOCUS_VISIBLE_CLASS} ${isConnected ? 'border-white/35 text-white hover:bg-white/10' : 'border-[var(--rb-border-light)] text-[var(--rb-primary-text)] hover:bg-black/5'}`}
@@ -302,7 +370,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
           </div>
 
           {/* Logo */}
-          <motion.button 
+          <motion.button
             onClick={() => onNavigate('home')}
             className={`absolute left-1/2 -translate-x-1/2 h-12 md:h-14 lg:h-16 w-auto flex items-center justify-center rounded-full ${FOCUS_VISIBLE_CLASS}`}
             whileHover={shouldReduceMotion ? undefined : { scale: 1.015 }}
@@ -310,28 +378,28 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
             transition={calmTween}
             aria-label="Go to home"
           >
-            <img 
-              src="/icare-logo.png" 
-              alt="icare beauty" 
+            <img
+              src="/icare-logo.png"
+              alt="icare beauty"
               className={`h-full w-auto object-contain transition-all duration-300 ${logoToneClass}`}
             />
           </motion.button>
 
           {/* Actions */}
           <div className="flex items-center gap-3 md:gap-6">
-            <button 
+            <button
                 onClick={onOpenSearch}
                 onMouseEnter={closeShopMenu}
-                className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
+                className={`rounded-full px-1 text-[12.8px] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
                 aria-label={t.search}
             >
               <span className="hidden md:inline">{t.search}</span>
               <Search size={20} className="md:hidden" />
             </button>
-            <button 
+            <button
               onClick={() => onNavigate('wishlist')}
               onMouseEnter={closeShopMenu}
-              className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors relative ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
+              className={`rounded-full px-1 text-[12.8px] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors relative ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
               aria-label={t.wishlist}
             >
               <span className="hidden md:inline">{t.wishlist}</span>
@@ -344,17 +412,17 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                 )}
               </div>
             </button>
-            <button 
+            <button
               onClick={() => onNavigate('account')}
               onMouseEnter={closeShopMenu}
-              className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors hidden md:block ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
+              className={`rounded-full px-1 text-[12.8px] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors hidden md:block ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
             >
               {t.account}
             </button>
-            <button 
+            <button
               onClick={onOpenCart}
               onMouseEnter={closeShopMenu}
-              className={`rounded-full px-1 text-[13px] font-[800] uppercase tracking-normal transition-colors relative ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
+              className={`rounded-full px-1 text-[12.8px] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors relative ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
               aria-label={t.cart}
             >
               <span className="hidden md:inline">{t.cart} ({cartCount})</span>
@@ -392,7 +460,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                       onMouseEnter={() => { setActiveCategory(t.categories.all); setActiveRootSlug(null); }}
                       onFocus={() => { setActiveCategory(t.categories.all); setActiveRootSlug(null); }}
                       onClick={() => { onNavigate('shop'); closeShopMenu(); }}
-                      className={`rounded-full px-1 text-[14px] font-bold uppercase tracking-tight relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
+                      className={`rounded-full px-1 text-[12.8px] font-bold uppercase tracking-[0.02em] leading-[1.5] relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
                         activePreviewCategory.trim().toLowerCase() === t.categories.all.trim().toLowerCase() ? 'text-[var(--rb-near-black)]' : 'text-[var(--rb-primary-text)]'
                       }`}
                     >
@@ -408,7 +476,8 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                         onMouseEnter={() => { setActiveCategory(cat.name); setActiveRootSlug(cat.slug); }}
                         onFocus={() => { setActiveCategory(cat.name); setActiveRootSlug(cat.slug); }}
                         onClick={() => { onNavigate('shop'); closeShopMenu(); }}
-                        className={`rounded-full px-1 text-[14px] font-bold uppercase tracking-tight relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
+                        /* Match Rhode 12.8px / 700 / 0.256px rhythm for secondary nav pills. */
+                        className={`rounded-full px-1 text-[12.8px] font-bold uppercase tracking-[0.02em] leading-[1.5] relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
                           activePreviewCategory.trim().toLowerCase() === cat.name.trim().toLowerCase() ? 'text-[var(--rb-near-black)]' : 'text-[var(--rb-primary-text)]'
                         }`}
                       >
@@ -425,7 +494,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                           onMouseEnter={() => setActiveCategory(cat)}
                           onFocus={() => setActiveCategory(cat)}
                           onClick={() => { onNavigate('shop'); closeShopMenu(); }}
-                          className={`rounded-full px-1 text-[14px] font-bold uppercase tracking-tight relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
+                          className={`rounded-full px-1 text-[12.8px] font-bold uppercase tracking-[0.02em] leading-[1.5] relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
                             activePreviewCategory.trim().toLowerCase() === cat.trim().toLowerCase() ? 'text-[var(--rb-near-black)]' : 'text-[var(--rb-primary-text)]'
                           }`}
                         >
@@ -446,7 +515,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                       <button
                         key={child.slug}
                         onClick={() => { onNavigate('shop'); closeShopMenu(); }}
-                        className={`rounded-full px-4 py-1.5 text-[12px] font-bold tracking-wide transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} text-[var(--rb-primary-text)] hover:text-[var(--rb-near-black)] hover:bg-[var(--rb-bg-surface)]`}
+                        className={`rounded-full px-4 py-1.5 text-[12.8px] font-bold tracking-[0.02em] leading-[1.5] transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} text-[var(--rb-primary-text)] hover:text-[var(--rb-near-black)] hover:bg-[var(--rb-bg-surface)]`}
                       >
                         {child.name}
                       </button>
@@ -476,13 +545,13 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                         />
                       </div>
                       <div className="mt-auto">
-                        <h4 className="text-[14px] font-bold uppercase tracking-tight text-[var(--rb-near-black)] mb-1">
+                        <h4 className="text-[14px] font-bold uppercase tracking-[0.02em] text-[var(--rb-near-black)] mb-1">
                           {product.title ?? product.name}
                         </h4>
-                        <p className="text-[14px] text-[var(--rb-primary-text)] font-medium leading-tight mb-2">
+                        <p className="text-[14px] text-[var(--rb-primary-text)] font-normal tracking-[0.02em] leading-[1.5] mb-2">
                           {product.description ?? <>{product.originalPrice && <span className="line-through mr-1">{product.originalPrice}</span>}{product.price}</>}
                         </p>
-                        <span className="text-[11px] font-black uppercase tracking-widest border-b border-[var(--rb-near-black)] pb-0.5 self-start group-hover:opacity-70 transition-opacity">
+                        <span className="text-[12.8px] font-normal uppercase tracking-[0.02em] border-b border-[var(--rb-near-black)] pb-0.5 self-start group-hover:opacity-70 transition-opacity">
                           {t.shopNow}
                         </span>
                       </div>
@@ -498,8 +567,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+        </div>
       </div>
     </motion.div>
+    </>
   );
 };

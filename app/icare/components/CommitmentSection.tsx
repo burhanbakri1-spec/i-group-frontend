@@ -87,17 +87,17 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNa
             className="grid grid-cols-[1fr_auto] items-center gap-8 border-t border-[#67645E]/20 py-[1.55rem] last:border-b max-[980px]:grid-cols-1 max-[980px]:gap-3"
           >
             <div>
-              <h3 className="m-0 text-[clamp(1.65rem,2.15vw,2.25rem)] font-bold lowercase leading-[1.1] tracking-normal text-[#67645E]">
+              <h3 className="m-0 text-[clamp(1.25rem,1.6vw,1.6rem)] font-bold lowercase leading-[1.5] tracking-normal text-[#67645E]">
                 {item.title}
               </h3>
-              <p className="m-0 mt-1 max-w-[34rem] text-[14px] leading-[1.45] text-[#84827E] md:text-[15px]">
+              <p className="m-0 mt-1 max-w-[34rem] text-[12.8px] leading-[1.5] tracking-[0.02em] text-[#67645E] md:text-[12.8px]">
                 {commitmentHeadline && index === 0 ? commitmentHeadline : item.detail}
               </p>
             </div>
             <button
               type="button"
               onClick={() => onNavigate('story')}
-              className="self-center text-[13px] font-bold uppercase text-[#67645E] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70"
+              className="self-center text-[15.73px] font-bold uppercase leading-[1.5] tracking-[0.02em] text-[#67645E] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70"
             >
               {item.cta}
             </button>
@@ -109,7 +109,7 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNa
             <motion.button
               onClick={() => onNavigate('story')}
               whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
-              className="relative isolate overflow-hidden rounded-full bg-white px-8 py-2.5 text-[13px] font-bold uppercase text-[#67645E] shadow-[inset_0_0_0_1px_#67645E] transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] before:absolute before:inset-0 before:-z-10 before:origin-bottom before:scale-y-0 before:rounded-full before:bg-[#67645E] before:transition-transform before:duration-500 before:ease-[cubic-bezier(0.76,0,0.24,1)] hover:-translate-y-px hover:text-white hover:before:scale-y-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F1F0ED]"
+              className="relative isolate overflow-hidden rounded-full bg-white px-8 py-2.5 text-[15.73px] font-bold uppercase leading-[1.5] tracking-[0.02em] text-[#67645E] shadow-[inset_0_0_0_1px_#67645E] transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] before:absolute before:inset-0 before:-z-10 before:origin-bottom before:scale-y-0 before:rounded-full before:bg-[#67645E] before:transition-transform before:duration-500 before:ease-[cubic-bezier(0.76,0,0.24,1)] hover:-translate-y-px hover:text-white hover:before:scale-y-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F1F0ED]"
             >
               {commitmentCta || (lang === 'en' ? 'our values' : 'قيمنا')}
             </motion.button>

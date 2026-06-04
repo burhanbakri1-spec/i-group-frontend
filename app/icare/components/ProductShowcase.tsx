@@ -74,7 +74,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
     <section className="icare-index-section icare-morning-section">
       <ScrollReveal direction="bottom" viewportMargin="-60px">
         <div className="icare-morning-header">
-          <h2 className="text-center text-[clamp(1rem,1.45vw,1.25rem)] font-bold uppercase leading-[1.2] tracking-normal text-[#67645E]">
+            <h2 className="text-center text-[12.8px] font-bold uppercase leading-[1.5] tracking-[0.02em] text-[#67645E]">
             {lang === 'en' ? 'featured skincare essentials' : 'أساسيات عناية مختارة'}
           </h2>
         </div>
@@ -180,17 +180,17 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
                       </svg>
                     ))}
                   </div>
-                  <span className="text-[8px] md:text-[11px] font-bold text-[#84827E] tracking-wider uppercase">({current.reviews})</span>
+                  <span className="text-[8px] md:text-[12.8px] font-bold text-[#67645E] tracking-[0.02em] uppercase leading-[1.5]">({current.reviews})</span>
                 </div>
 
                 <div className="space-y-0.5 md:space-y-2">
                   <div className="flex items-center gap-2">
                     <ImageWithFallback src="/icare-logo.png" alt="icare" className="h-3 md:h-5 w-auto object-contain hidden sm:block" />
-                    <h3 className="text-[14px] sm:text-[20px] md:text-[28px] font-[900] tracking-tight text-[#67645E] lowercase leading-tight">
+                    <h3 className="text-[14px] sm:text-[20px] md:text-[28px] font-bold tracking-normal text-[#67645E] lowercase leading-[1.1]">
                       {current.title ?? current.name}
                     </h3>
                   </div>
-                  <p className="text-[10px] sm:text-[14px] md:text-[16px] text-[#84827E] font-medium lowercase tracking-tight leading-snug">
+                    <p className="text-[10px] sm:text-[12.8px] md:text-[12.8px] text-[#67645E] font-bold tracking-[0.02em] leading-[1.5]">
                     {current.description}
                   </p>
                 </div>
@@ -198,7 +198,8 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
                 <motion.button
                   whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
                   onClick={() => onProductSelect(current)}
-                  className="bg-[#67645E] text-white rounded-full w-full py-3 md:py-4 text-[10px] md:text-[11px] font-black tracking-[0.1em] md:tracking-[0.2em] uppercase hover:bg-[#555] transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDECEB]"
+                  /* Rhode pill: 15.73px / 400 / 23.6px / 0.314px ls / uppercase. */
+                  className="bg-[#67645E] text-white rounded-full w-full py-3 md:py-4 text-[15.73px] font-bold tracking-[0.02em] uppercase hover:bg-[#555] transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDECEB]"
                 >
                   {lang === 'en' ? 'VIEW' : 'عرض'} — {current.originalPrice && <><span className="line-through text-white/60 mr-1">{current.originalPrice}</span> </>}{current.price}
                 </motion.button>

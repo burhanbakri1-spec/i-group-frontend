@@ -25,16 +25,30 @@
     --rb-border: var(--rb-border-light);
     --rb-ring: var(--rb-taupe-7B7872);
 
-    /* Typography Tokens */
-    --font-swiss: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    --font-display: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    /* Typography Tokens — matched to live rhodeskin.com landing (1440px viewport @ 16px root) */
+    /* Rhode uses a 2-family system:
+         - "Swiss"        : primary UI / body / nav / buttons  (weight 400-700)
+         - "Rektorat Heavy": display headings ("highlight/bronze/tint"),
+                              "swipe" cursor label, and the on-image "first access" badge.
+       On iCare, Swiss is best approximated by Geist (close geometric sans), and
+       Rektorat by Bricolage Grotesque (loaded from layout.tsx as --font-rektorat).
+       We keep "Rektorat Heavy" as the first choice so a future commercial license
+       swap is a one-line change. */
+    --font-swiss: var(--font-geist-sans), "Swiss", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    --font-display: "Rektorat Heavy", "Rektorat", var(--font-rektorat), var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    --font-rektorat: "Rektorat Heavy", "Rektorat", var(--font-rektorat), var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 
-    --rb-text-xs: 0.75rem;
+    /* Rhode text-size scale (px → rem on a 16px root).
+       Body text 16 / 24; micro 12.8 / 19.2 (with 0.256px tracking) is the canonical
+       Rhode link/footer text rhythm. */
+    --rb-text-xs: 0.75rem;            /* 12px — legacy, prefer --rb-text-2xs */
     --rb-text-xs--line-height: 1.2;
+    --rb-text-2xs: 0.8rem;            /* 12.8px — Rhode micro text (announce/footer links/labels) */
+    --rb-text-2xs--line-height: 1.5;  /* 19.2px */
     --rb-text-sm: 0.875rem;
     --rb-text-sm--line-height: 1.25;
-    --rb-text-base: 1rem;
-    --rb-text-base--line-height: 1.5;
+    --rb-text-base: 1rem;            /* 16px */
+    --rb-text-base--line-height: 1.5;/* 24px */
     --rb-text-md: 1.125rem;
     --rb-text-md--line-height: 1.4;
     --rb-text-lg: 1.25rem;
@@ -52,6 +66,27 @@
     --rb-text-6xl: 4.5rem;
     --rb-text-6xl--line-height: 0.85;
 
+    /* Rhode's collection-slider section heading is 34.6325px (Rektorat, 400, -1.3853px tracking).
+       The image-with-content section heading is 21.8617px (Swiss, 400, +0.437235px tracking). */
+    --rb-text-section-h2: 2.1645rem;     /* 34.6325px — "highlight/bronze/tint" */
+    --rb-text-section-h2--line-height: 1.2; /* 41.5589px */
+    --rb-text-section-h2--letter-spacing: -0.04em; /* -1.3853px ≈ -0.04em at this size */
+    --rb-text-imagewithcontent-h2: 1.3664rem; /* 21.8617px */
+    --rb-text-imagewithcontent-h2--line-height: 1.2; /* 26.2341px */
+    --rb-text-imagewithcontent-h2--letter-spacing: 0.02em; /* 0.437px */
+    --rb-text-mission-h2: 1.6082rem;      /* 25.7316px — Rhode TabbedSection "mission" h2 */
+    --rb-text-mission-h2--line-height: 1.5; /* 38.5974px */
+    --rb-text-rhode-you-h2: 1.375rem;     /* 22px — Rhode + you title */
+    --rb-text-rhode-you-h2--line-height: 1.2; /* 26.4px */
+    --rb-text-sun-kissed-h2: 1.25rem;     /* 20px — "SUN-KISSED + LUMINOUS" */
+    --rb-text-sun-kissed-h2--line-height: 1.4; /* 28px */
+
+    --rb-text-pill: 0.9832rem;            /* 15.7316px — Rhode button / pill text */
+    --rb-text-pill--line-height: 1.5;     /* 23.5974px */
+    --rb-text-pill--letter-spacing: 0.02em; /* 0.3146px ≈ 0.02em */
+    --rb-text-button-micro: 0.625rem;     /* 10px — first access / micro badge */
+    --rb-text-button-micro--line-height: 0.75; /* 7.5px */
+
     --rb-font-weight-normal: 400;
     --rb-font-weight-medium: 500;
     --rb-font-weight-semibold: 600;
@@ -59,10 +94,12 @@
     --rb-font-weight-extrabold: 800;
     --rb-font-weight-black: 900;
 
+    /* Rhode's letter-spacing scale. Their micro/footer rhythm is 0.256px = 0.02em;
+       button pills are 0.3146px ≈ 0.02em (kept consistent with micro). */
     --rb-tracking-tighter: -0.04em;
     --rb-tracking-tight: -0.02em;
     --rb-tracking-normal: 0em;
-    --rb-tracking-wide: 0.02em;
+    --rb-tracking-wide: 0.02em;          /* Rhode micro/footer rhythm */
     --rb-tracking-wider: 0.04em;
     --rb-tracking-widest: 0.08em;
 
@@ -105,14 +142,14 @@
     --rb-shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.10);
 
     /* Hero/header layout controls. Tune these to move every standard hero together. */
-    --icare-header-inset: clamp(1rem, 3vw, 2rem);
+    --icare-header-inset: clamp(1.25rem, 4vw, 3rem);
     --icare-announcement-inset: var(--icare-header-inset);
     --icare-announcement-margin-top: 0rem;
     --icare-announcement-padding-top: 0.75rem;
     --icare-announcement-height: 2.5rem;
     --icare-header-top-gap: 0.625rem;
     --icare-header-top: calc(var(--icare-announcement-margin-top) + var(--icare-announcement-padding-top) + var(--icare-announcement-height) + var(--icare-header-top-gap));
-    --icare-hero-inset: clamp(1rem, 3vw, 2rem);
+    --icare-hero-inset: clamp(1.25rem, 4vw, 3rem);
     --icare-hero-flow-offset: calc(var(--icare-header-top) - (var(--icare-announcement-margin-top) + var(--icare-announcement-padding-top) + var(--icare-announcement-height)));
     --icare-hero-top-gap: 0rem;
     --icare-hero-bottom-gap: 1rem;
@@ -120,8 +157,8 @@
     --icare-hero-min-height: 40rem;
     --icare-hero-radius: 12px;
     --icare-hero-media-scale: 1.018;
-    --icare-section-inset: clamp(1rem, 3vw, 2rem);
-    --icare-section-gap: clamp(0.75rem, 2vw, 1.25rem);
+    --icare-section-inset: clamp(1.25rem, 4vw, 3rem);
+    --icare-section-gap: clamp(1rem, 2.5vw, 1.75rem);
     --icare-section-radius: 12px;
     --icare-feature-radius: 8px;
   }
@@ -228,12 +265,15 @@
     width: 100%;
     margin: 0;
     max-width: calc(100% - 1.5rem);
-    color: inherit;
-    font-size: 0.75rem;
-    font-weight: 700;
-    line-height: 0.875rem;
+    color: var(--rb-primary-text);
+    /* Match Rhode announcement-bar slide typography:
+       12.8px / 400 / 19.2px line-height / 0.256px tracking / case preserved as authored. */
+    font-size: var(--rb-text-2xs);
+    font-weight: var(--rb-font-weight-normal);
+    line-height: var(--rb-text-2xs--line-height);
+    letter-spacing: var(--rb-tracking-wide);
     text-align: center;
-    text-transform: uppercase;
+    text-transform: none;
     white-space: nowrap;
   }
 
@@ -349,12 +389,16 @@
   }
 
   .icare-swipe-rail__cursor-label {
-    color: var(--rb-gray-84827E);
-    font-size: 0.72rem;
-    font-weight: 900;
-    line-height: 1;
+    /* Match Rhode "swipe" cursor label: 16px / 400 / 24px / -0.64px / lowercase / #67645E.
+       Rhode uses Rektorat Heavy here — we use our Rektorat (= Bricolage Grotesque) face. */
+    font-family: var(--font-rektorat);
+    color: var(--rb-primary-text);
+    font-size: 1rem;
+    font-weight: var(--rb-font-weight-normal);
+    line-height: 1.5;
+    letter-spacing: -0.04em;
     text-align: center;
-    text-transform: uppercase;
+    text-transform: lowercase;
     white-space: nowrap;
   }
 
@@ -389,10 +433,12 @@
   .icare-landing-products__title {
     margin: 0;
     color: var(--rb-primary-text);
-    font-size: clamp(2.25rem, 4.8vw, 4.5rem);
-    font-weight: 900;
-    line-height: 0.9;
-    letter-spacing: 0;
+    /* Match Rhode collection-slider h2: 34.6325px / Rektorat Heavy (400) / 41.5589px / -1.3853px / lowercase. */
+    font-family: var(--font-rektorat);
+    font-size: 2.1645rem;
+    font-weight: var(--rb-font-weight-bold);
+    line-height: 1.2;
+    letter-spacing: -0.04em;
     text-transform: lowercase;
   }
 
@@ -530,14 +576,20 @@
     top: 0.85rem;
     z-index: 2;
     color: var(--rb-pure-white);
-    font-size: clamp(0.95rem, 1.1vw, 1.1rem);
-    font-weight: 800;
+    /* Rhode uses Rektorat Heavy for the on-image "first access" badge (10px / 400
+       / 10px / -0.4px / lowercase). We use the same family to mirror that. */
+    font-family: var(--font-rektorat);
+    font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+    font-weight: var(--rb-font-weight-bold);
     line-height: 1;
-    text-transform: uppercase;
+    letter-spacing: -0.04em;
+    text-transform: lowercase;
   }
 
   .icare-product-card__label {
-    left: 0.85rem;
+    left: 1rem;
+    top: 1rem;
+    font-weight: var(--rb-font-weight-bold);
   }
 
   .icare-product-card__stock {
@@ -629,9 +681,11 @@
   .icare-product-card__reviews {
     margin-left: 0.35rem;
     color: var(--rb-muted-text);
-    font-size: 0.72rem;
-    font-weight: 800;
-    line-height: 1;
+    /* Match Rhode 12.8px micro rhythm for product card reviews. */
+    font-size: var(--rb-text-2xs);
+    font-weight: var(--rb-font-weight-normal);
+    letter-spacing: var(--rb-tracking-wide);
+    line-height: var(--rb-text-2xs--line-height);
   }
 
   .icare-product-card__summary {
@@ -650,17 +704,19 @@
   .icare-product-card__name {
     display: block;
     color: var(--rb-primary-text);
-    font-weight: 900;
-    letter-spacing: 0;
-    text-transform: lowercase;
+    /* Match Rhode product card h3 ("HIGHLIGHT MILK"): 14px / 700 / 16.8px / 0.28px ls / UPPERCASE. */
+    font-weight: var(--rb-font-weight-bold);
+    letter-spacing: var(--rb-tracking-wide);
+    text-transform: uppercase;
   }
 
   .icare-product-card--standard .icare-product-card__name {
-    font-size: clamp(1rem, 1.45vw, 1.55rem);
-    line-height: 1;
+    font-size: 0.875rem;
+    line-height: 1.2;
   }
 
   .icare-product-card--showcase .icare-product-card__name {
+    /* Showcase cards keep the larger display name — same weight/tracking as Rhode. */
     font-size: clamp(1.45rem, 2.15vw, 2.35rem);
     line-height: 0.96;
   }
@@ -668,16 +724,18 @@
   .icare-product-card__description {
     display: -webkit-box;
     overflow: hidden;
-    color: var(--rb-muted-text);
-    font-weight: 650;
+    color: var(--rb-primary-text);
+    /* Match Rhode product card subtitle: 14px / 400 / 21px / 0.28px ls. */
+    font-weight: var(--rb-font-weight-normal);
+    letter-spacing: var(--rb-tracking-wide);
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   }
 
   .icare-product-card--standard .icare-product-card__description {
     max-width: 28ch;
-    font-size: clamp(0.8rem, 0.95vw, 0.95rem);
-    line-height: 1.22;
+    font-size: 0.875rem;
+    line-height: 1.5;
   }
 
   .icare-product-card--showcase .icare-product-card__description {
@@ -692,14 +750,17 @@
     justify-items: end;
     margin-left: auto;
     color: var(--rb-primary-text);
-    font-weight: 900;
-    line-height: 1;
+    /* Match Rhode product card price: 16px / 700 / 24px / 0.32px ls / UPPERCASE. */
+    font-weight: var(--rb-font-weight-bold);
+    letter-spacing: 0.02em;
+    line-height: 1.5;
     text-align: right;
+    text-transform: uppercase;
     white-space: nowrap;
   }
 
   .icare-product-card--standard .icare-product-card__price {
-    font-size: clamp(0.9rem, 1vw, 1rem);
+    font-size: 1rem;
   }
 
   .icare-product-card--showcase .icare-product-card__price {
@@ -729,9 +790,11 @@
     background: var(--rb-pure-white);
     color: var(--rb-primary-text);
     cursor: pointer;
-    font-size: 0.72rem;
-    font-weight: 900;
-    line-height: 1;
+    /* Match Rhode pill button: 15.73px / 400 / 23.6px / 0.314px ls / uppercase. */
+    font-size: var(--rb-text-pill);
+    font-weight: var(--rb-font-weight-normal);
+    letter-spacing: var(--rb-text-pill--letter-spacing);
+    line-height: var(--rb-text-pill--line-height);
     text-transform: uppercase;
     transition:
       background 180ms var(--rb-ease-out),
@@ -767,11 +830,13 @@
   .icare-section-title {
     margin: 0;
     color: var(--rb-primary-text);
-    font-size: min(2.5rem, 12vw);
-    font-weight: 900;
-    letter-spacing: -0.04em;
-    line-height: 1;
-    text-transform: lowercase;
+    /* Match Rhode "rhode + you" h2: 22px / Swiss 400 / 26.4px / normal / no case. */
+    font-family: var(--font-swiss);
+    font-size: var(--rb-text-rhode-you-h2);
+    font-weight: var(--rb-font-weight-bold);
+    line-height: var(--rb-text-rhode-you-h2--line-height);
+    letter-spacing: var(--rb-tracking-normal);
+    text-transform: none;
   }
 
   .icare-split-banner {
@@ -931,8 +996,10 @@
     background: var(--rb-pure-white);
     color: var(--rb-primary-text);
     padding: 0 1rem;
-    font-size: 0.8125rem;
-    line-height: 1;
+    /* Match Rhode 12.8px micro rhythm for inputs. */
+    font-size: var(--rb-text-2xs);
+    letter-spacing: var(--rb-tracking-wide);
+    line-height: var(--rb-text-2xs--line-height);
     outline: 0;
   }
 
@@ -949,10 +1016,11 @@
     color: var(--rb-primary-text);
     cursor: pointer;
     padding: 0 1rem;
-    font-size: 0.6875rem;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    line-height: 1;
+    /* Match Rhode SUBSCRIBE button: 15.73px / 400 / 23.6px / 0.314px ls / uppercase. */
+    font-size: var(--rb-text-pill);
+    font-weight: var(--rb-font-weight-normal);
+    letter-spacing: var(--rb-text-pill--letter-spacing);
+    line-height: var(--rb-text-pill--line-height);
     text-transform: uppercase;
     white-space: nowrap;
     box-shadow: inset 0 0 0 1px var(--rb-primary-text);
@@ -981,17 +1049,17 @@
 
 @media (max-width: 980px) {
   :root {
-    --icare-header-inset: 1rem;
+    --icare-header-inset: 1.25rem;
     --icare-announcement-height: 3rem;
     --icare-header-top-gap: 0.625rem;
     --icare-announcement-padding-top: 0.75rem;
-    --icare-hero-inset: 0.75rem;
+    --icare-hero-inset: 1.25rem;
     --icare-hero-flow-offset: calc(var(--icare-header-top) - (var(--icare-announcement-margin-top) + var(--icare-announcement-padding-top) + var(--icare-announcement-height)));
     --icare-hero-height: calc(100vh - 22.25rem);
     --icare-hero-min-height: 30.5rem;
     --icare-hero-radius: 10px;
-    --icare-section-inset: 1rem;
-    --icare-section-gap: 0.75rem;
+    --icare-section-inset: 1.25rem;
+    --icare-section-gap: 1.125rem;
   }
 
   .icare-morning-section {
@@ -1007,7 +1075,8 @@
   }
 
   .icare-landing-products__title {
-    font-size: clamp(2rem, 12vw, 3.5rem);
+    /* Mobile fallback — keep the 34.6px section-h2 rhythm but scale for small screens. */
+    font-size: clamp(1.75rem, 8.5vw, 2.1645rem);
   }
 
   .icare-landing-products__track {
@@ -1064,7 +1133,7 @@
 /* ─── Tablet Breakpoint (768px–1023px) ─── */
 @media (min-width: 768px) and (max-width: 1023px) {
   :root {
-    --icare-section-gap: 1rem;
+    --icare-section-gap: 1.5rem;
     --icare-hero-height: calc(100vh - 18rem);
     --icare-hero-min-height: 32rem;
   }
@@ -1092,10 +1161,10 @@
 /* ─── Mobile Trending Scroll (used in ProductSection) ─── */
 @media (max-width: 767px) {
   :root {
-    --icare-header-inset: 0.75rem;
-    --icare-hero-inset: 0.75rem;
-    --icare-section-inset: 0.75rem;
-    --icare-section-gap: 0.75rem;
+    --icare-header-inset: 1.125rem;
+    --icare-hero-inset: 1.125rem;
+    --icare-section-inset: 1.125rem;
+    --icare-section-gap: 1.125rem;
     --icare-hero-height: calc(100vh - 14rem);
     --icare-hero-min-height: 28rem;
   }

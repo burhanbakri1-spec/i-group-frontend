@@ -35,7 +35,8 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang, onNavigate }) => {
         </motion.h2>
         <motion.button
           onClick={() => onNavigate('vlog')}
-          className="relative hidden overflow-hidden rounded-full px-8 py-2 text-[13px] font-bold uppercase text-[#67645E] shadow-[inset_0_0_0_1px_#67645E] transition-all duration-300 group hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 md:block"
+          /* Rhode pill: 15.73px / 400 / 23.6px / 0.314px ls / uppercase. */
+          className="relative hidden overflow-hidden rounded-full px-8 py-2 text-[15.73px] font-bold uppercase leading-[1.5] tracking-[0.02em] text-[#67645E] shadow-[inset_0_0_0_1px_#67645E] transition-all duration-300 group hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 md:block"
           initial={shouldReduceMotion ? false : { opacity: 0, x: 10 }}
           whileInView={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
           viewport={{ once: true }}
@@ -82,7 +83,7 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang, onNavigate }) => {
 
       <button
         onClick={() => onNavigate('vlog')}
-        className="mt-8 w-full rounded-full border border-[#67645E]/20 py-4 text-[10px] font-bold uppercase tracking-[0.1em] text-[#67645E] hover:bg-[#67645E]/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDECEB] md:hidden"
+        className="mt-8 w-full rounded-full border border-[#67645E]/20 py-4 text-[12.8px] font-bold uppercase leading-[1.5] tracking-[0.02em] text-[#67645E] hover:bg-[#67645E]/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDECEB] md:hidden"
       >
         {lang === 'en' ? socialGridCta : 'تابعنا على السوشيال'}
       </button>
