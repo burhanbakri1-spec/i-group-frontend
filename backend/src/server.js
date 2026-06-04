@@ -11,6 +11,7 @@ import productRoutes from "./routes/products.js";
 import reviewRoutes from "./routes/reviews.js";
 import uploadRoutes, { uploadsDir } from "./routes/uploads.js";
 import workSessionRoutes from "./routes/workSessions.js";
+import websiteMediaRoutes from "./routes/websiteMedia.js";
 
 const app = express();
 const port = Number(process.env.PORT || 5000);
@@ -55,6 +56,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/employee", employeeRoutes);
 app.use("/api/employees", employeeRoutes);
 app.use("/api/work-sessions", workSessionRoutes);
+app.use("/api/website-media", websiteMediaRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({ message: "API route not found." });

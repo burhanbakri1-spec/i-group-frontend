@@ -1,4 +1,5 @@
 import React from "react";
+import { getWebsiteMediaImage } from "../data/websiteMedia.js";
 
 const lifestyleImage = "/products/limescale-remover-main.jpg";
 const saveBannerImage = "/products/limescale-remover-hover.jpg";
@@ -38,8 +39,18 @@ function PointsIcon({ type }) {
   );
 }
 
-function EBPointsPage({ currentUser, language, onNavigate }) {
+function EBPointsPage({ currentUser, language, onNavigate, websiteMedia = [] }) {
   const isArabic = language === "ar";
+  const resolvedLifestyleImage = getWebsiteMediaImage(
+    websiteMedia,
+    "eb_points_lifestyle",
+    lifestyleImage,
+  );
+  const resolvedSaveBannerImage = getWebsiteMediaImage(
+    websiteMedia,
+    "eb_points_save_banner",
+    saveBannerImage,
+  );
   const cards = [
     {
       icon: "order",
@@ -89,7 +100,7 @@ function EBPointsPage({ currentUser, language, onNavigate }) {
       </section>
 
       <section className="eb-points-lifestyle" aria-label={isArabic ? "نقاط EB" : "EB Points lifestyle"}>
-        <img alt="" src={lifestyleImage} />
+        <img alt="" src={resolvedLifestyleImage} />
       </section>
 
       <section className="eb-points-how">
@@ -111,7 +122,7 @@ function EBPointsPage({ currentUser, language, onNavigate }) {
       </section>
 
       <section className="eb-points-cta">
-        <img alt="" src={saveBannerImage} />
+        <img alt="" src={resolvedSaveBannerImage} />
         <div className="eb-points-cta-copy">
           <h2>{isArabic ? "وفّر مع كل طلب" : "Save with every order"}</h2>
           <p>

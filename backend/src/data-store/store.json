@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "savedAt": "2026-06-03T17:31:27.320Z",
+  "savedAt": "2026-06-04T11:41:53.018Z",
   "users": [
     {
       "id": "admin-demo",
@@ -456,456 +456,6 @@
   ],
   "products": [
     {
-      "id": "product-1780507887318",
-      "slug": "test-supabase-product12344",
-      "name": {
-        "en": "Test Supabase Product12344",
-        "ar": "Test Supabase Product12344"
-      },
-      "categoryId": "home-cleaning",
-      "shortDescription": {
-        "en": "Test Supabase Product12344",
-        "ar": "Test Supabase Product12344"
-      },
-      "longDescription": {
-        "en": "Test Supabase Product12344",
-        "ar": "Test Supabase Product12344"
-      },
-      "image": "https://hmugkuhbsqbdbnoqhcsm.supabase.co/storage/v1/object/public/eb-chemical-uploads/uploads/2026-06-03/whatsapp-image-2026-06-01-at-1-31-08-pm-1780507858760-6pay5v.jpg",
-      "hoverImage": "https://hmugkuhbsqbdbnoqhcsm.supabase.co/storage/v1/object/public/eb-chemical-uploads/uploads/2026-06-03/car-care-1780507867123-ekp1xt.png",
-      "fallbackImage": "/images/products/product-placeholder.svg",
-      "variants": [
-        {
-          "id": "product-variant-0",
-          "color_name": "Default",
-          "color_value": "#1db7d8",
-          "size": "500ml",
-          "price": 18,
-          "stock": 24,
-          "image_url": "/images/products/product-placeholder.svg",
-          "sort_order": 0
-        }
-      ],
-      "sizes": [
-        {
-          "size": "500ml",
-          "price": 18
-        }
-      ],
-      "gallery_images": [],
-      "galleryImages": [],
-      "badge": {
-        "en": "Featured",
-        "ar": "منتج مميز"
-      },
-      "stockStatus": "In stock",
-      "usageNotes": {
-        "en": "Product managed from the admin dashboard.",
-        "ar": "منتج يتم إدارته من لوحة التحكم."
-      }
-    },
-    {
-      "id": "product-1780507707598",
-      "slug": "Supabase Test Product 123",
-      "sku": "Supabase Test Product 123",
-      "name": {
-        "en": "Supabase Test Product 123",
-        "ar": "Supabase Test Product 123"
-      },
-      "categoryId": "home-cleaning",
-      "brand": "EB Chemical",
-      "shortDescription": {
-        "en": "Supabase Test Product 123",
-        "ar": "Supabase Test Product 123"
-      },
-      "longDescription": {
-        "en": "Supabase Test Product 123",
-        "ar": "Supabase Test Product 123"
-      },
-      "howToUse": "Supabase Test Product 123",
-      "ingredients": "Supabase Test Product 123",
-      "benefits": "Supabase Test Product 123",
-      "skinTypes": "Supabase Test Product 123",
-      "concerns": "Supabase Test Product 123",
-      "image": "https://eb-chemical-full.onrender.com/uploads/whatsapp-image-2026-06-01-at-3-00-07-pm-1780417659733-zcf5dz.jpg",
-      "hoverImage": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAJQAxgMBEQACEQEDEQH/xAAcAAACAwEBAQEAAAAAAAAAAAAAAQIEBQYDBwj/xAA7EAACAQMCAwUFBQcEAwAAAAABAgMABBEFIQYSMRMiQVFhcYGRobEHFCMywRUzQnKC0fAkUmKyF0Nj/8QAGwEBAQADAQEBAAAAAAAAAAAAAAECBAUDBgf/xAAzEQACAQMDAQUGBgIDAAAAAAAAAQIDBBESITEFE0FRYXEiMoGRsdEVQqHB4fAU8QYjUv/aAAwDAQACEQMRAD8A+30AUAUAUA6AKAKAKAKAKAKAdAFAFAFAFAFAFAFAFAFAFAFAKgCgI0A6AKAKAKAdAFAFAFAFAFAFAFAFAFAOgCgCgCgCgFQBQBQBQBQEM1SADUAwaAdChQBQBQDoAoAoAoAoAoAoAoAoAoAoAoAoAoAoAoAoAoDk14vl7MSScP6pyk4AjVHb3gNmssGOTzm4/wBOtZOzu9O1eF8Zw1m3T3UwMngPtS4VzvdXAI6g27EiphjUjQtOO+HruDt4rx+zB3ZoHAHyrLQyaka1nrWm3qB7W9hkBGcBt/h1pokXUj0n1SwtgDc3kMIPQyOF+tNL8BqQQarp1wMwX9rJ/JMp/WscMuUWRNEekiH+qmGMokGVvysD7DUGUS6UKIsB1IFALtE/3D41cEyeEmoWUbFZLy3Rh1DSqD9ahSaXdtIvNHcQsPNXBqNpckyitc61plt++v7dSDgjtAcfCo5JcsjlFd5Um4p0SFS0mowADx5q81Xpt4TGpGb/AORuE+2MA1aLtB4YNe6i2",
-      "fallbackImage": "/images/products/product-placeholder.svg",
-      "variants": [
-        {
-          "id": "product-variant-0",
-          "color_name": "Default",
-          "color_value": "#1db7d8",
-          "size": "500ml",
-          "price": 18,
-          "stock": 24,
-          "image_url": "",
-          "sort_order": 0
-        }
-      ],
-      "gallery_images": [],
-      "galleryImages": [],
-      "sizes": [
-        {
-          "size": "500ml",
-          "price": 18
-        }
-      ],
-      "badge": {
-        "en": "Supabase Test Product 123",
-        "ar": "Supabase Test Product 123"
-      },
-      "status": "Active",
-      "isActive": true,
-      "isFeatured": false,
-      "isNewArrival": false,
-      "isBestseller": false,
-      "stockQty": 24,
-      "stockStatus": "In Stock",
-      "metaTitle": "",
-      "metaDescription": "",
-      "createdAt": "2026-06-03T17:30:29.386Z",
-      "updatedAt": "2026-06-03T17:30:29.386Z"
-    },
-    {
-      "id": "product-1780507379624",
-      "slug": "Test Supabase Product1",
-      "sku": "Test Supabase Product1",
-      "name": {
-        "en": "Test Supabase Product1",
-        "ar": "Test Supabase Product1"
-      },
-      "categoryId": "home-cleaning",
-      "brand": "EB Chemical",
-      "shortDescription": {
-        "en": "Test Supabase Product1",
-        "ar": "Test Supabase Product1"
-      },
-      "longDescription": {
-        "en": "Test Supabase Product1",
-        "ar": "Test Supabase Product1"
-      },
-      "howToUse": "Test Supabase Product1",
-      "ingredients": "Test Supabase Product1",
-      "benefits": "Test Supabase Product1",
-      "skinTypes": "Test Supabase Product1",
-      "concerns": "Test Supabase Product1",
-      "image": "/images/products/product-placeholder.svg",
-      "hoverImage": "/images/products/product-placeholder.svg",
-      "fallbackImage": "/images/products/product-placeholder.svg",
-      "variants": [
-        {
-          "id": "product-variant-0",
-          "color_name": "Default",
-          "color_value": "#1db7d8",
-          "size": "500ml",
-          "price": 18,
-          "stock": 24,
-          "image_url": "",
-          "sort_order": 0
-        }
-      ],
-      "gallery_images": [],
-      "galleryImages": [],
-      "sizes": [
-        {
-          "size": "500ml",
-          "price": 18
-        }
-      ],
-      "badge": {
-        "en": "Test Supabase Product1",
-        "ar": "Test Supabase Product1"
-      },
-      "status": "Active",
-      "isActive": true,
-      "isFeatured": false,
-      "isNewArrival": false,
-      "isBestseller": false,
-      "stockQty": 24,
-      "stockStatus": "In Stock",
-      "metaTitle": "",
-      "metaDescription": "",
-      "createdAt": "2026-06-03T17:22:59.624Z",
-      "updatedAt": "2026-06-03T17:22:59.624Z"
-    },
-    {
-      "id": "product-1780507168866",
-      "slug": "Test Supabase Product",
-      "sku": "Test Supabase Product",
-      "name": {
-        "en": "Test Supabase Product",
-        "ar": "Test Supabase Product"
-      },
-      "categoryId": "home-cleaning",
-      "brand": "EB Chemical",
-      "shortDescription": {
-        "en": "Test Supabase Product",
-        "ar": "Test Supabase Product"
-      },
-      "longDescription": {
-        "en": "Test Supabase Product",
-        "ar": "Test Supabase Product"
-      },
-      "howToUse": "Test Supabase Product",
-      "ingredients": "Test Supabase Product",
-      "benefits": "Test Supabase Product",
-      "skinTypes": "Test Supabase Product",
-      "concerns": "Test Supabase Product",
-      "image": "/images/products/product-placeholder.svg",
-      "hoverImage": "/images/products/product-placeholder.svg",
-      "fallbackImage": "/images/products/product-placeholder.svg",
-      "variants": [
-        {
-          "id": "product-variant-0",
-          "color_name": "Default",
-          "color_value": "#1db7d8",
-          "size": "500ml",
-          "price": 18,
-          "stock": 24,
-          "image_url": "",
-          "sort_order": 0
-        }
-      ],
-      "gallery_images": [],
-      "galleryImages": [],
-      "sizes": [
-        {
-          "size": "500ml",
-          "price": 18
-        }
-      ],
-      "badge": {
-        "en": "Test Supabase Product",
-        "ar": "Test Supabase Product"
-      },
-      "status": "Active",
-      "isActive": true,
-      "isFeatured": false,
-      "isNewArrival": false,
-      "isBestseller": false,
-      "stockQty": 24,
-      "stockStatus": "In Stock",
-      "metaTitle": "",
-      "metaDescription": "",
-      "createdAt": "2026-06-03T17:22:42.507Z",
-      "updatedAt": "2026-06-03T17:22:42.507Z"
-    },
-    {
-      "id": "product-1780505554726",
-      "slug": "test4",
-      "name": {
-        "en": "test4",
-        "ar": "test4"
-      },
-      "categoryId": "home-cleaning",
-      "shortDescription": {
-        "en": "test",
-        "ar": "test"
-      },
-      "longDescription": {
-        "en": "test",
-        "ar": "test"
-      },
-      "image": "http://localhost:5000/uploads/whatsapp-image-2026-06-01-at-3-00-07-pm-1780506774843-9240un.jpg",
-      "hoverImage": "http://localhost:5000/uploads/whatsapp-image-2026-06-01-at-1-31-08-pm-1-1780506783903-9b3rd2.jpg",
-      "fallbackImage": "/images/products/product-placeholder.svg",
-      "variants": [
-        {
-          "id": "product-variant-0",
-          "color_name": "Default",
-          "color_value": "#1db7d8",
-          "size": "500ml",
-          "price": 18,
-          "stock": 24,
-          "image_url": "/images/products/product-placeholder.svg",
-          "sort_order": 0
-        }
-      ],
-      "sizes": [
-        {
-          "size": "500ml",
-          "price": 18
-        }
-      ],
-      "gallery_images": [],
-      "galleryImages": [],
-      "badge": {
-        "en": "Featured",
-        "ar": "منتج مميز"
-      },
-      "stockStatus": "In Stock",
-      "usageNotes": {
-        "en": "Product managed from the admin dashboard.",
-        "ar": "منتج يتم إدارته من لوحة التحكم."
-      },
-      "sku": "TEST4",
-      "brand": "EB Chemical",
-      "howToUse": "",
-      "ingredients": "",
-      "benefits": "",
-      "skinTypes": "",
-      "concerns": "",
-      "status": "Active",
-      "isActive": true,
-      "isFeatured": false,
-      "isNewArrival": false,
-      "isBestseller": false,
-      "stockQty": 24,
-      "metaTitle": "",
-      "metaDescription": "",
-      "createdAt": "2026-06-03T17:17:00.921Z",
-      "updatedAt": "2026-06-03T17:17:00.921Z"
-    },
-    {
-      "id": "product-1780501858335",
-      "slug": "test",
-      "sku": "test",
-      "name": {
-        "en": "test3",
-        "ar": "test3"
-      },
-      "categoryId": "home-cleaning",
-      "brand": "EB Chemical",
-      "shortDescription": {
-        "en": "test",
-        "ar": "test"
-      },
-      "longDescription": {
-        "en": "test",
-        "ar": "test"
-      },
-      "howToUse": "test",
-      "ingredients": "test",
-      "benefits": "test",
-      "skinTypes": "test",
-      "concerns": "test",
-      "image": "http://localhost:5000/uploads/whatsapp-image-2026-06-01-at-3-00-07-pm-1780501714633-zgsuxb.jpg",
-      "hoverImage": "http://localhost:5000/uploads/whatsapp-image-2026-06-01-at-3-00-07-pm-1780501720345-foirv8.jpg",
-      "fallbackImage": "/images/products/product-placeholder.svg",
-      "variants": [
-        {
-          "id": "product-variant-0",
-          "color_name": "blue",
-          "color_value": "#1db7d8",
-          "size": "500ml",
-          "price": 18,
-          "stock": 24,
-          "image_url": "http://localhost:5000/uploads/whatsapp-image-2026-06-01-at-3-00-07-pm-1780501792255-ywikyw.jpg",
-          "sort_order": 0
-        },
-        {
-          "id": "product-variant-1",
-          "color_name": "blue",
-          "color_value": "#1db7d8",
-          "size": "5L",
-          "price": 40,
-          "stock": 19,
-          "image_url": "http://localhost:5000/uploads/whatsapp-image-2026-06-01-at-3-00-07-pm-1780501714633-zgsuxb.jpg",
-          "sort_order": 1
-        },
-        {
-          "id": "product-variant-2",
-          "color_name": "red",
-          "color_value": "#FF0000",
-          "size": "500ml",
-          "price": 18,
-          "stock": 24,
-          "image_url": "http://localhost:5000/uploads/whatsapp-image-2026-06-01-at-1-31-09-pm-1780501822570-vbxadk.jpg",
-          "sort_order": 2
-        }
-      ],
-      "gallery_images": [],
-      "galleryImages": [],
-      "sizes": [
-        {
-          "size": "500ml",
-          "price": 18
-        },
-        {
-          "size": "5L",
-          "price": 40
-        }
-      ],
-      "badge": {
-        "en": "Featured",
-        "ar": "مميز"
-      },
-      "status": "Active",
-      "isActive": true,
-      "isFeatured": false,
-      "isNewArrival": false,
-      "isBestseller": false,
-      "stockQty": 67,
-      "stockStatus": "In Stock",
-      "metaTitle": "test",
-      "metaDescription": "test",
-      "createdAt": "2026-06-03T15:52:02.116Z",
-      "updatedAt": "2026-06-03T15:52:02.116Z"
-    },
-    {
-      "id": "product-1780482488537",
-      "slug": "test",
-      "name": {
-        "en": "test",
-        "ar": "test"
-      },
-      "categoryId": "home-cleaning",
-      "shortDescription": {
-        "en": "test",
-        "ar": "test"
-      },
-      "longDescription": {
-        "en": "test",
-        "ar": "test"
-      },
-      "image": "http://localhost:5000/uploads/car-care-1780482380011-mlby07.png",
-      "hoverImage": "http://localhost:5000/uploads/kitchen-1780482387787-dr9hrb.png",
-      "fallbackImage": "/images/products/product-placeholder.svg",
-      "variants": [
-        {
-          "id": "product-variant-0",
-          "color_name": "blue",
-          "color_value": "#1db7d8",
-          "size": "500ml",
-          "price": 18,
-          "stock": 24,
-          "image_url": "http://localhost:5000/uploads/car-care-1780482380011-mlby07.png",
-          "sort_order": 0
-        },
-        {
-          "id": "product-variant-1",
-          "color_name": "red",
-          "color_value": "#FF0000",
-          "size": "1L",
-          "price": 180,
-          "stock": 22,
-          "image_url": "http://localhost:5000/uploads/kitchen-1780482387787-dr9hrb.png",
-          "sort_order": 1
-        }
-      ],
-      "sizes": [
-        {
-          "size": "500ml",
-          "price": 18
-        },
-        {
-          "size": "1L",
-          "price": 180
-        }
-      ],
-      "gallery_images": [],
-      "galleryImages": [],
-      "badge": {
-        "en": "Featured",
-        "ar": "منتج مميز"
-      },
-      "stockStatus": "In stock",
-      "usageNotes": {
-        "en": "Product managed from the admin dashboard.",
-        "ar": "منتج يتم إدارته من لوحة التحكم."
-      }
-    },
-    {
       "id": "hc-fabric-cleaner",
       "slug": "fabric-cleaner",
       "name": {
@@ -921,8 +471,8 @@
         "en": "A fabric cleaner designed to refresh upholstered furniture and textile surfaces with a simple, easy-to-use routine.",
         "ar": "منظف أقمشة مصمم لإنعاش الأثاث المنجد والأسطح النسيجية بطريقة سهلة الاستخدام."
       },
-      "image": "/images/products/fabric-cleaner.svg",
-      "hoverImage": "/images/products/carpet-rug-cleaner.svg",
+      "image": "https://hmugkuhbsqbdbnoqhcsm.supabase.co/storage/v1/object/public/eb-chemical-uploads/uploads/2026-06-04/1-1780573261871-4mcs14.png",
+      "hoverImage": "https://hmugkuhbsqbdbnoqhcsm.supabase.co/storage/v1/object/public/eb-chemical-uploads/uploads/2026-06-04/1-2-1780573275596-qq89d5.png",
       "fallbackImage": "/images/products/product-placeholder.svg",
       "sizes": [
         {
@@ -954,7 +504,7 @@
           "size": "500ml",
           "price": 18,
           "stock": 24,
-          "image_url": "/images/products/fabric-cleaner.svg",
+          "image_url": "https://hmugkuhbsqbdbnoqhcsm.supabase.co/storage/v1/object/public/eb-chemical-uploads/uploads/2026-06-04/1-1780573231734-1bh0a3.png",
           "sort_order": 0
         },
         {
@@ -964,7 +514,7 @@
           "size": "5L",
           "price": 55,
           "stock": 24,
-          "image_url": "/images/products/fabric-cleaner.svg",
+          "image_url": "https://hmugkuhbsqbdbnoqhcsm.supabase.co/storage/v1/object/public/eb-chemical-uploads/uploads/2026-06-04/1-1780573234482-tg6hs7.png",
           "sort_order": 1
         },
         {
@@ -974,12 +524,30 @@
           "size": "18L",
           "price": 145,
           "stock": 24,
-          "image_url": "/images/products/fabric-cleaner.svg",
+          "image_url": "https://hmugkuhbsqbdbnoqhcsm.supabase.co/storage/v1/object/public/eb-chemical-uploads/uploads/2026-06-04/1-1780573241531-mswjfm.png",
           "sort_order": 2
         }
       ],
       "gallery_images": [],
-      "galleryImages": []
+      "galleryImages": [],
+      "sku": "FABRIC-CLEANER",
+      "brand": "EB Chemical",
+      "howToUse": "",
+      "ingredients": "",
+      "benefits": "",
+      "skinTypes": "",
+      "concerns": "",
+      "status": "Active",
+      "isActive": true,
+      "isFeatured": false,
+      "isNewArrival": false,
+      "isBestseller": false,
+      "stockQty": 72,
+      "stockStatus": "In Stock",
+      "metaTitle": "",
+      "metaDescription": "",
+      "createdAt": "2026-06-04T11:41:53.009Z",
+      "updatedAt": "2026-06-04T11:41:53.009Z"
     },
     {
       "id": "hc-carpet-rug-cleaner",
@@ -2772,7 +2340,445 @@
       "isApproved": true
     }
   ],
+  "websiteMedia": [
+    {
+      "id": "website-media-homepage-hero-left",
+      "sectionKey": "homepage_hero_left",
+      "sectionLabel": "Homepage hero - left image",
+      "groupKey": "homepage",
+      "imageUrl": "https://hmugkuhbsqbdbnoqhcsm.supabase.co/storage/v1/object/public/eb-chemical-uploads/uploads/2026-06-04/artboard-1-jpg-1780571532958-qm24p5.jpg",
+      "sortOrder": 1,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": "",
+      "createdAt": "2026-06-04T11:11:16.521Z",
+      "updatedAt": "2026-06-04T11:12:16.348Z"
+    },
+    {
+      "id": "website-media-homepage-hero-right",
+      "sectionKey": "homepage_hero_right",
+      "sectionLabel": "Homepage hero - right image",
+      "groupKey": "homepage",
+      "imageUrl": "https://hmugkuhbsqbdbnoqhcsm.supabase.co/storage/v1/object/public/eb-chemical-uploads/uploads/2026-06-04/01-jpg-1780571448205-96qpth.jpg",
+      "sortOrder": 2,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": "",
+      "createdAt": "2026-06-04T11:11:14.451Z",
+      "updatedAt": "2026-06-04T11:11:14.451Z"
+    },
+    {
+      "id": "website-media-homepage-category-home",
+      "sectionKey": "homepage_category_home",
+      "sectionLabel": "Homepage category - home care",
+      "groupKey": "homepage_categories",
+      "imageUrl": "https://hmugkuhbsqbdbnoqhcsm.supabase.co/storage/v1/object/public/eb-chemical-uploads/uploads/2026-06-04/1-1-1780571755265-dseldj.png",
+      "sortOrder": 1,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": "",
+      "createdAt": "2026-06-04T11:16:06.627Z",
+      "updatedAt": "2026-06-04T11:16:06.627Z"
+    },
+    {
+      "id": "website-media-homepage-category-car",
+      "sectionKey": "homepage_category_car",
+      "sectionLabel": "Homepage category - car care",
+      "groupKey": "homepage_categories",
+      "imageUrl": "https://hmugkuhbsqbdbnoqhcsm.supabase.co/storage/v1/object/public/eb-chemical-uploads/uploads/2026-06-04/1-5-1780571734033-1m8yqk.png",
+      "sortOrder": 2,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": "",
+      "createdAt": "2026-06-04T11:15:47.976Z",
+      "updatedAt": "2026-06-04T11:15:47.976Z"
+    },
+    {
+      "id": "website-media-homepage-category-kitchen",
+      "sectionKey": "homepage_category_kitchen",
+      "sectionLabel": "Homepage category - kitchen",
+      "groupKey": "homepage_categories",
+      "imageUrl": "https://hmugkuhbsqbdbnoqhcsm.supabase.co/storage/v1/object/public/eb-chemical-uploads/uploads/2026-06-04/1-4-1780571864239-eeq41q.png",
+      "sortOrder": 3,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": "",
+      "createdAt": "2026-06-04T11:17:51.837Z",
+      "updatedAt": "2026-06-04T11:17:51.837Z"
+    },
+    {
+      "id": "website-media-homepage-category-bathroom",
+      "sectionKey": "homepage_category_bathroom",
+      "sectionLabel": "Homepage category - bathroom",
+      "groupKey": "homepage_categories",
+      "imageUrl": "https://hmugkuhbsqbdbnoqhcsm.supabase.co/storage/v1/object/public/eb-chemical-uploads/uploads/2026-06-04/1-3-1780571890025-oh4jp7.png",
+      "sortOrder": 4,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": "",
+      "createdAt": "2026-06-04T11:18:22.734Z",
+      "updatedAt": "2026-06-04T11:18:22.734Z"
+    },
+    {
+      "id": "website-media-homepage-category-laundry",
+      "sectionKey": "homepage_category_laundry",
+      "sectionLabel": "Homepage category - laundry",
+      "groupKey": "homepage_categories",
+      "imageUrl": "https://hmugkuhbsqbdbnoqhcsm.supabase.co/storage/v1/object/public/eb-chemical-uploads/uploads/2026-06-04/1-2-1780571897733-ml5y3w.png",
+      "sortOrder": 5,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": "",
+      "createdAt": "2026-06-04T11:18:30.921Z",
+      "updatedAt": "2026-06-04T11:18:30.921Z"
+    },
+    {
+      "id": "website-media-homepage-promo",
+      "sectionKey": "homepage_promo_banner",
+      "sectionLabel": "Homepage promotional banner",
+      "groupKey": "homepage",
+      "imageUrl": "https://hmugkuhbsqbdbnoqhcsm.supabase.co/storage/v1/object/public/eb-chemical-uploads/uploads/2026-06-04/5-1780572931833-nnmpmc.png",
+      "sortOrder": 3,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": "",
+      "createdAt": "2026-06-04T11:35:43.797Z",
+      "updatedAt": "2026-06-04T11:35:43.797Z"
+    },
+    {
+      "id": "website-media-homepage-split-home",
+      "sectionKey": "homepage_split_home",
+      "sectionLabel": "Homepage split banner - home care",
+      "groupKey": "homepage",
+      "imageUrl": "https://hmugkuhbsqbdbnoqhcsm.supabase.co/storage/v1/object/public/eb-chemical-uploads/uploads/2026-06-04/8-2-1780572182772-db5p27.png",
+      "sortOrder": 4,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": "",
+      "createdAt": "2026-06-04T11:23:26.180Z",
+      "updatedAt": "2026-06-04T11:23:26.180Z"
+    },
+    {
+      "id": "website-media-homepage-split-car",
+      "sectionKey": "homepage_split_car",
+      "sectionLabel": "Homepage split banner - car care",
+      "groupKey": "homepage",
+      "imageUrl": "https://hmugkuhbsqbdbnoqhcsm.supabase.co/storage/v1/object/public/eb-chemical-uploads/uploads/2026-06-04/8-1-1780572213121-8imntd.png",
+      "sortOrder": 5,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": "",
+      "createdAt": "2026-06-04T11:23:44.551Z",
+      "updatedAt": "2026-06-04T11:23:44.551Z"
+    },
+    {
+      "id": "website-media-about-hero",
+      "sectionKey": "about_hero",
+      "sectionLabel": "About page - hero",
+      "groupKey": "about",
+      "imageUrl": "/images/products/multi-surface-cleaner.svg",
+      "sortOrder": 1,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-about-banner",
+      "sectionKey": "about_banner",
+      "sectionLabel": "About page - editorial banner",
+      "groupKey": "about",
+      "imageUrl": "/images/products/car-interior-cleaner.svg",
+      "sortOrder": 2,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-about-card-bottle",
+      "sectionKey": "about_card_bottle",
+      "sectionLabel": "About page - every bottle card",
+      "groupKey": "about",
+      "imageUrl": "/images/products/fabric-cleaner.svg",
+      "sortOrder": 3,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-about-card-concentrate",
+      "sectionKey": "about_card_concentrate",
+      "sectionLabel": "About page - concentrates card",
+      "groupKey": "about",
+      "imageUrl": "/images/products/grease-oil-remover.svg",
+      "sortOrder": 4,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-about-card-material",
+      "sectionKey": "about_card_material",
+      "sectionLabel": "About page - materials card",
+      "groupKey": "about",
+      "imageUrl": "/images/products/car-shampoo-gloss.svg",
+      "sortOrder": 5,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-about-cta",
+      "sectionKey": "about_cta",
+      "sectionLabel": "About page - CTA image",
+      "groupKey": "about",
+      "imageUrl": "/images/products/limescale-remover.svg",
+      "sortOrder": 6,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-about-impact",
+      "sectionKey": "about_impact",
+      "sectionLabel": "About page - impact image",
+      "groupKey": "about",
+      "imageUrl": "/images/products/radiator-water-green.svg",
+      "sortOrder": 7,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-cleanups-hero",
+      "sectionKey": "cleanups_hero",
+      "sectionLabel": "Cleanups page - hero",
+      "groupKey": "cleanups",
+      "imageUrl": "/images/products/green-radiator-water.svg",
+      "sortOrder": 1,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-cleanups-gallery-1",
+      "sectionKey": "cleanups_gallery_1",
+      "sectionLabel": "Cleanups page - gallery image 1",
+      "groupKey": "cleanups_gallery",
+      "imageUrl": "/images/products/fabric-cleaner.svg",
+      "sortOrder": 1,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-cleanups-gallery-2",
+      "sectionKey": "cleanups_gallery_2",
+      "sectionLabel": "Cleanups page - gallery image 2",
+      "groupKey": "cleanups_gallery",
+      "imageUrl": "/images/products/car-interior-cleaner.svg",
+      "sortOrder": 2,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-cleanups-gallery-3",
+      "sectionKey": "cleanups_gallery_3",
+      "sectionLabel": "Cleanups page - gallery image 3",
+      "groupKey": "cleanups_gallery",
+      "imageUrl": "/images/products/grease-oil-remover.svg",
+      "sortOrder": 3,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-cleanups-gallery-4",
+      "sectionKey": "cleanups_gallery_4",
+      "sectionLabel": "Cleanups page - gallery image 4",
+      "groupKey": "cleanups_gallery",
+      "imageUrl": "/images/products/stone-marble-floor-cleaner.svg",
+      "sortOrder": 4,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-cleanups-gallery-5",
+      "sectionKey": "cleanups_gallery_5",
+      "sectionLabel": "Cleanups page - gallery image 5",
+      "groupKey": "cleanups_gallery",
+      "imageUrl": "/images/products/ocean-breeze-home-car-fragrance.svg",
+      "sortOrder": 5,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-cleanups-cta",
+      "sectionKey": "cleanups_cta",
+      "sectionLabel": "Cleanups page - signup banner",
+      "groupKey": "cleanups",
+      "imageUrl": "/images/products/carpet-rug-cleaner.svg",
+      "sortOrder": 2,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-cleanups-community",
+      "sectionKey": "cleanups_tab_community",
+      "sectionLabel": "Cleanups page - community tab",
+      "groupKey": "cleanups_tabs",
+      "imageUrl": "/images/products/porcelain-ceramic-floor-cleaner.svg",
+      "sortOrder": 1,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-cleanups-collaborations",
+      "sectionKey": "cleanups_tab_collaborations",
+      "sectionLabel": "Cleanups page - collaborations tab",
+      "groupKey": "cleanups_tabs",
+      "imageUrl": "/images/products/limescale-remover.svg",
+      "sortOrder": 2,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-cleanups-locations",
+      "sectionKey": "cleanups_tab_locations",
+      "sectionLabel": "Cleanups page - locations tab",
+      "groupKey": "cleanups_tabs",
+      "imageUrl": "/images/products/green-radiator-water.svg",
+      "sortOrder": 3,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-eb-points-lifestyle",
+      "sectionKey": "eb_points_lifestyle",
+      "sectionLabel": "EB Points - lifestyle image",
+      "groupKey": "eb_points",
+      "imageUrl": "/products/limescale-remover-main.jpg",
+      "sortOrder": 1,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-eb-points-banner",
+      "sectionKey": "eb_points_save_banner",
+      "sectionLabel": "EB Points - save banner",
+      "groupKey": "eb_points",
+      "imageUrl": "/products/limescale-remover-hover.jpg",
+      "sortOrder": 2,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-how-hero",
+      "sectionKey": "how_it_works_hero",
+      "sectionLabel": "How it Works - hero",
+      "groupKey": "how_it_works",
+      "imageUrl": "/images/products/multi-surface-cleaner.svg",
+      "sortOrder": 1,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-how-steps",
+      "sectionKey": "how_it_works_steps",
+      "sectionLabel": "How it Works - concentrate steps",
+      "groupKey": "how_it_works",
+      "imageUrl": "/images/products/grease-oil-remover.svg",
+      "sortOrder": 2,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-how-refill",
+      "sectionKey": "how_it_works_refill",
+      "sectionLabel": "How it Works - refill steps",
+      "groupKey": "how_it_works",
+      "imageUrl": "/images/products/fabric-cleaner.svg",
+      "sortOrder": 3,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-how-cta",
+      "sectionKey": "how_it_works_cta",
+      "sectionLabel": "How it Works - shop CTA",
+      "groupKey": "how_it_works",
+      "imageUrl": "/images/products/car-shampoo-gloss.svg",
+      "sortOrder": 4,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    },
+    {
+      "id": "website-media-how-essentials",
+      "sectionKey": "how_it_works_essentials",
+      "sectionLabel": "How it Works - essentials",
+      "groupKey": "how_it_works",
+      "imageUrl": "/images/products/car-interior-cleaner.svg",
+      "sortOrder": 5,
+      "isActive": true,
+      "title": "",
+      "subtitle": "",
+      "linkUrl": ""
+    }
+  ],
   "workSessions": [
+    {
+      "id": "session-1780566166283",
+      "employeeId": "employee-1780482340247",
+      "employeeName": "عمر حرب",
+      "date": "2026-06-04",
+      "loginTime": "2026-06-04T09:42:46.283Z",
+      "logoutTime": null
+    },
     {
       "id": "session-1780507845046",
       "employeeId": "employee-1780482340247",

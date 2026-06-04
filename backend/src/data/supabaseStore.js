@@ -211,6 +211,42 @@ function orderItemRows(order) {
   }));
 }
 
+function websiteMediaRow(item, index = 0) {
+  return {
+    id: item.id || `website-media-${index}`,
+    section_key: item.sectionKey || item.section_key || "",
+    section_label: item.sectionLabel || item.section_label || "",
+    group_key: item.groupKey || item.group_key || "sections",
+    image_url: item.imageUrl || item.image_url || "",
+    title: item.title || "",
+    subtitle: item.subtitle || "",
+    link_url: item.linkUrl || item.link_url || "",
+    sort_order: Number(item.sortOrder ?? item.sort_order ?? index),
+    is_active: item.isActive !== false,
+    data: item,
+    created_at: rowDate(item.createdAt),
+    updated_at: rowDate(item.updatedAt),
+  };
+}
+
+function mergeWebsiteMedia(row) {
+  return {
+    ...(row.data || {}),
+    id: row.id,
+    sectionKey: row.section_key,
+    sectionLabel: row.section_label,
+    groupKey: row.group_key,
+    imageUrl: row.image_url,
+    title: row.title || "",
+    subtitle: row.subtitle || "",
+    linkUrl: row.link_url || "",
+    sortOrder: Number(row.sort_order || 0),
+    isActive: row.is_active !== false,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
 function mergeUser(row) {
   return {
     ...(row.data || {}),
@@ -321,6 +357,7 @@ export async function loadStoreFromSupabase() {
     categoryCards,
     reviews,
     workSessions,
+    websiteMedia,
   ] = await Promise.all([
     selectAll("users", "select=*"),
     selectAll("products", "select=*"),
@@ -333,6 +370,7 @@ export async function loadStoreFromSupabase() {
     selectAll("homepage_category_cards", "select=*"),
     selectAll("reviews", "select=*"),
     selectAll("work_sessions", "select=*"),
+    selectAll("website_media", "select=*"),
   ]);
 
   const hasRows = [
@@ -347,6 +385,7 @@ export async function loadStoreFromSupabase() {
     categoryCards,
     reviews,
     workSessions,
+    websiteMedia,
   ].some((rows) => rows.length);
 
   return {
@@ -361,6 +400,7 @@ export async function loadStoreFromSupabase() {
       offers: offers.map((offer) => offer.data || offer),
       categoryCards: categoryCards.map((card) => card.data || card),
       reviews: reviews.map((review) => review.data || review),
+      websiteMedia: websiteMedia.map(mergeWebsiteMedia),
       workSessions: workSessions.map((session) => session.data || session),
     },
   };
@@ -375,6 +415,7 @@ export async function saveStoreToSupabase(store, options = {}) {
   const categoryCards = store.categoryCards || [];
   const reviews = store.reviews || [];
   const workSessions = store.workSessions || [];
+  const websiteMedia = store.websiteMedia || [];
   const carts = Object.entries(store.carts || {});
 
   const productRows = products.map(productRow);
@@ -426,6 +467,7 @@ export async function saveStoreToSupabase(store, options = {}) {
     items,
     updated_at: new Date().toISOString(),
   }));
+  const websiteMediaRows = websiteMedia.map(websiteMediaRow);
 
   await upsertRows("users", userRows);
   await upsertRows("products", productRows);
@@ -438,6 +480,7 @@ export async function saveStoreToSupabase(store, options = {}) {
   await upsertRows("homepage_category_cards", cardRows);
   await upsertRows("reviews", reviewRows);
   await upsertRows("work_sessions", workSessionRows);
+  await upsertRows("website_media", websiteMediaRows);
 
   if (pruneMissing) {
     await deleteMissingRows("users", userRows.map((row) => row.id));
@@ -451,6 +494,7 @@ export async function saveStoreToSupabase(store, options = {}) {
     await deleteMissingRows("homepage_category_cards", cardRows.map((row) => row.id));
     await deleteMissingRows("reviews", reviewRows.map((row) => row.id));
     await deleteMissingRows("work_sessions", workSessionRows.map((row) => row.id));
+    await deleteMissingRows("website_media", websiteMediaRows.map((row) => row.id));
   }
 }
 

@@ -1,5 +1,6 @@
 import { products } from "./products.js";
 import { homepageCategoryCards, homepageOffers, reviews as initialReviews } from "../../../src/data/homeContent.js";
+import { defaultWebsiteMedia } from "../../../src/data/websiteMedia.js";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -241,6 +242,22 @@ function normalizeReview(review, index = 0) {
   };
 }
 
+function normalizeWebsiteMedia(item, index = 0) {
+  return {
+    ...item,
+    id: item.id || `website-media-${index}`,
+    sectionKey: item.sectionKey || item.section_key || `custom_section_${index}`,
+    sectionLabel: item.sectionLabel || item.section_label || item.sectionKey || "Website image",
+    groupKey: item.groupKey || item.group_key || "sections",
+    imageUrl: item.imageUrl || item.image_url || "",
+    title: item.title || "",
+    subtitle: item.subtitle || "",
+    linkUrl: item.linkUrl || item.link_url || "",
+    sortOrder: Number(item.sortOrder ?? item.sort_order ?? index),
+    isActive: item.isActive !== false && item.is_active !== false,
+  };
+}
+
 async function readInitialStore() {
   if (!isSupabaseConfigured()) {
     return { persisted: readPersistedStore(), canPersistToSupabase: false };
@@ -271,6 +288,14 @@ export const productCatalog = ensureArray(persisted?.products, products).map(nor
 export const offers = ensureArray(persisted?.offers, homepageOffers).map(normalizeOffer);
 export const categoryCards = ensureArray(persisted?.categoryCards, homepageCategoryCards).map(normalizeCategoryCard);
 export const reviews = ensureArray(persisted?.reviews, initialReviews).map(normalizeReview);
+const persistedWebsiteMedia = Array.isArray(persisted?.websiteMedia) ? persisted.websiteMedia : [];
+const websiteMediaWithDefaults = new Map(
+  clone(defaultWebsiteMedia).map((item) => [item.id, item]),
+);
+persistedWebsiteMedia.forEach((item, index) => {
+  websiteMediaWithDefaults.set(item.id || `persisted-website-media-${index}`, item);
+});
+export const websiteMedia = [...websiteMediaWithDefaults.values()].map(normalizeWebsiteMedia);
 
 export function currentStoreSnapshot() {
   const store = {
@@ -282,6 +307,7 @@ export function currentStoreSnapshot() {
     offers,
     categoryCards,
     reviews,
+    websiteMedia,
     workSessions,
     carts: Object.fromEntries(carts.entries()),
   };

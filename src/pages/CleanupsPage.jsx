@@ -1,4 +1,5 @@
 import React from "react";
+import { getWebsiteMediaImage } from "../data/websiteMedia.js";
 
 const cleanupImages = {
   hero: "/images/products/green-radiator-water.svg",
@@ -142,14 +143,24 @@ const content = {
   },
 };
 
-function CleanupsPage({ language = "en", onNavigate }) {
+function CleanupsPage({ language = "en", onNavigate, websiteMedia = [] }) {
   const isArabic = language === "ar";
   const text = content[language] || content.en;
+  const gallery = text.gallery.map((item, index) => ({
+    ...item,
+    image: getWebsiteMediaImage(websiteMedia, `cleanups_gallery_${index + 1}`, item.image),
+  }));
+  const tabs = text.tabs.map((tab) => ({
+    ...tab,
+    image: getWebsiteMediaImage(websiteMedia, `cleanups_tab_${tab.key}`, tab.image),
+  }));
+  const heroImage = getWebsiteMediaImage(websiteMedia, "cleanups_hero", cleanupImages.hero);
+  const ctaImage = getWebsiteMediaImage(websiteMedia, "cleanups_cta", cleanupImages.cta);
   const galleryRef = React.useRef(null);
   const tabsRef = React.useRef(null);
   const [activeTab, setActiveTab] = React.useState("locations");
   const activeTabContent =
-    text.tabs.find((tab) => tab.key === activeTab) || text.tabs[text.tabs.length - 1];
+    tabs.find((tab) => tab.key === activeTab) || tabs[tabs.length - 1];
 
   function scrollGallery(direction) {
     const track = galleryRef.current;
@@ -166,7 +177,7 @@ function CleanupsPage({ language = "en", onNavigate }) {
   return (
     <section className="cleanups-page">
       <section className="cleanups-hero-section">
-        <img alt="" aria-hidden="true" src={cleanupImages.hero} />
+        <img alt="" aria-hidden="true" src={heroImage} />
         <div className="cleanups-hero-copy">
           <span>EB Chemical Cleanups</span>
           <h1>{text.heroTitle}</h1>
@@ -188,7 +199,7 @@ function CleanupsPage({ language = "en", onNavigate }) {
         </div>
 
         <div className="cleanups-gallery-track" ref={galleryRef}>
-          {text.gallery.map((item) => (
+          {gallery.map((item) => (
             <article className="cleanup-gallery-card" key={item.title}>
               <img alt="" aria-hidden="true" src={item.image} />
               <div>
@@ -201,7 +212,7 @@ function CleanupsPage({ language = "en", onNavigate }) {
       </section>
 
       <section className="cleanups-signup-banner">
-        <img alt="" aria-hidden="true" src={cleanupImages.cta} />
+        <img alt="" aria-hidden="true" src={ctaImage} />
         <div className="cleanups-signup-copy">
           <h2>{text.ctaTitle}</h2>
           <p>{text.ctaText}</p>
@@ -225,7 +236,7 @@ function CleanupsPage({ language = "en", onNavigate }) {
             </button>
           </div>
           <div className="cleanups-tab-list" role="tablist" aria-label={text.galleryTitle}>
-            {text.tabs.map((tab) => (
+            {tabs.map((tab) => (
               <button
                 aria-selected={activeTab === tab.key}
                 className={activeTab === tab.key ? "active" : ""}

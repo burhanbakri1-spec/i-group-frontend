@@ -1,4 +1,5 @@
 import React from "react";
+import { getWebsiteMediaImage } from "../data/websiteMedia.js";
 
 const aboutImages = {
   hero: "/images/products/multi-surface-cleaner.svg",
@@ -10,28 +11,37 @@ const aboutImages = {
   impact: "/images/products/radiator-water-green.svg",
 };
 
-function AboutPage({ language = "en", onNavigate }) {
+function AboutPage({ language = "en", onNavigate, websiteMedia = [] }) {
   const isArabic = language === "ar";
   const [activeCard, setActiveCard] = React.useState(null);
+  const images = {
+    hero: getWebsiteMediaImage(websiteMedia, "about_hero", aboutImages.hero),
+    banner: getWebsiteMediaImage(websiteMedia, "about_banner", aboutImages.banner),
+    bottle: getWebsiteMediaImage(websiteMedia, "about_card_bottle", aboutImages.bottle),
+    concentrate: getWebsiteMediaImage(websiteMedia, "about_card_concentrate", aboutImages.concentrate),
+    material: getWebsiteMediaImage(websiteMedia, "about_card_material", aboutImages.material),
+    cta: getWebsiteMediaImage(websiteMedia, "about_cta", aboutImages.cta),
+    impact: getWebsiteMediaImage(websiteMedia, "about_impact", aboutImages.impact),
+  };
   const cards = isArabic
     ? [
         {
           title: "كل عبوة",
           description:
             "صُممت عبواتنا للاستخدام اليومي المتكرر، للمساعدة في تقليل الهدر ودعم روتين تنظيف يدوم أكثر.",
-          image: aboutImages.bottle,
+          image: images.bottle,
         },
         {
           title: "التركيبات المركزة",
           description:
             "تساعد التركيبات المركزة على تقليل التغليف غير الضروري وجعل التنظيف أكثر كفاءة دون التأثير على الأداء.",
-          image: aboutImages.concentrate,
+          image: images.concentrate,
         },
         {
           title: "المواد",
           description:
             "نختار المواد بعناية لدعم المتانة والعملية ونظام منتجات أكثر مسؤولية.",
-          image: aboutImages.material,
+          image: images.material,
         },
       ]
     : [
@@ -39,19 +49,19 @@ function AboutPage({ language = "en", onNavigate }) {
           title: "Every Bottle",
           description:
             "Designed for repeated daily use, our bottles help reduce waste and support a longer-lasting cleaning routine.",
-          image: aboutImages.bottle,
+          image: images.bottle,
         },
         {
           title: "Concentrates",
           description:
             "Our concentrates reduce unnecessary packaging and make cleaning more efficient without compromising performance.",
-          image: aboutImages.concentrate,
+          image: images.concentrate,
         },
         {
           title: "Materials",
           description:
             "We choose materials thoughtfully to support durability, practicality, and a more responsible product system.",
-          image: aboutImages.material,
+          image: images.material,
         },
       ];
   const stats = isArabic
@@ -73,7 +83,7 @@ function AboutPage({ language = "en", onNavigate }) {
   return (
     <main className="about-editorial-page">
       <section className="about-hero-section">
-        <img alt="" aria-hidden="true" src={aboutImages.hero} />
+        <img alt="" aria-hidden="true" src={images.hero} />
         <div className="about-hero-copy">
           <span className="about-review-badge">{isArabic ? "EB Chemical" : "EB Chemical"}</span>
           <h1>{isArabic ? "نحن هنا لجعل التنظيف أسهل" : "We’re here to make cleaning simpler"}</h1>
@@ -94,7 +104,7 @@ function AboutPage({ language = "en", onNavigate }) {
       </section>
 
       <section className="about-image-banner">
-        <img alt="" aria-hidden="true" src={aboutImages.banner} />
+        <img alt="" aria-hidden="true" src={images.banner} />
         <div>
           <h2>{isArabic ? "إعادة التفكير في التنظيف اليومي" : "Rethinking everyday cleaning"}</h2>
           <p>
@@ -137,7 +147,7 @@ function AboutPage({ language = "en", onNavigate }) {
 
       <section className="about-cta-section">
         <div className="about-cta-image">
-          <img alt="" aria-hidden="true" src={aboutImages.cta} />
+          <img alt="" aria-hidden="true" src={images.cta} />
         </div>
         <div className="about-cta-copy">
           <h2>{isArabic ? "انضم إلينا لجعل التنظيف أسهل" : "Join us in making cleaning simpler"}</h2>
@@ -162,7 +172,7 @@ function AboutPage({ language = "en", onNavigate }) {
           </p>
         </div>
         <div className="about-impact-media">
-          <img alt="" aria-hidden="true" src={aboutImages.impact} />
+          <img alt="" aria-hidden="true" src={images.impact} />
           <div className="about-impact-stats">
             {stats.map((stat) => (
               <article key={stat.label}>

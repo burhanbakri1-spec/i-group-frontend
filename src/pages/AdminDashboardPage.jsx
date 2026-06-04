@@ -2,6 +2,7 @@ import React from "react";
 import { Minus, Plus, Search, Upload } from "lucide-react";
 import AdminLayout from "../components/AdminLayout.jsx";
 import AdminOrdersTable from "../components/AdminOrdersTable.jsx";
+import WebsiteMediaManager from "../components/WebsiteMediaManager.jsx";
 import { categories as defaultCategories } from "../data/categories.js";
 import { uploadImage, uploadImages } from "../utils/api.js";
 
@@ -28,6 +29,7 @@ const pageMeta = {
   "admin-vlogs-new": ["New Vlog", "Create a storefront vlog entry"],
   "admin-store-locator": ["Store Locator", "Manage physical store locations"],
   "admin-store-locator-new": ["New Store", "Create a retail location"],
+  "admin-website-media": ["Website Media", "Manage images used across storefront sections"],
   "admin-orders": ["Orders", "Manage and track customer orders"],
   "admin-reviews": ["Reviews", "Moderate customer reviews and ratings"],
   "admin-inventory": ["Inventory Management", "Monitor stock levels, adjust quantities, and review movement history"],
@@ -926,6 +928,8 @@ function AdminDashboardPage({
   onSaveCategoryCard,
   onSaveOffer,
   onSaveProduct,
+  onSaveWebsiteMedia,
+  onDeleteWebsiteMedia,
   onModerateReview,
   onDeleteReview,
   onStatusChange,
@@ -936,6 +940,7 @@ function AdminDashboardPage({
   reviews,
   statusMessage,
   t,
+  websiteMedia = [],
 }) {
   const [editingProduct, setEditingProduct] = React.useState(null);
   const [filters, setFilters] = React.useState({ brand: "all", category: "all", search: "", status: "all" });
@@ -1114,6 +1119,8 @@ function AdminDashboardPage({
         return renderSimpleTable("stores");
       case "admin-store-locator-new":
         return renderEntityForm("store");
+      case "admin-website-media":
+        return <WebsiteMediaManager items={websiteMedia} language={language} onDelete={onDeleteWebsiteMedia} onSave={onSaveWebsiteMedia} />;
       case "admin-orders":
         return <section className="admin-panel-card"><Toolbar><SearchField placeholder="Search order #, customer..." value="" onChange={() => {}} /><select><option>Status</option></select><select><option>Payment</option></select></Toolbar>{orders.length ? <AdminOrdersTable employees={employees} canDelete={canManageSensitive} language={language} onAssignEmployee={onAssignEmployee} onDeleteOrder={onDeleteOrder} onStatusChange={onStatusChange} orders={orders} products={products} t={t} /> : <EmptyState title="No orders found" description="No orders have been placed yet. Orders will appear here once customers complete their purchases." />}</section>;
       case "admin-reviews":

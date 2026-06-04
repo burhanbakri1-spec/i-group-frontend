@@ -3,6 +3,7 @@ import FloatingProductCollage from "../components/FloatingProductCollage.jsx";
 import { brand } from "../data/brand.js";
 import { categories } from "../data/categories.js";
 import { homepageCategoryCards as defaultHomepageCategoryCards } from "../data/homeContent.js";
+import { getWebsiteMediaImage } from "../data/websiteMedia.js";
 
 function getLocalized(value, language) {
   if (!value) return "";
@@ -161,7 +162,7 @@ function ProductShowcaseSlider({ language, onViewProduct, products, title, varia
   );
 }
 
-function HowItWorksSplit({ language, onNavigate }) {
+function HowItWorksSplit({ image, language, onNavigate }) {
   const isArabic = language === "ar";
   const steps = isArabic
     ? [
@@ -195,9 +196,15 @@ function HowItWorksSplit({ language, onNavigate }) {
 
   return (
     <section className="how-works-split storefront-wide-section">
-      <div className="how-works-image" aria-hidden="true">
-        <div className="how-works-bottle how-works-bottle-main" />
-        <div className="how-works-bottle how-works-bottle-small" />
+      <div className={`how-works-image${image ? " has-media" : ""}`} aria-hidden="true">
+        {image ? (
+          <img alt="" src={image} />
+        ) : (
+          <>
+            <div className="how-works-bottle how-works-bottle-main" />
+            <div className="how-works-bottle how-works-bottle-small" />
+          </>
+        )}
       </div>
       <div className="how-works-panel">
         <p className="eyebrow">{isArabic ? "طريقة الاستخدام" : "How it works"}</p>
@@ -466,22 +473,30 @@ function WidePromoBanner({ language, onNavigate, image }) {
   );
 }
 
-function SplitCategoryBanner({ language, onCategorySelect, products }) {
+function SplitCategoryBanner({ language, onCategorySelect, products, websiteMedia }) {
   const isArabic = language === "ar";
   const panels = [
     {
       id: "home-cleaning",
       title: isArabic ? "العناية بالمنزل" : "Home Care",
       image:
-        products.find((product) => product.categoryId === "home-cleaning")?.image ||
-        "/images/products/multi-surface-cleaner.svg",
+        getWebsiteMediaImage(
+          websiteMedia,
+          "homepage_split_home",
+          products.find((product) => product.categoryId === "home-cleaning")?.image ||
+            "/images/products/multi-surface-cleaner.svg",
+        ),
     },
     {
       id: "car-care",
       title: isArabic ? "العناية بالسيارة" : "Car Care",
       image:
-        products.find((product) => product.categoryId === "car-care")?.image ||
-        "/images/products/car-interior-cleaner.svg",
+        getWebsiteMediaImage(
+          websiteMedia,
+          "homepage_split_car",
+          products.find((product) => product.categoryId === "car-care")?.image ||
+            "/images/products/car-interior-cleaner.svg",
+        ),
     },
   ];
 
@@ -524,6 +539,7 @@ function HomePage({
   products,
   reviews = [],
   t,
+  websiteMedia = [],
 }) {
   const starterProducts = getPromotedProducts(products);
   const essentialsProducts =
@@ -536,10 +552,32 @@ function HomePage({
   const activeOffers = homepageOffers
     .filter((offer) => offer.isActive !== false)
     .sort((a, b) => Number(a.displayOrder || 0) - Number(b.displayOrder || 0));
-  const promoImage =
+  const promoImage = getWebsiteMediaImage(
+    websiteMedia,
+    "homepage_promo_banner",
     activeOffers[0]?.image ||
-    products.find((product) => product.categoryId === "car-care")?.image ||
-    products[0]?.image;
+      products.find((product) => product.categoryId === "car-care")?.image ||
+      products[0]?.image,
+  );
+  const mediaCategoryCards = homepageCategoryCards.map((card) => ({
+    ...card,
+    image: getWebsiteMediaImage(websiteMedia, `homepage_category_${card.key}`, card.image),
+  }));
+  const heroLeftImage = getWebsiteMediaImage(
+    websiteMedia,
+    "homepage_hero_left",
+    "/products/limescale-remover-hover.jpg",
+  );
+  const heroRightImage = getWebsiteMediaImage(
+    websiteMedia,
+    "homepage_hero_right",
+    "/products/limescale-remover-main.jpg",
+  );
+  const howItWorksImage = getWebsiteMediaImage(
+    websiteMedia,
+    "homepage_how_it_works_image",
+    "/homepage-categories/home-care.jpg",
+  );
   const siteReviews = reviews.filter(
     (review) =>
       (review.type === "store" || review.type === "site" || !review.employeeId) &&
@@ -571,13 +609,21 @@ function HomePage({
 
         <div className="hero-panel hero-panel-visual" aria-label={brand.name}>
           <div className="hero-image-duo hero-visuals">
-            <div className="hero-image-panel hero-visual-panel hero-visual-panel-soft" aria-hidden="true" />
-            <div className="hero-image-panel hero-visual-panel hero-visual-panel-fresh" aria-hidden="true" />
+            <div
+              className="hero-image-panel hero-visual-panel hero-visual-panel-soft"
+              aria-hidden="true"
+              style={{ "--website-media-image": `url("${heroLeftImage}")` }}
+            />
+            <div
+              className="hero-image-panel hero-visual-panel hero-visual-panel-fresh"
+              aria-hidden="true"
+              style={{ "--website-media-image": `url("${heroRightImage}")` }}
+            />
           </div>
         </div>
       </section>
 
-      <CleaningSystemShowcase categoryCards={homepageCategoryCards} language={language} />
+      <CleaningSystemShowcase categoryCards={mediaCategoryCards} language={language} />
 
       <ProductShowcaseSlider
         language={language}
@@ -595,7 +641,7 @@ function HomePage({
         variant="essentials"
       />
 
-      <HowItWorksSplit language={language} onNavigate={onNavigate} />
+      <HowItWorksSplit image={howItWorksImage} language={language} onNavigate={onNavigate} />
 
       {siteReviews.length > 0 && (
         <section className="reviews-section storefront-section">
@@ -640,6 +686,7 @@ function HomePage({
         language={language}
         onCategorySelect={onCategorySelect}
         products={products}
+        websiteMedia={websiteMedia}
       />
 
       {false && siteReviews.length > 0 && (

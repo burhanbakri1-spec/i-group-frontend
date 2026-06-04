@@ -66,6 +66,12 @@ import {
   submitCustomerReview,
   updateReviewStatus,
 } from "./utils/homeContentApi.js";
+import {
+  deleteWebsiteMedia as deleteWebsiteMediaApi,
+  fetchAllWebsiteMedia,
+  fetchWebsiteMedia,
+  saveWebsiteMedia as saveWebsiteMediaApi,
+} from "./utils/websiteMediaApi.js";
 import "./styles/global.css";
 
 const cartStorageKey = "epChemicalCart";
@@ -95,6 +101,7 @@ const pagePaths = {
   "admin-vlogs-new": "/admin/vlogs/new",
   "admin-store-locator": "/admin/store-locator",
   "admin-store-locator-new": "/admin/store-locator/new",
+  "admin-website-media": "/admin/website-media",
   "admin-orders": "/admin/orders",
   "admin-reviews": "/admin/reviews",
   "admin-inventory": "/admin/inventory",
@@ -118,6 +125,7 @@ const adminPageKeys = [
   "admin-vlogs-new",
   "admin-store-locator",
   "admin-store-locator-new",
+  "admin-website-media",
   "admin-orders",
   "admin-reviews",
   "admin-inventory",
@@ -170,6 +178,7 @@ function App() {
   const [homepageOffers, setHomepageOffers] = React.useState([]);
   const [homepageCategoryCards, setHomepageCategoryCards] = React.useState([]);
   const [reviews, setReviews] = React.useState([]);
+  const [websiteMedia, setWebsiteMedia] = React.useState([]);
   const [currentUser, setUser] = React.useState(getCurrentUser);
   const [loginMessage, setLoginMessage] = React.useState("");
   const [adminLoginMessage, setAdminLoginMessage] = React.useState("");
@@ -192,6 +201,7 @@ function App() {
   React.useEffect(() => {
     loadProducts();
     loadHomeContent();
+    loadWebsiteMedia();
     hydrateUser();
   }, []);
 
@@ -209,6 +219,7 @@ function App() {
     loadEmployees(currentUser);
     loadReviews(currentUser);
     loadWorkSession(currentUser);
+    loadWebsiteMedia(currentUser);
   }, [currentUser]);
 
   React.useEffect(() => {
@@ -363,6 +374,15 @@ function App() {
     setHomepageOffers(await fetchHomepageOffers());
     setHomepageCategoryCards(await fetchHomepageCategoryCards());
     setReviews(await fetchReviews());
+  }
+
+  async function loadWebsiteMedia(user = null) {
+    try {
+      const canManage = user && (user.role === "admin" || isStaffRole(user.role));
+      setWebsiteMedia(canManage ? await fetchAllWebsiteMedia() : await fetchWebsiteMedia());
+    } catch {
+      setWebsiteMedia(await fetchWebsiteMedia());
+    }
   }
 
   async function loadReviews(user) {
@@ -779,6 +799,19 @@ function App() {
     setReviews(await fetchAllReviews());
   }
 
+  async function handleSaveWebsiteMedia(item) {
+    const saved = await saveWebsiteMediaApi(item);
+    await loadWebsiteMedia(currentUser);
+    setAdminMessage(t("admin.productSaved"));
+    return saved;
+  }
+
+  async function handleDeleteWebsiteMedia(id) {
+    await deleteWebsiteMediaApi(id);
+    await loadWebsiteMedia(currentUser);
+    setAdminMessage(t("admin.productDeleted"));
+  }
+
   async function handleCreateOrder(customerInfo) {
     try {
       const order = await createOrder({
@@ -855,6 +888,7 @@ function App() {
             products={demoProducts}
             reviews={reviews}
             t={t}
+            websiteMedia={websiteMedia}
           />
         )}
 
@@ -913,7 +947,9 @@ function App() {
           />
         )}
 
-        {activePage === "about" && <AboutPage language={language} onNavigate={navigate} t={t} />}
+        {activePage === "about" && (
+          <AboutPage language={language} onNavigate={navigate} t={t} websiteMedia={websiteMedia} />
+        )}
 
         {activePage === "how" && (
           <HowItWorksPage
@@ -921,11 +957,12 @@ function App() {
             onNavigate={navigate}
             onViewProduct={handleViewProduct}
             products={demoProducts}
+            websiteMedia={websiteMedia}
           />
         )}
 
         {activePage === "cleanups" && (
-          <CleanupsPage language={language} onNavigate={navigate} />
+          <CleanupsPage language={language} onNavigate={navigate} websiteMedia={websiteMedia} />
         )}
 
         {activePage === "eb-points" && (
@@ -933,6 +970,7 @@ function App() {
             currentUser={currentUser}
             language={language}
             onNavigate={navigate}
+            websiteMedia={websiteMedia}
           />
         )}
 
@@ -1000,6 +1038,9 @@ function App() {
             reviews={reviews}
             t={t}
             workSession={workSession}
+            websiteMedia={websiteMedia}
+            onSaveWebsiteMedia={handleSaveWebsiteMedia}
+            onDeleteWebsiteMedia={handleDeleteWebsiteMedia}
           />
         )}
 
@@ -1037,6 +1078,9 @@ function App() {
             onSaveCategoryCard={handleSaveCategoryCard}
             statusMessage={adminMessage}
             t={t}
+            websiteMedia={websiteMedia}
+            onSaveWebsiteMedia={handleSaveWebsiteMedia}
+            onDeleteWebsiteMedia={handleDeleteWebsiteMedia}
           />
         )}
 

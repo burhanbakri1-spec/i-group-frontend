@@ -4,6 +4,7 @@ import AdminProductForm from "../components/AdminProductForm.jsx";
 import AdminProductTable from "../components/AdminProductTable.jsx";
 import StatusBadge from "../components/StatusBadge.jsx";
 import WorkTimer from "../components/WorkTimer.jsx";
+import WebsiteMediaManager from "../components/WebsiteMediaManager.jsx";
 import { hasPermission, permissionGroups } from "../data/permissions.js";
 
 const statuses = ["Pending", "Processing", "Completed", "Cancelled"];
@@ -53,11 +54,14 @@ function EmployeeDashboardPage({
   onDeleteProduct,
   onNavigate,
   onSaveProduct,
+  onSaveWebsiteMedia,
+  onDeleteWebsiteMedia,
   onStatusChange,
   orders,
   products,
   t,
   workSession,
+  websiteMedia = [],
 }) {
   const [activeTab, setActiveTab] = React.useState("overview");
   const [editingProduct, setEditingProduct] = React.useState(null);
@@ -382,6 +386,13 @@ function EmployeeDashboardPage({
             {t("employee.createCustomerOrder")}
           </button>
         )}
+        <button
+          className={activeTab === "website-media" ? "nav-link active" : "nav-link"}
+          onClick={() => setActiveTab("website-media")}
+          type="button"
+        >
+          {language === "ar" ? "صور الموقع" : "Website Media"}
+        </button>
       </div>
 
       {activeTab === "overview" && (
@@ -610,6 +621,15 @@ function EmployeeDashboardPage({
             </div>
           </form>
         </section>
+      )}
+
+      {activeTab === "website-media" && (
+        <WebsiteMediaManager
+          items={websiteMedia}
+          language={language}
+          onDelete={onDeleteWebsiteMedia}
+          onSave={onSaveWebsiteMedia}
+        />
       )}
 
     </section>

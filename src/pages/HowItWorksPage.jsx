@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import { placeholderImage } from "../data/products.js";
+import { getWebsiteMediaImage } from "../data/websiteMedia.js";
 
 function getLocalized(value, language) {
   if (!value) return "";
@@ -122,8 +123,21 @@ function HowProductCarousel({ language, onViewProduct, products }) {
   );
 }
 
-function HowItWorksPage({ language = "en", onNavigate, onViewProduct, products = [] }) {
+function HowItWorksPage({
+  language = "en",
+  onNavigate,
+  onViewProduct,
+  products = [],
+  websiteMedia = [],
+}) {
   const isArabic = language === "ar";
+  const images = {
+    hero: getWebsiteMediaImage(websiteMedia, "how_it_works_hero", howImages.hero),
+    steps: getWebsiteMediaImage(websiteMedia, "how_it_works_steps", howImages.steps),
+    refill: getWebsiteMediaImage(websiteMedia, "how_it_works_refill", howImages.refill),
+    cta: getWebsiteMediaImage(websiteMedia, "how_it_works_cta", howImages.cta),
+    essentials: getWebsiteMediaImage(websiteMedia, "how_it_works_essentials", howImages.essentials),
+  };
   const label = isArabic ? "كيف يعمل" : "How it works";
   const firstSteps = isArabic
     ? [
@@ -152,7 +166,7 @@ function HowItWorksPage({ language = "en", onNavigate, onViewProduct, products =
   return (
     <main className="how-page">
       <section className="how-hero">
-        <img alt="" aria-hidden="true" src={howImages.hero} />
+        <img alt="" aria-hidden="true" src={images.hero} />
         <div className="how-hero-copy">
           <span className="how-rating-badge">
             {isArabic ? "أكثر من 500 طلب من عملاء سعداء" : "Over 500+ orders from happy customers"}
@@ -175,13 +189,13 @@ function HowItWorksPage({ language = "en", onNavigate, onViewProduct, products =
           steps={firstSteps}
         />
         <div className="how-image-panel">
-          <img alt="" aria-hidden="true" src={howImages.steps} />
+          <img alt="" aria-hidden="true" src={images.steps} />
         </div>
       </section>
 
       <section className="how-split-section reverse">
         <div className="how-image-panel">
-          <img alt="" aria-hidden="true" src={howImages.refill} />
+          <img alt="" aria-hidden="true" src={images.refill} />
         </div>
         <StepList
           isArabic={isArabic}
@@ -200,13 +214,13 @@ function HowItWorksPage({ language = "en", onNavigate, onViewProduct, products =
           </button>
         </div>
         <div className="how-cta-image">
-          <img alt="" aria-hidden="true" src={howImages.cta} />
+          <img alt="" aria-hidden="true" src={images.cta} />
         </div>
       </section>
 
       <section className="how-essentials-section">
         <div className="how-cta-image">
-          <img alt="" aria-hidden="true" src={howImages.essentials} />
+          <img alt="" aria-hidden="true" src={images.essentials} />
         </div>
         <div className="how-essentials-copy">
           <h2>{isArabic ? "اختر أساسياتك" : "Pick your essentials"}</h2>

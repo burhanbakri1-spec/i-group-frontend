@@ -8,6 +8,7 @@ import {
   Film,
   FolderTree,
   Grid3X3,
+  Images,
   Languages,
   MapPin,
   Moon,
@@ -47,6 +48,7 @@ const navSections = [
     items: [
       { key: "admin-vlogs", icon: Film, label: { en: "Vlogs", ar: "الفيديوهات" } },
       { key: "admin-store-locator", icon: MapPin, label: { en: "Store Locator", ar: "مواقع المتاجر" } },
+      { key: "admin-website-media", icon: Images, label: { en: "Website Media", ar: "صور الموقع" } },
     ],
   },
   {

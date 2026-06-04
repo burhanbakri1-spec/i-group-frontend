@@ -145,6 +145,22 @@ create table if not exists public.work_sessions (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.website_media (
+  id text primary key,
+  section_key text not null default '',
+  section_label text not null default '',
+  group_key text not null default 'sections',
+  image_url text not null default '',
+  title text not null default '',
+  subtitle text not null default '',
+  link_url text not null default '',
+  sort_order integer not null default 0,
+  is_active boolean not null default true,
+  data jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create or replace view public.customers as
 select *
 from public.users
@@ -158,6 +174,7 @@ create index if not exists idx_product_gallery_product_id on public.product_gall
 create index if not exists idx_orders_customer_user_id on public.orders (customer_user_id);
 create index if not exists idx_orders_status on public.orders (status);
 create index if not exists idx_order_items_order_id on public.order_items (order_id);
+create index if not exists idx_website_media_section_key on public.website_media (section_key);
 
 alter table public.users enable row level security;
 alter table public.products enable row level security;
@@ -170,3 +187,4 @@ alter table public.homepage_offers enable row level security;
 alter table public.homepage_category_cards enable row level security;
 alter table public.reviews enable row level security;
 alter table public.work_sessions enable row level security;
+alter table public.website_media enable row level security;
