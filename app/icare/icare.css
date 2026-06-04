@@ -579,7 +579,7 @@
     /* Rhode uses Rektorat Heavy for the on-image "first access" badge (10px / 400
        / 10px / -0.4px / lowercase). We use the same family to mirror that. */
     font-family: var(--font-rektorat);
-    font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+    font-size: clamp(2.5rem, 2.5vw, 2.25rem);
     font-weight: var(--rb-font-weight-bold);
     line-height: 1;
     letter-spacing: -0.04em;
@@ -652,42 +652,6 @@
     padding: clamp(1rem, 1.7vw, 1.5rem);
   }
 
-  .icare-product-card__rating {
-    display: flex;
-    align-items: center;
-    gap: 0.2rem;
-    color: var(--rb-primary-text);
-  }
-
-  .icare-product-card__rating svg {
-    fill: transparent;
-    stroke-width: 1.8;
-  }
-
-  .icare-product-card--standard .icare-product-card__rating svg {
-    width: clamp(0.72rem, 0.85vw, 0.9rem);
-    height: clamp(0.72rem, 0.85vw, 0.9rem);
-  }
-
-  .icare-product-card--showcase .icare-product-card__rating svg {
-    width: clamp(0.9rem, 1vw, 1rem);
-    height: clamp(0.9rem, 1vw, 1rem);
-  }
-
-  .icare-product-card__rating svg.is-filled {
-    fill: currentColor;
-  }
-
-  .icare-product-card__reviews {
-    margin-left: 0.35rem;
-    color: var(--rb-muted-text);
-    /* Match Rhode 12.8px micro rhythm for product card reviews. */
-    font-size: var(--rb-text-2xs);
-    font-weight: var(--rb-font-weight-normal);
-    letter-spacing: var(--rb-tracking-wide);
-    line-height: var(--rb-text-2xs--line-height);
-  }
-
   .icare-product-card__summary {
     display: flex;
     align-items: flex-start;
@@ -711,13 +675,13 @@
   }
 
   .icare-product-card--standard .icare-product-card__name {
-    font-size: 0.875rem;
+    font-size: 1.3125rem;
     line-height: 1.2;
   }
 
   .icare-product-card--showcase .icare-product-card__name {
     /* Showcase cards keep the larger display name — same weight/tracking as Rhode. */
-    font-size: clamp(1.45rem, 2.15vw, 2.35rem);
+    font-size: clamp(2.175rem, 3.225vw, 3.525rem);
     line-height: 0.96;
   }
 
@@ -734,13 +698,13 @@
 
   .icare-product-card--standard .icare-product-card__description {
     max-width: 28ch;
-    font-size: 0.875rem;
+    font-size: 1.3125rem;
     line-height: 1.5;
   }
 
   .icare-product-card--showcase .icare-product-card__description {
     max-width: 32ch;
-    font-size: clamp(0.95rem, 1.05vw, 1.1rem);
+    font-size: clamp(1.425rem, 1.575vw, 1.65rem);
     line-height: 1.24;
   }
 
@@ -760,16 +724,16 @@
   }
 
   .icare-product-card--standard .icare-product-card__price {
-    font-size: 1rem;
+    font-size: 1.5rem;
   }
 
   .icare-product-card--showcase .icare-product-card__price {
-    font-size: clamp(1rem, 1.15vw, 1.2rem);
+    font-size: clamp(1.5rem, 1.725vw, 1.8rem);
   }
 
   .icare-product-card__original-price {
     color: var(--rb-muted-text);
-    font-size: 0.75em;
+    font-size: 1.125em;
     font-weight: 800;
     text-decoration: line-through;
   }
@@ -791,7 +755,7 @@
     color: var(--rb-primary-text);
     cursor: pointer;
     /* Match Rhode pill button: 15.73px / 400 / 23.6px / 0.314px ls / uppercase. */
-    font-size: var(--rb-text-pill);
+    font-size: 1.4748rem;
     font-weight: var(--rb-font-weight-normal);
     letter-spacing: var(--rb-text-pill--letter-spacing);
     line-height: var(--rb-text-pill--line-height);

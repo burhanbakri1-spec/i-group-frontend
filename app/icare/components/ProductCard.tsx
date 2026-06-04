@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { Star } from 'lucide-react';
 import { Language } from '../translations';
 import { Product } from '../types';
 import { isPurchasableStock } from '../lib/mappers';
@@ -34,15 +33,6 @@ const getCardLabel = (product: Product) => (
   || ''
 );
 
-const getFilledStars = (rating?: string) => {
-  const numericRating = Number.parseFloat(rating ?? '5');
-  if (!Number.isFinite(numericRating)) {
-    return 5;
-  }
-
-  return Math.max(0, Math.min(5, Math.round(numericRating)));
-};
-
 const ProductCardBase: React.FC<ProductCardProps> = ({
   product,
   lang,
@@ -57,7 +47,6 @@ const ProductCardBase: React.FC<ProductCardProps> = ({
   const displayName = getDisplayName(product);
   const description = getDisplayDescription(product, lang);
   const cardLabel = getCardLabel(product);
-  const filledStars = getFilledStars(product.rating);
   const hoverImage = product.images && product.images.length > 1 ? product.images[1] : null;
   const shouldShowQuickAdd = showQuickAdd && variant === 'standard';
 
@@ -120,22 +109,6 @@ const ProductCardBase: React.FC<ProductCardProps> = ({
             </span>
 
             <span className="icare-product-card__body">
-              <span
-                className="icare-product-card__rating"
-                aria-label={`${product.rating ?? '5'} ${lang === 'en' ? 'out of 5 stars' : 'من 5 نجوم'}`}
-              >
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <Star
-                    key={index}
-                    className={index < filledStars ? 'is-filled' : ''}
-                    aria-hidden="true"
-                  />
-                ))}
-                {product.reviews && (
-                  <span className="icare-product-card__reviews">({product.reviews})</span>
-                )}
-              </span>
-
               <span className="icare-product-card__summary">
                 <span className="icare-product-card__copy">
                   <span className="icare-product-card__name">{displayName}</span>
