@@ -453,7 +453,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
             >
               <div className="max-w-[1440px] mx-auto px-10">
                 {megaMenuCategories.length > 0 && (
-                  <div className="flex justify-end gap-6 mb-4 px-6">
+                  <div className="flex justify-center gap-6 mb-4 px-6">
                     {/* "All" button */}
                       <button
                       key={t.categories.all}

@@ -195,11 +195,11 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
       />
 
       {/* Navigation & Hierarchy */}
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col gap-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-10 flex flex-col gap-8">
 
         {/* Level 1: Root Categories */}
         <div className="overflow-x-auto no-scrollbar border-b border-black/10 pb-4">
-          <div className="flex md:justify-center justify-start gap-3 px-1 md:px-4 min-w-max">
+          <div className="flex justify-center gap-3 px-1 md:px-4 min-w-max">
             <button
               onClick={() => selectRoot(null)}
               className={`px-6 md:px-8 py-2.5 rounded-full text-[12px] font-black uppercase tracking-widest transition-colors ${CONTROL_FOCUS_CLASS} ${!activeMain ? 'bg-[#67645E] text-white' : 'bg-white text-[#67645E] border border-[#DDDDDD]'}`}
@@ -229,7 +229,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
               transition={{ duration: 0.2 }}
               className="overflow-x-auto no-scrollbar border-b border-black/10 pb-4 motion-reduce:transition-none"
             >
-              <div className="flex md:justify-center justify-start gap-3 px-1 md:px-4 min-w-max">
+              <div className="flex justify-center gap-3 px-1 md:px-4 min-w-max">
                 <button
                   onClick={() => setActiveChild(null)}
                   className={`px-6 py-2 rounded-full text-[11px] font-bold uppercase transition-colors ${CONTROL_FOCUS_CLASS} ${!activeChild ? 'bg-[#67645E] text-white' : 'bg-white text-[#84827E] border border-[#DDDDDD]'}`}
