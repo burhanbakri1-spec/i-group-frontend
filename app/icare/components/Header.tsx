@@ -6,7 +6,7 @@ import { translations, Language } from '../translations';
 import { useShop } from '../context/ShopContext';
 import { usePathname } from 'next/navigation';
 import { BackendCategory, Product } from '../types';
-import { fetchCatalogProducts, fetchCategoryRoots, fetchCategoryChildren } from '../lib/catalog-client';
+import { fetchCatalogProducts, fetchCategoryRoots } from '../lib/catalog-client';
 import { hasIcareStandardHero } from '../lib/hero-routes';
 
 interface HeaderProps {
@@ -27,20 +27,21 @@ const HEADER_HIDE_SCROLL_THRESHOLD = 32;
 const HEADER_SCROLL_DELTA = 4;
 const HEADER_HIDE_DELAY_MS = 80;
 const HEADER_MOTION_EASE = [0.76, 0, 0.24, 1] as const;
+const PREVIEW_LIMIT = 8;
+const PREVIEW_SLIDE_DISTANCE = 60;
 
 export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavigate, onProductSelect, onOpenMenu, isDrawerOpen, lang, onToggleLang }) => {
   const t = translations[lang];
   const { cartCount, wishlistItems } = useShop();
   const [isShopHovered, setIsShopHovered] = useState(false);
-  const [activeCategory, setActiveCategory] = useState(t.categories.all);
+  const [activePreviewIndex, setActivePreviewIndex] = useState(0);
+  const [previewDirection, setPreviewDirection] = useState<'left' | 'right'>('right');
   const [isVisible, setIsVisible] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isScrollingUp, setIsScrollingUp] = useState(false);
   const [hasScrolledPastHero, setHasScrolledPastHero] = useState(false);
   const [previewProducts, setPreviewProducts] = useState<Product[]>([]);
   const [rootCategories, setRootCategories] = useState<BackendCategory[]>([]);
-  const [categoryChildren, setCategoryChildren] = useState<Record<string, BackendCategory[]>>({});
-  const [activeRootSlug, setActiveRootSlug] = useState<string | null>(null);
   const shouldReduceMotion = useReducedMotion();
   const pathname = usePathname();
   const headerRef = useRef<HTMLDivElement | null>(null);
@@ -54,6 +55,17 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
   useEffect(() => { isShopHoveredRef.current = isShopHovered; }, [isShopHovered]);
   const calmTween = shouldReduceMotion ? { duration: 0 } : { duration: 0.2, ease: 'easeOut' as const };
   const headerMotion = shouldReduceMotion ? { duration: 0 } : { duration: 0.42, ease: HEADER_MOTION_EASE };
+  const previewVariants = {
+    enter: (direction: 'left' | 'right') => ({
+      x: direction === 'left' ? PREVIEW_SLIDE_DISTANCE : -PREVIEW_SLIDE_DISTANCE,
+      opacity: 0,
+    }),
+    center: { x: 0, opacity: 1 },
+    exit: (direction: 'left' | 'right') => ({
+      x: direction === 'left' ? -PREVIEW_SLIDE_DISTANCE : PREVIEW_SLIDE_DISTANCE,
+      opacity: 0,
+    }),
+  } as const;
 
   const cancelHideTimer = () => {
     if (hideTimerRef.current !== null) {
@@ -163,17 +175,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
     return () => { cancelled = true; };
   }, []);
 
-  // Fetch children when a root category is hovered
-  useEffect(() => {
-    if (!activeRootSlug || categoryChildren[activeRootSlug]) return;
-    let cancelled = false;
-    fetchCategoryChildren(activeRootSlug).then(children => {
-      if (cancelled) return;
-      setCategoryChildren(prev => ({ ...prev, [activeRootSlug]: Array.isArray(children) ? children : [] }));
-    });
-    return () => { cancelled = true; };
-  }, [activeRootSlug, categoryChildren]);
-
   const megaMenuCategories = useMemo(() => {
     if (rootCategories.length > 0) {
       return [t.categories.all, ...rootCategories.map((c) => c.name)];
@@ -185,14 +186,50 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
     return [t.categories.all, ...backendCategories];
   }, [rootCategories, previewProducts, t.categories.all]);
 
-  const activePreviewCategory = megaMenuCategories.some((category) => category.trim().toLowerCase() === activeCategory.trim().toLowerCase())
-    ? activeCategory
-    : t.categories.all;
+  const clampedActivePreviewIndex = megaMenuCategories.length > 0
+    ? Math.min(activePreviewIndex, megaMenuCategories.length - 1)
+    : 0;
 
   const visiblePreviewProducts = useMemo(() => {
-    if (activePreviewCategory === t.categories.all) return previewProducts;
-    return previewProducts.filter((product) => product.category?.trim().toLowerCase() === activePreviewCategory.trim().toLowerCase());
-  }, [activePreviewCategory, previewProducts, t.categories.all]);
+    if (previewProducts.length === 0) return [];
+
+    // "All" pill → show top N previews (no filter).
+    if (clampedActivePreviewIndex === 0) {
+      return previewProducts.slice(0, PREVIEW_LIMIT);
+    }
+
+    const activeName = megaMenuCategories[clampedActivePreviewIndex]?.trim().toLowerCase();
+    if (!activeName) {
+      return previewProducts.slice(0, PREVIEW_LIMIT);
+    }
+
+    // If we can find the matching root category, prefer matching by categoryId.
+    // Otherwise (fallback path with derived names), fall back to a string match
+    // on the product's `category` field — same approach the Shop filter uses.
+    const activeRoot = rootCategories.find(
+      (c) => c.name.trim().toLowerCase() === activeName
+    );
+
+    return previewProducts
+      .filter((p) => {
+        if (p.categoryId !== undefined && activeRoot) {
+          return p.categoryId === activeRoot.id;
+        }
+        const cat = p.category?.trim().toLowerCase() ?? '';
+        if (!cat) return false;
+        return cat === activeName;
+      })
+      .slice(0, PREVIEW_LIMIT);
+  }, [previewProducts, clampedActivePreviewIndex, megaMenuCategories, rootCategories]);
+
+  const setPreviewByIndex = (nextIndex: number) => {
+    if (nextIndex === clampedActivePreviewIndex) return;
+    // Cards sweep in the direction the user moves their mouse:
+    //   old on left, new on right (nextIndex > current) → sweep right (mouse moved right)
+    //   old on right, new on left (nextIndex < current) → sweep left (mouse moved left)
+    setPreviewDirection(nextIndex > clampedActivePreviewIndex ? 'right' : 'left');
+    setActivePreviewIndex(nextIndex);
+  };
 
   useEffect(() => {
     const updateHeaderState = () => {
@@ -457,49 +494,49 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                     {/* "All" button */}
                       <button
                       key={t.categories.all}
-                      onMouseEnter={() => { setActiveCategory(t.categories.all); setActiveRootSlug(null); }}
-                      onFocus={() => { setActiveCategory(t.categories.all); setActiveRootSlug(null); }}
+                      onMouseEnter={() => setPreviewByIndex(0)}
+                      onFocus={() => setPreviewByIndex(0)}
                       onClick={() => { onNavigate('shop'); closeShopMenu(); }}
                       className={`rounded-full px-1 text-[12.8px] font-bold uppercase tracking-[0.02em] leading-[1.5] relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
-                        activePreviewCategory.trim().toLowerCase() === t.categories.all.trim().toLowerCase() ? 'text-[var(--rb-near-black)]' : 'text-[var(--rb-primary-text)]'
+                        clampedActivePreviewIndex === 0 ? 'text-[var(--rb-near-black)]' : 'text-[var(--rb-primary-text)]'
                       }`}
                     >
                       {t.categories.all}
-                      {activePreviewCategory.trim().toLowerCase() === t.categories.all.trim().toLowerCase() && (
+                      {clampedActivePreviewIndex === 0 && (
                         <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="absolute -bottom-2 left-0 w-full h-[1px] bg-black" />
                       )}
                     </button>
                     {/* Root category buttons */}
-                    {rootCategories.length > 0 ? rootCategories.map((cat) => (
+                    {rootCategories.length > 0 ? rootCategories.map((cat, index) => (
                       <button
                         key={cat.slug}
-                        onMouseEnter={() => { setActiveCategory(cat.name); setActiveRootSlug(cat.slug); }}
-                        onFocus={() => { setActiveCategory(cat.name); setActiveRootSlug(cat.slug); }}
+                        onMouseEnter={() => setPreviewByIndex(index + 1)}
+                        onFocus={() => setPreviewByIndex(index + 1)}
                         onClick={() => { onNavigate('shop'); closeShopMenu(); }}
                         /* Match Rhode 12.8px / 700 / 0.256px rhythm for secondary nav pills. */
                         className={`rounded-full px-1 text-[12.8px] font-bold uppercase tracking-[0.02em] leading-[1.5] relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
-                          activePreviewCategory.trim().toLowerCase() === cat.name.trim().toLowerCase() ? 'text-[var(--rb-near-black)]' : 'text-[var(--rb-primary-text)]'
+                          clampedActivePreviewIndex === index + 1 ? 'text-[var(--rb-near-black)]' : 'text-[var(--rb-primary-text)]'
                         }`}
                       >
                         {cat.name}
-                        {activePreviewCategory.trim().toLowerCase() === cat.name.trim().toLowerCase() && (
+                        {clampedActivePreviewIndex === index + 1 && (
                           <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="absolute -bottom-2 left-0 w-full h-[1px] bg-[var(--rb-near-black)]" />
                         )}
                       </button>
                     )) : (
                       /* Fallback when no root categories: use derived names */
-                      megaMenuCategories.filter(c => c !== t.categories.all).map((cat) => (
+                      megaMenuCategories.filter(c => c !== t.categories.all).map((cat, index) => (
                         <button
                           key={cat}
-                          onMouseEnter={() => setActiveCategory(cat)}
-                          onFocus={() => setActiveCategory(cat)}
+                          onMouseEnter={() => setPreviewByIndex(index + 1)}
+                          onFocus={() => setPreviewByIndex(index + 1)}
                           onClick={() => { onNavigate('shop'); closeShopMenu(); }}
                           className={`rounded-full px-1 text-[12.8px] font-bold uppercase tracking-[0.02em] leading-[1.5] relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
-                            activePreviewCategory.trim().toLowerCase() === cat.trim().toLowerCase() ? 'text-[var(--rb-near-black)]' : 'text-[var(--rb-primary-text)]'
+                            clampedActivePreviewIndex === index + 1 ? 'text-[var(--rb-near-black)]' : 'text-[var(--rb-primary-text)]'
                           }`}
                         >
                           {cat}
-                          {activePreviewCategory.trim().toLowerCase() === cat.trim().toLowerCase() && (
+                          {clampedActivePreviewIndex === index + 1 && (
                             <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="absolute -bottom-2 left-0 w-full h-[1px] bg-[var(--rb-near-black)]" />
                           )}
                         </button>
@@ -508,56 +545,48 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                   </div>
                 )}
 
-                {/* Children subcategories row */}
-                {activeRootSlug && categoryChildren[activeRootSlug]?.length > 0 && (
-                  <div className="flex justify-center gap-4 mb-4 px-6">
-                    {categoryChildren[activeRootSlug].map((child) => (
-                      <button
-                        key={child.slug}
-                        onClick={() => { onNavigate('shop'); closeShopMenu(); }}
-                        className={`rounded-full px-4 py-1.5 text-[12.8px] font-bold tracking-[0.02em] leading-[1.5] transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} text-[var(--rb-primary-text)] hover:text-[var(--rb-near-black)] hover:bg-[var(--rb-bg-surface)]`}
-                      >
-                        {child.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
                 {visiblePreviewProducts.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-6">
-                    {visiblePreviewProducts.map((product) => (
-                    <motion.button
-                      type="button"
-                      key={product.id}
-                      layout
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
+                  <AnimatePresence mode="wait" initial={false} custom={previewDirection}>
+                    <motion.div
+                      key={clampedActivePreviewIndex}
+                      custom={previewDirection}
+                      variants={previewVariants}
+                      initial="enter"
+                      animate="center"
+                      exit="exit"
                       transition={calmTween}
-                      className={`bg-[var(--rb-bg-surface)] rounded-[var(--rb-radius-card)] p-4 flex flex-col group cursor-pointer hover:bg-[var(--rb-bg-light)] transition-colors duration-200 text-left ${FOCUS_VISIBLE_CLASS}`}
-                      onClick={() => { onProductSelect?.(product); setIsShopHovered(false); }}
-                      aria-label={`${t.shopNow} ${product.title ?? product.name}`}
+                      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-6"
                     >
-                      <div className="relative aspect-square mb-3 flex items-center justify-center p-4">
-                        <ImageWithFallback 
-                          src={product.image} 
-                          alt={product.title ?? product.name}
-                          className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-200"
-                        />
-                      </div>
-                      <div className="mt-auto">
-                        <h4 className="text-[14px] font-bold uppercase tracking-[0.02em] text-[var(--rb-near-black)] mb-1">
-                          {product.title ?? product.name}
-                        </h4>
-                        <p className="text-[14px] text-[var(--rb-primary-text)] font-normal tracking-[0.02em] leading-[1.5] mb-2">
-                          {product.description ?? <>{product.originalPrice && <span className="line-through mr-1">{product.originalPrice}</span>}{product.price}</>}
-                        </p>
-                        <span className="text-[12.8px] font-normal uppercase tracking-[0.02em] border-b border-[var(--rb-near-black)] pb-0.5 self-start group-hover:opacity-70 transition-opacity">
-                          {t.shopNow}
-                        </span>
-                      </div>
-                      </motion.button>
-                    ))}
-                  </div>
+                      {visiblePreviewProducts.map((product) => (
+                        <button
+                          type="button"
+                          key={product.id}
+                          className={`bg-[var(--rb-bg-surface)] rounded-[var(--rb-radius-card)] p-4 flex flex-col group cursor-pointer hover:bg-[var(--rb-bg-light)] transition-colors duration-200 text-left ${FOCUS_VISIBLE_CLASS}`}
+                          onClick={() => { onProductSelect?.(product); setIsShopHovered(false); }}
+                          aria-label={`${t.shopNow} ${product.title ?? product.name}`}
+                        >
+                          <div className="relative aspect-square mb-3 flex items-center justify-center p-4">
+                            <ImageWithFallback
+                              src={product.image}
+                              alt={product.title ?? product.name}
+                              className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-200"
+                            />
+                          </div>
+                          <div className="mt-auto">
+                            <h4 className="text-[14px] font-bold uppercase tracking-[0.02em] text-[var(--rb-near-black)] mb-1">
+                              {product.title ?? product.name}
+                            </h4>
+                            <p className="text-[14px] text-[var(--rb-primary-text)] font-normal tracking-[0.02em] leading-[1.5] mb-2">
+                              {product.description ?? <>{product.originalPrice && <span className="line-through mr-1">{product.originalPrice}</span>}{product.price}</>}
+                            </p>
+                            <span className="text-[12.8px] font-normal uppercase tracking-[0.02em] border-b border-[var(--rb-near-black)] pb-0.5 self-start group-hover:opacity-70 transition-opacity">
+                              {t.shopNow}
+                            </span>
+                          </div>
+                        </button>
+                      ))}
+                    </motion.div>
+                  </AnimatePresence>
                 ) : (
                   <div className="px-10 py-16 text-center text-[13px] font-bold uppercase tracking-[0.2em] text-[var(--rb-primary-text)]">
                     product previews unavailable
