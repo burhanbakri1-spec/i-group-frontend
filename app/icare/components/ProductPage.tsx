@@ -312,10 +312,11 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
   }, []);
 
   return (
-    <div className={`bg-[#F1F0ED] min-h-screen overflow-x-hidden selection:bg-[#67645E] selection:text-white ${isRtl ? 'rtl' : 'ltr'}`}>
+    <div className={`bg-white min-h-screen overflow-x-hidden selection:bg-[#67645E] selection:text-white ${isRtl ? 'rtl' : 'ltr'}`}>
       
       {/* 1. HERO SECTION - REFINED FOR MOBILE */}
-      <section className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 p-4 md:p-6 overflow-hidden">
+      <section className="icare-index-section bg-[#F1F0ED] rounded-[12px] overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 md:p-6">
         
         {/* LEFT COLUMN: IMAGE SLIDER */}
         <div className="relative aspect-[4/5] rounded-[12px] group z-0 overflow-hidden bg-[#F1F0ED]">
@@ -432,9 +433,10 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                 </motion.button>
                 <div className="flex items-center justify-center gap-2 text-[9px] md:text-[10px] font-bold text-[#84827E]">
                   {lang === 'en' ? (productAfterpayText || 'Or 4 interest-free payments with') : 'أو 4 دفعات بدون فوائد مع'} <span className="text-black font-black bg-[#ACEBFF] px-1.5 py-0.5 rounded italic">Afterpay</span>
-               </div>
-             </div>
+                </div>
+              </div>
           </div>
+        </div>
         </div>
       </section>
 
@@ -442,8 +444,8 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
       <ProductShowcaseBlock slug={product.slug} lang={lang} />
 
       {/* 2. REVIEWS SECTION */}
-      <section className="px-4 lg:px-6 pb-32">
-        <div className="max-w-[1600px] mx-auto bg-white rounded-[12px] p-8 lg:p-16">
+      <section className="icare-index-section pb-32">
+        <div className="bg-[#F1F0ED] rounded-[12px] overflow-hidden p-8 lg:p-16">
           
           <ScrollReveal direction="bottom" viewportMargin="-60px">
             <div className="border-b border-black/10 pb-8 space-y-8">
@@ -617,7 +619,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
             opacity: showBottomBar ? 1 : 0 
           }}
           transition={{ duration: shouldReduceMotion ? 0 : 0.28, ease: [0.32, 0.72, 0, 1] }}
-          className="fixed bottom-0 left-0 w-full bg-[#F1F0ED] px-4 md:px-8 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex items-center justify-between gap-4 z-50 border-t border-[#DDDDDD]"
+          className="fixed bottom-0 left-0 w-full bg-white px-[var(--icare-section-inset)] py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex items-center justify-between gap-4 z-50 border-t border-[#DDDDDD]"
         >
           <div className="flex min-w-0 items-center gap-3 md:gap-4">
             <div className="w-11 h-11 bg-white rounded-md flex items-center justify-center p-1.5">

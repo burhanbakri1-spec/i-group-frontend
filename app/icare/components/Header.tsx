@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
-import { Menu, Search, ShoppingBag, Globe, Heart } from 'lucide-react';
+import { Menu, Search, ShoppingBag, Globe } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { translations, Language } from '../translations';
 import { useShop } from '../context/ShopContext';
@@ -32,7 +32,7 @@ const PREVIEW_SLIDE_DISTANCE = 60;
 
 export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavigate, onProductSelect, onOpenMenu, isDrawerOpen, lang, onToggleLang }) => {
   const t = translations[lang];
-  const { cartCount, wishlistItems } = useShop();
+  const { cartCount } = useShop();
   const [isShopHovered, setIsShopHovered] = useState(false);
   const [activePreviewIndex, setActivePreviewIndex] = useState(0);
   const [previewDirection, setPreviewDirection] = useState<'left' | 'right'>('right');
@@ -381,7 +381,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                   }
                 }}
                 /* Match Rhode header nav links: 12.8px / 700 / 19.2px / 0.256px ls / uppercase. */
-                className={`rounded-full px-1 text-[12.8px] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
+                className={`rounded-full px-1 text-[clamp(0.875rem,0.6vw+0.75rem,1rem)] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
                 aria-haspopup="true"
                 aria-expanded={isShopHovered}
                 aria-controls={SHOP_MEGA_MENU_ID}
@@ -391,14 +391,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
               <button
                 onClick={() => onNavigate('story')}
                 onMouseEnter={closeShopMenu}
-                className={`rounded-full px-1 text-[12.8px] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
+                className={`rounded-full px-1 text-[clamp(0.875rem,0.6vw+0.75rem,1rem)] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
               >
                 {t.story}
               </button>
               <button
                 onClick={onToggleLang}
                 onMouseEnter={closeShopMenu}
-                className={`text-[12px] font-bold flex items-center gap-2 border px-3 py-1.5 rounded-full transition-colors ${FOCUS_VISIBLE_CLASS} ${isConnected ? 'border-white/35 text-white hover:bg-white/10' : 'border-[var(--rb-border-light)] text-[var(--rb-primary-text)] hover:bg-black/5'}`}
+                className={`text-[clamp(0.875rem,0.6vw+0.75rem,1rem)] font-bold flex items-center gap-2 border px-3 py-1.5 rounded-full transition-colors ${FOCUS_VISIBLE_CLASS} ${isConnected ? 'border-white/35 text-white hover:bg-white/10' : 'border-[var(--rb-border-light)] text-[var(--rb-primary-text)] hover:bg-black/5'}`}
               >
                 <Globe size={14} />
                 {lang === 'en' ? 'العربية' : 'EN'}
@@ -427,39 +427,23 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
             <button
                 onClick={onOpenSearch}
                 onMouseEnter={closeShopMenu}
-                className={`rounded-full px-1 text-[12.8px] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
+                className={`rounded-full px-1 text-[clamp(0.875rem,0.6vw+0.75rem,1rem)] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
                 aria-label={t.search}
             >
               <span className="hidden md:inline">{t.search}</span>
               <Search size={20} className="md:hidden" />
             </button>
             <button
-              onClick={() => onNavigate('wishlist')}
-              onMouseEnter={closeShopMenu}
-              className={`rounded-full px-1 text-[12.8px] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors relative ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
-              aria-label={t.wishlist}
-            >
-              <span className="hidden md:inline">{t.wishlist}</span>
-              <div className="md:hidden relative">
-                <Heart size={20} />
-                {wishlistItems.length > 0 && (
-                  <span className={`absolute -top-2 -right-2 w-5 h-5 text-[10px] font-black rounded-full flex items-center justify-center ${isConnected ? 'bg-white text-[var(--rb-primary-text)]' : 'bg-[var(--rb-primary-text)] text-white'}`}>
-                    {wishlistItems.length}
-                  </span>
-                )}
-              </div>
-            </button>
-            <button
               onClick={() => onNavigate('account')}
               onMouseEnter={closeShopMenu}
-              className={`rounded-full px-1 text-[12.8px] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors hidden md:block ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
+              className={`rounded-full px-1 text-[clamp(0.875rem,0.6vw+0.75rem,1rem)] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors hidden md:block ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
             >
               {t.account}
             </button>
             <button
               onClick={onOpenCart}
               onMouseEnter={closeShopMenu}
-              className={`rounded-full px-1 text-[12.8px] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors relative ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
+              className={`rounded-full px-1 text-[clamp(0.875rem,0.6vw+0.75rem,1rem)] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors relative ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
               aria-label={t.cart}
             >
               <span className="hidden md:inline">{t.cart} ({cartCount})</span>

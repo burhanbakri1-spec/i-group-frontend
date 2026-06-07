@@ -832,11 +832,9 @@
   .icare-split-banner__media {
     position: relative;
     order: 2;
-  }
-
-  .icare-split-banner__media {
-    position: relative;
-    order: 2;
+    flex: 1;
+    min-height: 0;
+    max-height: 28rem;
   }
 
   .icare-full-banner {
@@ -884,7 +882,7 @@
   }
 
   .icare-morning-panel {
-    min-height: 44.25rem;
+    height: 28rem;
     overflow: hidden;
     border-radius: var(--icare-section-radius);
     background: var(--rb-pure-white);

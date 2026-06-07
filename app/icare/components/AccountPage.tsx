@@ -133,9 +133,11 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
   };
 
   return (
-    <div className="min-h-screen md:h-screen bg-[#F1F0ED] p-4 md:p-6 lg:p-12 mb-12 md:mb-0 flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 lg:gap-8 overflow-y-auto md:overflow-hidden">
+    <div className="min-h-screen bg-white">
+      <section className="icare-index-section bg-[#F1F0ED] rounded-[12px] overflow-hidden" style={{ marginTop: 'var(--icare-hero-flow-offset)' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 items-stretch">
       {/* Left Section: Image and Message */}
-      <div className="md:w-1/2 relative h-[45vh] md:h-[80vh] w-full overflow-hidden rounded-[32px]">
+      <div className="relative h-[45vh] md:h-[80vh] w-full overflow-hidden z-0">
         <ImageWithFallback 
           src={loginImage} 
           alt="Skin Investment" 
@@ -150,7 +152,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
       </div>
 
       {/* Right Section: Login Form */}
-      <div className="md:w-1/2 bg-[#F2F1ED] flex items-center justify-center p-8 md:p-12 rounded-[32px] w-full h-auto md:h-[80vh]">
+      <div className="bg-[#F2F1ED] flex items-center justify-center p-8 md:p-12 w-full h-auto md:h-[80vh] z-10">
         <motion.div 
           initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
           animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
@@ -462,6 +464,8 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
           </div>}
         </motion.div>
       </div>
+        </div>
+      </section>
     </div>
   );
 };

@@ -56,7 +56,7 @@ const DEFAULT_VALUES_IMAGE = 'https://images.unsplash.com/photo-1642080668102-dc
 const DEFAULT_TEAM_1_IMAGE = 'https://images.unsplash.com/photo-1702261347927-11207f77e751?q=80&w=800';
 const DEFAULT_TEAM_2_IMAGE = 'https://images.unsplash.com/photo-1763692108454-6cfa2b0af5c1?q=80&w=800';
 const DEFAULT_TEAM_3_IMAGE = 'https://images.unsplash.com/photo-1631214565164-dd0b7fba0295?q=80&w=800';
-const DEFAULT_SIGNATURE_IMAGE = 'https://via.placeholder.com/200x60/000000/FFFFFF?text=iCare+Beauty';
+
 
 export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
@@ -68,7 +68,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
     aboutTeamMember1Name, aboutTeamMember1Title, aboutTeamMember1Image,
     aboutTeamMember2Name, aboutTeamMember2Title, aboutTeamMember2Image,
     aboutTeamMember3Name, aboutTeamMember3Title, aboutTeamMember3Image,
-    aboutValuesImage, aboutFounderNoteHeading, aboutFounderLetter, aboutFounderSignatureImage,
+    aboutValuesImage, aboutFounderNoteHeading, aboutFounderLetter,
   } = useSiteContent();
 
   const valuesData = [
@@ -87,7 +87,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
   ];
 
   return (
-    <div className="bg-[#F1F0ED]">
+    <div className="bg-white">
+      {/* 1. HERO */}
       <PageHero
         image={aboutHeroImage}
         fallbackImage={DEFAULT_HERO_IMAGE}
@@ -99,38 +100,36 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
       />
 
       {/* 2. INTENTIONAL SKINCARE SECTION */}
-      <section className="bg-[#F1F0ED] py-8 px-4 md:px-8">
-        <div className="max-w-[1600px] mx-auto relative">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 items-center">
-            <ScrollReveal direction="left" viewportMargin="-80px">
-              <div className="rounded-[16px] overflow-hidden aspect-[4/5] lg:aspect-auto lg:h-[80vh] z-0">
-                <ImageWithFallback 
-                  src={aboutIntentionalImage || DEFAULT_INTENTIONAL_IMAGE} 
-                  alt="Intentional Skincare" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </ScrollReveal>
-            <ScrollReveal direction="right" viewportMargin="-80px">
-              <div className="lg:absolute lg:right-20 lg:top-1/2 lg:-translate-y-1/2 bg-[#F2F1ED] p-10 md:p-20 rounded-[16px] lg:max-w-xl -mt-20 mx-4 lg:mt-0 lg:mx-0 z-10">
-                <h2 className="text-[32px] md:text-[48px] font-bold tracking-tight text-[#67645E] mb-6 lowercase">
-                  {aboutIntentionalTitle}
-                </h2>
-                <p className="text-[16px] md:text-[18px] text-[#84827E] leading-[1.6]">
-                  {aboutIntentionalText}
-                </p>
-              </div>
-            </ScrollReveal>
-          </div>
+      <section className="icare-index-section bg-[#F1F0ED] rounded-[12px] overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 items-center">
+          <ScrollReveal direction="left" viewportMargin="-80px">
+            <div className="overflow-hidden aspect-[4/5] lg:aspect-auto lg:h-[80vh] z-0">
+              <ImageWithFallback 
+                src={aboutIntentionalImage || DEFAULT_INTENTIONAL_IMAGE} 
+                alt="Intentional Skincare" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </ScrollReveal>
+          <ScrollReveal direction="right" viewportMargin="-80px">
+            <div className="bg-[#F2F1ED] p-10 md:p-20 rounded-[16px] lg:max-w-xl -mt-20 mx-4 lg:mt-0 lg:mx-0 z-10">
+              <h2 className="text-[32px] md:text-[48px] font-bold tracking-tight text-[#67645E] mb-6 lowercase">
+                {aboutIntentionalTitle}
+              </h2>
+              <p className="text-[16px] md:text-[18px] text-[#84827E] leading-[1.6]">
+                {aboutIntentionalText}
+              </p>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
       {/* 3. OUR FOUNDATION SECTION */}
-      <section className="py-8 md:py-12 px-4 md:px-12 bg-[#F1F0ED]">
+      <section className="icare-index-section bg-[#F1F0ED] rounded-[12px] overflow-hidden py-8 md:py-12 px-4 md:px-12">
         <div className="max-w-[1600px] mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <ScrollReveal direction="left" viewportMargin="-80px">
-              <div className="space-y-8 md:space-y-10 order-2 lg:order-1 px-4 lg:px-0">
+              <div className="flex flex-col items-center space-y-8 md:space-y-10 order-2 lg:order-1 px-4 lg:px-0">
                 <div className="space-y-2">
                   <span className="text-[10px] font-black tracking-[0.3em] uppercase text-[#999]">{aboutFoundationLabel}</span>
                   <h2 className="text-[42px] md:text-[64px] font-bold leading-[0.9] tracking-[-0.04em] text-[#67645E] lowercase">
@@ -161,9 +160,9 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* 4. OUR VALUES ACCORDION SECTION */}
-      <section className="py-8 px-4 md:px-8 bg-[#F1F0ED]">
+      <section className="icare-index-section bg-[#F1F0ED] rounded-[12px] overflow-hidden py-8 px-4 md:px-8">
         <div className="max-w-[1600px] mx-auto relative">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-0 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 items-stretch">
             <ScrollReveal direction="left" viewportMargin="-80px">
               <div className="rounded-[16px] overflow-hidden aspect-[4/5] lg:aspect-auto lg:h-[80vh]">
                 <ImageWithFallback 
@@ -193,7 +192,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* 5. OUR CREW SECTION */}
-      <section className="py-10 px-4 md:px-8 bg-[#F1F0ED] overflow-hidden">
+      <section className="icare-index-section bg-[#F1F0ED] rounded-[12px] overflow-hidden py-10 px-4 md:px-8">
         <div className="max-w-[1600px] mx-auto space-y-12 md:space-y-16">
           <ScrollReveal direction="bottom" viewportMargin="-60px">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-black/10 pb-10">
@@ -265,9 +264,9 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* 6. A NOTE FROM OUR FOUNDER */}
-      <section className="py-12 px-6 md:px-12 bg-[#F2F1ED] min-h-[70vh] flex items-center">
+      <section className="icare-index-section bg-[#F2F1ED] rounded-[12px] overflow-hidden py-12 px-6 md:px-12 min-h-[50vh] flex items-center">
         <ScrollReveal direction="bottom" viewportMargin="-60px">
-          <div className="max-w-4xl mx-auto text-center space-y-12">
+          <div className="max-w-4xl mx-auto text-center space-y-8">
             <h2 className="text-[12px] font-black tracking-[0.3em] uppercase text-[#706E6A]">
               {aboutFounderNoteHeading}
             </h2>
@@ -275,16 +274,6 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             <p className="text-[20px] md:text-[26px] text-[#67645E] leading-[1.6] font-[400] tracking-tight">
               {aboutFounderLetter}
             </p>
-
-            <div className="flex flex-col items-center pt-8">
-              <div className="w-48 h-20 relative">
-                <ImageWithFallback 
-                  src={aboutFounderSignatureImage || DEFAULT_SIGNATURE_IMAGE} 
-                  alt="Founder Signature" 
-                  className="w-full h-full object-contain mix-blend-multiply"
-                />
-              </div>
-            </div>
           </div>
         </ScrollReveal>
       </section>

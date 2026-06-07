@@ -669,8 +669,8 @@ function renderMixedLayoutUnits(units: ShowcaseUnit[], shouldReduceMotion: boole
 
 function SkeletonLoader() {
   return (
-    <section className="bg-[#F1F0ED] py-12 md:py-20">
-      <div className="max-w-[1600px] mx-auto px-4 lg:px-12">
+    <section className="icare-index-section bg-[#F1F0ED] rounded-[12px] overflow-hidden py-12 md:py-20">
+      <div className="max-w-[1600px] mx-auto px-[var(--icare-section-inset)]">
         <div className="flex flex-col gap-8 md:gap-12">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="w-full border-b border-black/10 pb-8 md:pb-12 last:border-b-0 last:pb-0 animate-pulse motion-reduce:animate-none">
@@ -711,8 +711,8 @@ export const ProductShowcaseBlock: React.FC<ProductShowcaseBlockProps> = ({ slug
   if (activeUnits.length === 0) return null;
 
   return (
-    <section className="overflow-hidden bg-[#F1F0ED] py-12 md:py-20">
-      <div className="max-w-[1600px] mx-auto px-4 lg:px-12">
+    <section className="icare-index-section bg-[#F1F0ED] rounded-[12px] overflow-hidden py-12 md:py-20">
+      <div className="max-w-[1600px] mx-auto px-[var(--icare-section-inset)]">
         <div className={`flex flex-col ${LAYOUT_GAP}`}>{renderMixedLayoutUnits(activeUnits, shouldReduceMotion)}</div>
       </div>
     </section>

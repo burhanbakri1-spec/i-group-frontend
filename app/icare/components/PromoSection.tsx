@@ -14,7 +14,7 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) 
   const shouldReduceMotion = useReducedMotion();
   const { promoBadge, promoHeadline, promoDescription, promoCtaLabel, promoImage } = useSiteContent();
   return (
-    <section className="icare-index-section icare-split-banner overflow-hidden rounded-[var(--icare-section-radius)] p-[var(--icare-section-inset)]">
+    <section className="icare-index-section icare-split-banner rounded-[var(--icare-section-radius)] p-[var(--icare-section-inset)]">
       <div className="contents">
         
         {/* Left Side: Content Section */}
@@ -96,7 +96,7 @@ viewport={{ once: false }}
             <ImageWithFallback 
               src={promoImage} 
               alt="icare Pocket Blush" 
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
           </motion.div>
           

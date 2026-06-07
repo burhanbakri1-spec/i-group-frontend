@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
-import { X, ShoppingBag, Heart, Globe } from 'lucide-react';
+import { X, ShoppingBag, Globe } from 'lucide-react';
 import { Language } from '../translations';
 import { useShop } from '../context/ShopContext';
 import { ImageWithFallback } from './figma/ImageWithFallback';
@@ -28,7 +28,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
   void onOpenSearch;
   const [activeCategory, setActiveCategory] = useState(SHOP_ALL_CATEGORY);
   const [remoteProducts, setRemoteProducts] = useState<Product[]>([]);
-  const { cartCount, wishlistItems } = useShop();
+  const { cartCount } = useShop();
   const { socialLinks: rawSocialLinks } = useSiteContent();
   const shouldReduceMotion = useReducedMotion();
   const calmTween = shouldReduceMotion ? { duration: 0 } : { duration: 0.22, ease: 'easeOut' as const };
@@ -92,14 +92,6 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
                 <span className="text-[12px] font-bold text-[var(--rb-primary-text)] uppercase">
                   {lang === 'en' ? 'AR' : 'EN'}
                 </span>
-              </button>
-              <button onClick={() => { onNavigate('wishlist'); onClose(); }} className={`p-2 relative rounded-full hover:bg-black/5 transition-colors ${FOCUS_VISIBLE_CLASS}`} aria-label="Open wishlist">
-                <Heart size={22} className="text-[var(--rb-primary-text)]" />
-                {wishlistItems.length > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-[var(--rb-primary-text)] text-white text-[10px] font-black rounded-full flex items-center justify-center">
-                    {wishlistItems.length}
-                  </span>
-                )}
               </button>
               <button onClick={() => { onOpenCart(); onClose(); }} className={`p-2 relative rounded-full hover:bg-black/5 transition-colors ${FOCUS_VISIBLE_CLASS}`} aria-label="Open cart">
                 <ShoppingBag size={22} className="text-[var(--rb-primary-text)]" />

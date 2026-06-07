@@ -83,7 +83,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
         
         {/* Left Column: Lifestyle Image */}
         <ScrollReveal direction="left" viewportMargin="-80px">
-          <div className="icare-morning-panel relative aspect-[3/4] md:aspect-auto">
+          <div className="icare-morning-panel relative aspect-[3/4] md:aspect-auto md:min-h-[44.25rem]">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentIndex}
@@ -96,7 +96,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
                 <ImageWithFallback 
                   src={current.images?.[1] ?? current.images?.[0] ?? current.image}
                   alt={current.title ?? current.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover object-center"
                 />
               </motion.div>
             </AnimatePresence>
@@ -116,7 +116,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
 
         {/* Right Column: Product Info Box */}
         <ScrollReveal direction="right" viewportMargin="-80px">
-          <div className="icare-morning-panel relative flex flex-col justify-between p-5 sm:p-8 md:p-8">
+          <div className="icare-morning-panel relative flex flex-col justify-between p-5 sm:p-8 md:p-8 md:min-h-[44.25rem]">
           
           <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 flex justify-between px-1 md:px-8 z-20 pointer-events-none">
             <motion.button 
@@ -143,7 +143,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
             </motion.button>
           </div>
 
-          <div className="flex-1 flex items-center justify-center py-2 md:py-10">
+          <div className="h-full flex items-center justify-center py-0">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentIndex}
@@ -151,7 +151,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-                className="w-full max-w-[140px] sm:max-w-[260px] md:max-w-[380px]"
+                className="w-full"
               >
                 <ImageWithFallback 
                   src={current.image}

@@ -180,18 +180,16 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ onProductSelect, p
 
   if (remoteProducts === null) {
     return (
-      <section className="bg-[#F1F0ED] pt-12 pb-24 lg:pb-32 overflow-hidden">
-        <div className="max-w-[1600px] mx-auto px-4 lg:px-12">
-          <div className="rounded-[12px] bg-white p-12">
-            <div className="flex gap-5 md:gap-8 overflow-hidden">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="flex-shrink-0 w-[280px] space-y-3">
-                  <SkeletonPulse className="aspect-square w-full rounded-xl" />
-                  <SkeletonPulse className="h-4 w-2/3 rounded" />
-                  <SkeletonPulse className="h-4 w-1/3 rounded" />
-                </div>
-              ))}
-            </div>
+      <section className="bg-[#F1F0ED] overflow-hidden pt-12 pb-24 lg:pb-32">
+        <div className="max-w-[1600px] mx-auto px-[var(--icare-section-inset)]">
+          <div className="flex gap-5 md:gap-8 overflow-hidden">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="flex-shrink-0 w-[280px] space-y-3">
+                <SkeletonPulse className="aspect-square w-full rounded-xl" />
+                <SkeletonPulse className="h-4 w-2/3 rounded" />
+                <SkeletonPulse className="h-4 w-1/3 rounded" />
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -200,17 +198,15 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ onProductSelect, p
 
   if (error) {
     return (
-      <section className="bg-[#F1F0ED] pt-12 pb-24 lg:pb-32 overflow-hidden">
-        <div className="max-w-[1600px] mx-auto px-4 lg:px-12">
-          <div className="rounded-[12px] bg-white p-12 text-center space-y-4">
-            <p className="text-[13px] text-red-600 font-medium">{error}</p>
-            <button
-              onClick={loadProducts}
-              className={`px-6 py-2 bg-[#67645E] text-white rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#67645E]/90 transition-colors ${CONTROL_FOCUS_CLASS}`}
-            >
-              Retry
-            </button>
-          </div>
+      <section className="bg-[#F1F0ED] overflow-hidden pt-12 pb-24 lg:pb-32">
+        <div className="max-w-[1600px] mx-auto px-[var(--icare-section-inset)] text-center space-y-4">
+          <p className="text-[13px] text-red-600 font-medium">{error}</p>
+          <button
+            onClick={loadProducts}
+            className={`px-6 py-2 bg-[#67645E] text-white rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#67645E]/90 transition-colors ${CONTROL_FOCUS_CLASS}`}
+          >
+            Retry
+          </button>
         </div>
       </section>
     );
@@ -218,19 +214,17 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ onProductSelect, p
 
   if (items.length === 0) {
     return (
-      <section className="bg-[#F1F0ED] pt-12 pb-24 lg:pb-32 overflow-hidden">
-        <div className="max-w-[1600px] mx-auto px-4 lg:px-12">
-          <div className="rounded-[12px] bg-white p-12 text-center text-[12px] font-bold uppercase tracking-[0.2em] text-[#84827E]">
-            no related products are available yet
-          </div>
+      <section className="bg-[#F1F0ED] overflow-hidden pt-12 pb-24 lg:pb-32">
+        <div className="max-w-[1600px] mx-auto px-[var(--icare-section-inset)] text-center text-[12px] font-bold uppercase tracking-[0.2em] text-[#84827E]">
+          no related products are available yet
         </div>
       </section>
     );
   }
 
   return (
-    <section className="bg-[#F1F0ED] pt-12 pb-24 lg:pb-32 overflow-hidden">
-      <div className="max-w-[1600px] mx-auto px-4 lg:px-12 relative group">
+    <section className="bg-[#F1F0ED] overflow-hidden pt-12 pb-24 lg:pb-32">
+      <div className="max-w-[1600px] mx-auto px-[var(--icare-section-inset)] relative group">
         <div 
           ref={scrollRef}
           className="flex gap-5 md:gap-8 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-8 scroll-px-4"

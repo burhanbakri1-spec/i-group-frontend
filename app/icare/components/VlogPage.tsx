@@ -128,7 +128,7 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
   const heroImage = normalizeVlogHeroImageUrl(vlogHeroImage);
 
   return (
-    <div className="min-h-screen bg-[#F1F0ED] pb-32">
+    <div className="min-h-screen bg-white pb-32">
       <PageHero
         image={heroImage}
         fallbackImage={VLOG_HERO_FALLBACK_IMAGE}
@@ -138,7 +138,7 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
       />
 
       {/* 2. Vlog Grid */}
-      <section className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 md:pt-12">
+      <section className="icare-index-section bg-[#F1F0ED] rounded-[12px] overflow-hidden py-8 md:py-12 px-4 sm:px-6 lg:px-8">
         {isLoading ? (
           <VlogGridSkeleton count={6} />
         ) : error ? (

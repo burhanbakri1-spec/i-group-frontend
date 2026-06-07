@@ -44,7 +44,7 @@ export const IcareRoutePage = ({ page }: { page: IcarePageKey }) => {
     case 'checkout':
       return <CheckoutPage lang={lang} onNavigate={navigateToPage} />;
     case 'wishlist':
-      return <WishlistPage lang={lang} onProductSelect={navigateToProduct} onNavigate={navigateToPage} />;
+      return null;
     case 'cart':
       return <CartPage />;
     case 'shipping':
