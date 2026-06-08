@@ -599,6 +599,10 @@ export interface OrderSummaryItem {
   totalPrice: number;
 }
 
+export interface OrderDetailItem extends OrderSummaryItem {
+  id: number;
+}
+
 export interface OrderSummary {
   items: OrderSummaryItem[];
   subtotal: number;
@@ -640,6 +644,7 @@ export interface CreatedOrder {
   shippingPostalCode?: string;
   shippingCountry?: string;
   statusHistory?: Array<{ status: string; comment?: string | null; createdAt: string }>;
+  items?: OrderDetailItem[];
   guestEmail?: string | null;
   guestPhone?: string | null;
   guestSessionToken?: string | null;
