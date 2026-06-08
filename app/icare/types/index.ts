@@ -54,6 +54,8 @@ export interface Product {
   rawPrice?: number;
   date?: string;
   variants?: ProductVariant[];
+  /** Color options managed at the product level. */
+  colors?: ProductColor[];
   backendProduct?: BackendProduct;
   cartLineId?: string;
   sourceProductId?: string;
@@ -256,6 +258,27 @@ export interface BackendBrand {
   productCount?: number;
 }
 
+export interface ProductColor {
+  id: number;
+  name: string;
+  hexCode: string;
+  image?: string | null;
+  isActive?: boolean;
+  sortOrder?: number;
+}
+
+export interface ProductVariantColor {
+  id: number;
+  colorId: number;
+  stockQuantity: number;
+  stockStatus: string;
+  image?: string | null;
+  sku?: string | null;
+  sortOrder?: number;
+  isActive?: boolean;
+  color?: ProductColor | null;
+}
+
 export interface ProductVariant {
   id: number;
   name: string;
@@ -269,6 +292,8 @@ export interface ProductVariant {
   stockStatus?: string;
   isActive?: boolean;
   isDefault?: boolean;
+  /** Per-color stock and image data, populated when colors are managed at the variant level. */
+  variantColors?: ProductVariantColor[];
 }
 
 export interface BackendProductImage {
@@ -313,6 +338,8 @@ export interface BackendProduct {
   category?: BackendCategory | null;
   images?: BackendProductImage[];
   variants?: ProductVariant[];
+  /** Color options managed at the product level (per-product color palette). */
+  colors?: ProductColor[];
   reviews?: BackendProductReviewsSummary;
 }
 
@@ -525,8 +552,6 @@ export interface CreateOrderInput {
   guestPhone?: string;
   items?: OrderItemInput[];
   addressId?: number;
-  shippingLatitude?: number;
-  shippingLongitude?: number;
 }
 
 export interface UserAddress {
@@ -614,9 +639,6 @@ export interface CreatedOrder {
   shippingState?: string;
   shippingPostalCode?: string;
   shippingCountry?: string;
-  shippingLatitude?: number | null;
-  shippingLongitude?: number | null;
-  items?: Array<OrderSummaryItem & { id: number }>;
   statusHistory?: Array<{ status: string; comment?: string | null; createdAt: string }>;
   guestEmail?: string | null;
   guestPhone?: string | null;

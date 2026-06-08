@@ -95,11 +95,28 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
     }
   };
 
+  /** Human-readable label for each order status. */
+  const statusLabel = (status: string): string => {
+    const s = status.toLowerCase();
+    if (s === 'pending') return 'Pending';
+    if (s === 'reviewed') return 'Reviewed';
+    if (s === 'confirmed') return 'Confirmed';
+    if (s === 'processing') return 'Processing';
+    if (s === 'shipped') return 'Shipped';
+    if (s === 'out_for_delivery') return 'Out for Delivery';
+    if (s === 'delivered') return 'Delivered';
+    if (s === 'cancelled' || s === 'canceled') return 'Cancelled';
+    return status;
+  };
+
   const statusBadgeClass = (status: string): string => {
     const s = status.toLowerCase();
     if (s === 'pending') return 'bg-amber-100 text-amber-800';
+    if (s === 'reviewed') return 'bg-blue-100 text-blue-800';
     if (s === 'confirmed' || s === 'processing') return 'bg-blue-100 text-blue-800';
-    if (s === 'shipped' || s === 'delivered') return 'bg-green-100 text-green-800';
+    if (s === 'shipped') return 'bg-indigo-100 text-indigo-800';
+    if (s === 'out_for_delivery') return 'bg-purple-100 text-purple-800';
+    if (s === 'delivered') return 'bg-green-100 text-green-800';
     if (s === 'cancelled' || s === 'canceled') return 'bg-red-100 text-red-800';
     return 'bg-gray-100 text-gray-600';
   };
@@ -109,9 +126,15 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
     return new Intl.DateTimeFormat(lang === 'ar' ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(iso));
   };
 
+  /**
+   * Orders can be cancelled while they haven't been handed off to
+   * delivery yet — pending, reviewed, confirmed, and processing
+   * are all cancellable. shipped, out_for_delivery, delivered,
+   * and cancelled are NOT.
+   */
   const isCancellable = (status: string) => {
     const s = status.toLowerCase();
-    return s === 'pending' || s === 'confirmed';
+    return s === 'pending' || s === 'reviewed' || s === 'confirmed' || s === 'processing';
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -236,7 +259,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                             </div>
                             <div className="flex items-center gap-3 flex-shrink-0">
                               <span className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full ${statusBadgeClass(order.status)}`}>
-                                {order.status}
+                                {statusLabel(order.status)}
                               </span>
                               <span className="text-[11px] font-bold text-[#5C5A56] whitespace-nowrap">
                                 USD {order.total.toFixed(0)}
@@ -327,13 +350,16 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                                             const s = entry.status.toLowerCase();
                                             const dotColor =
                                               s === 'cancelled' || s === 'canceled' ? 'bg-red-400' :
-                                              s === 'delivered' || s === 'shipped' ? 'bg-green-400' :
+                                              s === 'delivered' ? 'bg-green-400' :
+                                              s === 'out_for_delivery' ? 'bg-purple-400' :
+                                              s === 'shipped' ? 'bg-indigo-400' :
+                                              s === 'reviewed' ? 'bg-blue-400' :
                                               'bg-[#5C5A56]';
                                             return (
                                               <div key={idx} className="flex items-start gap-2 pb-1.5">
                                                 <div className={`w-2 h-2 rounded-full mt-1 flex-shrink-0 ${dotColor}`} />
                                                 <div>
-                                                  <p className="text-[11px] font-bold text-[#5C5A56]">{entry.status}</p>
+                                                  <p className="text-[11px] font-bold text-[#5C5A56]">{statusLabel(entry.status)}</p>
                                                   <p className="text-[9px] text-[#5C5A56]/70">{formatDate(entry.createdAt)}</p>
                                                   {entry.comment && (
                                                     <p className="text-[10px] text-[#5C5A56]/75 italic">{entry.comment}</p>

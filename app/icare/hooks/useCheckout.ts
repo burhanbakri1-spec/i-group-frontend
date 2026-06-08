@@ -42,8 +42,6 @@ interface PersistedCheckoutState {
   step: number;
   paymentMethod: 'cod' | 'card' | 'paypal';
   shippingForm: ShippingFormData;
-  mapLat: number | null;
-  mapLng: number | null;
   selectedAddressId: number | null;
   appliedCoupon: string | null;
   timestamp: number;
@@ -85,8 +83,6 @@ function writeCheckoutState(state: Partial<PersistedCheckoutState>) {
         country: '',
         deliveryNotes: '',
       },
-      mapLat: null,
-      mapLng: null,
       selectedAddressId: null,
       appliedCoupon: null,
       timestamp: Date.now(),
@@ -141,8 +137,6 @@ export interface CheckoutState {
   /** Single payment status enum — replaces verifyingPayment + paymentVerified booleans */
   paymentStatus: 'idle' | 'processing' | 'success' | 'failed' | 'not_applicable';
   shippingForm: ShippingFormData;
-  mapLat: number | null;
-  mapLng: number | null;
   savedAddresses: UserAddress[];
   selectedAddress: UserAddress | null;
   appliedCoupon: string | null;
@@ -164,7 +158,6 @@ export interface CheckoutActions {
   /** Update payment status after manual verification (e.g., callback page) */
   setPaymentStatus: (status: CheckoutState['paymentStatus']) => void;
   placeOrder: () => Promise<void>;
-  handleLocationSelect: (lat: number, lng: number) => void;
   selectSavedAddress: (address: UserAddress) => void;
   applyCoupon: (code: string) => void;
   removeCoupon: () => void;
@@ -239,8 +232,6 @@ export function useCheckout(lang: Language): UseCheckoutReturn {
     country: persisted?.shippingForm?.country ?? user?.country ?? '',
     deliveryNotes: persisted?.shippingForm?.deliveryNotes ?? '',
   }));
-  const [mapLat, setMapLat] = useState<number | null>(persisted?.mapLat ?? null);
-  const [mapLng, setMapLng] = useState<number | null>(persisted?.mapLng ?? null);
   const [savedAddresses, setSavedAddresses] = useState<UserAddress[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<UserAddress | null>(null);
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(persisted?.appliedCoupon ?? null);
@@ -256,8 +247,6 @@ export function useCheckout(lang: Language): UseCheckoutReturn {
         step,
         paymentMethod,
         shippingForm,
-        mapLat,
-        mapLng,
         selectedAddressId: selectedAddress?.id ?? null,
         appliedCoupon,
       });
@@ -266,8 +255,6 @@ export function useCheckout(lang: Language): UseCheckoutReturn {
           step,
           paymentMethod,
           shippingForm,
-          mapLat,
-          mapLng,
           selectedAddressId: selectedAddress?.id ?? null,
           appliedCoupon,
         });
@@ -280,7 +267,7 @@ export function useCheckout(lang: Language): UseCheckoutReturn {
         storageTimerRef.current = null;
       }
     };
-  }, [step, paymentMethod, shippingForm, mapLat, mapLng, selectedAddress?.id, appliedCoupon]);
+  }, [step, paymentMethod, shippingForm, selectedAddress?.id, appliedCoupon]);
 
   // ── Fire analytics on mount ──
   useEffect(() => {
@@ -436,17 +423,8 @@ export function useCheckout(lang: Language): UseCheckoutReturn {
     [],
   );
 
-  // ── Location handlers ──
-  const handleLocationSelect = useCallback((lat: number, lng: number) => {
-    setMapLat(lat);
-    setMapLng(lng);
-    setSelectedAddress(null);
-  }, []);
-
   const selectSavedAddress = useCallback((address: UserAddress) => {
     setSelectedAddress(address);
-    setMapLat(address.latitude);
-    setMapLng(address.longitude);
   }, []);
 
   // ── Coupon handlers ──
@@ -517,10 +495,6 @@ export function useCheckout(lang: Language): UseCheckoutReturn {
     if (selectedAddress?.id) {
       baseOrder.addressId = selectedAddress.id;
     }
-    if (mapLat !== null && mapLng !== null) {
-      baseOrder.shippingLatitude = mapLat;
-      baseOrder.shippingLongitude = mapLng;
-    }
 
     // Attach coupon code if present
     if (appliedCoupon) {
@@ -528,7 +502,7 @@ export function useCheckout(lang: Language): UseCheckoutReturn {
     }
 
     return baseOrder;
-  }, [shippingForm, paymentMethod, selectedAddress?.id, mapLat, mapLng, appliedCoupon]);
+  }, [shippingForm, paymentMethod, selectedAddress?.id, appliedCoupon]);
 
   // ── Validation ──
   const validateCheckout = useCallback(() => {
@@ -677,8 +651,6 @@ export function useCheckout(lang: Language): UseCheckoutReturn {
     summaryLoading,
     paymentStatus,
     shippingForm,
-    mapLat,
-    mapLng,
     savedAddresses,
     selectedAddress,
     appliedCoupon,
@@ -695,7 +667,6 @@ export function useCheckout(lang: Language): UseCheckoutReturn {
     updateShippingField,
     setPaymentStatus,
     placeOrder,
-    handleLocationSelect,
     selectSavedAddress,
     applyCoupon,
     removeCoupon,

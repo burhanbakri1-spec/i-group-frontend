@@ -219,6 +219,7 @@ export const mapBackendProductToProduct = (product: BackendProduct, selectedVari
     rawPrice: displayPrice,
     date: product.createdAt,
     variants: product.variants,
+    colors: product.colors,
     backendProduct: product,
   };
 };

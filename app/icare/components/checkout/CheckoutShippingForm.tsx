@@ -1,30 +1,17 @@
 'use client';
 
 import React, { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
-import dynamic from 'next/dynamic';
 import { Language, checkoutTranslations } from '../../translations';
 import { ShippingFormData } from '../../hooks/useCheckout';
 import { CartItem, UserAddress } from '../../types';
 import { validateCheckout, ValidationResult } from '../../lib/checkout/validate-checkout';
 
-const MAP_PICKER_FRAME_CLASS =
-  'w-full h-64 md:h-80 rounded-[12px] overflow-hidden border border-[#DDDDDD] mb-4';
 const CONTROL_FOCUS_CLASS =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 const INPUT_FOCUS_CLASS =
   'focus-visible:outline-none focus-visible:border-[#67645E] focus-visible:ring-2 focus-visible:ring-[#7B7872]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 const CHECKOUT_INPUT_CLASS = `w-full px-4 py-3 border border-[#DDDDDD] rounded text-[#67645E] placeholder:text-[#84827E] transition-[border-color,box-shadow] duration-200 ${INPUT_FOCUS_CLASS}`;
 const INPUT_ERROR_CLASS = `w-full px-4 py-3 border rounded text-[#67645E] placeholder:text-[#84827E] transition-[border-color,box-shadow] duration-200 border-red-500 ${INPUT_FOCUS_CLASS}`;
-
-const MapAddressPicker = dynamic(() => import('../MapAddressPicker'), {
-  ssr: false,
-  loading: () => (
-    <div
-      className={`${MAP_PICKER_FRAME_CLASS} bg-gray-50 animate-pulse motion-reduce:animate-none`}
-      aria-hidden="true"
-    />
-  ),
-});
 
 export interface CheckoutShippingFormHandle {
   validate: () => ValidationResult;
@@ -34,85 +21,11 @@ interface CheckoutShippingFormProps {
   lang: Language;
   shippingForm: ShippingFormData;
   updateShippingField: (field: keyof ShippingFormData, value: string) => void;
-  mapLat: number | null;
-  mapLng: number | null;
-  onLocationSelect: (lat: number, lng: number) => void;
   savedAddresses: UserAddress[];
   selectedAddress: UserAddress | null;
   onSelectSavedAddress: (address: UserAddress) => void;
   checkoutShippingHeading: string;
   cartItems: CartItem[];
-}
-
-/**
- * Parses a Nominatim display_name and address components into discrete
- * street / city / region / country / postalCode fields.
- *
- * Uses Nominatim's `address` object when available (precise), falls back
- * to heuristic splitting of `display_name` by comma.
- */
-function parseResolvedAddress(
-  displayName: string,
-  addressComponents?: Record<string, string>,
-): {
-  street: string;
-  city: string;
-  region: string;
-  country: string;
-  postalCode: string;
-} {
-  const result = { street: '', city: '', region: '', country: '', postalCode: '' };
-
-  if (addressComponents) {
-    // Nominatim address object — precise field extraction
-    result.street = [
-      addressComponents.house_number,
-      addressComponents.road,
-      addressComponents.pedestrian,
-      addressComponents.footway,
-    ]
-      .filter(Boolean)
-      .join(' ') || addressComponents.neighbourhood || addressComponents.suburb || '';
-
-    result.city =
-      addressComponents.city ||
-      addressComponents.town ||
-      addressComponents.village ||
-      addressComponents.municipality ||
-      '';
-
-    result.region =
-      addressComponents.state ||
-      addressComponents.region ||
-      addressComponents.province ||
-      addressComponents.county ||
-      '';
-
-    result.country = addressComponents.country || '';
-
-    result.postalCode = addressComponents.postcode || '';
-  }
-
-  // Fallback: heuristic comma-splitting of display_name
-  // Nominatim format is typically: detail, street, city, region, country
-  if (displayName) {
-    const parts = displayName.split(',').map((s) => s.trim());
-
-    if (!result.country && parts.length > 0) {
-      result.country = parts[parts.length - 1];
-    }
-    if (!result.region && parts.length > 1 && parts.length >= 4) {
-      result.region = parts[parts.length - 2];
-    }
-    if (!result.city && parts.length > 2 && parts.length >= 3) {
-      result.city = parts[parts.length - 3];
-    }
-    if (!result.street && parts.length > 3) {
-      result.street = parts.slice(0, parts.length - 3).join(', ');
-    }
-  }
-
-  return result;
 }
 
 export const CheckoutShippingForm = forwardRef<
@@ -124,9 +37,6 @@ export const CheckoutShippingForm = forwardRef<
       lang,
       shippingForm,
       updateShippingField,
-      mapLat,
-      mapLng,
-      onLocationSelect,
       savedAddresses,
       selectedAddress,
       onSelectSavedAddress,
@@ -153,26 +63,6 @@ export const CheckoutShippingForm = forwardRef<
         setErrors(result.errors);
       },
       [shippingForm, cartItems, lang],
-    );
-
-    // ── Address resolved from map pin ──
-    const handleAddressResolved = useCallback(
-      (displayName: string, addressComponents?: Record<string, string>) => {
-        const parsed = parseResolvedAddress(displayName, addressComponents);
-        const fields: [keyof ShippingFormData, string][] = [
-          ['address', parsed.street],
-          ['city', parsed.city],
-          ['region', parsed.region],
-          ['country', parsed.country],
-          ['postalCode', parsed.postalCode],
-        ];
-        for (const [field, value] of fields) {
-          if (value) {
-            updateShippingField(field, value);
-          }
-        }
-      },
-      [updateShippingField],
     );
 
     // ── Saved address selection — populate ALL form fields ──
@@ -213,39 +103,6 @@ export const CheckoutShippingForm = forwardRef<
     return (
       <div className="space-y-6">
         <h2 className="text-2xl font-light mb-6">{checkoutShippingHeading}</h2>
-
-        {/* Map Section */}
-        {mapLat !== null && mapLng !== null ? (
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-[#67645E] mb-2">
-              {ct.deliveryLocation}
-            </label>
-            <MapAddressPicker
-              initialLat={mapLat}
-              initialLng={mapLng}
-              onLocationSelect={onLocationSelect}
-              onAddressResolved={handleAddressResolved}
-              lang={lang}
-            />
-            {process.env.NODE_ENV !== 'production' && (
-              <p className="text-xs text-[#84827E] mt-1">
-                Lat: {mapLat.toFixed(6)}, Lng: {mapLng.toFixed(6)}
-              </p>
-            )}
-          </div>
-        ) : (
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-[#67645E] mb-2">
-              {ct.deliveryLocation}
-            </label>
-            <MapAddressPicker
-              onLocationSelect={onLocationSelect}
-              onAddressResolved={handleAddressResolved}
-              lang={lang}
-            />
-            <p className="text-xs text-[#84827E] mt-1">{ct.clickMapToSetLocation}</p>
-          </div>
-        )}
 
         {/* Saved Addresses */}
         {savedAddresses.length > 0 && (

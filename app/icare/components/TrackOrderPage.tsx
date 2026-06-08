@@ -42,6 +42,12 @@ const STATUS_MAP: Record<string, {
     icon: <Clock size={16} />,
     color: 'bg-amber-100 text-amber-800',
   },
+  reviewed: {
+    labelEn: 'Reviewed',
+    labelAr: 'تمت المراجعة',
+    icon: <CheckCircle size={16} />,
+    color: 'bg-blue-100 text-blue-800',
+  },
   confirmed: {
     labelEn: 'Confirmed',
     labelAr: 'تم التأكيد',
@@ -58,7 +64,13 @@ const STATUS_MAP: Record<string, {
     labelEn: 'Shipped',
     labelAr: 'تم الشحن',
     icon: <Truck size={16} />,
-    color: 'bg-green-100 text-green-800',
+    color: 'bg-indigo-100 text-indigo-800',
+  },
+  out_for_delivery: {
+    labelEn: 'Out for Delivery',
+    labelAr: 'قيد التوصيل',
+    icon: <Truck size={16} />,
+    color: 'bg-purple-100 text-purple-800',
   },
   delivered: {
     labelEn: 'Delivered',

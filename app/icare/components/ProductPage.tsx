@@ -110,14 +110,41 @@ const ReviewItem = ({ review, content, helpfulCount = 0, onHelpfulVote }: Review
   </div>
 );
 
-const getProductImageGallery = (displayProduct: Product, selectedVariant: ProductVariant | null): ProductGalleryMedia[] => {
+const getProductImageGallery = (
+  displayProduct: Product,
+  selectedVariant: ProductVariant | null,
+  selectedColorId?: number | null,
+): ProductGalleryMedia[] => {
+  // Color-aware gallery: if a color is selected and the current variant has per-color images,
+  // surface the variant-color image first, then fall back to other images.
+  let colorVariantImage: string | null = null;
+  if (selectedColorId && selectedVariant?.variantColors) {
+    const vc = selectedVariant.variantColors.find((v) => v.colorId === selectedColorId);
+    colorVariantImage = vc?.image || null;
+  }
+  // Also try the product-level color image if the color has its own image
+  let colorImage: string | null = colorVariantImage;
+  if (!colorImage && selectedColorId && displayProduct.colors) {
+    const pc = displayProduct.colors.find((c) => c.id === selectedColorId);
+    colorImage = pc?.image || null;
+  }
+
   if (displayProduct.backendProduct) {
-    return mapBackendProductGalleryMedia(displayProduct.backendProduct, selectedVariant)
+    const baseMedia = mapBackendProductGalleryMedia(displayProduct.backendProduct, selectedVariant)
       .filter((media) => media.mediaType === 'IMAGE');
+    if (colorImage) {
+      // Reorder: put color image first if not already present
+      const hasColorImage = baseMedia.some((m) => normalizeProductMediaUrl(m.url) === normalizeProductMediaUrl(colorImage));
+      if (!hasColorImage) {
+        return [{ url: colorImage, mediaType: 'IMAGE' as const, isPrimary: true, altText: 'color' }, ...baseMedia];
+      }
+    }
+    return baseMedia;
   }
 
   const variantImages: ProductGalleryMedia[] = [
-    ...(selectedVariant?.image ? [{ url: selectedVariant.image, mediaType: 'IMAGE' as const, altText: selectedVariant.name, isPrimary: true }] : []),
+    ...(colorImage ? [{ url: colorImage, mediaType: 'IMAGE' as const, altText: 'color', isPrimary: true }] : []),
+    ...(selectedVariant?.image ? [{ url: selectedVariant.image, mediaType: 'IMAGE' as const, altText: selectedVariant.name }] : []),
     ...(displayProduct.variants ?? [])
       .filter((variant) => variant.id !== selectedVariant?.id && variant.image)
       .map((variant) => ({ url: variant.image ?? '', mediaType: 'IMAGE' as const, altText: variant.name })),
@@ -164,9 +191,15 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
   } = useSiteContent();
   const [displayProduct, setDisplayProduct] = useState<Product>(product);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(product.variants?.find((variant) => variant.id === product.variantId) ?? null);
+  const [selectedColorId, setSelectedColorId] = useState<number | null>(() => {
+    // Auto-select the first available color for the current variant
+    const firstColor = product.colors?.find((c) => c.isActive !== false);
+    return firstColor?.id ?? null;
+  });
   const [activeImageSelection, setActiveImageSelection] = useState({ index: 0, galleryKey: '', resetKey: '' });
   const [showBottomBar, setShowBottomBar] = useState(false);
   const [isReviewsExpanded, setIsReviewsExpanded] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   const [remoteReviews, setRemoteReviews] = useState<ProductReview[] | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[] | null>(null);
   const [isWriteReviewOpen, setIsWriteReviewOpen] = useState(false);
@@ -184,8 +217,8 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
   const isRtl = lang === 'ar';
 
   const displayImages = useMemo(
-    () => getProductImageGallery(displayProduct, selectedVariant),
-    [displayProduct, selectedVariant],
+    () => getProductImageGallery(displayProduct, selectedVariant, selectedColorId),
+    [displayProduct, selectedVariant, selectedColorId],
   );
   const displayImagesKey = displayImages.map((image) => image.url).join('|');
   const activeImageResetKey = `${product.id}|${product.slug ?? ''}|${selectedVariant?.id ?? ''}`;
@@ -401,6 +434,84 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
           </div>
 
           <div className="pt-4 space-y-6 md:space-y-8">
+              {/* Color picker — shown when product has colors defined and current variant has variant-color data */}
+              {displayProduct.colors && displayProduct.colors.length > 0 && (() => {
+                const activeColors = displayProduct.colors.filter((c) => c.isActive !== false);
+                if (activeColors.length === 0) return null;
+                // Determine stock for the currently selected variant-color combination
+                let currentColorStock: number | null = null;
+                let currentColorStatus: string | null = null;
+                if (selectedVariant?.variantColors && selectedColorId) {
+                  const vc = selectedVariant.variantColors.find((v) => v.colorId === selectedColorId);
+                  if (vc) {
+                    currentColorStock = vc.stockQuantity;
+                    currentColorStatus = vc.stockStatus;
+                  }
+                }
+                return (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-[12px] md:text-[13px] text-[#84827E] lowercase font-black">
+                        {lang === 'en' ? 'color' : 'اللون'}:
+                      </span>
+                      <span className="text-[12px] md:text-[13px] text-[#67645E] lowercase font-black">
+                        {activeColors.find((c) => c.id === selectedColorId)?.name ?? '—'}
+                      </span>
+                      {currentColorStock !== null && currentColorStock > 0 && currentColorStock <= 5 && (
+                        <span className="text-[10px] md:text-[11px] font-bold text-amber-700 lowercase">
+                          {lang === 'en' ? `only ${currentColorStock} left` : `بقي ${currentColorStock} فقط`}
+                        </span>
+                      )}
+                      {currentColorStatus === 'out_of_stock' && (
+                        <span className="text-[10px] md:text-[11px] font-bold text-black/40 lowercase">
+                          {lang === 'en' ? 'out of stock' : 'غير متوفر'}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {activeColors.map((color) => {
+                        const isSelected = selectedColorId === color.id;
+                        // Find the variant-color for this color to get stock info
+                        const variantColor = selectedVariant?.variantColors?.find((vc) => vc.colorId === color.id);
+                        const isOutOfStock = variantColor?.stockStatus === 'out_of_stock' || (variantColor?.stockQuantity === 0);
+                        return (
+                          <button
+                            key={color.id}
+                            type="button"
+                            onClick={() => setSelectedColorId(color.id)}
+                            aria-label={color.name}
+                            title={color.name}
+                            disabled={isOutOfStock}
+                            className={`relative h-9 w-9 md:h-11 md:w-11 rounded-full overflow-hidden border-2 transition-all ${CONTROL_FOCUS_CLASS} ${
+                              isSelected
+                                ? 'border-[#67645E] ring-2 ring-[#67645E]/30 opacity-100 scale-105'
+                                : isOutOfStock
+                                  ? 'border-black/15 opacity-40 cursor-not-allowed'
+                                  : 'border-black/15 opacity-90 hover:opacity-100 hover:border-[#67645E]/40'
+                            }`}
+                            style={!color.image ? { backgroundColor: color.hexCode } : undefined}
+                          >
+                            {color.image ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={color.image}
+                                alt={color.name}
+                                className="h-full w-full object-cover"
+                              />
+                            ) : null}
+                            {isOutOfStock && (
+                              <span className="absolute inset-0 flex items-center justify-center">
+                                <span className="block h-[2px] w-full bg-black/40 rotate-45" />
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
+
               {displayProduct.variants && displayProduct.variants.length > 0 && (
                 <div className="flex flex-wrap items-center gap-2 text-[12px] md:text-[13px]">
                   <span className="text-[#84827E] lowercase">{productSelectOption || 'Select option'}</span>
@@ -436,6 +547,58 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                 </div>
               </div>
           </div>
+
+          {/* Product Details — collapsible */}
+          {(() => {
+            const bp = displayProduct.backendProduct;
+            if (!bp) return null;
+
+            const details: { label: string; value: string | string[] }[] = [];
+
+            if (bp.howToUse) details.push({ label: lang === 'ar' ? 'طريقة الاستخدام' : 'How to Use', value: bp.howToUse });
+            if (bp.ingredients?.length) details.push({ label: lang === 'ar' ? 'المكونات' : 'Ingredients', value: bp.ingredients });
+            if (bp.benefits?.length) details.push({ label: lang === 'ar' ? 'الفوائد' : 'Benefits', value: bp.benefits });
+            if (bp.skinTypes?.length) details.push({ label: lang === 'ar' ? 'نوع البشرة' : 'Skin Types', value: bp.skinTypes });
+            if (bp.concerns?.length) details.push({ label: lang === 'ar' ? 'المخاوف' : 'Concerns', value: bp.concerns });
+
+            if (details.length === 0) return null;
+
+            return (
+              <div className="border-t border-[#DDDDDD] pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowDetails((prev) => !prev)}
+                  className={`flex items-center justify-between w-full text-[11px] md:text-[12px] font-black uppercase tracking-[0.15em] text-[#67645E] ${CONTROL_FOCUS_CLASS}`}
+                >
+                  <span>{lang === 'ar' ? 'تفاصيل المنتج' : 'Product Details'}</span>
+                  <ChevronDown
+                    size={14}
+                    className={`transition-transform duration-200 ${showDetails ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                {showDetails && (
+                  <div className="mt-4 space-y-4">
+                    {details.map((detail) => (
+                      <div key={detail.label} className="space-y-1">
+                        <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] text-[#84827E]">
+                          {detail.label}
+                        </p>
+                        {Array.isArray(detail.value) ? (
+                          <p className="text-[12px] md:text-[13px] text-[#67645E] leading-relaxed">
+                            {detail.value.join(' · ')}
+                          </p>
+                        ) : (
+                          <p className="text-[12px] md:text-[13px] text-[#67645E] leading-relaxed whitespace-pre-line">
+                            {detail.value}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </div>
         </div>
       </section>
