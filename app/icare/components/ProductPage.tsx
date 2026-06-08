@@ -122,7 +122,10 @@ const getProductImageGallery = (
     const vc = selectedVariant.variantColors.find((v) => v.colorId === selectedColorId);
     colorVariantImage = vc?.image || null;
   }
-  // Also try the product-level color image if the color has its own image
+  // Also try the product-level color image as a last-resort fallback
+  // (legacy path: admin UI no longer writes `ProductColor.image` —
+  // canonical per-color images now live on `variantColors[].image`,
+  // i.e. the per-(variant×color) join row).
   let colorImage: string | null = colorVariantImage;
   if (!colorImage && selectedColorId && displayProduct.colors) {
     const pc = displayProduct.colors.find((c) => c.id === selectedColorId);
