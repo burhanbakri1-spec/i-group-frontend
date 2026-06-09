@@ -35,9 +35,10 @@ export interface Product {
   price: string;
   originalPrice?: string;
   description?: string;
+  /** @deprecated Use `primaryImage` instead. Mirrors `primaryImage` for backwards compatibility. */
   image: string;
-  /** Card-dedicated primary image URL — the main photo shown in product cards. */
-  primaryImage?: string;
+  /** Card-dedicated primary image URL — the main photo shown in product cards. Always populated (falls back to first gallery image). */
+  primaryImage: string;
   /** Card-dedicated secondary image URL — the hover-state photo shown in product cards. */
   secondaryImage?: string;
   images?: string[];
@@ -77,6 +78,7 @@ export interface ProductGalleryMedia {
   url: string;
   mediaType: ProductGalleryMediaType;
   altText?: string | null;
+  /** @deprecated Card primary/hover is driven by Product.primaryImage / Product.secondaryImage. The gallery is ordered by sortOrder. */
   isPrimary?: boolean;
   sortOrder?: number;
 }
@@ -310,6 +312,7 @@ export interface BackendProductImage {
   imageUrl: string;
   altText?: string | null;
   sortOrder?: number;
+  /** @deprecated Ignored by the shop frontend. Card primary is driven by Product.primaryImage. */
   isPrimary?: boolean;
   mediaType?: string;
 }

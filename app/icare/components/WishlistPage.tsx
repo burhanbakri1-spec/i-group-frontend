@@ -129,7 +129,7 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
                   onClick={() => onProductSelect(product)}
                 >
                   <ImageWithFallback
-                    src={product.image}
+                    src={product.primaryImage}
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-200 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                   />

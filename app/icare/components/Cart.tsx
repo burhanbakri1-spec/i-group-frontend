@@ -111,7 +111,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                       <div key={item.id} className="flex gap-6 relative group pb-4 border-b border-black/5">
                         <div className="w-20 h-24 bg-white/40 rounded-[8px] overflow-hidden flex-shrink-0">
                           <ImageWithFallback 
-                            src={item.image} 
+                            src={item.primaryImage} 
                             alt={item.name} 
                             className="w-full h-full object-cover"
                           />

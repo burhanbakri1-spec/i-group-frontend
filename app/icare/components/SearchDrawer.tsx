@@ -198,7 +198,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                               <button key={product.id} onClick={() => handleProductSelect(product)} className={`flex items-center gap-5 group cursor-pointer text-left w-full rounded-[8px] ${CONTROL_FOCUS_CLASS}`}>
                                 <div className="w-14 h-16 bg-white/40 rounded-[8px] overflow-hidden flex-shrink-0 flex items-center justify-center">
                                   <ImageWithFallback 
-                                    src={product.image} 
+                                    src={product.primaryImage} 
                                     alt={product.name} 
                                     className="w-full h-full object-contain mix-blend-multiply p-1 group-hover:scale-[1.03] transition-transform duration-200 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                                   />
@@ -255,7 +255,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                         {searchableProducts.slice(0, 2).map((product) => (
                           <button key={product.id} onClick={() => handleProductSelect(product)} className={`flex items-center gap-6 group cursor-pointer text-left w-full rounded-[8px] ${CONTROL_FOCUS_CLASS}`}>
                             <div className="w-16 h-20 bg-white/40 rounded-[8px] overflow-hidden flex items-center justify-center">
-                              <ImageWithFallback src={product.image} alt={product.name} className="w-full h-full object-contain mix-blend-multiply p-2 group-hover:scale-[1.03] transition-transform duration-200 motion-reduce:transition-none motion-reduce:group-hover:scale-100" />
+                              <ImageWithFallback src={product.primaryImage} alt={product.name} className="w-full h-full object-contain mix-blend-multiply p-2 group-hover:scale-[1.03] transition-transform duration-200 motion-reduce:transition-none motion-reduce:group-hover:scale-100" />
                             </div>
                             <span className="text-[14px] font-black text-[#67645E] tracking-widest uppercase">{product.name}</span>
                           </button>

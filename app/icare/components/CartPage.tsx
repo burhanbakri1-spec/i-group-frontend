@@ -76,7 +76,7 @@ const CartPage: React.FC = () => {
             {cartItems.map((item) => (
               <motion.div key={item.id} layout className="flex gap-4 md:gap-6 p-4 rounded-[12px] border border-[#DDDDDD] hover:border-[#67645E] transition-colors bg-white">
                 <div className="w-24 h-24 md:w-28 md:h-28 bg-[#F1F0ED] rounded-[12px] flex items-center justify-center p-3 flex-shrink-0">
-                  <ImageWithFallback src={item.image} alt={item.name} className="w-full h-full object-contain" />
+                  <ImageWithFallback src={item.primaryImage} alt={item.name} className="w-full h-full object-contain" />
                 </div>
                 <div className="flex-1 flex flex-col justify-between">
                   <div>

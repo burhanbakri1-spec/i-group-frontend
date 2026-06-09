@@ -551,7 +551,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                         >
                           <div className="relative aspect-square mb-3 flex items-center justify-center p-4">
                             <ImageWithFallback
-                              src={product.image}
+                              src={product.primaryImage}
                               alt={product.title ?? product.name}
                               className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-200"
                             />

@@ -94,7 +94,7 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
           >
             <div className="w-20 h-20 bg-[#F1F0ED] rounded-[12px] overflow-hidden">
               <ImageWithFallback
-                src={item.image}
+                src={item.primaryImage}
                 alt={item.name}
                 className="w-full h-full object-cover"
               />

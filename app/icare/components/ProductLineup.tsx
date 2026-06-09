@@ -239,7 +239,7 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ onProductSelect, p
                   description={item.description ?? item.category ?? 'iCare product'}
                   price={item.price}
                   originalPrice={item.originalPrice}
-                  image={item.image}
+                  image={item.primaryImage}
                   reviews={item.reviews ?? '0'}
                   onSelect={onProductSelect}
                 />

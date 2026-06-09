@@ -50,7 +50,7 @@ const ProductCardBase: React.FC<ProductCardProps> = ({
   const hoverImage = product.secondaryImage ?? null;
   const shouldShowQuickAdd = showQuickAdd && variant === 'standard';
 
-  const primaryImage = product.primaryImage ?? product.image;
+  const primaryImage = product.primaryImage;
 
   const cardMotion = shouldReduceMotion
     ? {}

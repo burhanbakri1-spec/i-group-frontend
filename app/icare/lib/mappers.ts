@@ -41,10 +41,6 @@ const getFirstValidNumber = (...values: NumericInput[]) => values.map(coerceNumb
 
 export const formatUsdPrice = (price: NumericInput) => `$${getFirstValidNumber(price).toFixed(2)}`;
 
-export const getVariantDisplayPrice = (product: BackendProduct, variant?: ProductVariant | null) => {
-  return getFirstValidNumber(variant?.salePrice, variant?.price, product.salePrice, product.price);
-};
-
 export const getDefaultVariant = (product: BackendProduct) => {
   return product.variants?.find((variant) => variant.isDefault && variant.isActive !== false)
     ?? product.variants?.find((variant) => variant.isActive !== false)
@@ -93,13 +89,15 @@ const normalizeProductMediaType = (mediaType?: string | null): ProductGalleryMed
   mediaType?.toUpperCase() === 'VIDEO' ? 'VIDEO' : 'IMAGE'
 );
 
+/**
+ * Sort gallery images purely by sortOrder then original index.
+ * The legacy `isPrimary` field is ignored — the card primary is now
+ * driven solely by `Product.primaryImage` (admin-set), and the gallery
+ * is a sortOrder-ordered list of media items.
+ */
 const sortProductImagesByBackendPriority = (images: BackendProduct['images'] = []) => images
   .map((image, originalIndex) => ({ image, originalIndex }))
   .sort((first, second) => {
-    if (Boolean(first.image.isPrimary) !== Boolean(second.image.isPrimary)) {
-      return first.image.isPrimary ? -1 : 1;
-    }
-
     const firstSortOrder = first.image.sortOrder ?? Number.MAX_SAFE_INTEGER;
     const secondSortOrder = second.image.sortOrder ?? Number.MAX_SAFE_INTEGER;
     if (firstSortOrder !== secondSortOrder) return firstSortOrder - secondSortOrder;
@@ -132,12 +130,10 @@ const mapVariantImagesToGalleryMedia = (product: BackendProduct, selectedVariant
     url: normalizeProductMediaUrl(defaultColorImage),
     mediaType: 'IMAGE' as const,
     altText: selectedVariant?.name,
-    isPrimary: true,
   }] : selectedVariant?.image ? [{
     url: normalizeProductMediaUrl(selectedVariant.image),
     mediaType: 'IMAGE' as const,
     altText: selectedVariant.name,
-    isPrimary: true,
   }] : [];
   const remainingVariantMedia = variants
     .filter((variant) => variant.id !== selectedVariant?.id && variant.image)
@@ -152,46 +148,41 @@ const mapVariantImagesToGalleryMedia = (product: BackendProduct, selectedVariant
 
 export const mapBackendProductGalleryMedia = (product: BackendProduct, variant?: ProductVariant | null): ProductGalleryMedia[] => {
   const sortedBackendImages = sortProductImagesByBackendPriority(product.images);
-  const hasBackendPrimary = sortedBackendImages.some((image) => image.isPrimary);
   const backendMedia = sortedBackendImages.map<ProductGalleryMedia>((image) => ({
     url: normalizeProductMediaUrl(image.imageUrl),
     mediaType: normalizeProductMediaType(image.mediaType),
     altText: image.altText,
-    isPrimary: image.isPrimary,
     sortOrder: image.sortOrder,
   }));
-  const primaryBackendMedia = hasBackendPrimary && backendMedia[0]?.isPrimary ? [backendMedia[0]] : [];
-  const remainingBackendMedia = hasBackendPrimary ? backendMedia.slice(1) : backendMedia;
   const variantMedia = mapVariantImagesToGalleryMedia(product, variant);
 
-  const primaryMedia = product.primaryImage ? [{
-    url: normalizeProductMediaUrl(product.primaryImage),
-    mediaType: 'IMAGE' as const,
-    altText: product.name,
-    isPrimary: true,
-  }] : [];
-
-  const secondaryMedia = product.secondaryImage ? [{
-    url: normalizeProductMediaUrl(product.secondaryImage),
-    mediaType: 'IMAGE' as const,
-    altText: product.name,
-  }] : [];
-
+  // Gallery is the ordered union of variant media (first, for color/variant context)
+  // and the backend gallery images sorted by sortOrder.
+  // `product.primaryImage` and `product.secondaryImage` are NOT prepended here —
+  // those are card-display fields and the gallery is independent.
   return dedupeGalleryMedia([
-    ...primaryMedia,
-    ...secondaryMedia,
     ...variantMedia,
-    ...primaryBackendMedia,
-    ...remainingBackendMedia,
+    ...backendMedia,
   ]);
 };
 
 export const mapBackendProductToProduct = (product: BackendProduct, selectedVariant?: ProductVariant | null): Product => {
   const variant = selectedVariant ?? getDefaultVariant(product);
-  const displayPrice = getFirstValidNumber(product.primarySalePrice, product.primaryPrice, variant?.salePrice, variant?.price, product.salePrice, product.price);
 
-  // Determine the regular (non-sale) price: primary fields take priority, then variant, then product
-  const regularPrice = getFirstValidNumber(product.primaryPrice, variant?.price, product.price) ?? 0;
+  // When a variant is explicitly selected, the variant's price is the source
+  // of truth for what the user is about to buy. The product-level `primaryPrice` /
+  // `primarySalePrice` are card-display overrides that the admin uses to make
+  // a specific price appear on listings — they should NOT override the variant
+  // the user has actively selected on the product page.
+  const displayPrice = variant
+    ? getFirstValidNumber(variant.salePrice, variant.price, product.primarySalePrice, product.primaryPrice, product.salePrice, product.price)
+    : getFirstValidNumber(product.primarySalePrice, product.primaryPrice, product.salePrice, product.price);
+
+  // Regular (non-sale) price follows the same priority: variant first when
+  // selected, then product-level primary fields, then product base price.
+  const regularPrice = variant
+    ? getFirstValidNumber(variant.price, product.primaryPrice, product.price) ?? 0
+    : getFirstValidNumber(product.primaryPrice, product.price) ?? 0;
 
   // Show original price only when the display (sale) price is lower than the regular price
   const originalPrice = regularPrice !== null && displayPrice < regularPrice
@@ -201,7 +192,12 @@ export const mapBackendProductToProduct = (product: BackendProduct, selectedVari
   const ratingCount = coerceNumber(product.ratingCount);
   const galleryMedia = mapBackendProductGalleryMedia(product, variant);
   const backendImages = galleryMedia.filter((media) => media.mediaType === 'IMAGE').map((media) => media.url);
-  const primaryImage = backendImages[0] ?? '';
+  const fallbackCardImage = backendImages[0] ?? '';
+  const normalizedBackendPrimary = normalizeProductMediaUrl(product.primaryImage);
+  // Card primary: admin-set Product.primaryImage if present, else first gallery image.
+  // Card hover: admin-set Product.secondaryImage (no fallback — empty means no hover).
+  const cardPrimaryImage = normalizedBackendPrimary || fallbackCardImage;
+  const cardSecondaryImage = normalizeProductMediaUrl(product.secondaryImage) || undefined;
   const categoryName = product.category?.name?.trim() || 'shop all';
   const brandName = product.brand?.name?.trim();
   const normalizedCategoryName = normalizeFilterName(categoryName);
@@ -217,9 +213,12 @@ export const mapBackendProductToProduct = (product: BackendProduct, selectedVari
     price: formatUsdPrice(displayPrice),
     originalPrice,
     description: product.shortDescription ?? product.description ?? undefined,
-    image: primaryImage,
-    primaryImage: normalizeProductMediaUrl(product.primaryImage) || primaryImage,
-    secondaryImage: normalizeProductMediaUrl(product.secondaryImage) || undefined,
+    // `image` is the legacy field kept for backwards compatibility with
+    // code that hasn't migrated to `primaryImage` yet. It mirrors `primaryImage`
+    // so the storefront has a single source of truth.
+    image: cardPrimaryImage,
+    primaryImage: cardPrimaryImage,
+    secondaryImage: cardSecondaryImage,
     cardPrice: formatUsdPrice(getFirstValidNumber(product.primaryPrice, product.price)),
     cardSalePrice: product.primarySalePrice != null ? formatUsdPrice(getFirstValidNumber(product.primarySalePrice)) : undefined,
     cardCostPrice: product.primaryCostPrice != null ? formatUsdPrice(getFirstValidNumber(product.primaryCostPrice)) : undefined,

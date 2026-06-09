@@ -139,14 +139,14 @@ const getProductImageGallery = (
       // Reorder: put color image first if not already present
       const hasColorImage = baseMedia.some((m) => normalizeProductMediaUrl(m.url) === normalizeProductMediaUrl(colorImage));
       if (!hasColorImage) {
-        return [{ url: colorImage, mediaType: 'IMAGE' as const, isPrimary: true, altText: 'color' }, ...baseMedia];
+        return [{ url: colorImage, mediaType: 'IMAGE' as const, altText: 'color' }, ...baseMedia];
       }
     }
     return baseMedia;
   }
 
   const variantImages: ProductGalleryMedia[] = [
-    ...(colorImage ? [{ url: colorImage, mediaType: 'IMAGE' as const, altText: 'color', isPrimary: true }] : []),
+    ...(colorImage ? [{ url: colorImage, mediaType: 'IMAGE' as const, altText: 'color' }] : []),
     ...(selectedVariant?.image ? [{ url: selectedVariant.image, mediaType: 'IMAGE' as const, altText: selectedVariant.name }] : []),
     ...(displayProduct.variants ?? [])
       .filter((variant) => variant.id !== selectedVariant?.id && variant.image)
@@ -157,7 +157,7 @@ const getProductImageGallery = (
     ? displayProduct.galleryMedia
     : [
         ...(displayProduct.images ?? []).map((url) => ({ url, mediaType: 'IMAGE' as const })),
-        { url: displayProduct.image, mediaType: 'IMAGE' as const },
+        { url: displayProduct.primaryImage, mediaType: 'IMAGE' as const },
       ];
 
   const seenUrls = new Set<string>();
@@ -789,7 +789,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
         >
           <div className="flex min-w-0 items-center gap-3 md:gap-4">
             <div className="w-11 h-11 bg-white rounded-md flex items-center justify-center p-1.5">
-               <ImageWithFallback src={displayProduct.image} alt={displayProduct.name} className="w-full h-full object-contain mix-blend-multiply" />
+               <ImageWithFallback src={displayProduct.primaryImage} alt={displayProduct.name} className="w-full h-full object-contain mix-blend-multiply" />
             </div>
             <span className="min-w-0 truncate text-[11px] md:text-[12px] font-black uppercase tracking-[0.14em] md:tracking-[0.2em] text-[#67645E]">{displayProduct.name}</span>
           </div>

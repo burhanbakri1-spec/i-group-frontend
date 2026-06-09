@@ -94,7 +94,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
                 className="w-full h-full"
               >
                 <ImageWithFallback 
-                  src={current.images?.[1] ?? current.images?.[0] ?? current.image}
+                  src={current.secondaryImage ?? current.primaryImage}
                   alt={current.title ?? current.name}
                   className="w-full h-full object-cover object-center"
                 />
@@ -154,7 +154,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
                 className="w-full"
               >
                 <ImageWithFallback 
-                  src={current.image}
+                  src={current.primaryImage}
                   alt={current.title ?? current.name}
                   className="w-full h-full object-contain mix-blend-multiply drop-shadow-sm"
                 />

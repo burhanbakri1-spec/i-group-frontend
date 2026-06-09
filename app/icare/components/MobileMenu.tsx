@@ -153,7 +153,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
                   >
                     <div className="w-20 h-20 bg-[var(--rb-bg-light)] rounded-[var(--rb-radius-card)] flex items-center justify-center p-2">
                       <ImageWithFallback 
-                        src={product.image} 
+                        src={product.primaryImage} 
                         alt={product.title ?? product.name}
                         className="w-full h-full object-contain"
                       />
