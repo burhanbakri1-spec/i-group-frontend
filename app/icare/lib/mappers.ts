@@ -121,7 +121,19 @@ const dedupeGalleryMedia = (media: ProductGalleryMedia[]) => {
 
 const mapVariantImagesToGalleryMedia = (product: BackendProduct, selectedVariant?: ProductVariant | null): ProductGalleryMedia[] => {
   const variants = product.variants ?? [];
-  const selectedVariantMedia = selectedVariant?.image ? [{
+  // Canonical per-(variant×color) image for the default variant: pick
+  // the first active `variantColors` row that carries an image. This
+  // matches the storefront contract that the product card surfaces the
+  // image of the default color of the default variant.
+  const defaultColorImage = selectedVariant?.variantColors
+    ?.filter((row) => row.isActive !== false)
+    .find((row) => row.image)?.image ?? null;
+  const selectedVariantMedia = defaultColorImage ? [{
+    url: normalizeProductMediaUrl(defaultColorImage),
+    mediaType: 'IMAGE' as const,
+    altText: selectedVariant?.name,
+    isPrimary: true,
+  }] : selectedVariant?.image ? [{
     url: normalizeProductMediaUrl(selectedVariant.image),
     mediaType: 'IMAGE' as const,
     altText: selectedVariant.name,

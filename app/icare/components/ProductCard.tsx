@@ -50,6 +50,19 @@ const ProductCardBase: React.FC<ProductCardProps> = ({
   const hoverImage = product.images && product.images.length > 1 ? product.images[1] : null;
   const shouldShowQuickAdd = showQuickAdd && variant === 'standard';
 
+  // Derive primary image with explicit fallback chain:
+  // 1. Default variant's default color image (variantColors[0])
+  // 2. First active variantColor image
+  // 3. Variant's own image
+  // 4. Product featured image
+  const defaultVariant = product.variants?.find(v => v.isDefault) ?? product.variants?.[0];
+  const defaultColorImage = defaultVariant?.variantColors?.[0]?.image;
+  const firstActiveColorImage = defaultVariant?.variantColors
+    ?.filter((vc) => vc.isActive !== false)
+    .find((vc) => vc.image)?.image;
+  const variantImage = defaultVariant?.image;
+  const primaryImage = defaultColorImage || firstActiveColorImage || variantImage || product.image;
+
   const cardMotion = shouldReduceMotion
     ? {}
     : {
@@ -102,7 +115,7 @@ const ProductCardBase: React.FC<ProductCardProps> = ({
                 </span>
               )}
               <ImageWithFallback
-                src={product.image}
+                src={primaryImage}
                 alt={displayName}
                 className="icare-product-card__image"
               />
