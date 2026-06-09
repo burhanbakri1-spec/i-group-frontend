@@ -26,7 +26,7 @@ export const Shop: React.FC = () => {
           <div key={product.id} className="group cursor-pointer">
             <div className="bg-[#F2F1ED] rounded-[32px] aspect-square flex items-center justify-center p-12 overflow-hidden mb-6">
               <ImageWithFallback 
-                src={product.primaryImage} 
+                src={product.image} 
                 alt={product.title} 
                 className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700"
               />
