@@ -47,22 +47,10 @@ const ProductCardBase: React.FC<ProductCardProps> = ({
   const displayName = getDisplayName(product);
   const description = getDisplayDescription(product, lang);
   const cardLabel = getCardLabel(product);
-  const hoverImage = product.images && product.images.length > 1 ? product.images[1] : null;
+  const hoverImage = product.secondaryImage ?? null;
   const shouldShowQuickAdd = showQuickAdd && variant === 'standard';
 
-  // Derive primary image with explicit fallback chain:
-  // 1. Default variant's default color image (variantColors[0])
-  // 2. First active variantColor image
-  // 3. Variant's own image
-  // 4. Product featured image
-  const defaultVariant = product.variants?.find(v => v.isDefault) ?? product.variants?.[0];
-  const activeVariantColors = defaultVariant?.variantColors
-    ?.filter((vc) => vc.isActive !== false);
-  const defaultColorImage = activeVariantColors?.[0]?.image;
-  const firstActiveColorImage = activeVariantColors
-    ?.find((vc) => vc.image)?.image;
-  const variantImage = defaultVariant?.image;
-  const primaryImage = defaultColorImage || firstActiveColorImage || variantImage || product.image;
+  const primaryImage = product.primaryImage ?? product.image;
 
   const cardMotion = shouldReduceMotion
     ? {}

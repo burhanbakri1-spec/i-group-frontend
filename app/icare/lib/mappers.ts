@@ -164,29 +164,34 @@ export const mapBackendProductGalleryMedia = (product: BackendProduct, variant?:
   const remainingBackendMedia = hasBackendPrimary ? backendMedia.slice(1) : backendMedia;
   const variantMedia = mapVariantImagesToGalleryMedia(product, variant);
 
-  const featuredMedia = product.featuredImage ? [{
-    url: normalizeProductMediaUrl(product.featuredImage),
+  const primaryMedia = product.primaryImage ? [{
+    url: normalizeProductMediaUrl(product.primaryImage),
     mediaType: 'IMAGE' as const,
     altText: product.name,
-    isPrimary: !hasBackendPrimary,
+    isPrimary: true,
+  }] : [];
+
+  const secondaryMedia = product.secondaryImage ? [{
+    url: normalizeProductMediaUrl(product.secondaryImage),
+    mediaType: 'IMAGE' as const,
+    altText: product.name,
   }] : [];
 
   return dedupeGalleryMedia([
+    ...primaryMedia,
+    ...secondaryMedia,
     ...variantMedia,
     ...primaryBackendMedia,
-    ...featuredMedia,
     ...remainingBackendMedia,
   ]);
 };
 
 export const mapBackendProductToProduct = (product: BackendProduct, selectedVariant?: ProductVariant | null): Product => {
   const variant = selectedVariant ?? getDefaultVariant(product);
-  const displayPrice = getVariantDisplayPrice(product, variant);
+  const displayPrice = getFirstValidNumber(product.primarySalePrice, product.primaryPrice, variant?.salePrice, variant?.price, product.salePrice, product.price);
 
-  // Determine the regular (non-sale) price: variant's price if available, otherwise product's price
-  const variantPrice = coerceNumber(variant?.price);
-  const productPrice = coerceNumber(product.price);
-  const regularPrice = variantPrice ?? productPrice;
+  // Determine the regular (non-sale) price: primary fields take priority, then variant, then product
+  const regularPrice = getFirstValidNumber(product.primaryPrice, variant?.price, product.price) ?? 0;
 
   // Show original price only when the display (sale) price is lower than the regular price
   const originalPrice = regularPrice !== null && displayPrice < regularPrice
@@ -213,6 +218,11 @@ export const mapBackendProductToProduct = (product: BackendProduct, selectedVari
     originalPrice,
     description: product.shortDescription ?? product.description ?? undefined,
     image: primaryImage,
+    primaryImage: normalizeProductMediaUrl(product.primaryImage) || primaryImage,
+    secondaryImage: normalizeProductMediaUrl(product.secondaryImage) || undefined,
+    cardPrice: formatUsdPrice(getFirstValidNumber(product.primaryPrice, product.price)),
+    cardSalePrice: product.primarySalePrice != null ? formatUsdPrice(getFirstValidNumber(product.primarySalePrice)) : undefined,
+    cardCostPrice: product.primaryCostPrice != null ? formatUsdPrice(getFirstValidNumber(product.primaryCostPrice)) : undefined,
     images: backendImages,
     galleryMedia,
     rating: ratingAverage && ratingAverage > 0 ? ratingAverage.toFixed(1) : '0',
@@ -243,7 +253,7 @@ const mapBackendCartItem = (item: BackendCartItem): CartItem => {
     name: item.product.name,
     price: item.product.price,
     salePrice: item.product.salePrice,
-    featuredImage: item.variant?.image || item.product.featuredImage,
+    primaryImage: item.variant?.image || item.product.primaryImage,
     variants: item.variant ? [item.variant] : [],
   };
 

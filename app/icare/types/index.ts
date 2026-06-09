@@ -36,8 +36,18 @@ export interface Product {
   originalPrice?: string;
   description?: string;
   image: string;
+  /** Card-dedicated primary image URL — the main photo shown in product cards. */
+  primaryImage?: string;
+  /** Card-dedicated secondary image URL — the hover-state photo shown in product cards. */
+  secondaryImage?: string;
   images?: string[];
   galleryMedia?: ProductGalleryMedia[];
+  /** Card-dedicated selling price (formatted USD). Used by product card price line. */
+  cardPrice?: string;
+  /** Card-dedicated discounted price (formatted USD). Shown as "original price" when lower than cardPrice. */
+  cardSalePrice?: string;
+  /** Card-dedicated cost price (formatted USD). Internal — not rendered in customer-facing card. */
+  cardCostPrice?: string;
   rating?: string | undefined;
   reviews?: string;
   label?: string;
@@ -323,7 +333,11 @@ export interface BackendProduct {
   stockQuantity?: number;
   stockStatus?: string;
   size?: string | null;
-  featuredImage?: string | null;
+  primaryImage?: string | null;
+  secondaryImage?: string | null;
+  primaryPrice?: BackendNumeric | null;
+  primarySalePrice?: BackendNumeric | null;
+  primaryCostPrice?: BackendNumeric | null;
   videoUrl?: string | null;
   isFeatured?: boolean;
   isNew?: boolean;
@@ -486,7 +500,7 @@ export interface AdminListData<T> {
 export interface BackendCartItem {
   id: number;
   quantity: number;
-  product: Pick<BackendProduct, 'id' | 'slug' | 'name' | 'price' | 'salePrice' | 'featuredImage'> & {
+  product: Pick<BackendProduct, 'id' | 'slug' | 'name' | 'price' | 'salePrice' | 'primaryImage'> & {
     deletedAt?: string | null;
     isActive?: boolean;
   };
