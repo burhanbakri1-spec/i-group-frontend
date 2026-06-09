@@ -56,10 +56,11 @@ const ProductCardBase: React.FC<ProductCardProps> = ({
   // 3. Variant's own image
   // 4. Product featured image
   const defaultVariant = product.variants?.find(v => v.isDefault) ?? product.variants?.[0];
-  const defaultColorImage = defaultVariant?.variantColors?.[0]?.image;
-  const firstActiveColorImage = defaultVariant?.variantColors
-    ?.filter((vc) => vc.isActive !== false)
-    .find((vc) => vc.image)?.image;
+  const activeVariantColors = defaultVariant?.variantColors
+    ?.filter((vc) => vc.isActive !== false);
+  const defaultColorImage = activeVariantColors?.[0]?.image;
+  const firstActiveColorImage = activeVariantColors
+    ?.find((vc) => vc.image)?.image;
   const variantImage = defaultVariant?.image;
   const primaryImage = defaultColorImage || firstActiveColorImage || variantImage || product.image;
 
