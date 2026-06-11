@@ -44,7 +44,7 @@ export const CartDrawer = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
 
             <div className="pt-8 border-t border-[#DDDDDD]">
               <div className="flex justify-between mb-4">
-                <span className="text-[11px] tracking-widest uppercase font-medium text-[#67645E]">{t.cartSubtotalLabel}</span>
+                <span className="text-[11px] tracking-widest uppercase font-medium text-[#67645E]">{t.cartDrawer.cartSubtotalLabel}</span>
                 <span className="text-[11px] tracking-widest uppercase font-medium text-[#67645E]">$0.00</span>
               </div>
               <p className="text-[9px] text-[#84827E] tracking-wider uppercase mb-6 text-center">{cartShippingDisclaimer}</p>

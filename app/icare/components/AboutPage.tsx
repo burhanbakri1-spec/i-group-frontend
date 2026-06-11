@@ -9,7 +9,7 @@ import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
 
 interface AboutPageProps {
   onNavigate?: (page: string) => void;
-  lang?: Language;
+  lang: Language;
 }
 
 const AccordionItem = ({ title, content, isOpen, onClick }: { title: string, content: string, isOpen: boolean, onClick: () => void }) => {
@@ -70,7 +70,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
     aboutTeamMember2Name, aboutTeamMember2Title, aboutTeamMember2Image,
     aboutTeamMember3Name, aboutTeamMember3Title, aboutTeamMember3Image,
     aboutValuesImage, aboutFounderNoteHeading, aboutFounderLetter,
-  } = useSiteContent(lang ?? 'en');
+  } = useSiteContent(lang);
 
   // TODO: Move valuesData to CMS (useSiteContent) for centralized content management.
   // Now driven from translations[lang] for bilingual support.

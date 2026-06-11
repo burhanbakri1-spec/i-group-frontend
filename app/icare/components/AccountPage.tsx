@@ -9,7 +9,7 @@ import type { OrderListItem, CreatedOrder } from '../types';
 
 interface AccountPageProps {
   onNavigate?: (page: string) => void;
-  lang?: Language;
+  lang: Language;
 }
 
 const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F1F0ED]';
@@ -36,7 +36,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
     authToggleToLogin,
   } = useSiteContent(lang);
   const loginImage = authLoginImage || "https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=1200&auto=format&fit=crop";
-  const t = translations[lang ?? 'en'];
+  const t = translations[lang];
   const { user, isAuthenticated, accessToken, login, register, logout, authError } = useShop();
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [name, setName] = useState('');
@@ -97,8 +97,8 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
   };
 
   /** Human-readable label for each order status. */
-  const statusLabel = (status: string, lang: Language): string => {
-    const t = translations[lang];
+  const statusLabel = (status: string, lng: Language): string => {
+    const t = translations[lng];
     const labels: Record<string, string> = {
       pending: t.accountPage.pending,
       reviewed: t.accountPage.reviewed,
@@ -263,7 +263,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                             </div>
                             <div className="flex items-center gap-3 flex-shrink-0">
                               <span className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full ${statusBadgeClass(order.status)}`}>
-                                {statusLabel(order.status, lang!)}
+                                 {statusLabel(order.status, lang)}
                               </span>
                               <span className="text-[11px] font-bold text-[#5C5A56] whitespace-nowrap">
                                  USD {order.total.toFixed(0)}

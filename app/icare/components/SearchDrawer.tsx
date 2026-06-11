@@ -11,7 +11,7 @@ import { mapBackendProductToProduct, mapBrandNames, mapCategoryNames, unwrapList
 interface SearchDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  lang?: Language;
+  lang: Language;
   onProductSelect?: (product: Product) => void;
 }
 
@@ -31,8 +31,8 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
     searchProductsHeading,
     searchBrandsHeading,
     searchCollectionsUnavailable,
-  } = useSiteContent(lang ?? 'en');
-  const t = translations[lang ?? 'en'];
+  } = useSiteContent(lang);
+  const t = translations[lang];
   const [searchQuery, setSearchQuery] = useState('');
   const [remoteCollections, setRemoteCollections] = useState<string[]>([]);
   const [remoteProducts, setRemoteProducts] = useState<Product[]>([]);
