@@ -1,4 +1,5 @@
 import { BackendProduct, BackendShowcaseUnit, BackendVlog, ContentDirection, CreateReviewInput, FAQCategoryGroup, Product, ProductReview, ShowcaseUnit, ShowcaseUnitType, VlogContentItem } from '../types';
+import { z } from 'zod';
 import { icareApi, IcareApiError } from './api-client';
 import { cachedFetch, cacheMiddleware } from './cache-middleware';
 import {
@@ -21,44 +22,6 @@ const normalizeShowcaseImageUrl = (image?: string | null) => {
   if (image.startsWith('http')) return image;
   if (image.startsWith('/')) return `${IMAGE_BASE_URL || IMAGE_PROXY_BASE_URL}${image}`;
   return image;
-};
-
-const SEMANTIC_SHOWCASE_TYPES = new Set<ShowcaseUnitType>([
-  'generic',
-  'simple_media_text',
-  'kit_contents',
-  'application_steps',
-  'results_study',
-  'routine_steps',
-]);
-
-const getShowcaseUnitType = (type?: string | null): ShowcaseUnitType => (
-  SEMANTIC_SHOWCASE_TYPES.has(type as ShowcaseUnitType) ? type as ShowcaseUnitType : 'generic'
-);
-
-const mapBackendShowcaseUnit = (unit: BackendShowcaseUnit): ShowcaseUnit => {
-  const image = normalizeShowcaseImageUrl(unit.image);
-  const title = unit.title ?? '';
-  const description = unit.description ?? '';
-  const type = getShowcaseUnitType(unit.type);
-
-  return {
-    id: unit.id,
-    type,
-    payload: unit.payload ?? {
-      eyebrow: 'showcase',
-      title,
-      description,
-      image: image ? { url: image, alt: title || 'Product showcase' } : undefined,
-    },
-    theme: unit.theme,
-    image,
-    title,
-    description,
-    sortOrder: unit.sortOrder,
-    isActive: unit.isActive,
-    direction: (unit.direction === 'rtl' ? 'rtl' : 'ltr') as ContentDirection,
-  };
 };
 
 const isDirectVideoUrl = (url: string) => VIDEO_FILE_PATTERN.test(url);
@@ -339,14 +302,447 @@ export async function fetchProductMediaVlogs(limit = 12): Promise<VlogContentIte
   }
 }
 
-export const fetchProductShowcase = async (slug: string): Promise<ShowcaseUnit[] | null> => {
+/**
+ * Fetch Rhode-format showcase units for a product slug.
+ * Falls back gracefully — callers should use RHODE_SHOWCASE_FALLBACK on null/empty.
+ * REQ-C6-1, REQ-C6-2
+ */
+export const fetchProductShowcaseRhode = async (slug: string): Promise<import('../types/rhode-showcase-units').RhodeShowcaseUnit[] | null> => {
   try {
     if (!icareApi.isConfigured()) return null;
     const units = await icareApi.products.showcase(slug);
-    return units.map(mapBackendShowcaseUnit);
+    if (!Array.isArray(units) || units.length === 0) return null;
+
+    // ─── Zod schema map: one validated payload schema per unit type ────────────
+    const payloadSchemaFor = {
+      hero_gallery: z.object({
+        images: z.array(z.object({
+          url: z.string().min(1),
+          alt: z.string(),
+          width: z.number().int().positive().optional(),
+          height: z.number().int().positive().optional(),
+        })).min(2),
+        badges: z.array(z.string()).optional(),
+        sizes: z.array(z.object({
+          id: z.string(),
+          label: z.string(),
+          subtext: z.string().optional(),
+          priceDelta: z.number().optional(),
+        })).optional(),
+        defaultSizeId: z.string().optional(),
+        videoUrl: z.string().optional(),
+        videoPoster: z.object({
+          url: z.string().min(1),
+          alt: z.string(),
+          width: z.number().int().positive().optional(),
+          height: z.number().int().positive().optional(),
+        }).optional(),
+      }),
+      benefits_grid: z.object({
+        eyebrow: z.string().optional(),
+        heading: z.string().optional(),
+        items: z.array(z.object({
+          icon: z.string().optional(),
+          text: z.string().min(1),
+        })).min(2).max(6),
+      }),
+      application_steps: z.object({
+        eyebrow: z.string().optional(),
+        heading: z.object({
+          eyebrow: z.string().optional(),
+          kicker: z.string().optional(),
+          title: z.string(),
+          subtitle: z.string().optional(),
+          description: z.string().optional(),
+        }).optional(),
+        steps: z.array(z.object({
+          id: z.string(),
+          stepNumber: z.number().int().min(1).optional(),
+          title: z.string().min(1),
+          description: z.string().optional(),
+          image: z.object({
+            url: z.string().min(1),
+            alt: z.string(),
+            width: z.number().int().positive().optional(),
+            height: z.number().int().positive().optional(),
+          }).optional(),
+          duration: z.string().optional(),
+        })).min(2).max(6),
+        defaultActiveStepId: z.string().optional(),
+      }),
+      key_ingredients: z.object({
+        heading: z.object({
+          eyebrow: z.string().optional(),
+          kicker: z.string().optional(),
+          title: z.string(),
+          subtitle: z.string().optional(),
+          description: z.string().optional(),
+        }),
+        heroIngredients: z.array(z.object({
+          name: z.string(),
+          description: z.string(),
+          image: z.object({
+            url: z.string().min(1),
+            alt: z.string(),
+            width: z.number().int().positive().optional(),
+            height: z.number().int().positive().optional(),
+          }).optional(),
+        })).min(1).max(3),
+        alsoMadeWith: z.array(z.string()).default([]),
+        fullListUrl: z.string().optional(),
+        fullListText: z.string().optional(),
+      }),
+      value_props_grid: z.object({
+        eyebrow: z.string().optional(),
+        props: z.array(z.object({
+          icon: z.object({
+            url: z.string().min(1),
+            alt: z.string(),
+            width: z.number().int().positive().optional(),
+            height: z.number().int().positive().optional(),
+          }).optional(),
+          label: z.string(),
+        })).min(2).max(4),
+      }),
+      visual_application: z.object({
+        eyebrow: z.string().optional(),
+        heading: z.string().optional(),
+        steps: z.array(z.object({
+          number: z.number().int().min(1),
+          title: z.string(),
+          description: z.string().optional(),
+          image: z.object({
+            url: z.string().min(1),
+            alt: z.string(),
+            width: z.number().int().positive().optional(),
+            height: z.number().int().positive().optional(),
+          }).optional(),
+        })).min(2).max(5),
+      }),
+      ingredient_spotlight: z.object({
+        heading: z.object({
+          eyebrow: z.string().optional(),
+          kicker: z.string().optional(),
+          title: z.string(),
+          subtitle: z.string().optional(),
+          description: z.string().optional(),
+        }).optional(),
+        heroImage: z.object({
+          url: z.string().min(1),
+          alt: z.string(),
+          width: z.number().int().positive().optional(),
+          height: z.number().int().positive().optional(),
+        }),
+        featuredIngredients: z.array(z.object({
+          name: z.string(),
+          description: z.string(),
+          image: z.object({
+            url: z.string().min(1),
+            alt: z.string(),
+            width: z.number().int().positive().optional(),
+            height: z.number().int().positive().optional(),
+          }).optional(),
+        })).min(1).max(3),
+        alsoMadeWith: z.array(z.string()).default([]),
+      }),
+      results_study: z.object({
+        mode: z.enum(['tabs', 'timeline']),
+        heroImages: z.array(z.object({
+          url: z.string().min(1),
+          alt: z.string(),
+          width: z.number().int().positive().optional(),
+          height: z.number().int().positive().optional(),
+        })).optional(),
+        heading: z.object({
+          eyebrow: z.string().optional(),
+          kicker: z.string().optional(),
+          title: z.string(),
+          subtitle: z.string().optional(),
+          description: z.string().optional(),
+        }).optional(),
+        tabs: z.array(z.object({
+          id: z.string(),
+          label: z.string(),
+          title: z.string().optional(),
+          description: z.string().optional(),
+          bullets: z.array(z.string()).default([]),
+          metrics: z.array(z.object({
+            id: z.string(),
+            value: z.string(),
+            label: z.string(),
+            description: z.string().optional(),
+          })).default([]),
+          beforeAfter: z.object({
+            before: z.object({
+              url: z.string().min(1),
+              alt: z.string(),
+              width: z.number().int().positive().optional(),
+              height: z.number().int().positive().optional(),
+            }).optional(),
+            after: z.object({
+              url: z.string().min(1),
+              alt: z.string(),
+              width: z.number().int().positive().optional(),
+              height: z.number().int().positive().optional(),
+            }).optional(),
+            caption: z.string().optional(),
+          }).optional(),
+          source: z.string().optional(),
+          disclaimer: z.string().optional(),
+        })).default([]),
+        defaultTabId: z.string().optional(),
+        source: z.string().optional(),
+        disclaimer: z.string().optional(),
+      }),
+      routine_map: z.object({
+        title: z.string(),
+        subtitle: z.string().optional(),
+        steps: z.array(z.object({
+          id: z.string(),
+          number: z.number().int().min(1),
+          label: z.string(),
+          productName: z.string(),
+          productSubtitle: z.string().optional(),
+          swatchImage: z.object({
+            url: z.string().min(1),
+            alt: z.string(),
+            width: z.number().int().positive().optional(),
+            height: z.number().int().positive().optional(),
+          }).optional(),
+          lifestyleImage: z.object({
+            url: z.string().min(1),
+            alt: z.string(),
+            width: z.number().int().positive().optional(),
+            height: z.number().int().positive().optional(),
+          }),
+          dayNight: z.enum(['day', 'night', 'both']).optional(),
+        })).min(3).max(7),
+      }),
+      reviews: z.object({
+        source: z.enum(['okendo', 'native']).default('native'),
+        okendoId: z.string().optional(),
+        productId: z.string().optional(),
+        locale: z.string().default('en'),
+        customRatingField: z.string().optional(),
+        nativeReviews: z.array(z.object({
+          id: z.string(),
+          author: z.string(),
+          rating: z.number().min(1).max(5),
+          title: z.string().optional(),
+          body: z.string(),
+          date: z.string().optional(),
+          skinType: z.string().optional(),
+          verified: z.boolean().default(false),
+        })).optional(),
+        overallRating: z.number().min(0).max(5).optional(),
+        totalReviews: z.number().int().min(0).optional(),
+      }),
+      comparison_chart: z.object({
+        heading: z.string().optional(),
+        products: z.array(z.object({
+          id: z.string(),
+          name: z.string(),
+          shortName: z.string(),
+          tagline: z.string(),
+          image: z.object({
+            url: z.string().min(1),
+            alt: z.string(),
+            width: z.number().int().positive().optional(),
+            height: z.number().int().positive().optional(),
+          }).optional(),
+          fields: z.object({
+            whatItIs: z.string(),
+            bestFor: z.string(),
+            whereItFits: z.string(),
+            keyIngredients: z.string(),
+          }),
+          price: z.string().optional(),
+          buyUrl: z.string().optional(),
+        })).min(2).max(3),
+      }),
+      kit_contents: z.object({
+        heading: z.object({
+          eyebrow: z.string().optional(),
+          kicker: z.string().optional(),
+          title: z.string(),
+          subtitle: z.string().optional(),
+          description: z.string().optional(),
+        }).optional(),
+        products: z.array(z.object({
+          slug: z.string(),
+          name: z.string(),
+          subtitle: z.string(),
+          image: z.object({
+            url: z.string().min(1),
+            alt: z.string(),
+            width: z.number().int().positive().optional(),
+            height: z.number().int().positive().optional(),
+          }),
+          rating: z.number().min(0).max(5).optional(),
+          reviewCount: z.number().int().min(0).optional(),
+          price: z.string().optional(),
+          buyLabel: z.string().optional(),
+        })).min(2).max(8),
+      }),
+      results_carousel: z.object({
+        heading: z.string(),
+        subtitle: z.string().optional(),
+        cards: z.array(z.object({
+          id: z.string(),
+          productName: z.string(),
+          metricValue: z.string(),
+          metricLabel: z.string(),
+          image: z.object({
+            url: z.string().min(1),
+            alt: z.string(),
+            width: z.number().int().positive().optional(),
+            height: z.number().int().positive().optional(),
+          }),
+          creator: z.object({
+            handle: z.string(),
+            skinType: z.string().optional(),
+          }).optional(),
+        })).min(2).max(8),
+      }),
+      shade_selector: z.object({
+        heading: z.string().optional(),
+        shades: z.array(z.object({
+          id: z.string(),
+          name: z.string(),
+          description: z.string(),
+          hex: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+          image: z.object({
+            url: z.string().min(1),
+            alt: z.string(),
+            width: z.number().int().positive().optional(),
+            height: z.number().int().positive().optional(),
+          }).optional(),
+          isNew: z.boolean().default(false),
+          isOutOfStock: z.boolean().default(false),
+          group: z.enum(['limited_edition', 'core']),
+        })).min(1),
+        defaultShadeId: z.string().optional(),
+      }),
+      lifestyle_carousel: z.object({
+        heading: z.string(),
+        images: z.array(z.object({
+          id: z.string(),
+          image: z.object({
+            url: z.string().min(1),
+            alt: z.string(),
+            width: z.number().int().positive().optional(),
+            height: z.number().int().positive().optional(),
+          }),
+          caption: z.string().optional(),
+        })).min(3).max(10),
+      }),
+      research_ingredients: z.object({
+        heroImage: z.object({
+          url: z.string().min(1),
+          alt: z.string(),
+          width: z.number().int().positive().optional(),
+          height: z.number().int().positive().optional(),
+        }),
+        heading: z.object({
+          eyebrow: z.string().optional(),
+          kicker: z.string().optional(),
+          title: z.string(),
+          subtitle: z.string().optional(),
+          description: z.string().optional(),
+        }).optional(),
+        ingredients: z.array(z.object({
+          id: z.string(),
+          name: z.string(),
+          icon: z.object({
+            url: z.string().min(1),
+            alt: z.string(),
+            width: z.number().int().positive().optional(),
+            height: z.number().int().positive().optional(),
+          }).optional(),
+          description: z.string(),
+          alsoMadeWith: z.array(z.string()).default([]),
+        })).min(2).max(6),
+      }),
+      sustainability: z.object({
+        title: z.string(),
+        intro: z.string().optional(),
+        specs: z.array(z.object({
+          component: z.string(),
+          detail: z.string(),
+        })).min(2),
+        recycleCta: z.object({
+          label: z.string(),
+          href: z.string().min(1),
+        }).optional(),
+        steps: z.array(z.string()).default([]),
+        closingNote: z.string().optional(),
+      }),
+    } as const;
+
+    const payloadTypeUnsafeScheme = z.object({
+      url: z.string().min(1),
+      alt: z.string(),
+      width: z.number().int().positive().optional(),
+      height: z.number().int().positive().optional(),
+    });
+
+    const unitTypeScheme = z.enum([
+      'hero_gallery',
+      'benefits_grid',
+      'application_steps',
+      'key_ingredients',
+      'value_props_grid',
+      'visual_application',
+      'ingredient_spotlight',
+      'results_study',
+      'routine_map',
+      'reviews',
+      'comparison_chart',
+      'kit_contents',
+      'results_carousel',
+      'shade_selector',
+      'lifestyle_carousel',
+      'research_ingredients',
+      'sustainability',
+    ]);
+
+    const validatedUnits = [] as import('../types/rhode-showcase-units').RhodeShowcaseUnit[];
+
+    for (const unit of units as BackendShowcaseUnit[]) {
+      const typeResult = unitTypeScheme.safeParse(unit.type);
+      if (!typeResult.success) {
+        console.warn('[fetchProductShowcaseRhode] Skipping unit with unknown type:', unit.type);
+        continue;
+      }
+
+      const confirmedType = typeResult.data;
+      const payloadSchema = payloadSchemaFor[confirmedType];
+      if (!payloadSchema) {
+        console.warn('[fetchProductShowcaseRhode] No schema for type:', confirmedType);
+        continue;
+      }
+
+      const payloadResult = payloadSchema.safeParse(unit.payload);
+      if (!payloadResult.success) {
+        console.warn('[fetchProductShowcaseRhode] Skipping unit with invalid payload, type:', confirmedType, 'errors:', payloadResult.error.issues?.map(i => i.message).join(', '));
+        continue;
+      }
+
+      validatedUnits.push({
+        id: String(unit.id),
+        type: confirmedType,
+        sortOrder: unit.sortOrder ?? 0,
+        isActive: unit.isActive !== false,
+        direction: unit.direction === 'rtl' ? 'rtl' : 'ltr',
+        theme: unit.theme as 'light' | 'dark' | 'cream' | 'clinical' | 'brand' | undefined,
+        payload: payloadResult.data,
+      } as import('../types/rhode-showcase-units').RhodeShowcaseUnit);
+    }
+
+    return validatedUnits;
   } catch (error) {
     if (!(error instanceof IcareApiError && error.status === 0)) {
-      console.error('Error fetching product showcase:', error);
+      console.error('Error fetching Rhode product showcase:', error);
     }
     return null;
   }
