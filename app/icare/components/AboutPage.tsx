@@ -60,7 +60,6 @@ const DEFAULT_TEAM_3_IMAGE = 'https://images.unsplash.com/photo-1631214565164-dd
 
 export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
   const t = translations[lang];
-  const t = translations[lang];
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const {
     aboutHeroHeadline, aboutHeroCta, aboutHeroImage,
