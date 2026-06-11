@@ -3,11 +3,12 @@ import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { ChevronRight, Star, Plus } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Product } from '../types';
+import { Language, translations } from '../translations';
 import { fetchProductShortcut } from '../lib/catalog-client';
 import { SkeletonPulse } from './ui/skeletons';
 
 interface ProductLineupProps {
-  lang?: string;
+  lang: Language;
   onProductSelect?: (product: Product) => void;
   products?: Product[] | null;
   useShortcutFallback?: boolean;
@@ -23,12 +24,13 @@ interface LineupItemProps {
   originalPrice?: string;
   image: string;
   reviews: string;
+  quickAddText?: string;
   onSelect?: (product: Product) => void;
 }
 
 const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872] focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 
-const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, label, name, description, price, originalPrice, image, reviews, onSelect }) => {
+const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, label, name, description, price, originalPrice, image, reviews, quickAddText = 'Quick Add', onSelect }) => {
   const [isHovered, setIsHovered] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const selectProduct = () => product && onSelect?.(product);
@@ -91,7 +93,7 @@ const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, label, n
                 >
                   <button type="button" className={`bg-[#67645E] text-white px-8 py-3.5 rounded-full flex items-center gap-2 ${CONTROL_FOCUS_CLASS}`} onClick={(event) => { event.stopPropagation(); selectProduct(); }}>
                     <Plus size={16} strokeWidth={3} />
-                    <span className="text-[11px] font-black uppercase tracking-[0.2em]">Quick Add</span>
+                     <span className="text-[11px] font-black uppercase tracking-[0.2em]">{quickAddText}</span>
                   </button>
                 </motion.div>
               )}
@@ -137,7 +139,8 @@ const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, label, n
 
 const LineupCard = React.memo(LineupCardBase);
 
-export const ProductLineup: React.FC<ProductLineupProps> = ({ onProductSelect, products, useShortcutFallback = true }) => {
+export const ProductLineup: React.FC<ProductLineupProps> = ({ lang, onProductSelect, products, useShortcutFallback = true }) => {
+  const t = translations[lang];
   const scrollRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
   const [remoteProducts, setRemoteProducts] = useState<Product[] | null>(null);
@@ -205,7 +208,7 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ onProductSelect, p
             onClick={loadProducts}
             className={`px-6 py-2 bg-[#67645E] text-white rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#67645E]/90 transition-colors ${CONTROL_FOCUS_CLASS}`}
           >
-            Retry
+            {t.product.retry || 'Retry'}
           </button>
         </div>
       </section>
@@ -216,7 +219,7 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ onProductSelect, p
     return (
       <section className="bg-[#F1F0ED] overflow-hidden pt-12 pb-24 lg:pb-32">
         <div className="max-w-[1600px] mx-auto px-[var(--icare-section-inset)] text-center text-[12px] font-bold uppercase tracking-[0.2em] text-[#84827E]">
-          no related products are available yet
+          {t.product.noRelatedProducts || 'no related products are available yet'}
         </div>
       </section>
     );
@@ -231,18 +234,19 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ onProductSelect, p
         >
           {items.map((item) => (
             <div key={item.id} className="snap-start first:pl-1 last:pr-2">
-               <LineupCard
-                  product={item}
-                  category={item.title ?? item.category ?? 'icare'}
-                   label={item.label}
-                  name={item.name}
-                  description={item.description ?? item.category ?? 'iCare product'}
-                  price={item.price}
-                  originalPrice={item.originalPrice}
-                  image={item.primaryImage}
-                  reviews={item.reviews ?? '0'}
-                  onSelect={onProductSelect}
-                />
+                 <LineupCard
+                   product={item}
+                   category={item.title ?? item.category ?? 'icare'}
+                    label={item.label}
+                   name={item.name}
+                   description={item.description ?? item.category ?? 'iCare product'}
+                   price={item.price}
+                   originalPrice={item.originalPrice}
+                   image={item.primaryImage}
+                   reviews={item.reviews ?? '0'}
+                   quickAddText={t.product.quickAdd}
+                   onSelect={onProductSelect}
+                 />
             </div>
           ))}
         </div>

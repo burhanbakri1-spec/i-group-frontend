@@ -38,7 +38,7 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
     footerLinkContact,
     contactSupportHours,
     socialLinks: rawSocialLinks,
-  } = useSiteContent();
+  } = useSiteContent(lang);
 
   const [newsletterEmail, setNewsletterEmail] = React.useState('');
   const t = translations[lang];
@@ -150,7 +150,7 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
                 ))}
               </ul>
             ) : (
-              <p className="text-[12px] text-[#84827E] italic">Social links coming soon</p>
+               <p className="text-[12px] text-[#84827E] italic">{t.socialLinksComingSoon}</p>
             )}
           </div>
 

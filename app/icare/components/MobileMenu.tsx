@@ -20,17 +20,18 @@ interface MobileMenuProps {
   onToggleLang: () => void;
 }
 
-const SHOP_ALL_CATEGORY = 'SHOP ALL';
+const SHOP_ALL_SENTINEL = '__ALL__';
 const FOCUS_VISIBLE_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67645E]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--rb-bg-warm-gray)]';
 
 export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavigate, onProductSelect, onOpenCart, onOpenSearch, lang, onToggleLang }) => {
   // onOpenSearch is passed from parent but not currently used in this component
   void onOpenSearch;
   const t = translations[lang];
-  const [activeCategory, setActiveCategory] = useState(SHOP_ALL_CATEGORY);
+  const shopAllLabel = t.categories.all;
+  const [activeCategory, setActiveCategory] = useState(SHOP_ALL_SENTINEL);
   const [remoteProducts, setRemoteProducts] = useState<Product[]>([]);
   const { cartCount } = useShop();
-  const { socialLinks: rawSocialLinks } = useSiteContent();
+  const { socialLinks: rawSocialLinks } = useSiteContent(lang);
   const shouldReduceMotion = useReducedMotion();
   const calmTween = shouldReduceMotion ? { duration: 0 } : { duration: 0.22, ease: 'easeOut' as const };
 
@@ -49,14 +50,14 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
       .map((product) => product.category?.trim().toUpperCase())
       .filter((category): category is string => Boolean(category))));
 
-    return [SHOP_ALL_CATEGORY, ...backendCategories];
+    return [SHOP_ALL_SENTINEL, ...backendCategories];
   }, [remoteProducts]);
 
-  const activeMobileCategory = mobileCategories.includes(activeCategory) ? activeCategory : SHOP_ALL_CATEGORY;
+  const activeMobileCategory = mobileCategories.includes(activeCategory) ? activeCategory : SHOP_ALL_SENTINEL;
 
   const displayProducts = useMemo<Product[]>(() => {
     return remoteProducts
-      .filter((product) => activeMobileCategory === SHOP_ALL_CATEGORY || product.category?.trim().toUpperCase() === activeMobileCategory)
+       .filter((product) => activeMobileCategory === SHOP_ALL_SENTINEL || product.category?.trim().toUpperCase() === activeMobileCategory)
       .slice(0, 4);
   }, [activeMobileCategory, remoteProducts]);
 
@@ -78,7 +79,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
         >
           {/* Mobile Header Inside Menu */}
           <div className="px-6 py-4 flex items-center justify-between">
-            <button onClick={onClose} className={`p-2 rounded-full hover:bg-black/5 transition-colors ${FOCUS_VISIBLE_CLASS}`} aria-label="Close menu">
+             <button onClick={onClose} className={`p-2 rounded-full hover:bg-black/5 transition-colors ${FOCUS_VISIBLE_CLASS}`} aria-label={t.closeMenu}>
               <X size={24} className="text-[var(--rb-primary-text)]" />
             </button>
             <div className="absolute left-1/2 -translate-x-1/2 h-10">
@@ -91,10 +92,10 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
               >
                 <Globe size={16} className="text-[var(--rb-primary-text)]" />
                 <span className="text-[12px] font-bold text-[var(--rb-primary-text)] uppercase">
-                  {lang === 'en' ? 'AR' : 'EN'}
+                   {lang === 'en' ? t.langToggleAr : t.langToggleEn}
                 </span>
               </button>
-              <button onClick={() => { onOpenCart(); onClose(); }} className={`p-2 relative rounded-full hover:bg-black/5 transition-colors ${FOCUS_VISIBLE_CLASS}`} aria-label="Open cart">
+               <button onClick={() => { onOpenCart(); onClose(); }} className={`p-2 relative rounded-full hover:bg-black/5 transition-colors ${FOCUS_VISIBLE_CLASS}`} aria-label={t.openCart}>
                 <ShoppingBag size={22} className="text-[var(--rb-primary-text)]" />
                 {cartCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-black text-white text-[10px] font-black rounded-full flex items-center justify-center">
@@ -116,7 +117,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
                       activeMobileCategory === cat ? 'text-[var(--rb-near-black)]' : 'text-[var(--rb-primary-text)]'
                     }`}
                   >
-                    {cat}
+                    {cat === SHOP_ALL_SENTINEL ? shopAllLabel : cat}
                     {activeMobileCategory === cat && (
                       <motion.div
                         layoutId="mobileActiveTab"
@@ -126,8 +127,8 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
                     )}
                   </button>
                 )) : (
-                  <span className="text-[12px] font-bold uppercase tracking-[0.15em] text-[var(--rb-primary-text)] pb-2">
-                    no categories available
+                <span className="text-[12px] font-bold uppercase tracking-[0.15em] text-[var(--rb-primary-text)] pb-2">
+                    {t.noCategoriesAvailable}
                   </span>
                 )}
             </div>
@@ -177,9 +178,9 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
                     </div>
                   </button>
                 )) : (
-                  <div className="bg-[var(--rb-bg-light)]/70 rounded-[var(--rb-radius-card)] p-6 text-center text-[12px] font-bold uppercase tracking-[0.15em] text-[var(--rb-primary-text)]">
-                    no products available
-                  </div>
+                   <div className="bg-[var(--rb-bg-light)]/70 rounded-[var(--rb-radius-card)] p-6 text-center text-[12px] font-bold uppercase tracking-[0.15em] text-[var(--rb-primary-text)]">
+                     {t.noProductsAvailable}
+                   </div>
                 )}
               </motion.div>
             </AnimatePresence>

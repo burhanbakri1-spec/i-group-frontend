@@ -66,7 +66,7 @@ const COMMITMENT_ITEMS: Record<Language, CommitmentItem[]> = {
 
 export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNavigate }) => {
   const shouldReduceMotion = useReducedMotion();
-  const { commitmentImage } = useSiteContent();
+  const { commitmentImage } = useSiteContent(lang);
   const commitmentItems = COMMITMENT_ITEMS[lang];
   const scrollInInitialX = lang === 'ar' ? 10 : -10;
   const [activeId, setActiveId] = useState<CommitmentItem['id']>('mission');

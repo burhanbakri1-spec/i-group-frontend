@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { ChevronDown } from 'lucide-react';
-import { Language } from '../translations';
+import { Language, translations } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { PageHero } from './PageHero';
 import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
@@ -58,7 +58,9 @@ const DEFAULT_TEAM_2_IMAGE = 'https://images.unsplash.com/photo-1763692108454-6c
 const DEFAULT_TEAM_3_IMAGE = 'https://images.unsplash.com/photo-1631214565164-dd0b7fba0295?q=80&w=800';
 
 
-export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
+export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
+  const t = translations[lang];
+  const t = translations[lang];
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const {
     aboutHeroHeadline, aboutHeroCta, aboutHeroImage,
@@ -69,22 +71,22 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
     aboutTeamMember2Name, aboutTeamMember2Title, aboutTeamMember2Image,
     aboutTeamMember3Name, aboutTeamMember3Title, aboutTeamMember3Image,
     aboutValuesImage, aboutFounderNoteHeading, aboutFounderLetter,
-  } = useSiteContent();
+  } = useSiteContent(lang ?? 'en');
 
   // TODO: Move valuesData to CMS (useSiteContent) for centralized content management.
-  // Currently hardcoded in English; translations.ts has the Arabic equivalents under pages.about.*
+  // Now driven from translations[lang] for bilingual support.
   const valuesData = [
     {
-      title: "our values",
-      content: "It was important to us to build a value driven business. At icare, we believe in: Simplicity. Affordability. Authenticity. Quality. Transparency."
+      title: t.aboutValuesTitle,
+      content: t.aboutValuesContent,
     },
     {
-      title: "scientifically proven formulas",
-      content: "Every icare formula is developed in collaboration with leading dermatologists and chemists. We prioritize high-performance, clinical-grade ingredients that are proven to strengthen the skin barrier and deliver visible results without irritation."
+      title: t.aboutProvenTitle,
+      content: t.aboutProvenContent,
     },
     {
-      title: "our minimal footprint",
-      content: "We are committed to a sustainable future. This means using 100% recyclable packaging, minimizing secondary boxes, and sourcing ingredients responsibly. Our goal is to create products that are as kind to the planet as they are to your skin."
+      title: t.aboutFootprintTitle,
+      content: t.aboutFootprintContent,
     }
   ];
 
@@ -94,7 +96,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
       <PageHero
         image={aboutHeroImage}
         fallbackImage={DEFAULT_HERO_IMAGE}
-        alt="iCare philosophy"
+         alt={t.aboutAltBrand}
         title={aboutHeroHeadline}
         ctaLabel={aboutHeroCta}
         onCtaClick={() => onNavigate?.('shop')}
@@ -106,9 +108,9 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 items-center">
           <ScrollReveal direction="left" viewportMargin="-80px">
             <div className="overflow-hidden aspect-[4/5] lg:aspect-auto lg:h-[80vh] z-0">
-              <ImageWithFallback 
-                src={aboutIntentionalImage || DEFAULT_INTENTIONAL_IMAGE} 
-                alt="Intentional Skincare" 
+               <ImageWithFallback 
+                 src={aboutIntentionalImage || DEFAULT_INTENTIONAL_IMAGE} 
+                 alt={t.aboutAltTexture} 
                 className="w-full h-full object-cover"
               />
             </div>
@@ -150,9 +152,9 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             </ScrollReveal>
             <ScrollReveal direction="right" viewportMargin="-80px">
               <div className="relative aspect-[3/4] rounded-[16px] md:rounded-[24px] overflow-hidden lg:h-[80vh] order-1 lg:order-2">
-                <ImageWithFallback 
-                  src={aboutFoundationImage || DEFAULT_FOUNDATION_IMAGE} 
-                  alt="Skincare Texture" 
+                 <ImageWithFallback 
+                   src={aboutFoundationImage || DEFAULT_FOUNDATION_IMAGE} 
+                   alt={t.aboutAltTexture} 
                   className="w-full h-full object-cover scale-110"
                 />
               </div>
@@ -167,9 +169,9 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 items-stretch">
             <ScrollReveal direction="left" viewportMargin="-80px">
               <div className="rounded-[16px] overflow-hidden aspect-[4/5] lg:aspect-auto lg:h-[80vh]">
-                <ImageWithFallback 
-                  src={aboutValuesImage || DEFAULT_VALUES_IMAGE} 
-                  alt="Our Values Journey" 
+                 <ImageWithFallback 
+                   src={aboutValuesImage || DEFAULT_VALUES_IMAGE} 
+                   alt={t.aboutAltValues} 
                   className="w-full h-full object-cover grayscale"
                 />
               </div>
@@ -217,7 +219,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 <div className="aspect-[3/4] rounded-[16px] overflow-hidden bg-[#F2F1ED]">
                   <ImageWithFallback 
                     src={aboutTeamMember1Image || DEFAULT_TEAM_1_IMAGE} 
-                    alt="Team Member" 
+                    alt={t.aboutAltTeam} 
                     className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                   />
                 </div>
@@ -234,7 +236,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 <div className="aspect-[3/4] rounded-[16px] overflow-hidden bg-[#F2F1ED]">
                   <ImageWithFallback 
                     src={aboutTeamMember2Image || DEFAULT_TEAM_2_IMAGE} 
-                    alt="Team Member" 
+                    alt={t.aboutAltTeam} 
                     className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                   />
                 </div>
@@ -251,7 +253,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 <div className="aspect-[3/4] rounded-[16px] overflow-hidden bg-[#F2F1ED]">
                   <ImageWithFallback 
                     src={aboutTeamMember3Image || DEFAULT_TEAM_3_IMAGE} 
-                    alt="Team Member" 
+                    alt={t.aboutAltTeam} 
                     className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                   />
                 </div>

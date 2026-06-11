@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { icareApi } from '../lib/api-client';
 import { useSiteContent } from '../hooks/useSiteContent';
+import { useIcareShell } from './IcareShell';
+import { Language, translations } from '../translations';
 
 const SENTENCE_SPLIT_PATTERN = /\s*(?:\||\n|•|؛)\s*/;
 
@@ -38,8 +40,10 @@ const splitAnnouncementText = (text: string) => {
 };
 
 export const AnnouncementBar: React.FC = () => {
+  const { lang } = useIcareShell();
+  const t = translations[lang];
   const shouldReduceMotion = useReducedMotion();
-  const { announcementText } = useSiteContent();
+  const { announcementText } = useSiteContent(lang);
   const fallbackSlides = useMemo(() => splitAnnouncementText(announcementText), [announcementText]);
   const [remoteSlides, setRemoteSlides] = useState<string[]>([]);
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
@@ -101,7 +105,7 @@ export const AnnouncementBar: React.FC = () => {
   if (slides.length === 0) return null;
 
   return (
-    <section data-icare-announcement className="icare-announcement" aria-label="Announcements">
+      <section data-icare-announcement className="icare-announcement" aria-label={t.announcementsAriaLabel}>
       <div className="icare-announcement__body">
         <div className="icare-announcement__viewport" aria-live="polite">
           <AnimatePresence initial={false} mode="wait">
@@ -121,7 +125,7 @@ export const AnnouncementBar: React.FC = () => {
         {hasMultipleSlides ? (
           <button
             type="button"
-            aria-label={isPaused ? 'Resume announcements slider' : 'Pause announcements slider'}
+            aria-label={isPaused ? t.resumeSlider : t.pauseSlider}
             aria-pressed={isPaused}
             onClick={() => setIsPaused((currentValue) => !currentValue)}
             className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center justify-center p-2 text-[#67645E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67645E]/70"

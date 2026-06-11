@@ -190,7 +190,7 @@ const DEFAULT_SHIPPING_FORM: ShippingFormData = {
 export function useCheckout(lang: Language): UseCheckoutReturn {
   const router = useRouter();
   const { cartItems, cartTotal, clearCart, accessToken, isAuthenticated, user } = useShop();
-  const siteContent = useSiteContent();
+  const siteContent = useSiteContent(lang);
   const {
     checkoutTaxRate,
     freeShippingThreshold,

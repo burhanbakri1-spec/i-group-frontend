@@ -362,8 +362,8 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
               onClick={onOpenMenu}
               onMouseEnter={closeShopMenu}
               className={`p-2 rounded-full transition-colors lg:hidden ${FOCUS_VISIBLE_CLASS} ${isConnected ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}
-              aria-label="Open menu"
-            >
+               aria-label={t.openMenu}
+             >
               <Menu size={20} className={isConnected ? 'text-white' : 'text-[var(--rb-primary-text)]'} />
             </button>
             <nav className="hidden lg:flex items-center gap-7">
@@ -401,7 +401,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                 className={`text-[clamp(0.875rem,0.6vw+0.75rem,1rem)] font-bold flex items-center gap-2 border px-3 py-1.5 rounded-full transition-colors ${FOCUS_VISIBLE_CLASS} ${isConnected ? 'border-white/35 text-white hover:bg-white/10' : 'border-[var(--rb-border-light)] text-[var(--rb-primary-text)] hover:bg-black/5'}`}
               >
                 <Globe size={14} />
-                {lang === 'en' ? 'العربية' : 'EN'}
+                 {lang === 'en' ? t.langToggleAr : t.langToggleEn}
               </button>
             </nav>
           </div>
@@ -413,11 +413,11 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
             whileHover={shouldReduceMotion ? undefined : { scale: 1.015 }}
             whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
             transition={calmTween}
-            aria-label="Go to home"
+              aria-label={t.goToHome}
           >
             <img
               src="/icare-logo.png"
-              alt="icare beauty"
+                alt={t.aboutAltBrand}
               className={`h-full w-auto object-contain transition-all duration-300 ${logoToneClass}`}
             />
           </motion.button>
@@ -573,7 +573,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                   </AnimatePresence>
                 ) : (
                   <div className="px-10 py-16 text-center text-[13px] font-bold uppercase tracking-[0.2em] text-[var(--rb-primary-text)]">
-                    product previews unavailable
+                     {t.productPreviewsUnavailable}
                   </div>
                 )}
               </div>

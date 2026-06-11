@@ -4,7 +4,7 @@ import { Star, ChevronDown, ThumbsUp, ThumbsDown, CheckCircle2, ShoppingBag } fr
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language, translations } from '../translations';
 import { ProductLineup } from './ProductLineup';
-import { ProductShowcaseBlock } from './ProductShowcaseBlock';
+import { RhodeShowcaseBlock } from './RhodeShowcaseBlock';
 import { useShop } from '../context/ShopContext';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { Product, ProductGalleryMedia, ProductReview, ProductVariant, CreateReviewInput } from '../types';
@@ -192,7 +192,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
     reviewHydrationQuestion,
     reviewHydrationLow,
     reviewHydrationHigh,
-  } = useSiteContent();
+  } = useSiteContent(lang);
   const [displayProduct, setDisplayProduct] = useState<Product>(product);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(product.variants?.find((variant) => variant.id === product.variantId) ?? null);
   const [selectedColorId, setSelectedColorId] = useState<number | null>(() => {
@@ -429,9 +429,9 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
             </p>
             
             <div className="space-y-3 text-[13px] md:text-[14px] border-t border-[#DDDDDD] pt-6">
-                <p className="text-[#84827E] leading-relaxed"><span className="font-black lowercase">category:</span> {displayProduct.category ?? 'icare'} {displayProduct.stockStatus ? `— ${displayProduct.stockStatus.replaceAll('_', ' ')}` : ''}</p>
+                <p className="text-[#84827E] leading-relaxed"><span className="font-black lowercase">{t.product.categoryLabel}</span> {displayProduct.category ?? 'icare'} {displayProduct.stockStatus ? `— ${displayProduct.stockStatus.replaceAll('_', ' ')}` : ''}</p>
                 <div className="flex justify-between items-center py-2">
-                  <p className="font-black lowercase">{purchasableProduct.originalPrice ? <>original value: <span className="text-black/55 line-through ml-1">{purchasableProduct.originalPrice}</span></> : purchasableProduct.label ?? 'selected care'}</p>
+                  <p className="font-black lowercase">{purchasableProduct.originalPrice ? <>{t.product.originalValueLabel} <span className="text-black/55 line-through ml-1">{purchasableProduct.originalPrice}</span></> : purchasableProduct.label ?? 'selected care'}</p>
                   <p className="font-black text-[15px] md:text-[18px]">{purchasableProduct.price}</p>
                 </div>
             </div>
@@ -518,7 +518,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
 
               {displayProduct.variants && displayProduct.variants.length > 0 && (
                 <div className="flex flex-wrap items-center gap-2 text-[12px] md:text-[13px]">
-                  <span className="text-[#84827E] lowercase">{productSelectOption || 'Select option'}</span>
+                   <span className="text-[#84827E] lowercase">{productSelectOption || t.product.selectOption}</span>
                   {displayProduct.variants.map((variant) => (
                     <button
                       key={variant.id}
@@ -608,7 +608,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
       </section>
 
       {/* SHOWCASE SECTION */}
-      <ProductShowcaseBlock slug={product.slug} lang={lang} />
+      <RhodeShowcaseBlock slug={product.slug} lang={lang} />
 
       {/* 2. REVIEWS SECTION */}
       <section className="icare-index-section pb-32">
@@ -660,7 +660,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                       onClick={() => { setIsFilterDropdownOpen((prev) => !prev); setIsSortDropdownOpen(false); }}
                       className={`flex items-center gap-2 px-6 py-2.5 rounded-full border text-[10px] font-black uppercase tracking-widest transition-colors ${CONTROL_FOCUS_CLASS} ${reviewRatingFilter ? 'bg-[#67645E] text-white border-[#67645E]' : 'border-[#DDDDDD] hover:bg-[#67645E] hover:text-white'}`}
                     >
-                      {reviewRatingFilter ? `${reviewRatingFilter} stars` : (reviewFilterButton || 'Filter')}
+                       {reviewRatingFilter ? `${reviewRatingFilter} stars` : (reviewFilterButton || t.product.reviewFilter)}
                       <ChevronDown size={12} className={`transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`} />
                     </button>
                     {isFilterDropdownOpen && (
@@ -775,7 +775,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
       </section>
 
       {/* 3. LINEUP SECTION */}
-      <ProductLineup products={relatedProducts} useShortcutFallback={false} onProductSelect={onProductSelect} />
+      <ProductLineup lang={lang} products={relatedProducts} useShortcutFallback={false} onProductSelect={onProductSelect} />
 
       {/* FLOATING STICKY BAR */}
       <AnimatePresence>

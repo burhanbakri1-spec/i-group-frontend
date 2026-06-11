@@ -65,7 +65,11 @@ const resolveShippingPageContent = (
   };
 };
 
-export const useSiteContent = (lang: Language = 'en') => {
+export const useSiteContent = (lang: Language) => {
+  if (process.env.NODE_ENV !== 'production' && !lang) {
+    console.warn('useSiteContent called without lang');
+  }
+
   const { settings, socialLinks: contextSocialLinks } = useShop();
 
   return useMemo(() => {
