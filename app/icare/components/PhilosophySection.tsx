@@ -56,7 +56,7 @@ viewport={{ once: false }}
 
         <motion.button
           onClick={() => onNavigate('story')}
-          aria-label={lang === 'en' ? philosophyCta : 'تعرف على قصة آي كير'}
+          aria-label={philosophyCta}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { X, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { Language } from '../translations';
+import { Language, translations } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { Product } from '../types';
 import { icareApi } from '../lib/api-client';
@@ -21,7 +21,7 @@ const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 foc
 const INPUT_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 const DRAWER_TRANSITION = { duration: 0.18, ease: 'easeOut' as const };
 
-export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onProductSelect }) => {
+export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onProductSelect, lang }) => {
   const shouldReduceMotion = useReducedMotion();
   const {
     searchDrawerTitle,
@@ -32,6 +32,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
     searchBrandsHeading,
     searchCollectionsUnavailable,
   } = useSiteContent();
+  const t = translations[lang ?? 'en'];
   const [searchQuery, setSearchQuery] = useState('');
   const [remoteCollections, setRemoteCollections] = useState<string[]>([]);
   const [remoteProducts, setRemoteProducts] = useState<Product[]>([]);
@@ -138,7 +139,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
               <button 
                 onClick={onClose} 
                 className={`absolute right-6 p-1 text-[#67645E] hover:text-black transition-colors min-h-[44px] ${CONTROL_FOCUS_CLASS}`}
-                aria-label="Close search"
+                aria-label={t.ui.search.closeSearch}
               >
                 <X size={24} strokeWidth={1.5} />
               </button>
@@ -161,7 +162,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                     <button 
                       onClick={() => setSearchQuery('')}
                       className={`absolute right-4 top-1/2 -translate-y-1/2 p-1 text-[#67645E] hover:text-black ${INPUT_FOCUS_CLASS}`}
-                      aria-label="Clear search"
+                      aria-label={t.ui.search.clearSearch}
                     >
                       <X size={16} />
                     </button>
@@ -236,7 +237,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
               ) : (
                 <div className="space-y-12">
                   <div>
-                    <h3 className="text-[14px] font-black text-[#67645E] mb-5 lowercase">collections:</h3>
+                    <h3 className="text-[14px] font-black text-[#67645E] mb-5 lowercase">{t.ui.search.collections}</h3>
                     {searchableCollections.length > 0 ? (
                       <div className="flex flex-col gap-3">
                         {searchableCollections.map((item) => (
@@ -249,7 +250,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                   </div>
 
                   <div className="border-t border-black/10 pt-8">
-                    <h3 className="text-[14px] font-black text-[#67645E] mb-6 lowercase">recommended:</h3>
+                    <h3 className="text-[14px] font-black text-[#67645E] mb-6 lowercase">{t.ui.search.recommended}</h3>
                     {searchableProducts.length > 0 ? (
                       <div className="space-y-8">
                         {searchableProducts.slice(0, 2).map((product) => (
@@ -262,7 +263,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                         ))}
                       </div>
                     ) : (
-                      <p className="text-[13px] text-[#67645E] font-medium italic">recommendations unavailable</p>
+                      <p className="text-[13px] text-[#67645E] font-medium italic">{t.ui.search.recommendationsUnavailable}</p>
                     )}
                   </div>
                 </div>

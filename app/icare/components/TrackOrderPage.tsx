@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion, useReducedMotion } from 'motion/react';
 import { Search, Loader2, Truck, Package, Clock, CheckCircle, XCircle, AlertCircle, MapPin } from 'lucide-react';
 import { icareApi } from '../lib/api-client';
-import { Language, checkoutTranslations } from '../translations';
+import { Language, translations } from '../translations';
 
 const CONTROL_FOCUS_CLASS =
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
@@ -86,15 +86,14 @@ const STATUS_MAP: Record<string, {
   },
 };
 
-function getStatusInfo(status: string) {
-  return (
-    STATUS_MAP[status] ?? {
-      labelEn: status,
-      labelAr: status,
-      icon: <Clock size={16} />,
-      color: 'bg-gray-100 text-gray-800',
-    }
-  );
+function getStatusInfo(status: string, lang: Language) {
+  const entry = STATUS_MAP[status] ?? {
+    labelEn: status,
+    labelAr: status,
+    icon: <Clock size={16} />,
+    color: 'bg-gray-100 text-gray-800',
+  };
+  return { label: lang === 'ar' ? entry.labelAr : entry.labelEn, icon: entry.icon, color: entry.color };
 }
 
 export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrderNumber }) => {
@@ -105,7 +104,7 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
   const [errorMessage, setErrorMessage] = useState('');
   const shouldReduceMotion = useReducedMotion();
 
-  const ct = checkoutTranslations[lang];
+  const t = translations[lang];
   const isRtl = lang === 'ar';
 
   const doTrack = useCallback(async () => {
@@ -164,12 +163,10 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
               <Truck size={24} className="text-[#67645E]" />
             </div>
             <h1 className="text-2xl md:text-3xl font-light mb-2">
-              {lang === 'ar' ? 'تتبع طلبك' : 'Track Your Order'}
+              {t.pages.trackOrder.heading}
             </h1>
             <p className="text-sm text-[#84827E]">
-              {lang === 'ar'
-                ? 'أدخل رقم الطلب والبريد الإلكتروني للتحقق من حالة طلبك'
-                : 'Enter your order number and email to check your order status'}
+              {t.pages.trackOrder.description}
             </p>
           </div>
 
@@ -177,7 +174,7 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
           <form onSubmit={handleSubmit} className="space-y-4 mb-8">
             <div>
               <label className="block text-sm font-medium text-[#67645E] mb-1.5">
-                {lang === 'ar' ? 'رقم الطلب' : 'Order Number'}
+                {t.pages.trackOrder.orderNumber}
               </label>
               <input
                 type="text"
@@ -193,7 +190,7 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
             </div>
             <div>
               <label className="block text-sm font-medium text-[#67645E] mb-1.5">
-                {lang === 'ar' ? 'البريد الإلكتروني' : 'Email'}
+                {t.pages.trackOrder.email}
               </label>
               <input
                 type="email"
@@ -217,12 +214,12 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
               {loadState === 'loading' ? (
                 <>
                   <Loader2 size={18} className="animate-spin" />
-                  {lang === 'ar' ? 'جارٍ البحث...' : 'Searching...'}
+                  {t.pages.trackOrder.searching}
                 </>
               ) : (
                 <>
                   <Search size={18} />
-                  {lang === 'ar' ? 'تتبع الطلب' : 'Track Order'}
+                  {t.pages.trackOrder.trackButton}
                 </>
               )}
             </button>
@@ -233,9 +230,7 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
             <div className="text-center p-6 bg-red-50 rounded-lg">
               <AlertCircle size={32} className="mx-auto mb-3 text-red-500" />
               <p className="text-red-800 text-sm font-medium">
-                {lang === 'ar'
-                  ? 'الطلب غير موجود. يرجى التحقق من رقم الطلب والبريد الإلكتروني.'
-                  : 'Order not found. Please check your order number and email.'}
+                {t.pages.trackOrder.notFound}
               </p>
             </div>
           )}
@@ -244,9 +239,7 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
             <div className="text-center p-6 bg-red-50 rounded-lg">
               <AlertCircle size={32} className="mx-auto mb-3 text-red-500" />
               <p className="text-red-800 text-sm font-medium">
-                {lang === 'ar'
-                  ? 'تعذر تحميل معلومات التتبع. يرجى المحاولة مرة أخرى لاحقاً.'
-                  : 'Unable to load tracking information. Please try again later.'}
+                {t.pages.trackOrder.error}
               </p>
               {errorMessage && <p className="text-red-600 text-xs mt-2">{errorMessage}</p>}
             </div>
@@ -263,14 +256,14 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
               {/* Status badge */}
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-medium">
-                  {lang === 'ar' ? 'الطلب' : 'Order'} {result.orderNumber}
+                  {t.pages.trackOrder.orderPrefix} {result.orderNumber}
                 </h2>
                 {(() => {
-                  const info = getStatusInfo(result.status);
+                  const info = getStatusInfo(result.status, lang);
                   return (
                     <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${info.color}`}>
                       {info.icon}
-                      {lang === 'ar' ? info.labelAr : info.labelEn}
+                      {info.label}
                     </span>
                   );
                 })()}
@@ -282,7 +275,7 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
                   {result.trackingNumber && (
                     <div>
                       <p className="text-[#84827E] mb-0.5">
-                        {lang === 'ar' ? 'رقم التتبع' : 'Tracking Number'}
+                        {t.pages.trackOrder.trackingNumber}
                       </p>
                       <p className="font-medium">{result.trackingNumber}</p>
                     </div>
@@ -290,7 +283,7 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
                   {result.carrier && (
                     <div>
                       <p className="text-[#84827E] mb-0.5">
-                        {lang === 'ar' ? 'شركة الشحن' : 'Carrier'}
+                        {t.pages.trackOrder.carrier}
                       </p>
                       <p className="font-medium">{result.carrier}</p>
                     </div>
@@ -310,11 +303,11 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
               {statusTimeline.length > 0 && (
                 <div>
                   <h3 className="text-sm font-medium text-[#67645E] mb-4">
-                    {lang === 'ar' ? 'سجل الحالة' : 'Status History'}
+                    {t.pages.trackOrder.statusHistory}
                   </h3>
                   <div className="space-y-0">
                     {statusTimeline.map((entry, idx) => {
-                      const info = getStatusInfo(entry.status);
+                      const info = getStatusInfo(entry.status, lang);
                       const isLast = idx === statusTimeline.length - 1;
                       return (
                         <div key={idx} className="flex gap-4">
@@ -328,7 +321,7 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
                             <p className="text-sm">
                               <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${info.color}`}>
                                 {info.icon}
-                                {lang === 'ar' ? info.labelAr : info.labelEn}
+                                {info.label}
                               </span>
                             </p>
                             {entry.comment && (
@@ -351,7 +344,7 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
               {/* No history */}
               {statusTimeline.length === 0 && (
                 <p className="text-center text-sm text-[#AAA] py-6">
-                  {lang === 'ar' ? 'لا يوجد سجل حالة حتى الآن' : 'No status history available yet'}
+                  {t.pages.trackOrder.noHistory}
                 </p>
               )}
 
@@ -361,7 +354,7 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
                   href="/icare/contact"
                   className={`text-sm text-[#67645E] hover:underline ${CONTROL_FOCUS_CLASS}`}
                 >
-                  {lang === 'ar' ? 'بحاجة لمساعدة؟ اتصل بنا' : 'Need help? Contact support'}
+                  {t.pages.trackOrder.needHelp}
                 </Link>
               </div>
             </motion.div>

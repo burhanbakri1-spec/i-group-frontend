@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { Language } from '../translations';
+import { Language, translations } from '../translations';
 import { Product } from '../types';
 import { isPurchasableStock } from '../lib/mappers';
 import { ImageWithFallback } from './figma/ImageWithFallback';
@@ -18,12 +18,12 @@ interface ProductCardProps {
 
 const getDisplayName = (product: Product) => product.title ?? product.name;
 
-const getDisplayDescription = (product: Product, lang: Language) => (
+const getDisplayDescription = (product: Product, fallback: string) => (
   product.description
   || product.sub
   || product.main
   || product.category
-  || (lang === 'en' ? 'daily skin essential' : 'أساسي للعناية اليومية')
+  || fallback
 );
 
 const getCardLabel = (product: Product) => (
@@ -40,12 +40,13 @@ const ProductCardBase: React.FC<ProductCardProps> = ({
   variant = 'standard',
   showQuickAdd = true,
 }) => {
+  const t = translations[lang];
   const [isHovered, setIsHovered] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const { addToCart } = useShop();
   const isPurchasable = isPurchasableStock(product.stockStatus, product.stock);
   const displayName = getDisplayName(product);
-  const description = getDisplayDescription(product, lang);
+  const description = getDisplayDescription(product, t.product.dailySkinEssential);
   const cardLabel = getCardLabel(product);
   const hoverImage = product.secondaryImage ?? null;
   const shouldShowQuickAdd = showQuickAdd && variant === 'standard';
@@ -91,7 +92,7 @@ const ProductCardBase: React.FC<ProductCardProps> = ({
           onKeyDown={handleKeyDown}
           tabIndex={0}
           role="link"
-          aria-label={`${lang === 'en' ? 'View' : 'عرض'} ${displayName}`}
+          aria-label={`${t.product.view} ${displayName}`}
         >
           <div className="icare-product-card__primary">
             <span className="icare-product-card__media">
@@ -100,7 +101,7 @@ const ProductCardBase: React.FC<ProductCardProps> = ({
               )}
               {!isPurchasable && (
                 <span className="icare-product-card__stock">
-                  {lang === 'en' ? 'sold out' : 'نفد المخزون'}
+                  {t.product.soldOutLower}
                 </span>
               )}
               <ImageWithFallback
@@ -162,8 +163,8 @@ const ProductCardBase: React.FC<ProductCardProps> = ({
               disabled={!isPurchasable}
             >
               {isPurchasable
-                ? (lang === 'en' ? 'Quick Add' : 'إضافة سريعة')
-                : (lang === 'en' ? 'Sold Out' : 'نفد المخزون')}
+                ? t.product.quickAdd
+                : t.product.soldOut}
             </button>
           </motion.div>
         )}

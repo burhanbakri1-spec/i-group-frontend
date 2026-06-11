@@ -5,10 +5,11 @@ import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { Star, X, Send, Loader2 } from 'lucide-react';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { CreateReviewInput } from '../types';
+import { translations, Language } from '../translations';
 
 /* ──────────────────────────────────────────────────────────────────────────── */
 /*  Props                                                                       */
-/* ───────────────────────────────────────────�───────────────────────────────── */
+/* ──────────────────────────────────────────────────────────────────────────── */
 
 interface WriteReviewDialogProps {
   open: boolean;
@@ -18,6 +19,7 @@ interface WriteReviewDialogProps {
   onSubmit: (review: CreateReviewInput) => Promise<void>;
   isAuthenticated: boolean;
   onLoginRequest: () => void;
+  lang: Language;
 }
 
 /* ──────────────────────────────────────────────────────────────────────────── */
@@ -58,37 +60,6 @@ const MAX_COMMENT_LENGTH = 2000;
 const DEFAULT_HYDRATION = 75;
 
 /* ──────────────────────────────────────────────────────────────────────────── */
-/*  Fallback labels (English) — used when useSiteContent returns undefined     */
-/* ──────────────────────────────────────────────────────────────────────────── */
-
-const FALLBACK_LABELS = {
-  dialogTitle: 'WRITE A REVIEW',
-  ratingLabel: 'YOUR RATING *',
-  titleLabel: 'REVIEW TITLE',
-  titlePlaceholder: 'Summarize your experience',
-  commentLabel: 'YOUR REVIEW',
-  commentPlaceholder: 'Tell us more about your experience with this product',
-  ageRangeLabel: 'AGE RANGE',
-  ageRangePlaceholder: 'Select age range',
-  skinTypeLabel: 'SKIN TYPE',
-  skinTypePlaceholder: 'Select skin type',
-  skinConcernsLabel: 'SKIN CONCERNS',
-  favoriteFeaturesLabel: 'FAVORITE FEATURES',
-  hydrationLabel: 'HYDRATION RATING',
-  hydrationLow: 'Not very hydrated',
-  hydrationHigh: 'Super hydrated',
-  submitButton: 'SUBMIT REVIEW',
-  submittingButton: 'SUBMITTING...',
-  loginPrompt: 'LOG IN TO WRITE A REVIEW',
-  loginButton: 'LOG IN',
-  thankYouMessage: 'Thank you for your review!',
-  ratingRequired: 'Please select a rating',
-  titleTooLong: `Title must be ${MAX_TITLE_LENGTH} characters or fewer`,
-  commentTooLong: `Review must be ${MAX_COMMENT_LENGTH} characters or fewer`,
-  submitError: 'Something went wrong. Please try again.',
-} as const;
-
-/* ──────────────────────────────────────────────────────────────────────────── */
 /*  Component                                                                   */
 /* ──────────────────────────────────────────────────────────────────────────── */
 
@@ -100,9 +71,11 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
   onSubmit,
   isAuthenticated,
   onLoginRequest,
+  lang,
 }) => {
   const shouldReduceMotion = useReducedMotion();
   const { reviewHydrationLow, reviewHydrationHigh } = useSiteContent();
+  const t = translations[lang];
 
   /* ── Form state ────────────────────────────────────────────────────────── */
 
@@ -161,10 +134,8 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
 
   /* ── Helpers ──────────────────────────────────────────────────────────── */
 
-  const label = (key: keyof typeof FALLBACK_LABELS): string => FALLBACK_LABELS[key];
-
-  const hydrationLow = reviewHydrationLow || label('hydrationLow');
-  const hydrationHigh = reviewHydrationHigh || label('hydrationHigh');
+  const hydrationLow = reviewHydrationLow || t.reviewDialog.notVeryHydrated;
+  const hydrationHigh = reviewHydrationHigh || t.reviewDialog.superHydrated;
 
   const toggleItem = useCallback(
     (field: 'skinConcerns' | 'favoriteFeatures', item: string) => {
@@ -179,9 +150,9 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
   );
 
   const validate = (): string | null => {
-    if (rating < 1) return label('ratingRequired');
-    if (title.length > MAX_TITLE_LENGTH) return label('titleTooLong');
-    if (comment.length > MAX_COMMENT_LENGTH) return label('commentTooLong');
+    if (rating < 1) return t.reviewDialog.selectRating;
+    if (title.length > MAX_TITLE_LENGTH) return t.reviewDialog.titleMaxLength.replace('{max}', String(MAX_TITLE_LENGTH));
+    if (comment.length > MAX_COMMENT_LENGTH) return t.reviewDialog.reviewMaxLength.replace('{max}', String(MAX_COMMENT_LENGTH));
     return null;
   };
 
@@ -215,7 +186,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
         onClose();
       }, 1500);
     } catch {
-      setSubmitError(label('submitError'));
+      setSubmitError(t.reviewDialog.somethingWentWrong);
     } finally {
       setIsSubmitting(false);
     }
@@ -269,7 +240,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
               <button
                 onClick={onClose}
                 className={`absolute top-5 right-5 p-1 rounded-md hover:rotate-90 transition-transform duration-300 ${CONTROL_FOCUS_CLASS}`}
-                aria-label="Close"
+                aria-label={t.reviewDialog.close}
               >
                 <X size={18} strokeWidth={1.5} />
               </button>
@@ -278,7 +249,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                 {/* Header */}
                 <div className="pr-8 mb-8">
                   <h2 className="text-[12px] font-black uppercase tracking-widest text-[#67645E]">
-                    {label('dialogTitle')}
+                    {t.reviewDialog.writeReview}
                   </h2>
                   <p className="text-[13px] text-black/50 mt-1.5">{productName}</p>
                 </div>
@@ -287,13 +258,13 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                 {!isAuthenticated ? (
                   <div className="py-16 flex flex-col items-center justify-center text-center gap-6">
                     <p className="text-[12px] font-bold uppercase tracking-widest text-[#67645E]/60">
-                      {label('loginPrompt')}
+                      {t.reviewDialog.loginToReview}
                     </p>
                     <button
                       onClick={onLoginRequest}
                       className={`bg-[#67645E] text-white px-8 py-3.5 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#7B7872] transition-colors ${CONTROL_FOCUS_CLASS}`}
                     >
-                      {label('loginButton')}
+                      {t.reviewDialog.login}
                     </button>
                   </div>
                 ) : showThankYou ? (
@@ -305,7 +276,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                       transition={{ duration: shouldReduceMotion ? 0 : 0.3 }}
                     >
                       <p className="text-[14px] font-bold uppercase tracking-widest text-[#67645E]">
-                        {label('thankYouMessage')}
+                        {t.reviewDialog.thankYouReview}
                       </p>
                     </motion.div>
                   </div>
@@ -329,7 +300,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                     {/* Star rating */}
                     <div className="space-y-3">
                       <label className="block text-[10px] font-black uppercase tracking-widest text-[#67645E]">
-                        {label('ratingLabel')}
+                        {t.reviewDialog.yourRating}
                       </label>
                       <div className="flex gap-1.5">
                         {[1, 2, 3, 4, 5].map((star) => {
@@ -357,16 +328,16 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                     {/* Title */}
                     <div className="space-y-2">
                       <label className="block text-[10px] font-black uppercase tracking-widest text-[#67645E]">
-                        {label('titleLabel')}
+                        {t.reviewDialog.reviewTitle}
                         <span className="text-black/30 normal-case tracking-normal font-normal ml-1.5">
-                          optional
+                          {t.reviewDialog.optional}
                         </span>
                       </label>
                       <input
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        placeholder={label('titlePlaceholder')}
+                        placeholder={t.reviewDialog.summarizeExperience}
                         maxLength={MAX_TITLE_LENGTH}
                         className={`w-full px-4 py-3 rounded-[12px] border border-[#DDDDDD] bg-[#F9F8F6] text-[14px] text-[#67645E] placeholder:text-[#84827E] placeholder:text-[12px] transition-colors hover:border-[#7B7872] ${CONTROL_FOCUS_CLASS}`}
                       />
@@ -380,15 +351,15 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                     {/* Comment */}
                     <div className="space-y-2">
                       <label className="block text-[10px] font-black uppercase tracking-widest text-[#67645E]">
-                        {label('commentLabel')}
+                        {t.reviewDialog.yourReview}
                         <span className="text-black/30 normal-case tracking-normal font-normal ml-1.5">
-                          optional
+                          {t.reviewDialog.optional}
                         </span>
                       </label>
                       <textarea
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
-                        placeholder={label('commentPlaceholder')}
+                        placeholder={t.reviewDialog.tellUsMore}
                         maxLength={MAX_COMMENT_LENGTH}
                         rows={4}
                         className={`w-full px-4 py-3 rounded-[12px] border border-[#DDDDDD] bg-[#F9F8F6] text-[14px] text-[#67645E] placeholder:text-[#84827E] placeholder:text-[12px] resize-none transition-colors hover:border-[#7B7872] ${CONTROL_FOCUS_CLASS}`}
@@ -405,9 +376,9 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                       {/* Age range */}
                       <div className="space-y-2">
                         <label className="block text-[10px] font-black uppercase tracking-widest text-[#67645E]">
-                          {label('ageRangeLabel')}
+                          {t.reviewDialog.ageRange}
                           <span className="text-black/30 normal-case tracking-normal font-normal ml-1.5">
-                            optional
+                            {t.reviewDialog.optional}
                           </span>
                         </label>
                         <select
@@ -416,7 +387,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                           className={`w-full px-4 py-3 rounded-[12px] border border-[#DDDDDD] bg-[#F9F8F6] text-[14px] text-[#67645E] appearance-none transition-colors hover:border-[#7B7872] ${CONTROL_FOCUS_CLASS}`}
                         >
                           <option value="" disabled>
-                            {label('ageRangePlaceholder')}
+                            {t.reviewDialog.selectAgeRange}
                           </option>
                           {AGE_RANGES.map((range) => (
                             <option key={range} value={range}>
@@ -429,9 +400,9 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                       {/* Skin type */}
                       <div className="space-y-2">
                         <label className="block text-[10px] font-black uppercase tracking-widest text-[#67645E]">
-                          {label('skinTypeLabel')}
+                          {t.reviewDialog.skinType}
                           <span className="text-black/30 normal-case tracking-normal font-normal ml-1.5">
-                            optional
+                            {t.reviewDialog.optional}
                           </span>
                         </label>
                         <select
@@ -440,7 +411,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                           className={`w-full px-4 py-3 rounded-[12px] border border-[#DDDDDD] bg-[#F9F8F6] text-[14px] text-[#67645E] appearance-none transition-colors hover:border-[#7B7872] ${CONTROL_FOCUS_CLASS}`}
                         >
                           <option value="" disabled>
-                            {label('skinTypePlaceholder')}
+                            {t.reviewDialog.selectSkinType}
                           </option>
                           {SKIN_TYPES.map((type) => (
                             <option key={type} value={type}>
@@ -454,9 +425,9 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                     {/* Skin concerns chips */}
                     <div className="space-y-3">
                       <label className="block text-[10px] font-black uppercase tracking-widest text-[#67645E]">
-                        {label('skinConcernsLabel')}
+                        {t.reviewDialog.skinConcerns}
                         <span className="text-black/30 normal-case tracking-normal font-normal ml-1.5">
-                          optional
+                          {t.reviewDialog.optional}
                         </span>
                       </label>
                       <div className="flex flex-wrap gap-2">
@@ -482,9 +453,9 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                     {/* Favorite features chips */}
                     <div className="space-y-3">
                       <label className="block text-[10px] font-black uppercase tracking-widest text-[#67645E]">
-                        {label('favoriteFeaturesLabel')}
+                        {t.reviewDialog.favoriteFeatures}
                         <span className="text-black/30 normal-case tracking-normal font-normal ml-1.5">
-                          optional
+                          {t.reviewDialog.optional}
                         </span>
                       </label>
                       <div className="flex flex-wrap gap-2">
@@ -510,9 +481,9 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                     {/* Hydration slider */}
                     <div className="space-y-4">
                       <label className="block text-[10px] font-black uppercase tracking-widest text-[#67645E]">
-                        {label('hydrationLabel')}
+                        {t.reviewDialog.hydrationRating}
                         <span className="text-black/30 normal-case tracking-normal font-normal ml-1.5">
-                          optional
+                          {t.reviewDialog.optional}
                         </span>
                       </label>
 
@@ -540,7 +511,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                           value={hydrationRating}
                           onChange={(e) => setHydrationRating(Number(e.target.value))}
                           className={`absolute inset-0 w-full h-6 opacity-0 cursor-pointer ${CONTROL_FOCUS_CLASS}`}
-                          aria-label="Hydration rating"
+                          aria-label={t.reviewDialog.hydrationRatingLabel}
                         />
 
                         {/* Labels */}
@@ -563,12 +534,12 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                         {isSubmitting ? (
                           <>
                             <Loader2 size={16} className="animate-spin" />
-                            {label('submittingButton')}
+                            {t.reviewDialog.submitting}
                           </>
                         ) : (
                           <>
                             <Send size={14} />
-                            {label('submitButton')}
+                            {t.reviewDialog.submitReview}
                           </>
                         )}
                       </motion.button>

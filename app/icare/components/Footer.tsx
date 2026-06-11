@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { Language } from '../translations';
+import { translations, Language } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { getSocialPlatformIcon, getSocialPlatformLabel } from '../lib/social-links';
 
@@ -41,13 +41,14 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
   } = useSiteContent();
 
   const [newsletterEmail, setNewsletterEmail] = React.useState('');
+  const t = translations[lang];
   const shouldReduceMotion = useReducedMotion();
   const calmTween = shouldReduceMotion ? { duration: 0 } : { duration: 0.24, ease: 'easeOut' as const };
 
   const handleNewsletterSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!newsletterEmail.trim()) return;
-    alert(lang === 'en' ? 'Thank you for subscribing!' : 'شكراً لاشتراكك!');
+    alert(t.ui.thankYouForSubscribing);
     setNewsletterEmail('');
   };
 

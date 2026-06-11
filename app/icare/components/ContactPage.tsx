@@ -1,6 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Language } from '../translations';
+import { Language, translations } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { PageHero } from './PageHero';
 import { ScrollReveal } from './ui/ScrollReveal';
@@ -11,7 +11,7 @@ interface ContactPageProps {
 
 export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
   const router = useRouter();
-  const isEn = lang === 'en';
+  const t = translations[lang];
   const {
     contactHeroHeading,
     contactHeroImage,
@@ -32,8 +32,8 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
         image={contactHeroImage}
         fallbackImage="https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=2000"
         alt="Contact iCare"
-        title={isEn ? contactHeroHeading : 'ابقي على تواصل'}
-        subtitle={isEn ? 'customer experience' : 'تجربة العملاء'}
+        title={contactHeroHeading || t.pages.contact.heroHeading}
+        subtitle={t.pages.contact.heroSubtitle}
         priority
       />
 
@@ -46,13 +46,11 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
             <div className="space-y-8 md:space-y-16 pt-8 md:pt-24">
               <div className="space-y-4 md:space-y-6 px-2 md:px-0">
                 <h2 className="text-[28px] md:text-[42px] font-bold lowercase tracking-tight text-[#67645E] leading-tight">
-                  {isEn ? contactInfoTitle : "نحن هنا للمساعدة."}
+                  {contactInfoTitle || t.pages.contact.infoTitle}
                 </h2>
                 <div className="space-y-4 md:space-y-6 text-[13px] md:text-[16px] text-[#5C5A56] leading-relaxed font-medium">
                   <p className="opacity-80">
-                    {isEn 
-                      ? contactSupportInfo
-                      : "فريق تجربة العملاء متاح من الاثنين إلى الجمعة، من 9 صباحاً حتى 5 مساءً. نهدف للرد على جميع الاستفسارات خلال 24-48 ساعة عمل."}
+                    {contactSupportInfo || t.pages.contact.supportInfo}
                   </p>
                   <div className="pt-4 md:pt-6 border-t border-black/5 space-y-4 md:space-y-6">
                     <div>
@@ -74,13 +72,13 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
             <div className="bg-[#F2F1ED] p-6 md:p-10 rounded-[24px] md:rounded-[40px] space-y-4 border border-black/[0.03]">
               <h3 className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em]">{contactFaqTitle}</h3>
               <p className="text-[12px] md:text-[14px] text-[#5C5A56] leading-relaxed opacity-70">
-                {isEn ? contactFaqText : "على الأرجح، تمت الإجابة على سؤالك بالفعل."}
+                {contactFaqText || t.pages.contact.faqText}
               </p>
               <button
                 onClick={() => router.push('/icare/faq')}
                 className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.2em] border-b-2 border-black pb-1 hover:opacity-50 transition-all inline-block"
               >
-                {isEn ? contactFaqCta : "زيارة الأسئلة الشائعة"}
+                {contactFaqCta || t.pages.contact.faqCta}
               </button>
             </div>
           </ScrollReveal>

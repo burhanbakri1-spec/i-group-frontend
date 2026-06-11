@@ -7,6 +7,7 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { fetchProductShowcase } from '../lib/catalog-client';
 import { PRODUCT_SHOWCASE_FALLBACK_UNITS } from '../lib/product-showcase-fallback';
 import type { ShowcaseUnit } from '../types';
+import { translations, type Language } from '../translations';
 
 interface ProductShowcaseBlockProps {
   slug?: string;
@@ -289,7 +290,8 @@ function KitContentsShowcaseSection({ unit, direction }: { unit: ShowcaseUnit; d
   );
 }
 
-function ApplicationStepsShowcaseSection({ unit, shouldReduceMotion, direction }: { unit: ShowcaseUnit; shouldReduceMotion: boolean; direction: ContentDirection }) {
+function ApplicationStepsShowcaseSection({ unit, shouldReduceMotion, direction, lang }: { unit: ShowcaseUnit; shouldReduceMotion: boolean; direction: ContentDirection; lang?: string }) {
+  const t = translations[lang === 'ar' ? 'ar' : 'en'];
   const payload = isRecord(unit.payload) ? unit.payload : undefined;
   const heading = getHeading(payload, unit);
   const steps = asRecordArray(payload?.steps)
@@ -335,7 +337,7 @@ function ApplicationStepsShowcaseSection({ unit, shouldReduceMotion, direction }
         </div>
         <AnimatePresence mode="wait">
           <motion.div key={active.id} initial={shouldReduceMotion ? false : { y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -10, opacity: 0 }} transition={{ duration: shouldReduceMotion ? 0 : 0.5 }} className="space-y-4 md:space-y-6">
-            <p className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.25em] opacity-40">{heading.eyebrow ?? 'application'}</p>
+            <p className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.25em] opacity-40">{heading.eyebrow ?? t.product.application}</p>
             <div className="flex gap-3 md:gap-4 items-start max-w-md">
               <span className="text-[10px] md:text-[11px] font-bold opacity-30 mt-1.5">{String(safeActiveStep + 1).padStart(2, '0')}</span>
               <div className="space-y-3">
@@ -367,7 +369,7 @@ function ApplicationStepsShowcaseSection({ unit, shouldReduceMotion, direction }
           {active.image ? (
             <ImageWithFallback src={active.image.url} alt={active.image.alt} className="w-full h-full object-cover object-center" />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-[#F2F1ED] p-12 text-center text-[12px] font-black uppercase tracking-[0.2em] text-black/30">image not provided</div>
+            <div className="flex h-full w-full items-center justify-center bg-[#F2F1ED] p-12 text-center text-[12px] font-black uppercase tracking-[0.2em] text-black/30">{t.product.imageNotProvided}</div>
           )}
         </motion.div>
       </AnimatePresence>
@@ -571,7 +573,8 @@ function BeforeAfterImage({ pair, className }: { pair?: NormalizedBeforeAfterPai
   );
 }
 
-function RoutineStepsShowcaseSection({ unit, shouldReduceMotion, direction }: { unit: ShowcaseUnit; shouldReduceMotion: boolean; direction: ContentDirection }) {
+function RoutineStepsShowcaseSection({ unit, shouldReduceMotion, direction, lang }: { unit: ShowcaseUnit; shouldReduceMotion: boolean; direction: ContentDirection; lang?: string }) {
+  const t = translations[lang === 'ar' ? 'ar' : 'en'];
   const payload = isRecord(unit.payload) ? unit.payload : undefined;
   const heading = getHeading(payload, unit);
   const heroImage = getMedia(payload?.heroImage ?? payload?.lifestyleImage ?? unit.image, heading.title);
@@ -616,7 +619,7 @@ function RoutineStepsShowcaseSection({ unit, shouldReduceMotion, direction }: { 
             ) : (
               <div className="flex h-full w-full items-center justify-center rounded-[12px] bg-white p-8 text-center">
                 <div className="space-y-3">
-                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#84827E]">routine step</p>
+                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#84827E]">{t.product.routineStep}</p>
                   <p className="text-[22px] font-medium leading-tight text-[#67645E]">{active.title}</p>
                 </div>
               </div>
@@ -650,20 +653,20 @@ function RoutineStepsShowcaseSection({ unit, shouldReduceMotion, direction }: { 
   );
 }
 
-function SemanticShowcaseUnit({ unit, shouldReduceMotion }: { unit: ShowcaseUnit; shouldReduceMotion: boolean }) {
+function SemanticShowcaseUnit({ unit, shouldReduceMotion, lang }: { unit: ShowcaseUnit; shouldReduceMotion: boolean; lang?: string }) {
   const direction = getDirection(unit.direction);
   switch (unit.type) {
     case 'kit_contents': return <KitContentsShowcaseSection unit={unit} direction={direction} />;
-    case 'application_steps': return <ApplicationStepsShowcaseSection unit={unit} shouldReduceMotion={shouldReduceMotion} direction={direction} />;
+    case 'application_steps': return <ApplicationStepsShowcaseSection unit={unit} shouldReduceMotion={shouldReduceMotion} direction={direction} lang={lang} />;
     case 'results_study': return <ResultsStudyShowcaseSection unit={unit} shouldReduceMotion={shouldReduceMotion} direction={direction} />;
-    case 'routine_steps': return <RoutineStepsShowcaseSection unit={unit} shouldReduceMotion={shouldReduceMotion} direction={direction} />;
+    case 'routine_steps': return <RoutineStepsShowcaseSection unit={unit} shouldReduceMotion={shouldReduceMotion} direction={direction} lang={lang} />;
     default: return renderStackedUnit(unit);
   }
 }
 
-function renderMixedLayoutUnits(units: ShowcaseUnit[], shouldReduceMotion: boolean) {
+function renderMixedLayoutUnits(units: ShowcaseUnit[], shouldReduceMotion: boolean, lang?: string) {
   return units.map((unit, index) =>
-    renderMotionUnit(unit, index, <SemanticShowcaseUnit unit={unit} shouldReduceMotion={shouldReduceMotion} />, shouldReduceMotion)
+    renderMotionUnit(unit, index, <SemanticShowcaseUnit unit={unit} shouldReduceMotion={shouldReduceMotion} lang={lang} />, shouldReduceMotion)
   );
 }
 
@@ -688,7 +691,7 @@ function SkeletonLoader() {
   );
 }
 
-export const ProductShowcaseBlock: React.FC<ProductShowcaseBlockProps> = ({ slug }) => {
+export const ProductShowcaseBlock: React.FC<ProductShowcaseBlockProps> = ({ slug, lang }) => {
   const [showcaseUnits, setShowcaseUnits] = useState<ShowcaseUnit[] | null>(null);
   const shouldReduceMotion = Boolean(useReducedMotion());
 
@@ -713,7 +716,7 @@ export const ProductShowcaseBlock: React.FC<ProductShowcaseBlockProps> = ({ slug
   return (
     <section className="icare-index-section bg-[#F1F0ED] rounded-[12px] overflow-hidden py-12 md:py-20">
       <div className="max-w-[1600px] mx-auto px-[var(--icare-section-inset)]">
-        <div className={`flex flex-col ${LAYOUT_GAP}`}>{renderMixedLayoutUnits(activeUnits, shouldReduceMotion)}</div>
+        <div className={`flex flex-col ${LAYOUT_GAP}`}>{renderMixedLayoutUnits(activeUnits, shouldReduceMotion, lang)}</div>
       </div>
     </section>
   );

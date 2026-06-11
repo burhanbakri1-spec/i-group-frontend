@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { Star, ChevronDown, ThumbsUp, ThumbsDown, CheckCircle2, ShoppingBag } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { Language } from '../translations';
+import { Language, translations } from '../translations';
 import { ProductLineup } from './ProductLineup';
 import { ProductShowcaseBlock } from './ProductShowcaseBlock';
 import { useShop } from '../context/ShopContext';
@@ -26,7 +26,7 @@ const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 foc
 
 interface ReviewItemProps {
   review: ProductReview;
-  content: { verifiedLabel: string; hydrationQuestion: string; hydrationLow: string; hydrationHigh: string; helpfulQuestion: string };
+  content: { verifiedLabel: string; hydrationQuestion: string; hydrationLow: string; hydrationHigh: string; helpfulQuestion: string; ageRange: string; skinConcern: string; skinTypeQuestion: string; favoriteFeatures: string };
   helpfulCount?: number;
   onHelpfulVote?: (reviewId: number) => void;
 }
@@ -48,10 +48,10 @@ const ReviewItem = ({ review, content, helpfulCount = 0, onHelpfulVote }: Review
 
       <div className="space-y-4">
         {[
-          { label: "Age Range", value: review.age },
-          { label: "Biggest Skin Concern", value: review.concern },
-          { label: "What is your skin type?", value: review.skinType },
-          { label: "What are your favorite features about this product?", value: review.favorites },
+          { label: content.ageRange, value: review.age },
+          { label: content.skinConcern, value: review.concern },
+          { label: content.skinTypeQuestion, value: review.skinType },
+          { label: content.favoriteFeatures, value: review.favorites },
         ].map((item, idx) => (
           <div key={idx} className="space-y-1">
             <p className="text-[10px] font-black uppercase tracking-widest text-[#67645E]">{item.label}</p>
@@ -170,6 +170,7 @@ const getProductImageGallery = (
 };
 
 export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProductSelect }) => {
+  const t = translations[lang];
   const { addToCart, isAuthenticated, accessToken } = useShop();
   const { navigateToPage } = useIcareShell();
   const shouldReduceMotion = useReducedMotion();
@@ -455,19 +456,19 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
                       <span className="text-[12px] md:text-[13px] text-[#84827E] lowercase font-black">
-                        {lang === 'en' ? 'color' : 'اللون'}:
+                        {t.product.color}:
                       </span>
                       <span className="text-[12px] md:text-[13px] text-[#67645E] lowercase font-black">
                         {activeColors.find((c) => c.id === selectedColorId)?.name ?? '—'}
                       </span>
                       {currentColorStock !== null && currentColorStock > 0 && currentColorStock <= 5 && (
                         <span className="text-[10px] md:text-[11px] font-bold text-amber-700 lowercase">
-                          {lang === 'en' ? `only ${currentColorStock} left` : `بقي ${currentColorStock} فقط`}
+                          {t.product.onlyLeft.replace('{count}', String(currentColorStock))}
                         </span>
                       )}
                       {currentColorStatus === 'out_of_stock' && (
                         <span className="text-[10px] md:text-[11px] font-bold text-black/40 lowercase">
-                          {lang === 'en' ? 'out of stock' : 'غير متوفر'}
+                          {t.product.outOfStock}
                         </span>
                       )}
                     </div>
@@ -542,11 +543,11 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                 >
                   <ShoppingBag size={16} />
                     {isSelectedVariantPurchasable
-                      ? (lang === 'en' ? `${productAddToBag || 'Add to Bag'} — ${purchasableProduct.price}` : `أضف للسلة — ${purchasableProduct.price}`)
-                      : (lang === 'en' ? (productSoldOut || 'Sold Out') : 'نفد المخزون')}
+                      ? `${productAddToBag || t.product.addToBag} — ${purchasableProduct.price}`
+                      : (productSoldOut || t.product.soldOut)}
                 </motion.button>
                 <div className="flex items-center justify-center gap-2 text-[9px] md:text-[10px] font-bold text-[#84827E]">
-                  {lang === 'en' ? (productAfterpayText || 'Or 4 interest-free payments with') : 'أو 4 دفعات بدون فوائد مع'} <span className="text-black font-black bg-[#ACEBFF] px-1.5 py-0.5 rounded italic">Afterpay</span>
+                  {productAfterpayText || t.product.orAfterpay} <span className="text-black font-black bg-[#ACEBFF] px-1.5 py-0.5 rounded italic">Afterpay</span>
                 </div>
               </div>
           </div>
@@ -558,11 +559,11 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
 
             const details: { label: string; value: string | string[] }[] = [];
 
-            if (bp.howToUse) details.push({ label: lang === 'ar' ? 'طريقة الاستخدام' : 'How to Use', value: bp.howToUse });
-            if (bp.ingredients?.length) details.push({ label: lang === 'ar' ? 'المكونات' : 'Ingredients', value: bp.ingredients });
-            if (bp.benefits?.length) details.push({ label: lang === 'ar' ? 'الفوائد' : 'Benefits', value: bp.benefits });
-            if (bp.skinTypes?.length) details.push({ label: lang === 'ar' ? 'نوع البشرة' : 'Skin Types', value: bp.skinTypes });
-            if (bp.concerns?.length) details.push({ label: lang === 'ar' ? 'المخاوف' : 'Concerns', value: bp.concerns });
+            if (bp.howToUse) details.push({ label: t.product.howToUse, value: bp.howToUse });
+            if (bp.ingredients?.length) details.push({ label: t.product.ingredients, value: bp.ingredients });
+            if (bp.benefits?.length) details.push({ label: t.product.benefits, value: bp.benefits });
+            if (bp.skinTypes?.length) details.push({ label: t.product.skinTypes, value: bp.skinTypes });
+            if (bp.concerns?.length) details.push({ label: t.product.concerns, value: bp.concerns });
 
             if (details.length === 0) return null;
 
@@ -573,7 +574,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                   onClick={() => setShowDetails((prev) => !prev)}
                   className={`flex items-center justify-between w-full text-[11px] md:text-[12px] font-black uppercase tracking-[0.15em] text-[#67645E] ${CONTROL_FOCUS_CLASS}`}
                 >
-                  <span>{lang === 'ar' ? 'تفاصيل المنتج' : 'Product Details'}</span>
+                  <span>{t.product.productDetails}</span>
                   <ChevronDown
                     size={14}
                     className={`transition-transform duration-200 ${showDetails ? 'rotate-180' : ''}`}
@@ -624,8 +625,8 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-[12px] font-black uppercase tracking-widest text-[#67645E]">{productRatingLabel || 'Customer reviews'}</p>
-                    <p className="text-[12px] text-[#84827E]">Based on {reviewCount} reviews</p>
+                    <p className="text-[12px] font-black uppercase tracking-widest text-[#67645E]">{productRatingLabel || t.product.customerReviews}</p>
+                    <p className="text-[12px] text-[#84827E]">{t.product.basedOnReviews.replace('{count}', String(reviewCount))}</p>
                   </div>
                   {/* Rating distribution */}
                   <div className="space-y-2 w-full max-w-xs">
@@ -652,7 +653,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                     onClick={() => setIsWriteReviewOpen(true)}
                     className={`flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#67645E] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#67645E]/90 transition-colors ${CONTROL_FOCUS_CLASS}`}
                   >
-                    write a review
+                    {t.product.writeReview}
                   </button>
                   <div ref={filterDropdownRef} className="relative">
                     <button
@@ -669,7 +670,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                             onClick={() => { setReviewRatingFilter(undefined); setIsFilterDropdownOpen(false); }}
                             className={`w-full px-4 py-2 text-left text-[11px] font-bold hover:bg-[#F1F0ED] transition-colors text-[#84827E]`}
                           >
-                            all ratings
+                            {t.product.allRatings}
                           </button>
                         )}
                         {[5, 4, 3, 2, 1].map((r) => (
@@ -689,16 +690,16 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                       onClick={() => { setIsSortDropdownOpen((prev) => !prev); setIsFilterDropdownOpen(false); }}
                       className={`flex items-center gap-2 px-6 py-2.5 rounded-full border border-[#DDDDDD] text-[10px] font-black uppercase tracking-widest hover:border-[#67645E] transition-colors bg-white ${CONTROL_FOCUS_CLASS}`}
                     >
-                      {reviewSortBy === 'recent' ? 'Most recent' : reviewSortBy === 'highest' ? 'Highest rated' : reviewSortBy === 'lowest' ? 'Lowest rated' : 'Most helpful'}
+                      {reviewSortBy === 'recent' ? t.product.mostRecent : reviewSortBy === 'highest' ? t.product.highestRated : reviewSortBy === 'lowest' ? t.product.lowestRated : t.product.mostHelpful}
                       <ChevronDown size={12} className={`transition-transform ${isSortDropdownOpen ? 'rotate-180' : ''}`} />
                     </button>
                     {isSortDropdownOpen && (
                       <div className="absolute top-full mt-2 right-0 bg-white rounded-[12px] border border-[#DDDDDD] py-1 z-20 min-w-[160px]">
                         {[
-                          { value: 'recent', label: 'Most recent' },
-                          { value: 'highest', label: 'Highest rated' },
-                          { value: 'lowest', label: 'Lowest rated' },
-                          { value: 'helpful', label: 'Most helpful' },
+                          { value: 'recent', label: t.product.mostRecent },
+                          { value: 'highest', label: t.product.highestRated },
+                          { value: 'lowest', label: t.product.lowestRated },
+                          { value: 'helpful', label: t.product.mostHelpful },
                         ].map((opt) => (
                           <button
                             key={opt.value}
@@ -723,7 +724,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                   <ScrollReveal key={review.id ?? idx} direction="bottom" delay={idx * 0.06}>
                     <ReviewItem
                       review={review}
-                      content={{ verifiedLabel: reviewVerifiedLabel, hydrationQuestion: reviewHydrationQuestion, hydrationLow: reviewHydrationLow, hydrationHigh: reviewHydrationHigh, helpfulQuestion: reviewHelpfulQuestion }}
+                      content={{ verifiedLabel: reviewVerifiedLabel, hydrationQuestion: reviewHydrationQuestion, hydrationLow: reviewHydrationLow, hydrationHigh: reviewHydrationHigh, helpfulQuestion: reviewHelpfulQuestion, ageRange: t.product.ageRange, skinConcern: t.product.skinConcern, skinTypeQuestion: t.product.skinTypeQuestion, favoriteFeatures: t.product.favoriteFeatures }}
                       helpfulCount={helpfulVotes[review.id ?? 0] ?? 0}
                       onHelpfulVote={handleHelpfulVote}
                     />
@@ -732,7 +733,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
               </StaggerContainer>
             ) : (
               <div className="py-16 text-center text-[14px] font-bold uppercase tracking-[0.2em] text-[#67645E]/40">
-                {productNoReviews || 'No reviews yet'}
+                {productNoReviews || t.product.noReviewsYet}
               </div>
             )}
             
@@ -749,7 +750,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                   onClick={() => setIsReviewsExpanded(true)}
                   className={`px-12 py-3 rounded-full border border-[#DDDDDD] text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#67645E] hover:text-white transition-colors duration-200 bg-white ${CONTROL_FOCUS_CLASS}`}
                 >
-                  {reviewShowMore || 'Show more'}
+                  {reviewShowMore || t.product.showMore}
                 </button>
               )}
               {isReviewsExpanded && hasMoreReviews && (
@@ -757,7 +758,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                   onClick={loadMoreReviews}
                   className={`px-12 py-3 rounded-full border border-[#DDDDDD] text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#67645E] hover:text-white transition-colors duration-200 bg-white ${CONTROL_FOCUS_CLASS}`}
                 >
-                  load more reviews
+                  {t.product.loadMoreReviews}
                 </button>
               )}
               {isReviewsExpanded && (
@@ -765,7 +766,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                   onClick={() => { setIsReviewsExpanded(false); setAdditionalReviews([]); setReviewPage(1); }}
                   className={`px-8 py-2 rounded-full border border-[#DDDDDD] text-[10px] font-bold uppercase tracking-widest hover:border-[#67645E] transition-colors ${CONTROL_FOCUS_CLASS}`}
                 >
-                  {reviewShowLess || 'Show less'}
+                  {reviewShowLess || t.product.showLess}
                 </button>
               )}
             </div>
@@ -803,8 +804,8 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
           >
             <ShoppingBag size={14} />
             {isSelectedVariantPurchasable
-              ? (lang === 'en' ? `${productBuyNow || 'Buy Now'} - ${purchasableProduct.price}` : `اشتر الآن - ${purchasableProduct.price}`)
-              : (lang === 'en' ? (productSoldOut || 'Sold Out').toUpperCase() : 'نفد المخزون')}
+              ? `${productBuyNow || t.product.buyNow} - ${purchasableProduct.price}`
+              : (productSoldOut || t.product.soldOut).toUpperCase()}
           </motion.button>
         </motion.div>
       </AnimatePresence>
@@ -822,6 +823,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
         onSubmit={handleReviewSubmit}
         isAuthenticated={isAuthenticated}
         onLoginRequest={handleLoginRequest}
+        lang={lang}
       />
     </div>
   );

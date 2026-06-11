@@ -2,7 +2,7 @@ import React from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { SwipeRail } from './ui/SwipeRail';
-import { Language } from '../translations';
+import { translations, Language } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
 
 interface SocialGridProps {
@@ -13,6 +13,7 @@ interface SocialGridProps {
 export const SocialGrid: React.FC<SocialGridProps> = ({ lang, onNavigate }) => {
   const shouldReduceMotion = useReducedMotion();
   const { socialGridHeading, socialGridCta, socialGridImage1, socialGridImage2, socialGridImage3, socialGridImage4 } = useSiteContent();
+  const t = translations[lang];
 
   const lifestyleImages = [
     { id: 1, src: socialGridImage1, alt: 'icare lifestyle 1' },
@@ -54,8 +55,8 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang, onNavigate }) => {
       </div>
 
       <SwipeRail
-        ariaLabel={lang === 'en' ? 'Social lifestyle images' : 'صور نمط الحياة الاجتماعية'}
-        cursorLabel={lang === 'en' ? 'swipe' : 'اسحب'}
+        ariaLabel={t.ui.socialLifestyleImages}
+        cursorLabel={t.pages.landingShowcase.swipe}
         className="icare-social-rail"
         trackClassName="icare-social-rail__track"
       >

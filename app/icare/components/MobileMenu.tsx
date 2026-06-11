@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { X, ShoppingBag, Globe } from 'lucide-react';
-import { Language } from '../translations';
+import { translations, Language } from '../translations';
 import { useShop } from '../context/ShopContext';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { fetchCatalogProducts } from '../lib/catalog-client';
@@ -26,6 +26,7 @@ const FOCUS_VISIBLE_CLASS = 'focus-visible:outline-none focus-visible:ring-2 foc
 export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavigate, onProductSelect, onOpenCart, onOpenSearch, lang, onToggleLang }) => {
   // onOpenSearch is passed from parent but not currently used in this component
   void onOpenSearch;
+  const t = translations[lang];
   const [activeCategory, setActiveCategory] = useState(SHOP_ALL_CATEGORY);
   const [remoteProducts, setRemoteProducts] = useState<Product[]>([]);
   const { cartCount } = useShop();
@@ -149,7 +150,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
                     key={product.id}
                     onClick={() => { onProductSelect?.(product); onClose(); }}
                     className={`w-full bg-[var(--rb-pure-white)] rounded-[var(--rb-radius-card)] p-4 flex items-center gap-5 relative group active:scale-[0.99] transition-transform duration-150 text-left ${FOCUS_VISIBLE_CLASS}`}
-                    aria-label={`${lang === 'en' ? 'Open product' : 'فتح المنتج'} ${product.title ?? product.name}`}
+                    aria-label={`${t.ui.openProduct} ${product.title ?? product.name}`}
                   >
                     <div className="w-20 h-20 bg-[var(--rb-bg-light)] rounded-[var(--rb-radius-card)] flex items-center justify-center p-2">
                       <ImageWithFallback 
@@ -188,13 +189,13 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
           <div className="p-6 py-4 border-t border-[var(--rb-border-light)] space-y-3 bg-[var(--rb-bg-surface)]/30">
             <div className="flex gap-6">
                 <button onClick={() => { onNavigate('story'); onClose(); }} className={`block rounded-sm text-[15px] font-bold uppercase tracking-tight text-[var(--rb-near-black)] hover:text-[var(--rb-near-black)] transition-colors ${FOCUS_VISIBLE_CLASS}`}>
-                  {lang === 'en' ? 'STORY' : 'قصتنا'}
+                  {t.ui.story}
                 </button>
                 <button onClick={() => { onNavigate('vlog'); onClose(); }} className={`block rounded-sm text-[15px] font-bold uppercase tracking-tight text-[var(--rb-near-black)] hover:text-[var(--rb-near-black)] transition-colors ${FOCUS_VISIBLE_CLASS}`}>
-                  {lang === 'en' ? 'VLOG' : 'فلوج'}
+                  {t.ui.vlog}
                 </button>
                 <button onClick={() => { onNavigate('account'); onClose(); }} className={`block rounded-sm text-[15px] font-bold uppercase tracking-tight text-[var(--rb-near-black)] hover:text-[var(--rb-near-black)] transition-colors ${FOCUS_VISIBLE_CLASS}`}>
-                  {lang === 'en' ? 'ACCOUNT' : 'حسابي'}
+                  {t.ui.account}
                 </button>
             </div>
 

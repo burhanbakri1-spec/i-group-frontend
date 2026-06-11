@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { ProductCard } from './ProductCard';
-import { Language } from '../translations';
+import { translations, Language } from '../translations';
 import { fetchCatalogProducts } from '../lib/catalog-client';
 import { ProductGridSkeleton } from './ui/skeletons';
 import { Product } from '../types';
@@ -15,6 +15,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
   const shouldReduceMotion = useReducedMotion();
   const [products, setProducts] = useState<Product[] | null>(null);
   const [loading, setLoading] = useState(true);
+  const t = translations[lang];
 
   useEffect(() => {
     const loadData = async () => {
@@ -40,7 +41,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
     return (
       <div className="bg-[#F1F0ED] py-16 text-center">
         <p className="text-[14px] font-bold uppercase tracking-[0.2em] text-[#84827E]">
-          {lang === 'en' ? 'No products available' : 'لا توجد منتجات متاحة'}
+          {t.pages.landingShowcase.noProducts}
         </p>
       </div>
     );

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
 import { Search, Navigation, ExternalLink } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { Language } from '../translations';
+import { translations, Language } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { icareApi, IcareApiError } from '../lib/api-client';
 import { BackendStore, PaginatedData } from '../types';
@@ -125,7 +125,8 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
   }, []);
 
   const filteredStores = stores.filter((store) => matchesStoreSearch(store, searchQuery));
-  const noResultsText = storeLocatorNoResults?.trim() || (lang === 'en' ? 'no locations found in this area.' : 'لم يتم العثور على مواقع في هذه المنطقة.');
+  const t = translations[lang];
+  const noResultsText = storeLocatorNoResults?.trim() || t.pages.storeLocator.noResults;
 
   const handleStoreClick = useCallback((storeId: string) => {
     setSelectedStoreId(storeId);
@@ -135,14 +136,6 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
     }
   }, []);
 
-  const t = {
-    title: lang === 'en' ? 'where to find us' : 'أماكن تواجدنا',
-    searchPlaceholder: lang === 'en' ? 'search by city, address, phone, or email' : 'ابحث بالمدينة أو العنوان أو الهاتف أو البريد',
-    directions: lang === 'en' ? 'get directions' : 'الحصول على الاتجاهات',
-    contact: lang === 'en' ? 'contact' : 'التواصل',
-    open: lang === 'en' ? 'open now' : 'مفتوح الآن',
-  };
-
   return (
     <div className="min-h-screen bg-[#F1F0ED] overflow-hidden px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col md:flex-row h-[calc(100vh-96px)]">
@@ -151,9 +144,9 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
         <div className="w-full md:w-[320px] lg:w-[450px] flex flex-col border-r border-[#DDDDDD] h-[45vh] md:h-full overflow-hidden bg-white z-10">
           <div className="p-4 lg:p-8 space-y-4 lg:space-y-8">
             <header>
-              <h1 className="text-[24px] lg:text-[42px] font-brand lowercase italic leading-none mb-1 lg:mb-2">{t.title}</h1>
+              <h1 className="text-[24px] lg:text-[42px] font-brand lowercase italic leading-none mb-1 lg:mb-2">{t.pages.storeLocator.title}</h1>
               <p className="text-[9px] lg:text-[11px] font-bold uppercase tracking-widest text-black/40">
-                {lang === 'en' ? storeLocatorTagline : 'ابحث عن آي كير بالقرب منك'}
+                {storeLocatorTagline || t.pages.storeLocator.tagline}
               </p>
             </header>
 
@@ -161,7 +154,7 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
             <div className="relative">
               <input
                 type="text"
-                placeholder={t.searchPlaceholder}
+                placeholder={t.pages.storeLocator.searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full h-10 lg:h-14 pl-10 pr-4 bg-[#F2F1ED] rounded-full text-[12px] lg:text-[14px] font-bold lowercase placeholder:text-black/30 outline-none focus:ring-2 ring-black/5 transition-all"
@@ -180,13 +173,13 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
               {fetchState === 'error' && (
                 <div className="text-center py-20 space-y-4">
                   <p className="text-[14px] font-brand lowercase italic text-black/30">
-                    {lang === 'en' ? 'Unable to load store locations.' : 'تعذر تحميل مواقع المتاجر.'}
+                    {t.pages.storeLocator.unableToLoad}
                   </p>
                   <button
                     onClick={loadStores}
                     className="text-[9px] font-black uppercase tracking-[0.2em] border-b-2 border-black pb-1 hover:opacity-50 transition-all"
                   >
-                    {lang === 'en' ? 'retry' : 'إعادة المحاولة'}
+                    {t.pages.storeLocator.retry}
                   </button>
                 </div>
               )}
@@ -224,13 +217,13 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
                     <div className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
                       <span className="text-[9px] lg:text-[11px] font-bold lowercase text-black/70">
-                        {t.open}{store.openingHours ? ` • ${store.openingHours}` : ''}
+                        {t.pages.storeLocator.open}{store.openingHours ? ` • ${store.openingHours}` : ''}
                       </span>
                     </div>
 
                     {(store.phone || store.email) && (
                       <p className="text-[9px] lg:text-[11px] font-bold lowercase text-black/50">
-                        {t.contact}: {[store.phone, store.email].filter(Boolean).join(' • ')}
+                        {t.pages.storeLocator.contact}: {[store.phone, store.email].filter(Boolean).join(' • ')}
                       </p>
                     )}
 
@@ -243,7 +236,7 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
                         className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#67645E] text-white rounded-full text-[8px] lg:text-[10px] font-black uppercase tracking-widest hover:opacity-90 transition-all active:scale-95"
                       >
                         <Navigation size={10} />
-                        {t.directions}
+                        {t.pages.storeLocator.directions}
                       </a>
                       <a
                         href={getDirectionsUrl(store)}
@@ -277,14 +270,14 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
           {fetchState === 'loading' && (
             <div className="absolute inset-0 bg-[#F2F1ED]/70 flex items-center justify-center z-[400] pointer-events-none">
               <p className="text-sm text-black/30 font-medium">
-                {lang === 'en' ? 'Loading map...' : 'جاري تحميل الخريطة...'}
+                {t.pages.storeLocator.loadingMap}
               </p>
             </div>
           )}
           {fetchState === 'error' && (
             <div className="absolute inset-0 bg-[#F2F1ED]/70 flex items-center justify-center z-[400] pointer-events-none">
               <p className="text-sm text-black/30 font-medium">
-                {lang === 'en' ? 'Map temporarily unavailable' : 'الخريطة غير متوفرة مؤقتاً'}
+                {t.pages.storeLocator.mapUnavailable}
               </p>
             </div>
           )}

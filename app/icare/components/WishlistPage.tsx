@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
 import { Heart, ShoppingBag, X, Share2 } from 'lucide-react';
-import { Language } from '../translations';
+import { Language, translations } from '../translations';
 import { useShop } from '../context/ShopContext';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { Product } from '../types';
@@ -26,32 +26,7 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
   const [recommendations, setRecommendations] = useState<Product[]>([]);
   const shouldReduceMotion = useReducedMotion();
 
-  const t = {
-    en: {
-      wishlist: 'MY WISHLIST',
-      items: 'items',
-      empty: 'Your wishlist is empty',
-      emptyDesc: 'Start adding products you love',
-      shopNow: 'SHOP NOW',
-      remove: 'Remove',
-      addToBag: 'ADD TO BAG',
-      share: 'SHARE WISHLIST',
-      saveForLater: 'Save your favorites and share them with friends&#39;'
-    },
-    ar: {
-      wishlist: 'قائمة الأمنيات',
-      items: 'منتجات',
-      empty: 'قائمة الأمنيات فارغة',
-      emptyDesc: 'ابدأ بإضافة المنتجات المفضلة',
-      shopNow: 'تسوق الآن',
-      remove: 'حذف',
-      addToBag: 'أضف للسلة',
-      share: 'مشاركة القائمة',
-      saveForLater: 'احفظ المنتجات المفضلة وشاركها مع الأصدقاء'
-    }
-  };
-
-  const text = t[lang];
+  const t = translations[lang];
   useEffect(() => {
     const loadRecommendations = async () => {
       const bestsellers = await fetchProductShortcut('bestsellers', 4);
@@ -72,15 +47,15 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
         <div className="text-center mb-8 md:mb-12">
           <div className="flex items-center justify-center gap-2 md:gap-3 mb-4">
             <Heart size={28} className="text-[#67645E] md:w-8 md:h-8" fill="#67645E" />
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight">{text.wishlist}</h1>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight">{t.wishlist}</h1>
           </div>
-          <p className="text-sm md:text-base text-[#67645E] mb-4 px-4">{text.saveForLater}</p>
+          <p className="text-sm md:text-base text-[#67645E] mb-4 px-4">{t.cartDrawer.saveForLater}</p>
           {wishlistItems.length > 0 && (
             <div className="flex items-center justify-center gap-4 md:gap-6">
-              <p className="text-xs md:text-sm text-[#67645E]">{wishlistItems.length} {text.items}</p>
+              <p className="text-xs md:text-sm text-[#67645E]">{wishlistItems.length} {t.cartDrawer.items}</p>
               <button className={`flex items-center gap-2 text-xs md:text-sm text-[#67645E] hover:text-black transition-colors ${SURFACE_FOCUS_CLASS}`}>
                 <Share2 size={14} className="md:w-4 md:h-4" />
-                {text.share}
+                {t.cartDrawer.share}
               </button>
             </div>
           )}
@@ -100,7 +75,7 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
             <h2 className="text-xl md:text-2xl font-light mb-2">{wishlistEmpty}</h2>
             <p className="text-sm md:text-base text-[#84827E] mb-8">{wishlistEmptySubtext}</p>
             <button onClick={() => onNavigate?.('shop')} className={`px-6 md:px-8 py-3 bg-[#67645E] text-white text-sm md:text-base rounded-full hover:bg-[#7B7872] transition-colors ${CONTROL_FOCUS_CLASS}`}>
-              {text.shopNow}
+              {t.shopNow}
             </button>
           </motion.div>
         ) : (
@@ -118,7 +93,7 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
                 <button
                   onClick={() => removeFromWishlist(product.id)}
                   className={`absolute top-4 right-4 z-10 w-10 h-10 md:w-8 md:h-8 bg-white rounded-full flex items-center justify-center opacity-100 transition-opacity border border-[#DDDDDD] hover:bg-[#67645E] hover:text-white ${CONTROL_FOCUS_CLASS}`}
-                  aria-label={`${text.remove} ${product.name}`}
+                  aria-label={`${t.cartDrawer.remove} ${product.name}`}
                 >
                   <X size={16} />
                 </button>
@@ -164,7 +139,7 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
                     className={`w-full py-3 bg-[#67645E] text-white text-sm uppercase tracking-wider rounded-full hover:bg-[#7B7872] transition-colors flex items-center justify-center gap-2 ${CONTROL_FOCUS_CLASS}`}
                   >
                     <ShoppingBag size={16} />
-                    {text.addToBag}
+                    {t.cartDrawer.addToBag}
                   </button>
                 </div>
               </motion.div>

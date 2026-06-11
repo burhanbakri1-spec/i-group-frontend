@@ -71,6 +71,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
     aboutValuesImage, aboutFounderNoteHeading, aboutFounderLetter,
   } = useSiteContent();
 
+  // TODO: Move valuesData to CMS (useSiteContent) for centralized content management.
+  // Currently hardcoded in English; translations.ts has the Arabic equivalents under pages.about.*
   const valuesData = [
     {
       title: "our values",

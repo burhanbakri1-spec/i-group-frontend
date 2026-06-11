@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { Language } from '../translations';
+import { Language, translations } from '../translations';
 import { useShop } from '../context/ShopContext';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { icareApi, IcareApiError } from '../lib/api-client';
@@ -36,6 +36,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
     authToggleToLogin,
   } = useSiteContent();
   const loginImage = authLoginImage || "https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=1200&auto=format&fit=crop";
+  const t = translations[lang ?? 'en'];
   const { user, isAuthenticated, accessToken, login, register, logout, authError } = useShop();
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [name, setName] = useState('');
@@ -64,7 +65,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
       const list = Array.isArray(result) ? result : result.data ?? [];
       setOrders(list);
     } catch (err) {
-      setOrdersError(err instanceof IcareApiError ? err.message : 'Unable to load your orders. Please try again.');
+      setOrdersError(err instanceof IcareApiError ? err.message : t.accountPage.unableToLoad);
     } finally {
       setOrdersLoading(false);
     }
@@ -96,17 +97,20 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
   };
 
   /** Human-readable label for each order status. */
-  const statusLabel = (status: string): string => {
-    const s = status.toLowerCase();
-    if (s === 'pending') return 'Pending';
-    if (s === 'reviewed') return 'Reviewed';
-    if (s === 'confirmed') return 'Confirmed';
-    if (s === 'processing') return 'Processing';
-    if (s === 'shipped') return 'Shipped';
-    if (s === 'out_for_delivery') return 'Out for Delivery';
-    if (s === 'delivered') return 'Delivered';
-    if (s === 'cancelled' || s === 'canceled') return 'Cancelled';
-    return status;
+  const statusLabel = (status: string, lang: Language): string => {
+    const t = translations[lang];
+    const labels: Record<string, string> = {
+      pending: t.accountPage.pending,
+      reviewed: t.accountPage.reviewed,
+      confirmed: t.accountPage.confirmed,
+      processing: t.accountPage.processing,
+      shipped: t.accountPage.shipped,
+      out_for_delivery: t.accountPage.outForDelivery,
+      delivered: t.accountPage.delivered,
+      cancelled: t.accountPage.cancelled,
+      canceled: t.accountPage.cancelled,
+    };
+    return labels[status.toLowerCase()] ?? status;
   };
 
   const statusBadgeClass = (status: string): string => {
@@ -149,7 +153,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
       }
       onNavigate?.('shop');
     } catch (error) {
-      setFormError(error instanceof Error ? error.message : 'Authentication failed.');
+      setFormError(error instanceof Error ? error.message : t.accountPage.authFailed);
     } finally {
       setIsSubmitting(false);
     }
@@ -163,7 +167,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
       <div className="relative h-[45vh] md:h-[80vh] w-full overflow-hidden z-0">
         <ImageWithFallback 
           src={loginImage} 
-          alt="Skin Investment" 
+          alt={t.accountPage.skinInvestment} 
           className="w-full h-full object-cover"
         />
         {/* Overlay Text - Matching the image exactly */}
@@ -198,7 +202,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
               {/* ─── My Orders Section ─── */}
               <div className="w-full text-left bg-white rounded-[16px] overflow-hidden">
                 <h3 className="px-5 pt-5 text-[11px] font-black uppercase tracking-[0.2em] text-[#5C5A56]/50">
-                  {lang === 'ar' ? 'طلباتي' : 'My Orders'}
+                  {t.accountPage.myOrders}
                 </h3>
 
                 {/* Loading */}
@@ -216,7 +220,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                       onClick={fetchOrders}
                       className={`text-[11px] font-black uppercase tracking-widest underline underline-offset-4 text-[#5C5A56] hover:text-black ${CONTROL_FOCUS_CLASS}`}
                     >
-                      Retry
+                      {t.accountPage.retry}
                     </button>
                   </div>
                 )}
@@ -225,13 +229,13 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                 {!ordersLoading && !ordersError && orders.length === 0 && (
                   <div className="px-5 py-10 text-center">
                     <p className="text-[13px] text-[#5C5A56]/75 mb-4">
-                      You haven&apos;t placed any orders yet.
+                      {t.accountPage.noOrdersYet}
                     </p>
                     <button
                       onClick={() => onNavigate?.('shop')}
                       className={`text-[11px] font-black uppercase tracking-widest underline underline-offset-4 text-[#5C5A56] hover:text-black transition-colors ${CONTROL_FOCUS_CLASS}`}
                     >
-                      Start shopping
+                      {t.accountPage.startShopping}
                     </button>
                   </div>
                 )}
@@ -259,13 +263,13 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                             </div>
                             <div className="flex items-center gap-3 flex-shrink-0">
                               <span className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full ${statusBadgeClass(order.status)}`}>
-                                {statusLabel(order.status)}
+                                {statusLabel(order.status, lang!)}
                               </span>
                               <span className="text-[11px] font-bold text-[#5C5A56] whitespace-nowrap">
                                 USD {order.total.toFixed(0)}
                               </span>
                               <span className="text-[10px] text-[#5C5A56]/70 whitespace-nowrap">
-                                {order.itemCount} {order.itemCount === 1 ? 'item' : 'items'}
+                                {order.itemCount} {order.itemCount === 1 ? t.accountPage.item : t.accountPage.items}
                               </span>
                               <svg
                                 className={`w-3 h-3 text-[#5C5A56]/70 transition-transform duration-200 motion-reduce:transition-none ${isExpanded ? 'rotate-180' : ''}`}
@@ -299,7 +303,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                                       {/* Items */}
                                       {orderDetail.items && orderDetail.items.length > 0 && (
                                         <div>
-                                          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#5C5A56]/70 mb-2">Items</p>
+                                          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#5C5A56]/70 mb-2">{t.accountPage.itemsHeading}</p>
                                           <ul className="space-y-1.5">
                                             {orderDetail.items.map((item) => (
                                               <li key={item.id} className="flex justify-between text-[11px] text-[#5C5A56]">
@@ -317,27 +321,27 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                                       {/* Totals */}
                                       <div className="border-t border-black/5 pt-2 space-y-1">
                                         <div className="flex justify-between text-[11px] text-[#5C5A56]/75">
-                                          <span>Subtotal</span>
+                                          <span>{t.accountPage.subtotal}</span>
                                           <span>USD {orderDetail.subtotal.toFixed(0)}</span>
                                         </div>
                                         <div className="flex justify-between text-[11px] text-[#5C5A56]/75">
-                                          <span>Shipping</span>
+                                          <span>{t.accountPage.shipping}</span>
                                           <span>USD {orderDetail.shippingCost.toFixed(0)}</span>
                                         </div>
                                         {orderDetail.tax > 0 && (
                                           <div className="flex justify-between text-[11px] text-[#5C5A56]/75">
-                                            <span>Tax</span>
+                                            <span>{t.accountPage.tax}</span>
                                             <span>USD {orderDetail.tax.toFixed(0)}</span>
                                           </div>
                                         )}
                                         {orderDetail.discount > 0 && (
                                           <div className="flex justify-between text-[11px] text-[#5C5A56]/75">
-                                            <span>Discount</span>
+                                            <span>{t.accountPage.discount}</span>
                                             <span>-USD {orderDetail.discount.toFixed(0)}</span>
                                           </div>
                                         )}
                                         <div className="flex justify-between text-[12px] font-bold text-[#5C5A56] pt-1 border-t border-black/5">
-                                          <span>Total</span>
+                                          <span>{t.accountPage.total}</span>
                                           <span>USD {orderDetail.total.toFixed(0)}</span>
                                         </div>
                                       </div>
@@ -345,7 +349,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                                       {/* Status timeline */}
                                       {orderDetail.statusHistory && orderDetail.statusHistory.length > 0 && (
                                         <div>
-                                          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#5C5A56]/70 mb-1.5">Status Timeline</p>
+                                          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#5C5A56]/70 mb-1.5">{t.accountPage.statusTimeline}</p>
                                           {orderDetail.statusHistory.map((entry, idx) => {
                                             const s = entry.status.toLowerCase();
                                             const dotColor =
@@ -359,7 +363,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                                               <div key={idx} className="flex items-start gap-2 pb-1.5">
                                                 <div className={`w-2 h-2 rounded-full mt-1 flex-shrink-0 ${dotColor}`} />
                                                 <div>
-                                                  <p className="text-[11px] font-bold text-[#5C5A56]">{statusLabel(entry.status)}</p>
+                                                   <p className="text-[11px] font-bold text-[#5C5A56]">{statusLabel(entry.status, lang!)}</p>
                                                   <p className="text-[9px] text-[#5C5A56]/70">{formatDate(entry.createdAt)}</p>
                                                   {entry.comment && (
                                                     <p className="text-[10px] text-[#5C5A56]/75 italic">{entry.comment}</p>
@@ -382,18 +386,18 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                                               setCancelStatus((prev) => ({ ...prev, [order.orderNumber]: 'cancelled' }));
                                             } catch (err) {
                                               setCancelStatus((prev) => ({ ...prev, [order.orderNumber]: 'idle' }));
-                                              setOrdersError(err instanceof IcareApiError ? err.message : 'Failed to cancel order. Please try again.');
+                                              setOrdersError(err instanceof IcareApiError ? err.message : t.accountPage.cancelFailed);
                                             }
                                           }}
                                           className={`w-full mt-2 py-2 border border-red-300 text-red-600 rounded-[10px] text-[10px] font-black uppercase tracking-[0.1em] hover:bg-red-50 transition-colors active:scale-[0.98] motion-reduce:active:scale-100 disabled:opacity-50 disabled:cursor-not-allowed ${CONTROL_FOCUS_CLASS}`}
                                         >
-                                          {cancelState === 'loading' ? 'Cancelling…' : 'Cancel Order'}
+                                          {cancelState === 'loading' ? t.accountPage.cancelling : t.accountPage.cancelOrder}
                                         </button>
                                       )}
 
                                       {cancelState === 'cancelled' && (
                                         <p className="text-center text-[11px] text-red-600 font-bold mt-2">
-                                          Cancellation request submitted.
+                                          {t.accountPage.cancellationSubmitted}
                                         </p>
                                       )}
                                     </div>
@@ -401,7 +405,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
 
                                   {!detailLoading && !orderDetail && (
                                     <p className="text-center text-[11px] text-[#5C5A56]/75 py-4">
-                                      Could not load order details.
+                                      {t.accountPage.couldNotLoad}
                                     </p>
                                   )}
                                 </div>
@@ -473,7 +477,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                 {isSubmitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-[#5C5A56] border-t-transparent rounded-full animate-spin" />
-                    PLEASE WAIT
+                    {t.accountPage.pleaseWait}
                   </>
                 ) : mode === 'login' ? authSubmitLogin : authSubmitSignup}
               </button>
@@ -484,7 +488,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
             <div className="text-[12px] text-[#67645E] font-medium">
               {mode === 'login' ? authToggleToRegister : authToggleToLogin}{' '}
               <button onClick={() => setMode(mode === 'login' ? 'register' : 'login')} className={`underline underline-offset-4 hover:text-black transition-colors ${CONTROL_FOCUS_CLASS}`}>
-                {mode === 'login' ? 'Sign up!' : 'Sign in!'}
+                {mode === 'login' ? t.accountPage.signUp : t.accountPage.signIn}
               </button>
             </div>
           </div>}

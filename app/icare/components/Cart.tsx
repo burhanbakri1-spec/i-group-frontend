@@ -58,12 +58,12 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
             {/* Header */}
             <div className="relative p-6 flex items-center justify-center border-b border-black/5">
               <span className="text-[15px] font-medium text-[#67645E] tracking-tight">
-                {cartCount} {lang === 'en' ? 'items' : 'منتجات'}
+                {cartCount} {t.cartDrawer.items}
               </span>
               <button 
                 onClick={onClose} 
                 className={`absolute ${lang === 'ar' ? 'left-6' : 'right-6'} p-1 text-[#67645E] hover:text-black transition-colors ${CONTROL_FOCUS_CLASS}`}
-                aria-label={lang === 'en' ? 'Close cart' : 'إغلاق السلة'}
+                aria-label={t.cartDrawer.closeCart}
               >
                 <X size={24} strokeWidth={1.5} />
               </button>
@@ -77,7 +77,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                   <ShoppingBag size={64} className="text-[#D9D7D2] mb-4" />
                   <h3 className="text-lg font-medium text-[#67645E] mb-2">{t.emptyCart}</h3>
                   <p className="text-sm text-[#67645E] mb-6">
-                    {lang === 'en' ? 'Start adding products you love' : 'ابدأ بإضافة المنتجات المفضلة'}
+                    {t.cartDrawer.emptyMessage}
                   </p>
                   <button
                     onClick={() => { onClose(); onNavigate('shop'); }}
@@ -143,7 +143,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                               <button
                                 onClick={() => updateQuantity(item.id, item.quantity - 1)}
                                 className={`w-8 h-8 flex items-center justify-center border border-[#DDDDDD] rounded-full hover:border-[#67645E] transition-colors ${CONTROL_FOCUS_CLASS}`}
-                                aria-label={lang === 'en' ? `Decrease quantity of ${item.title}` : `تقليل كمية ${item.title}`}
+                                aria-label={t.cartDrawer!.decreaseQuantity!.replace('{item}', item.title!)}
                               >
                                 <Minus size={14} />
                               </button>
@@ -151,7 +151,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                               <button
                                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
                                 className={`w-8 h-8 flex items-center justify-center border border-[#DDDDDD] rounded-full hover:border-[#67645E] transition-colors ${CONTROL_FOCUS_CLASS}`}
-                                aria-label={lang === 'en' ? `Increase quantity of ${item.title}` : `زيادة كمية ${item.title}`}
+                                aria-label={t.cartDrawer!.increaseQuantity!.replace('{item}', item.title!)}
                               >
                                 <Plus size={14} />
                               </button>
@@ -160,7 +160,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                             <button
                               onClick={() => removeFromCart(item.id)}
                               className={`text-[#67645E] hover:text-red-600 transition-colors ${CONTROL_FOCUS_CLASS}`}
-                              aria-label={lang === 'en' ? `Remove ${item.title} from cart` : `حذف ${item.title} من السلة`}
+                              aria-label={t.cartDrawer!.removeFromCart!.replace('{item}', item.title!)}
                             >
                               <Trash2 size={18} />
                             </button>
@@ -178,7 +178,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
               <div className="border-t border-[#DDDDDD] p-8 space-y-4 bg-white">
                 <div className="flex justify-between items-center text-[15px]">
                   <span className="font-medium text-[#67645E]">
-                    {lang === 'en' ? 'Subtotal' : 'المجموع الفرعي'}
+                    {t.cartDrawer.subtotal}
                   </span>
                   <span className="font-[900] text-[#67645E]">
                     USD {cartTotal.toFixed(2)}
@@ -189,7 +189,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                   onClick={handleCheckout}
                   className={`w-full py-4 bg-[#67645E] text-white text-[14px] font-[900] tracking-wider uppercase rounded-full hover:bg-[#5A5853] transition-colors duration-200 motion-reduce:transition-none ${DARK_CONTROL_FOCUS_CLASS}`}
                 >
-                  {isAuthenticated ? t.checkout : lang === 'en' ? 'SIGN IN TO CHECKOUT' : 'سجّل الدخول لإتمام الطلب'}
+                  {isAuthenticated ? t.checkout : t.cartDrawer.signInToCheckout}
                 </button>
                 
                 <p className="text-xs text-[#84827E] text-center">
