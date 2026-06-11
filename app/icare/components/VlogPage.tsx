@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { Language } from '../translations';
+import { Language, translations } from '../translations';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Play } from 'lucide-react';
 import { fetchProductMediaVlogs } from '../lib/catalog-client';
@@ -13,8 +13,7 @@ interface VlogPageProps {
   lang: Language;
 }
 
-const VLOG_EMPTY_HEADING = 'Vlog content unavailable';
-const VLOG_EMPTY_DESCRIPTION = 'Product media will appear here when the backend provides it.';
+
 const VLOG_HERO_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1590439471364-192aa70c47b53?q=80&w=2000';
 const IMAGE_BASE_URL = (process.env.NEXT_PUBLIC_IMAGE_BASE_URL || '').replace(/\/$/, '');
 const IMAGE_PROXY_BASE_URL = '/api/icare';
@@ -30,7 +29,7 @@ const normalizeVlogHeroImageUrl = (image?: string | null) => {
   return trimmedImage;
 };
 
-const VlogItemBase = ({ image, subtitle, thumbnailType, title, videoPreviewUrl, videoUrl }: VlogContentItem) => (
+const VlogItemBase = ({ image, subtitle, thumbnailType, title, videoPreviewUrl, videoUrl, lang }: VlogContentItem & { lang: Language }) => (
   <motion.div 
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
@@ -39,7 +38,7 @@ const VlogItemBase = ({ image, subtitle, thumbnailType, title, videoPreviewUrl, 
     className={`group ${videoUrl ? 'cursor-pointer' : ''}`}
   >
     <div className="relative aspect-video rounded-2xl overflow-hidden bg-[#F2F1ED] mb-6">
-      <VlogThumbnailMedia image={image} thumbnailType={thumbnailType} title={title} videoPreviewUrl={videoPreviewUrl} />
+      <VlogThumbnailMedia image={image} thumbnailType={thumbnailType} title={title} videoPreviewUrl={videoPreviewUrl} lang={lang} />
       {videoUrl && (
         <div className="absolute inset-0 bg-black/5 group-hover:bg-black/20 transition-colors flex items-center justify-center">
           <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform">
@@ -57,7 +56,7 @@ const VlogItemBase = ({ image, subtitle, thumbnailType, title, videoPreviewUrl, 
 
 const VlogItem = React.memo(VlogItemBase);
 
-const VlogThumbnailMedia = ({ image, thumbnailType, title, videoPreviewUrl }: Pick<VlogContentItem, 'image' | 'thumbnailType' | 'title' | 'videoPreviewUrl'>) => {
+const VlogThumbnailMedia = ({ image, thumbnailType, title, videoPreviewUrl, lang }: Pick<VlogContentItem, 'image' | 'thumbnailType' | 'title' | 'videoPreviewUrl'> & { lang: Language }) => {
   const [videoFailed, setVideoFailed] = useState(false);
 
   if (thumbnailType === 'video' && videoPreviewUrl && !videoFailed) {
@@ -83,11 +82,11 @@ const VlogThumbnailMedia = ({ image, thumbnailType, title, videoPreviewUrl }: Pi
     );
   }
 
-  return <VlogThumbnailFallback title={title} />;
+  return <VlogThumbnailFallback title={title} lang={lang} />;
 };
 
-const VlogThumbnailFallback = ({ title }: { title: string }) => (
-  <div className="flex h-full w-full items-center justify-center bg-[#F2F1ED] text-black/35" role="img" aria-label={`${title} preview unavailable`}>
+const VlogThumbnailFallback = ({ title, lang }: { title: string; lang: Language }) => (
+  <div className="flex h-full w-full items-center justify-center bg-[#F2F1ED] text-black/35" role="img" aria-label={translations[lang].pages.vlog.previewUnavailable.replace('{title}', title)}>
     <VideoFallbackIcon />
   </div>
 );
@@ -100,6 +99,7 @@ const VideoFallbackIcon = () => (
 
 export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
   const { vlogHeroTitle, vlogHeroImage } = useSiteContent();
+  const t = translations[lang];
   const [remoteVlogs, setRemoteVlogs] = useState<VlogContentItem[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -112,7 +112,7 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
       setRemoteVlogs(items ?? []);
     } catch (err) {
       console.error('Failed to load vlogs', err);
-      setError(err instanceof Error ? err.message : 'Failed to load vlogs.');
+      setError(err instanceof Error ? err.message : t.pages.vlog.loadError);
     } finally {
       setLoading(false);
     }
@@ -124,7 +124,7 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
 
   const vlogs = remoteVlogs ?? [];
   const isLoading = loading || remoteVlogs === null;
-  const heroTitle = vlogHeroTitle?.trim() || 'PRODUCT STORIES';
+  const heroTitle = vlogHeroTitle?.trim() || t.pages.vlog.heroTitle;
   const heroImage = normalizeVlogHeroImageUrl(vlogHeroImage);
 
   return (
@@ -132,7 +132,7 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
       <PageHero
         image={heroImage}
         fallbackImage={VLOG_HERO_FALLBACK_IMAGE}
-        alt="iCare product stories"
+        alt={t.pages.vlog.heroAlt}
         title={heroTitle}
         priority
       />
@@ -148,22 +148,22 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
               onClick={loadVlogs}
               className="px-6 py-2 bg-[#67645E] text-white rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#7B7872] transition-colors"
             >
-              Retry
+              {t.pages.vlog.retry}
             </button>
           </div>
         ) : vlogs.length > 0 ? (
           <div className="grid grid-cols-2 gap-x-4 md:gap-x-8 gap-y-8 md:gap-y-16">
             {vlogs.map((vlog) => (
-              <VlogItem key={vlog.id} {...vlog} />
+              <VlogItem key={vlog.id} {...vlog} lang={lang} />
             ))}
           </div>
         ) : (
           <div className="py-20 text-center space-y-3">
             <h2 className="text-[18px] font-black uppercase tracking-tight text-black/60">
-              {VLOG_EMPTY_HEADING}
+              {t.pages.vlog.unavailable}
             </h2>
             <p className="text-[13px] text-black/40 font-medium">
-              {VLOG_EMPTY_DESCRIPTION}
+              {t.pages.vlog.description}
             </p>
           </div>
         )}
