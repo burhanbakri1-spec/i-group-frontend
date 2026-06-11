@@ -8,8 +8,8 @@ import { useSiteContent } from '../hooks/useSiteContent';
 import { Product } from '../types';
 
 export const IcareProductRoutePage = ({ slug }: { slug: string }) => {
-  const { productUnavailableHeadline, productUnavailableDesc, productUnavailableCta } = useSiteContent();
   const { lang, navigateToPage, navigateToProduct } = useIcareShell();
+  const { productUnavailableHeadline, productUnavailableDesc, productUnavailableCta } = useSiteContent(lang);
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUnavailable, setIsUnavailable] = useState(false);

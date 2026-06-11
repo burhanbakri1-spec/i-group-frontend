@@ -11,7 +11,7 @@ interface PhilosophySectionProps {
 
 export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ lang, onNavigate }) => {
   const shouldReduceMotion = useReducedMotion();
-  const { philosophyHeadline, philosophyText, philosophyCta, philosophyImage } = useSiteContent();
+  const { philosophyHeadline, philosophyText, philosophyCta, philosophyImage } = useSiteContent(lang);
   return (
     <section className="icare-index-section icare-full-banner">
       <div className="icare-full-banner__media">

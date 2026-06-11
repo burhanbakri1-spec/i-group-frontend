@@ -24,7 +24,7 @@ const getProductTimestamp = (product: Product) => {
 };
 
 export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => {
-  const { shopEmptyAll, shopEmptyFiltered, shopBackToAll, shopShowMore, shopSortLabel } = useSiteContent();
+  const { shopEmptyAll, shopEmptyFiltered, shopBackToAll, shopShowMore, shopSortLabel } = useSiteContent(lang);
   const t = translations[lang];
   const [catalogProducts, setCatalogProducts] = useState<Product[] | null>(null);
   const [loading, setLoading] = useState(true);

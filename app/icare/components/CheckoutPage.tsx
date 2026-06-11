@@ -25,7 +25,7 @@ interface CheckoutPageProps {
 
 export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) => {
   const checkout = useCheckout(lang);
-  const siteContent = useSiteContent();
+  const siteContent = useSiteContent(lang);
   const shouldReduceMotion = useReducedMotion();
 
   // ── Unauthenticated gate ──

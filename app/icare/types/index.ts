@@ -13,6 +13,13 @@ import type {
   SimpleMediaTextPayload,
 } from './product-presentation-units';
 
+import type {
+  BaseUnit,
+  RhodeShowcaseResponse,
+  RhodeShowcaseUnit,
+  RhodeShowcaseUnitType,
+} from './rhode-showcase-units';
+
 export type {
   ApplicationStepsPayload,
   ContentDirection,
@@ -24,6 +31,13 @@ export type {
   RoutineStepsPayload,
   SimpleMediaTextPayload,
 } from './product-presentation-units';
+
+export type {
+  BaseUnit,
+  RhodeShowcaseResponse,
+  RhodeShowcaseUnit,
+  RhodeShowcaseUnitType,
+} from './rhode-showcase-units';
 
 export interface Product {
   id: string;
@@ -598,7 +612,6 @@ export interface CreateAddressInput {
   area?: string;
   city: string;
   governorate?: string;
-  postalCode?: string;
   latitude: number;
   longitude: number;
   isDefault?: boolean;
@@ -677,7 +690,7 @@ export interface CreatedOrder {
   createdAt?: string;
 }
 
-export type ShowcaseUnitType = ProductPresentationUnitType | 'generic' | 'simple_media_text';
+export type ShowcaseUnitType = RhodeShowcaseUnitType | 'generic' | 'simple_media_text';
 
 export type ShowcaseUnitPayload =
   | KitContentsPayload

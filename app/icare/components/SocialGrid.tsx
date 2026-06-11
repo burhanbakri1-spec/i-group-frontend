@@ -12,7 +12,7 @@ interface SocialGridProps {
 
 export const SocialGrid: React.FC<SocialGridProps> = ({ lang, onNavigate }) => {
   const shouldReduceMotion = useReducedMotion();
-  const { socialGridHeading, socialGridCta, socialGridImage1, socialGridImage2, socialGridImage3, socialGridImage4 } = useSiteContent();
+  const { socialGridHeading, socialGridCta, socialGridImage1, socialGridImage2, socialGridImage3, socialGridImage4 } = useSiteContent(lang);
   const t = translations[lang];
 
   const lifestyleImages = [

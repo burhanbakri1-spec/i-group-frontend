@@ -98,7 +98,7 @@ const VideoFallbackIcon = () => (
 );
 
 export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
-  const { vlogHeroTitle, vlogHeroImage } = useSiteContent();
+  const { vlogHeroTitle, vlogHeroImage } = useSiteContent(lang);
   const t = translations[lang];
   const [remoteVlogs, setRemoteVlogs] = useState<VlogContentItem[] | null>(null);
   const [loading, setLoading] = useState(true);

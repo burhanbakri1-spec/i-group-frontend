@@ -34,7 +34,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
     authSubmitSignup,
     authToggleToRegister,
     authToggleToLogin,
-  } = useSiteContent();
+  } = useSiteContent(lang);
   const loginImage = authLoginImage || "https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=1200&auto=format&fit=crop";
   const t = translations[lang ?? 'en'];
   const { user, isAuthenticated, accessToken, login, register, logout, authError } = useShop();
@@ -266,7 +266,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                                 {statusLabel(order.status, lang!)}
                               </span>
                               <span className="text-[11px] font-bold text-[#5C5A56] whitespace-nowrap">
-                                USD {order.total.toFixed(0)}
+                                 USD {order.total.toFixed(0)}
                               </span>
                               <span className="text-[10px] text-[#5C5A56]/70 whitespace-nowrap">
                                 {order.itemCount} {order.itemCount === 1 ? t.accountPage.item : t.accountPage.items}

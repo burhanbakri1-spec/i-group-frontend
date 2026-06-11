@@ -74,7 +74,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
   lang,
 }) => {
   const shouldReduceMotion = useReducedMotion();
-  const { reviewHydrationLow, reviewHydrationHigh } = useSiteContent();
+  const { reviewHydrationLow, reviewHydrationHigh } = useSiteContent(lang);
   const t = translations[lang];
 
   /* ── Form state ────────────────────────────────────────────────────────── */

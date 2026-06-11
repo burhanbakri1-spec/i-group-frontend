@@ -12,7 +12,7 @@ interface PromoSectionProps {
 
 export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) => {
   const shouldReduceMotion = useReducedMotion();
-  const { promoBadge, promoHeadline, promoDescription, promoCtaLabel, promoImage } = useSiteContent();
+  const { promoBadge, promoHeadline, promoDescription, promoCtaLabel, promoImage } = useSiteContent(lang);
   return (
     <section className="icare-index-section icare-split-banner rounded-[var(--icare-section-radius)] p-[var(--icare-section-inset)]">
       <div className="contents">

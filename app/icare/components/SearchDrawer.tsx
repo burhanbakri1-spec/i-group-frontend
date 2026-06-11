@@ -31,7 +31,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
     searchProductsHeading,
     searchBrandsHeading,
     searchCollectionsUnavailable,
-  } = useSiteContent();
+  } = useSiteContent(lang ?? 'en');
   const t = translations[lang ?? 'en'];
   const [searchQuery, setSearchQuery] = useState('');
   const [remoteCollections, setRemoteCollections] = useState<string[]>([]);

@@ -19,7 +19,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
   void products;
   const t = translations[lang];
   const shouldReduceMotion = useReducedMotion();
-  const { productShowcaseLoading, productShowcaseEmpty } = useSiteContent();
+  const { productShowcaseLoading, productShowcaseEmpty } = useSiteContent(lang);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [remoteProducts, setRemoteProducts] = useState<Product[] | null>(null);
 

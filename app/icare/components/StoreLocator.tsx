@@ -85,7 +85,7 @@ const matchesStoreSearch = (store: Store, query: string) => {
 const fetchActiveStores = async () => normalizeStores(await icareApi.stores.list({ isActive: true }));
 
 export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
-  const { storeLocatorTagline, storeLocatorNoResults } = useSiteContent();
+  const { storeLocatorTagline, storeLocatorNoResults } = useSiteContent(lang);
   const [searchQuery, setSearchQuery] = useState('');
   const [stores, setStores] = useState<Store[]>([]);
   const [fetchState, setFetchState] = useState<'loading' | 'success' | 'error' | 'empty'>('loading');

@@ -22,7 +22,7 @@ const SHORT_TWEEN = { duration: 0.18, ease: 'easeOut' as const };
 
 export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelect, onNavigate }) => {
   const { wishlistItems, removeFromWishlist, addToCart } = useShop();
-  const { wishlistEmpty, wishlistEmptySubtext, wishlistRecommendationsTitle } = useSiteContent();
+  const { wishlistEmpty, wishlistEmptySubtext, wishlistRecommendationsTitle } = useSiteContent(lang);
   const [recommendations, setRecommendations] = useState<Product[]>([]);
   const shouldReduceMotion = useReducedMotion();
 

@@ -24,7 +24,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
     contactFaqTitle,
     contactFaqText,
     contactFaqCta,
-  } = useSiteContent();
+  } = useSiteContent(lang);
 
   return (
     <div className="min-h-screen bg-[#F1F0ED] pb-32">
