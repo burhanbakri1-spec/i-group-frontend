@@ -4,7 +4,7 @@ import { Star, ChevronDown, ThumbsUp, ThumbsDown, CheckCircle2, ShoppingBag } fr
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language, translations } from '../translations';
 import { ProductLineup } from './ProductLineup';
-import { RhodeShowcaseBlock } from './RhodeShowcaseBlock';
+import { ShowcaseBlock } from './showcase/ShowcaseBlock';
 import { useShop } from '../context/ShopContext';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { Product, ProductGalleryMedia, ProductReview, ProductVariant, CreateReviewInput } from '../types';
@@ -608,7 +608,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
       </section>
 
       {/* SHOWCASE SECTION */}
-      <RhodeShowcaseBlock slug={product.slug} lang={lang} />
+      <ShowcaseBlock slug={product.slug} lang={lang} />
 
       {/* 2. REVIEWS SECTION */}
       <section className="icare-index-section pb-32">

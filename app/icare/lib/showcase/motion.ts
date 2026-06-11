@@ -1,16 +1,16 @@
 /**
- * rhode-motion.ts — Centralized motion configuration for Rhode showcase system.
+ * showcase-motion.ts — Centralized motion configuration for the showcase system.
  * All durations, easings, stagger values, and Framer variants live here.
  * All units import from this file (REQ-C8-1).
  */
 
-/** Rhode's standard cubic-bezier easing — matches live rhodeskin.com thumbnail click */
+/** System standard cubic-bezier easing */
 export const EASE_STANDARD: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-/** Rhode's section-level slide-up easing (slightly softer enter) */
+/** System section-level slide-up easing (slightly softer enter) */
 export const EASE_SLIDE: [number, number, number, number] = [0.32, 0.72, 0, 1];
 
-/** Duration tokens in milliseconds — mapped from Rhode's actual page timings */
+/** Duration tokens in milliseconds */
 export const DUR = {
   fast: 200,       // Color / border / text hover transitions
   normal: 300,     // Opacity / transform / standard transitions

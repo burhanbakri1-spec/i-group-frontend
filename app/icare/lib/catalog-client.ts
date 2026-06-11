@@ -303,11 +303,11 @@ export async function fetchProductMediaVlogs(limit = 12): Promise<VlogContentIte
 }
 
 /**
- * Fetch Rhode-format showcase units for a product slug.
- * Falls back gracefully — callers should use RHODE_SHOWCASE_FALLBACK on null/empty.
+ * Fetch showcase units for a product slug.
+ * Falls back gracefully — callers should use SHOWCASE_FALLBACK on null/empty.
  * REQ-C6-1, REQ-C6-2
  */
-export const fetchProductShowcaseRhode = async (slug: string): Promise<import('../types/rhode-showcase-units').RhodeShowcaseUnit[] | null> => {
+export const fetchProductShowcase = async (slug: string): Promise<import('../types/showcase-units').ShowcaseUnit[] | null> => {
   try {
     if (!icareApi.isConfigured()) return null;
     const units = await icareApi.products.showcase(slug);
@@ -706,25 +706,25 @@ export const fetchProductShowcaseRhode = async (slug: string): Promise<import('.
       'sustainability',
     ]);
 
-    const validatedUnits = [] as import('../types/rhode-showcase-units').RhodeShowcaseUnit[];
+    const validatedUnits = [] as import('../types/showcase-units').ShowcaseUnit[];
 
     for (const unit of units as BackendShowcaseUnit[]) {
       const typeResult = unitTypeScheme.safeParse(unit.type);
       if (!typeResult.success) {
-        console.warn('[fetchProductShowcaseRhode] Skipping unit with unknown type:', unit.type);
+        console.warn('[fetchProductShowcase] Skipping unit with unknown type:', unit.type);
         continue;
       }
 
       const confirmedType = typeResult.data;
       const payloadSchema = payloadSchemaFor[confirmedType];
       if (!payloadSchema) {
-        console.warn('[fetchProductShowcaseRhode] No schema for type:', confirmedType);
+        console.warn('[fetchProductShowcase] No schema for type:', confirmedType);
         continue;
       }
 
       const payloadResult = payloadSchema.safeParse(unit.payload);
       if (!payloadResult.success) {
-        console.warn('[fetchProductShowcaseRhode] Skipping unit with invalid payload, type:', confirmedType, 'errors:', payloadResult.error.issues?.map(i => i.message).join(', '));
+        console.warn('[fetchProductShowcase] Skipping unit with invalid payload, type:', confirmedType, 'errors:', payloadResult.error.issues?.map(i => i.message).join(', '));
         continue;
       }
 
@@ -736,13 +736,13 @@ export const fetchProductShowcaseRhode = async (slug: string): Promise<import('.
         direction: unit.direction === 'rtl' ? 'rtl' : 'ltr',
         theme: unit.theme as 'light' | 'dark' | 'cream' | 'clinical' | 'brand' | undefined,
         payload: payloadResult.data,
-      } as import('../types/rhode-showcase-units').RhodeShowcaseUnit);
+      } as import('../types/showcase-units').ShowcaseUnit);
     }
 
     return validatedUnits;
   } catch (error) {
     if (!(error instanceof IcareApiError && error.status === 0)) {
-      console.error('Error fetching Rhode product showcase:', error);
+      console.error('Error fetching product showcase:', error);
     }
     return null;
   }

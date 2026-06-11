@@ -15,10 +15,11 @@ import type {
 
 import type {
   BaseUnit,
-  RhodeShowcaseResponse,
-  RhodeShowcaseUnit,
-  RhodeShowcaseUnitType,
-} from './rhode-showcase-units';
+  NormalizedShowcaseUnit,
+  ShowcaseResponse,
+  ShowcaseUnit,
+  ShowcaseUnitType,
+} from './showcase-units';
 
 export type {
   ApplicationStepsPayload,
@@ -34,10 +35,11 @@ export type {
 
 export type {
   BaseUnit,
-  RhodeShowcaseResponse,
-  RhodeShowcaseUnit,
-  RhodeShowcaseUnitType,
-} from './rhode-showcase-units';
+  NormalizedShowcaseUnit,
+  ShowcaseResponse,
+  ShowcaseUnit,
+  ShowcaseUnitType,
+} from './showcase-units';
 
 export interface Product {
   id: string;
@@ -690,7 +692,7 @@ export interface CreatedOrder {
   createdAt?: string;
 }
 
-export type ShowcaseUnitType = RhodeShowcaseUnitType | 'generic' | 'simple_media_text';
+
 
 export type ShowcaseUnitPayload =
   | KitContentsPayload
@@ -715,17 +717,4 @@ export interface BackendShowcaseUnit {
   sortOrder: number;
   direction?: ContentDirection | string | null;
   isActive: boolean;
-}
-
-export interface ShowcaseUnit {
-  id: number;
-  type: ShowcaseUnitType;
-  payload?: ShowcaseUnitPayload | unknown;
-  theme?: ShowcaseTheme;
-  image: string;
-  title: string;
-  description: string;
-  sortOrder?: number;
-  isActive?: boolean;
-  direction?: ContentDirection | string;
 }

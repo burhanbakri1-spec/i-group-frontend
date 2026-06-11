@@ -1,10 +1,10 @@
 'use client';
 
 /**
- * ValuePropsGrid.tsx — M5 Rhode showcase unit.
+ * ValuePropsGrid.tsx — M5 showcase unit.
  * 2–4 value props in 3-col desktop / 2-col mobile grid.
  * Each prop card shows an optional icon and the label repeated three times
- * in a small→medium→large rhythm (Rhode visual hierarchy).
+ * in a small→medium→large rhythm (system visual hierarchy).
  * Staggered viewport fade-up entrance.
  */
 
@@ -12,14 +12,14 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, Eyebrow, SectionTitle } from '../shared/UnitShell';
-import { registerUnit } from '../../../lib/rhode/registry';
-import type { NormalizedRhodeUnit, ValuePropsGridPayload } from '../../../types/rhode-showcase-units';
-import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/rhode/motion';
+import { registerUnit } from '../../../lib/showcase/registry';
+import type { NormalizedShowcaseUnit, ValuePropsGridPayload } from '../../../types/showcase-units';
+import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
-  unit: NormalizedRhodeUnit<ValuePropsGridPayload>;
+  unit: NormalizedShowcaseUnit<ValuePropsGridPayload>;
   lang?: 'en' | 'ar';
   shouldReduceMotion: boolean;
 }
@@ -130,7 +130,7 @@ const ValuePropsGrid: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion
   );
 };
 
-// Self-register with the Rhode unit registry
+// Self-register with the showcase registry
 registerUnit('value_props_grid', ValuePropsGrid);
 
 export default ValuePropsGrid;

@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * UnitShell.tsx — Common wrapper for all Rhode showcase units.
+ * UnitShell.tsx — Common wrapper for all showcase units.
  * Provides consistent padding, theme variants, and section structure.
  */
 

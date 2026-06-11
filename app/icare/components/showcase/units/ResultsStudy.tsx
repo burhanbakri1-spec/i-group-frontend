@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * ResultsStudy.tsx — M8 Rhode showcase unit.
+ * ResultsStudy.tsx — M8 showcase unit.
  * Results display with two modes:
  *  - 'tabs': 2-col layout (metrics + content left · before/after right) with tab bar at bottom
  *  - 'timeline': hero before/after images at top + tabbed timeline selector below
@@ -14,14 +14,14 @@ import { motion, AnimatePresence } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
-import { registerUnit } from '../../../lib/rhode/registry';
-import type { NormalizedRhodeUnit, ResultsStudyPayload } from '../../../types/rhode-showcase-units';
-import { EASE_STANDARD, DUR, VIEWPORT, tabFade } from '../../../lib/rhode/motion';
+import { registerUnit } from '../../../lib/showcase/registry';
+import type { NormalizedShowcaseUnit, ResultsStudyPayload } from '../../../types/showcase-units';
+import { EASE_STANDARD, DUR, VIEWPORT, tabFade } from '../../../lib/showcase/motion';
 
 // ─── Props ─────────────────────────────────────────────────────────────────────
 
 interface Props {
-  unit: NormalizedRhodeUnit<ResultsStudyPayload>;
+  unit: NormalizedShowcaseUnit<ResultsStudyPayload>;
   lang?: 'en' | 'ar';
   shouldReduceMotion: boolean;
 }

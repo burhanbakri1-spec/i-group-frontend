@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * RoutineMap.tsx — M9 Rhode showcase unit.
+ * RoutineMap.tsx — M9 showcase unit.
  * 2-col layout: lifestyle imagery on the left; step rail + active product display on the right.
  * Viewport-triggered fade-up, AnimatePresence cross-fades, RTL-aware, shouldReduceMotion respected.
  */
@@ -11,14 +11,14 @@ import { motion, AnimatePresence } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
-import { registerUnit } from '../../../lib/rhode/registry';
-import type { NormalizedRhodeUnit, RoutineMapPayload } from '../../../types/rhode-showcase-units';
-import { EASE_STANDARD, DUR, VIEWPORT } from '../../../lib/rhode/motion';
+import { registerUnit } from '../../../lib/showcase/registry';
+import type { NormalizedShowcaseUnit, RoutineMapPayload } from '../../../types/showcase-units';
+import { EASE_STANDARD, DUR, VIEWPORT } from '../../../lib/showcase/motion';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
-  unit: NormalizedRhodeUnit<RoutineMapPayload>;
+  unit: NormalizedShowcaseUnit<RoutineMapPayload>;
   lang?: 'en' | 'ar';
   shouldReduceMotion: boolean;
 }

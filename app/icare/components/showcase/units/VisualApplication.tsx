@@ -11,12 +11,12 @@ import { motion } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, Eyebrow, SectionTitle } from '../shared/UnitShell';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
-import { registerUnit } from '../../../lib/rhode/registry';
-import type { NormalizedRhodeUnit, VisualApplicationPayload } from '../../../types/rhode-showcase-units';
-import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/rhode/motion';
+import { registerUnit } from '../../../lib/showcase/registry';
+import type { NormalizedShowcaseUnit, VisualApplicationPayload } from '../../../types/showcase-units';
+import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
 
 interface Props {
-  unit: NormalizedRhodeUnit<VisualApplicationPayload>;
+  unit: NormalizedShowcaseUnit<VisualApplicationPayload>;
   lang?: 'en' | 'ar';
   shouldReduceMotion: boolean;
 }

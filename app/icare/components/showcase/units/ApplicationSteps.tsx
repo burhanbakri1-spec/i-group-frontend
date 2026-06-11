@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * ApplicationSteps.tsx — M3 Rhode showcase unit.
+ * ApplicationSteps.tsx — M3 showcase unit.
  * 2-col layout: step rail + content panel (left) · large image (right on desktop).
  * Keyboard ArrowLeft/Right navigation, AnimatePresence cross-fade,
  * RTL-aware, shouldReduceMotion respected on all animations.
@@ -18,14 +18,14 @@ import { motion, AnimatePresence } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
-import { registerUnit } from '../../../lib/rhode/registry';
-import type { NormalizedRhodeUnit, ApplicationStepsPayload } from '../../../types/rhode-showcase-units';
-import { EASE_STANDARD, DUR, VIEWPORT } from '../../../lib/rhode/motion';
+import { registerUnit } from '../../../lib/showcase/registry';
+import type { NormalizedShowcaseUnit, ApplicationStepsPayload } from '../../../types/showcase-units';
+import { EASE_STANDARD, DUR, VIEWPORT } from '../../../lib/showcase/motion';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
-  unit: NormalizedRhodeUnit<ApplicationStepsPayload>;
+  unit: NormalizedShowcaseUnit<ApplicationStepsPayload>;
   lang?: 'en' | 'ar';
   shouldReduceMotion: boolean;
 }

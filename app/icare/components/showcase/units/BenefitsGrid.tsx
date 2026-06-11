@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * BenefitsGrid.tsx — M2 Rhode showcase unit.
+ * BenefitsGrid.tsx — M2 showcase unit.
  * 4-column benefit cards with checkmark icons, staggered viewport entrance.
  * Desktop: 4-col | Tablet: 2-col | Mobile: 2-col
  */
@@ -10,12 +10,12 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell';
-import { registerUnit } from '../../../lib/rhode/registry';
-import type { NormalizedRhodeUnit, BenefitsGridPayload } from '../../../types/rhode-showcase-units';
-import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/rhode/motion';
+import { registerUnit } from '../../../lib/showcase/registry';
+import type { NormalizedShowcaseUnit, BenefitsGridPayload } from '../../../types/showcase-units';
+import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
 
 interface Props {
-  unit: NormalizedRhodeUnit<BenefitsGridPayload>;
+  unit: NormalizedShowcaseUnit<BenefitsGridPayload>;
   lang?: 'en' | 'ar';
   shouldReduceMotion: boolean;
 }

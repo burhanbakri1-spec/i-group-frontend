@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * ComparisonChart.tsx — Rhode showcase comparison unit (E1).
+ * ComparisonChart.tsx — showcase comparison unit (E1).
  * 2–3 product side-by-side columns on desktop.
  * Mobile renders a single product with toggle between products
  * (cross-fade transition, 300ms), respecting shouldReduceMotion and RTL.
@@ -11,9 +11,9 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell';
-import { registerUnit } from '../../../lib/rhode/registry';
-import type { NormalizedRhodeUnit, ComparisonChartPayload } from '../../../types/rhode-showcase-units';
-import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/rhode/motion';
+import { registerUnit } from '../../../lib/showcase/registry';
+import type { NormalizedShowcaseUnit, ComparisonChartPayload } from '../../../types/showcase-units';
+import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
 
 interface ProductField {
   label: string;
@@ -140,7 +140,7 @@ const MobileToggle: React.FC<{
 };
 
 interface Props {
-  unit: NormalizedRhodeUnit<ComparisonChartPayload>;
+  unit: NormalizedShowcaseUnit<ComparisonChartPayload>;
   lang?: 'en' | 'ar';
   shouldReduceMotion: boolean;
 }

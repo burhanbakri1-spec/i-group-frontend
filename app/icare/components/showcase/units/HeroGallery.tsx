@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * HeroGallery.tsx — M1 Rhode showcase unit.
+ * HeroGallery.tsx — M1 showcase unit.
  * Full-bleed product image gallery with animated transitions,
  * vertical thumbnail strip (desktop), dot navigation (mobile),
  * optional size selector, and badge row.
@@ -12,12 +12,12 @@ import { motion, AnimatePresence } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell } from '../shared/UnitShell';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
-import { registerUnit } from '../../../lib/rhode/registry';
-import type { NormalizedRhodeUnit, HeroGalleryPayload } from '../../../types/rhode-showcase-units';
-import { EASE_STANDARD, DUR, heroSwap, STAGGER_STEP } from '../../../lib/rhode/motion';
+import { registerUnit } from '../../../lib/showcase/registry';
+import type { NormalizedShowcaseUnit, HeroGalleryPayload } from '../../../types/showcase-units';
+import { EASE_STANDARD, DUR, heroSwap, STAGGER_STEP } from '../../../lib/showcase/motion';
 
 interface Props {
-  unit: NormalizedRhodeUnit<HeroGalleryPayload>;
+  unit: NormalizedShowcaseUnit<HeroGalleryPayload>;
   lang?: 'en' | 'ar';
   shouldReduceMotion: boolean;
 }

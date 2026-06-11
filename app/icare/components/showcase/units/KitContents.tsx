@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * KitContents.tsx — E2 Rhode showcase unit.
+ * KitContents.tsx — E2 showcase unit.
  * Mobile: horizontal scroll-snap carousel of product cards.
  * Desktop: 2-column layout — product grid on the left, sticky active-product
  *          media on the right with AnimatePresence cross-fade.
@@ -11,15 +11,15 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, Eyebrow, SectionTitle } from '../shared/UnitShell';
-import { registerUnit } from '../../../lib/rhode/registry';
-import type { NormalizedRhodeUnit, KitContentsPayload } from '../../../types/rhode-showcase-units';
-import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/rhode/motion';
+import { registerUnit } from '../../../lib/showcase/registry';
+import type { NormalizedShowcaseUnit, KitContentsPayload } from '../../../types/showcase-units';
+import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Props {
-  unit: NormalizedRhodeUnit<KitContentsPayload>;
+  unit: NormalizedShowcaseUnit<KitContentsPayload>;
   lang?: 'en' | 'ar';
   shouldReduceMotion: boolean;
 }

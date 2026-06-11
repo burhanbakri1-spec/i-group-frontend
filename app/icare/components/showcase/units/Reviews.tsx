@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Reviews.tsx — M10 Rhode showcase unit.
+ * Reviews.tsx — M10 showcase unit.
  * Renders Okendo iframe embed or native review summary + cards.
  */
 
@@ -9,14 +9,14 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell';
-import { registerUnit } from '../../../lib/rhode/registry';
-import type { NormalizedRhodeUnit, ReviewsPayload } from '../../../types/rhode-showcase-units';
-import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/rhode/motion';
+import { registerUnit } from '../../../lib/showcase/registry';
+import type { NormalizedShowcaseUnit, ReviewsPayload } from '../../../types/showcase-units';
+import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
-  unit: NormalizedRhodeUnit<ReviewsPayload>;
+  unit: NormalizedShowcaseUnit<ReviewsPayload>;
   lang?: 'en' | 'ar';
   shouldReduceMotion: boolean;
 }

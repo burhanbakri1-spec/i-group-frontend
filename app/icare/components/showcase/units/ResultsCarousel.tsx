@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * ResultsCarousel.tsx — E3 Rhode showcase unit.
+ * ResultsCarousel.tsx — E3 showcase unit.
  * Horizontal scroll carousel of 2-8 result metric cards with creator attribution.
  * Desktop: 3-4 cols | Tablet: 2 cols | Mobile: 1 col
  */
@@ -10,12 +10,12 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell';
-import { registerUnit } from '../../../lib/rhode/registry';
-import type { NormalizedRhodeUnit, ResultsCarouselPayload } from '../../../types/rhode-showcase-units';
-import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/rhode/motion';
+import { registerUnit } from '../../../lib/showcase/registry';
+import type { NormalizedShowcaseUnit, ResultsCarouselPayload } from '../../../types/showcase-units';
+import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
 
 interface Props {
-  unit: NormalizedRhodeUnit<ResultsCarouselPayload>;
+  unit: NormalizedShowcaseUnit<ResultsCarouselPayload>;
   lang?: 'en' | 'ar';
   shouldReduceMotion: boolean;
 }

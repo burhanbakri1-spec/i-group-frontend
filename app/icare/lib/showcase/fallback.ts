@@ -1,9 +1,9 @@
 /**
- * lib/rhode/fallback.ts — Rich fallback showcase data for Rhode showcase units.
+ * lib/showcase/fallback.ts — Rich fallback showcase data for showcase units.
  * Used when API is unavailable or returns empty. Covers all 17 unit types.
  */
 
-import type { RhodeShowcaseUnit } from '../../types/rhode-showcase-units';
+import type { ShowcaseUnit } from '../../types/showcase-units';
 
 const UNSPLASH_SKIN_1 = 'https://images.unsplash.com/photo-1616683693504-3ce769069d67?q=80&w=1200';
 const UNSPLASH_SKIN_2 = 'https://images.unsplash.com/photo-1666025062728-c33a25e8ee3f?q=80&w=1200';
@@ -14,7 +14,7 @@ const UNSPLASH_SKIN_6 = 'https://images.unsplash.com/photo-1728994062543-74a1dc2
 const UNSPLASH_SKIN_7 = 'https://images.unsplash.com/photo-1710580889701-9fa8f2cd5927?q=80&w=1200';
 const UNSPLASH_SKIN_8 = 'https://images.unsplash.com/photo-1589221134210-f010476445e2?q=80&w=800';
 
-export const RHODE_SHOWCASE_FALLBACK: RhodeShowcaseUnit[] = [
+export const SHOWCASE_FALLBACK: ShowcaseUnit[] = [
   // M1 HeroGallery
   {
     id: 'fallback-hero-gallery',
@@ -35,7 +35,7 @@ export const RHODE_SHOWCASE_FALLBACK: RhodeShowcaseUnit[] = [
       ],
       defaultSizeId: '200ml',
     },
-  } as RhodeShowcaseUnit,
+  } as ShowcaseUnit,
 
   // M2 BenefitsGrid
   {
@@ -53,7 +53,7 @@ export const RHODE_SHOWCASE_FALLBACK: RhodeShowcaseUnit[] = [
         { text: 'Suitable for all skin types' },
       ],
     },
-  } as RhodeShowcaseUnit,
+  } as ShowcaseUnit,
 
   // M3 ApplicationSteps
   {
@@ -92,7 +92,7 @@ export const RHODE_SHOWCASE_FALLBACK: RhodeShowcaseUnit[] = [
       ],
       defaultActiveStepId: 'step-mix',
     },
-  } as RhodeShowcaseUnit,
+  } as ShowcaseUnit,
 
   // M4 KeyIngredients
   {
@@ -115,7 +115,7 @@ export const RHODE_SHOWCASE_FALLBACK: RhodeShowcaseUnit[] = [
       alsoMadeWith: ['Niacinamide', 'Peptides', 'Vitamin E', 'Glycerin', 'Squalane'],
       fullListText: 'View full ingredient list',
     },
-  } as RhodeShowcaseUnit,
+  } as ShowcaseUnit,
 
   // M5 ValuePropsGrid
   {
@@ -132,7 +132,7 @@ export const RHODE_SHOWCASE_FALLBACK: RhodeShowcaseUnit[] = [
         { label: 'cruelty-free' },
       ],
     },
-  } as RhodeShowcaseUnit,
+  } as ShowcaseUnit,
 
   // M6 VisualApplication
   {
@@ -164,7 +164,7 @@ export const RHODE_SHOWCASE_FALLBACK: RhodeShowcaseUnit[] = [
         },
       ],
     },
-  } as RhodeShowcaseUnit,
+  } as ShowcaseUnit,
 
   // M7 IngredientSpotlight
   {
@@ -191,7 +191,7 @@ export const RHODE_SHOWCASE_FALLBACK: RhodeShowcaseUnit[] = [
       ],
       alsoMadeWith: ['Niacinamide', 'Glycerin', 'Squalane'],
     },
-  } as RhodeShowcaseUnit,
+  } as ShowcaseUnit,
 
   // M8 ResultsStudy
   {
@@ -237,7 +237,7 @@ export const RHODE_SHOWCASE_FALLBACK: RhodeShowcaseUnit[] = [
       ],
       defaultTabId: 'consumer',
     },
-  } as RhodeShowcaseUnit,
+  } as ShowcaseUnit,
 
   // M9 RoutineMap
   {
@@ -296,7 +296,7 @@ export const RHODE_SHOWCASE_FALLBACK: RhodeShowcaseUnit[] = [
         },
       ],
     },
-  } as RhodeShowcaseUnit,
+  } as ShowcaseUnit,
 
   // M10 Reviews
   {
@@ -342,7 +342,7 @@ export const RHODE_SHOWCASE_FALLBACK: RhodeShowcaseUnit[] = [
         },
       ],
     },
-  } as RhodeShowcaseUnit,
+  } as ShowcaseUnit,
 
   // E1 ComparisonChart
   {
@@ -383,7 +383,7 @@ export const RHODE_SHOWCASE_FALLBACK: RhodeShowcaseUnit[] = [
         },
       ],
     },
-  } as RhodeShowcaseUnit,
+  } as ShowcaseUnit,
 
   // E2 KitContents
   {
@@ -432,7 +432,7 @@ export const RHODE_SHOWCASE_FALLBACK: RhodeShowcaseUnit[] = [
         },
       ],
     },
-  } as RhodeShowcaseUnit,
+  } as ShowcaseUnit,
 
   // E3 ResultsCarousel
   {
@@ -478,7 +478,7 @@ export const RHODE_SHOWCASE_FALLBACK: RhodeShowcaseUnit[] = [
         },
       ],
     },
-  } as RhodeShowcaseUnit,
+  } as ShowcaseUnit,
 
   // E4 ShadeSelector
   {
@@ -537,7 +537,7 @@ export const RHODE_SHOWCASE_FALLBACK: RhodeShowcaseUnit[] = [
       ],
       defaultShadeId: 'biscuit',
     },
-  } as RhodeShowcaseUnit,
+  } as ShowcaseUnit,
 
   // E5 LifestyleCarousel
   {
@@ -555,7 +555,7 @@ export const RHODE_SHOWCASE_FALLBACK: RhodeShowcaseUnit[] = [
         { id: 'lc5', image: { url: UNSPLASH_SKIN_5, alt: 'Lifestyle 5' }, caption: 'Fresh out the shower glow.' },
       ],
     },
-  } as RhodeShowcaseUnit,
+  } as ShowcaseUnit,
 
   // E6 ResearchIngredients
   {
@@ -593,7 +593,7 @@ export const RHODE_SHOWCASE_FALLBACK: RhodeShowcaseUnit[] = [
         },
       ],
     },
-  } as RhodeShowcaseUnit,
+  } as ShowcaseUnit,
 
   // E7 Sustainability
   {
@@ -618,9 +618,9 @@ export const RHODE_SHOWCASE_FALLBACK: RhodeShowcaseUnit[] = [
         'Empty and rinse the bottle',
         'Remove the pump',
         'Drop bottle + cap into your curbside recycling',
-        'Return the pump to any rhode pop-up for terracycle recycling',
+        'Return the pump to any brand pop-up for terracycle recycling',
       ],
       closingNote: 'We\'re always working toward more sustainable packaging. Thank you for recycling.',
     },
-  } as RhodeShowcaseUnit,
+  } as ShowcaseUnit,
 ];

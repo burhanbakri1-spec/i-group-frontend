@@ -1,58 +1,58 @@
 'use client';
 
 /**
- * RhodeShowcaseBlock.tsx — Smart renderer for all 17 Rhode showcase units.
+ * ShowcaseBlock.tsx — Smart renderer for all 17 showcase units.
  * Dispatches to the correct unit component via the registry.
  * REQ-C3-1, REQ-C3-2, REQ-C10-1, REQ-C10-2
  */
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { fetchProductShowcaseRhode } from '../lib/catalog-client';
-import { RHODE_SHOWCASE_FALLBACK } from '../lib/rhode/fallback';
-import { getUnitComponent, isRegistered } from '../lib/rhode/registry';
-import { EASE_STANDARD } from '../lib/rhode/motion';
-import type { RhodeShowcaseUnit } from '../types/rhode-showcase-units';
+import { fetchProductShowcase } from '../../lib/catalog-client';
+import { SHOWCASE_FALLBACK } from '../../lib/showcase/fallback';
+import { getUnitComponent, isRegistered } from '../../lib/showcase/registry';
+import { EASE_STANDARD } from '../../lib/showcase/motion';
+import type { ShowcaseUnit } from '../../types/showcase-units';
 
 // ─── Side-effect: register all units ─────────────────────────────────────────
 // Import order matches spec: M-cluster first, E-cluster second
-import './rhode/units/HeroGallery';
-import './rhode/units/BenefitsGrid';
-import './rhode/units/ApplicationSteps';
-import './rhode/units/KeyIngredients';
-import './rhode/units/ValuePropsGrid';
-import './rhode/units/VisualApplication';
-import './rhode/units/IngredientSpotlight';
-import './rhode/units/ResultsStudy';
-import './rhode/units/RoutineMap';
-import './rhode/units/Reviews';
-import './rhode/units/ComparisonChart';
-import './rhode/units/KitContents';
-import './rhode/units/ResultsCarousel';
-import './rhode/units/ShadeSelector';
-import './rhode/units/LifestyleCarousel';
-import './rhode/units/ResearchIngredients';
-import './rhode/units/Sustainability';
+import './units/HeroGallery';
+import './units/BenefitsGrid';
+import './units/ApplicationSteps';
+import './units/KeyIngredients';
+import './units/ValuePropsGrid';
+import './units/VisualApplication';
+import './units/IngredientSpotlight';
+import './units/ResultsStudy';
+import './units/RoutineMap';
+import './units/Reviews';
+import './units/ComparisonChart';
+import './units/KitContents';
+import './units/ResultsCarousel';
+import './units/ShadeSelector';
+import './units/LifestyleCarousel';
+import './units/ResearchIngredients';
+import './units/Sustainability';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
-export interface RhodeShowcaseBlockProps {
+export interface ShowcaseBlockProps {
   /** Product slug — if omitted, fallback units are used (e.g. preview page) */
   slug?: string;
   /** UI language — controls RTL text direction */
   lang?: 'en' | 'ar';
   /** Override units directly (preview mode / admin) */
-  units?: RhodeShowcaseUnit[];
+  units?: ShowcaseUnit[];
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export const RhodeShowcaseBlock: React.FC<RhodeShowcaseBlockProps> = ({
+export const ShowcaseBlock: React.FC<ShowcaseBlockProps> = ({
   slug,
   lang = 'en',
   units: overrideUnits,
 }) => {
-  const [units, setUnits] = useState<RhodeShowcaseUnit[] | null>(
+  const [units, setUnits] = useState<ShowcaseUnit[] | null>(
     overrideUnits ?? null,
   );
   const shouldReduceMotion = Boolean(useReducedMotion());
@@ -63,20 +63,20 @@ export const RhodeShowcaseBlock: React.FC<RhodeShowcaseBlockProps> = ({
       return;
     }
     if (!slug) {
-      setUnits(RHODE_SHOWCASE_FALLBACK);
+      setUnits(SHOWCASE_FALLBACK);
       return;
     }
     let cancelled = false;
     void (async () => {
       try {
-        const data = await fetchProductShowcaseRhode(slug);
+        const data = await fetchProductShowcase(slug);
         if (cancelled) return;
         setUnits(
-          data && data.length > 0 ? data : RHODE_SHOWCASE_FALLBACK,
+          data && data.length > 0 ? data : SHOWCASE_FALLBACK,
         );
       } catch (e) {
-        console.warn('[RhodeShowcaseBlock] Fetch failed, using fallback', e);
-        if (!cancelled) setUnits(RHODE_SHOWCASE_FALLBACK);
+        console.warn('[ShowcaseBlock] Fetch failed, using fallback', e);
+        if (!cancelled) setUnits(SHOWCASE_FALLBACK);
       }
     })();
     return () => {
@@ -92,12 +92,12 @@ export const RhodeShowcaseBlock: React.FC<RhodeShowcaseBlockProps> = ({
     [units],
   );
 
-  if (activeUnits === null) return <RhodeShowcaseSkeleton />;
+  if (activeUnits === null) return <ShowcaseSkeleton />;
   if (activeUnits.length === 0) return null;
 
   return (
     <section
-      className="icare-rhode-showcase bg-[var(--rb-bg-warm-gray)] rounded-[16px] overflow-hidden py-8 md:py-12"
+      className="icare-showcase bg-[var(--rb-bg-warm-gray)] rounded-[16px] overflow-hidden py-8 md:py-12"
       dir={lang === 'ar' ? 'rtl' : 'ltr'}
       aria-label="Product showcase"
     >
@@ -126,13 +126,13 @@ function UnitWrapper({
   shouldReduceMotion,
   lang,
 }: {
-  unit: RhodeShowcaseUnit;
+  unit: ShowcaseUnit;
   index: number;
   shouldReduceMotion: boolean;
   lang: 'en' | 'ar';
 }) {
   if (!isRegistered(unit.type)) {
-    console.warn(`[RhodeShowcaseBlock] Unknown unit type: ${unit.type}`);
+    console.warn(`[ShowcaseBlock] Unknown unit type: ${unit.type}`);
     return null;
   }
 
@@ -157,9 +157,9 @@ function UnitWrapper({
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
-function RhodeShowcaseSkeleton() {
+function ShowcaseSkeleton() {
   return (
-    <section className="icare-rhode-showcase bg-[var(--rb-bg-warm-gray)] rounded-[16px] overflow-hidden py-8 md:py-12">
+    <section className="icare-showcase bg-[var(--rb-bg-warm-gray)] rounded-[16px] overflow-hidden py-8 md:py-12">
       <div className="max-w-[1600px] mx-auto px-4 md:px-8">
         <div className="flex flex-col gap-4 md:gap-6">
           <SkeletonByType />
@@ -258,4 +258,4 @@ function SkeletonByType() {
   );
 }
 
-export default RhodeShowcaseBlock;
+export default ShowcaseBlock;

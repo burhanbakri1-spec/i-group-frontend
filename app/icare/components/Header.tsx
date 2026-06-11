@@ -380,7 +380,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                     onNavigate('shop');
                   }
                 }}
-                /* Match Rhode header nav links: 12.8px / 700 / 19.2px / 0.256px ls / uppercase. */
+                /* Match system header nav links: 12.8px / 700 / 19.2px / 0.256px ls / uppercase. */
                 className={`rounded-full px-1 text-[clamp(0.875rem,0.6vw+0.75rem,1rem)] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
                 aria-haspopup="true"
                 aria-expanded={isShopHovered}
@@ -497,7 +497,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                         onMouseEnter={() => setPreviewByIndex(index + 1)}
                         onFocus={() => setPreviewByIndex(index + 1)}
                         onClick={() => { onNavigate('shop'); closeShopMenu(); }}
-                        /* Match Rhode 12.8px / 700 / 0.256px rhythm for secondary nav pills. */
+                        /* Match system 12.8px / 700 / 0.256px rhythm for secondary nav pills. */
                         className={`rounded-full px-1 text-[12.8px] font-bold uppercase tracking-[0.02em] leading-[1.5] relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
                           clampedActivePreviewIndex === index + 1 ? 'text-[var(--rb-near-black)]' : 'text-[var(--rb-primary-text)]'
                         }`}

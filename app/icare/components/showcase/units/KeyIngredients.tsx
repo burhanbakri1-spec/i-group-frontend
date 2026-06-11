@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * KeyIngredients.tsx — M4 Rhode showcase unit.
+ * KeyIngredients.tsx — M4 showcase unit.
  * Hero ingredient spotlight with "also made with" pills and optional CTA.
  * Desktop: 2-col layout | Tablet/Mobile: single column stacked.
  */
@@ -10,12 +10,12 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell';
-import { registerUnit } from '../../../lib/rhode/registry';
-import type { NormalizedRhodeUnit, KeyIngredientsPayload } from '../../../types/rhode-showcase-units';
-import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/rhode/motion';
+import { registerUnit } from '../../../lib/showcase/registry';
+import type { NormalizedShowcaseUnit, KeyIngredientsPayload } from '../../../types/showcase-units';
+import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
 
 interface Props {
-  unit: NormalizedRhodeUnit<KeyIngredientsPayload>;
+  unit: NormalizedShowcaseUnit<KeyIngredientsPayload>;
   lang?: 'en' | 'ar';
   shouldReduceMotion: boolean;
 }

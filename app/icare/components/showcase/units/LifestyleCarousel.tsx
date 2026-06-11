@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * LifestyleCarousel.tsx — E5 Rhode showcase unit.
+ * LifestyleCarousel.tsx — E5 showcase unit.
  * Horizontally-scrollable lifestyle image carousel with scroll-snap,
  * AnimatePresence cross-fade, dot indicators (mobile), and arrow
  * navigation (desktop).
@@ -12,14 +12,14 @@ import { motion, AnimatePresence } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, SectionTitle } from '../shared/UnitShell';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
-import { registerUnit } from '../../../lib/rhode/registry';
-import type { NormalizedRhodeUnit, LifestyleCarouselPayload } from '../../../types/rhode-showcase-units';
-import { EASE_STANDARD, DUR, crossfade, VIEWPORT } from '../../../lib/rhode/motion';
+import { registerUnit } from '../../../lib/showcase/registry';
+import type { NormalizedShowcaseUnit, LifestyleCarouselPayload } from '../../../types/showcase-units';
+import { EASE_STANDARD, DUR, crossfade, VIEWPORT } from '../../../lib/showcase/motion';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
-  unit: NormalizedRhodeUnit<LifestyleCarouselPayload>;
+  unit: NormalizedShowcaseUnit<LifestyleCarouselPayload>;
   lang?: 'en' | 'ar';
   shouldReduceMotion: boolean;
 }

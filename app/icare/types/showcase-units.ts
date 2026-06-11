@@ -1,5 +1,5 @@
 /**
- * rhode-showcase-units.ts — Rhode showcase unit type system.
+ * showcase-units.ts — Showcase unit type system.
  * Zod schemas, TypeScript types, and discriminated union for all 17 unit kinds.
  * REQ-C2-1, REQ-C2-2
  */
@@ -33,7 +33,7 @@ export type SectionHeading = z.infer<typeof SectionHeadingSchema>;
 
 // ─── Unit type enum (17 kinds) ────────────────────────────────────────────────
 
-export const RhodeShowcaseUnitTypeSchema = z.enum([
+export const ShowcaseUnitTypeSchema = z.enum([
   'hero_gallery',
   'benefits_grid',
   'application_steps',
@@ -52,13 +52,13 @@ export const RhodeShowcaseUnitTypeSchema = z.enum([
   'research_ingredients',
   'sustainability',
 ]);
-export type RhodeShowcaseUnitType = z.infer<typeof RhodeShowcaseUnitTypeSchema>;
+export type ShowcaseUnitType = z.infer<typeof ShowcaseUnitTypeSchema>;
 
 // ─── Base unit ────────────────────────────────────────────────────────────────
 
 export const BaseUnitSchema = z.object({
   id: z.string().min(1),
-  type: RhodeShowcaseUnitTypeSchema,
+  type: ShowcaseUnitTypeSchema,
   sortOrder: z.number().int().min(0),
   isActive: z.boolean().default(true),
   direction: z.enum(['ltr', 'rtl']).optional(),
@@ -348,7 +348,7 @@ export type SustainabilityPayload = z.infer<typeof SustainabilityPayloadSchema>;
 
 // ─── Discriminated union ──────────────────────────────────────────────────────
 
-export type RhodeShowcaseUnit = {
+export type ShowcaseUnit = {
   hero_gallery: BaseUnit & { type: 'hero_gallery'; payload: HeroGalleryPayload };
   benefits_grid: BaseUnit & { type: 'benefits_grid'; payload: BenefitsGridPayload };
   application_steps: BaseUnit & { type: 'application_steps'; payload: ApplicationStepsPayload };
@@ -366,16 +366,16 @@ export type RhodeShowcaseUnit = {
   lifestyle_carousel: BaseUnit & { type: 'lifestyle_carousel'; payload: LifestyleCarouselPayload };
   research_ingredients: BaseUnit & { type: 'research_ingredients'; payload: ResearchIngredientsPayload };
   sustainability: BaseUnit & { type: 'sustainability'; payload: SustainabilityPayload };
-}[RhodeShowcaseUnitType];
+}[ShowcaseUnitType];
 
 // ─── Response type ────────────────────────────────────────────────────────────
 
-export const RhodeShowcaseResponseSchema = z.object({
+export const ShowcaseResponseSchema = z.object({
   productId: z.string(),
   productSlug: z.string(),
   units: z.array(BaseUnitSchema),
 });
-export type RhodeShowcaseResponse = z.infer<typeof RhodeShowcaseResponseSchema>;
+export type ShowcaseResponse = z.infer<typeof ShowcaseResponseSchema>;
 
 // Generic normalized unit (for the registry component API)
-export type NormalizedRhodeUnit<P = unknown> = BaseUnit & { payload: P };
+export type NormalizedShowcaseUnit<P = unknown> = BaseUnit & { payload: P };

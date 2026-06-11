@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Sustainability.tsx — E7 Rhode showcase unit.
+ * Sustainability.tsx — E7 showcase unit.
  * Packaging specs, optional recycle CTA, and numbered recycling steps.
  * Desktop: 2-col specs grid | Mobile: 1-col
  */
@@ -10,12 +10,12 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell';
-import { registerUnit } from '../../../lib/rhode/registry';
-import type { NormalizedRhodeUnit, SustainabilityPayload } from '../../../types/rhode-showcase-units';
-import { EASE_STANDARD, DUR, VIEWPORT } from '../../../lib/rhode/motion';
+import { registerUnit } from '../../../lib/showcase/registry';
+import type { NormalizedShowcaseUnit, SustainabilityPayload } from '../../../types/showcase-units';
+import { EASE_STANDARD, DUR, VIEWPORT } from '../../../lib/showcase/motion';
 
 interface Props {
-  unit: NormalizedRhodeUnit<SustainabilityPayload>;
+  unit: NormalizedShowcaseUnit<SustainabilityPayload>;
   lang?: 'en' | 'ar';
   shouldReduceMotion: boolean;
 }

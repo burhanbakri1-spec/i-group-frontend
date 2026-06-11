@@ -1,0 +1,11 @@
+refactor(frontend): rename all "Rhode" references to brand-neutral showcase naming
+
+- Rename type file: types/rhode-showcase-units.ts → types/showcase-units.ts
+- Rename lib dirs: lib/rhode/ → lib/showcase/
+- Rename component dirs: components/rhode/ → components/showcase/
+- Rename types: RhodeShowcaseUnit → ShowcaseUnit, RhodeShowcaseUnitType → ShowcaseUnitType, etc.
+- Rename functions/vars: fetchProductShowcaseRhode → fetchProductShowcase, RHODE_SHOWCASE_FALLBACK → SHOWCASE_FALLBACK
+- Rename CSS class: icare-rhode-showcase → icare-showcase
+- Update all import paths, component usages, comments, console strings
+- Fix type circular reference in types/index.ts
+- No behavior changes; no backend changes

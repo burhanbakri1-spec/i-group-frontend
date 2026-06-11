@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * ShadeSelector.tsx — E4 Rhode showcase unit.
+ * ShadeSelector.tsx — E4 showcase unit.
  * Circular swatch buttons grouped into Limited Edition and Core collections.
  * Selection animates with ring + scale (300ms), hover shifts opacity (200ms).
  * RTL-aware layout, respects shouldReduceMotion, self-registers on import.
@@ -11,16 +11,16 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, SectionTitle, BodyText } from '../shared/UnitShell';
-import { registerUnit } from '../../../lib/rhode/registry';
-import type { NormalizedRhodeUnit, ShadeSelectorPayload } from '../../../types/rhode-showcase-units';
-import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/rhode/motion';
+import { registerUnit } from '../../../lib/showcase/registry';
+import type { NormalizedShowcaseUnit, ShadeSelectorPayload } from '../../../types/showcase-units';
+import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
 
 // ---------------------------------------------------------------------------
 // Props
 // ---------------------------------------------------------------------------
 
 interface Props {
-  unit: NormalizedRhodeUnit<ShadeSelectorPayload>;
+  unit: NormalizedShowcaseUnit<ShadeSelectorPayload>;
   lang?: 'en' | 'ar';
   shouldReduceMotion: boolean;
 }

@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import RhodeShowcaseBlock from '../../../components/RhodeShowcaseBlock';
-import { RHODE_SHOWCASE_FALLBACK } from '../../../lib/rhode/fallback';
-import type { RhodeShowcaseUnit } from '../../../types/rhode-showcase-units';
+import ShowcaseBlock from '../../../components/showcase/ShowcaseBlock';
+import { SHOWCASE_FALLBACK } from '../../../lib/showcase/fallback';
+import type { ShowcaseUnit } from '../../../types/showcase-units';
 
-export default function RhodeShowcasePreviewPage() {
+export default function ShowcasePreviewPage() {
   const [lang, setLang] = useState<'en' | 'ar'>('en');
 
   return (
@@ -19,7 +19,7 @@ export default function RhodeShowcasePreviewPage() {
         }}
       >
         <h1 style={{ fontSize: '1.5rem', fontWeight: 600, margin: 0 }}>
-          Rhode Showcase Preview
+          Showcase Preview
         </h1>
 
         <button
@@ -38,8 +38,8 @@ export default function RhodeShowcasePreviewPage() {
         </button>
       </div>
 
-      <RhodeShowcaseBlock
-        units={RHODE_SHOWCASE_FALLBACK as RhodeShowcaseUnit[]}
+      <ShowcaseBlock
+        units={SHOWCASE_FALLBACK as ShowcaseUnit[]}
         lang={lang}
       />
     </div>

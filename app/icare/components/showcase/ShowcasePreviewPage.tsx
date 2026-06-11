@@ -1,11 +1,11 @@
 'use client';
 
 /**
- * RhodeShowcasePreviewPage.tsx — Client component for the showcase preview sub-page.
+ * ShowcasePreviewPage.tsx — Client component for the showcase preview sub-page.
  *
  * Renders:
  * 1. A top bar with product slug, unit count info, lang toggle
- * 2. The full RhodeShowcaseBlock with all active units
+ * 2. The full ShowcaseBlock with all active units
  * 3. A sidebar/drawer showing unit type list for quick navigation
  *
  * Route: /icare/products/[slug]/showcase
@@ -14,10 +14,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, Layers, Eye, LayoutGrid, Moon, Sun, Globe } from 'lucide-react';
-import { RhodeShowcaseBlock } from '../RhodeShowcaseBlock';
-import { EASE_STANDARD } from '../../lib/rhode/motion';
+import { ShowcaseBlock } from './ShowcaseBlock';
+import { EASE_STANDARD } from '../../lib/showcase/motion';
 
-interface RhodeShowcasePreviewPageProps {
+interface ShowcasePreviewPageProps {
   slug: string;
 }
 
@@ -41,7 +41,7 @@ const UNIT_LABELS: Record<string, string> = {
   sustainability: 'E7 Sustainability',
 };
 
-export const RhodeShowcasePreviewPage: React.FC<RhodeShowcasePreviewPageProps> = ({ slug }) => {
+export const ShowcasePreviewPage: React.FC<ShowcasePreviewPageProps> = ({ slug }) => {
   const [lang, setLang] = useState<'en' | 'ar'>('en');
   const [showUnitList, setShowUnitList] = useState(false);
 
@@ -102,12 +102,12 @@ export const RhodeShowcasePreviewPage: React.FC<RhodeShowcasePreviewPageProps> =
           </div>
         </div>
 
-        {/* Rhode-style showcase indicator */}
+        {/* Showcase-style indicator */}
         <div className="bg-[#F1F0ED] border-t border-[var(--rb-border-light)] px-4 md:px-8 py-2 flex items-center gap-3">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-xs text-[var(--rb-muted-text)]">
-              Rhode Showcase System — 17 units available
+              Showcase System — 17 units available
             </span>
           </div>
           <div className="h-3 w-px bg-[var(--rb-border-light)]" />
@@ -163,24 +163,24 @@ export const RhodeShowcasePreviewPage: React.FC<RhodeShowcasePreviewPageProps> =
             </div>
             <div>
               <h1 className="text-lg font-medium text-[var(--rb-near-black)] mb-1">
-                {productLabel} — Rhode Showcase Preview
+                {productLabel} — Showcase Preview
               </h1>
               <p className="text-sm text-[var(--rb-muted-text)] leading-relaxed">
-                This preview page renders all active Rhode showcase units for this product.
+                This preview page renders all active showcase units for this product.
                 Use the controls above to test language direction (LTR/RTL) and browse all available unit types.
-                Units are loaded from the API or fallback data if the product is not yet Rhode-enabled.
+                Units are loaded from the API or fallback data if the product is not yet system-enabled.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Rhode Showcase Block */}
-        <RhodeShowcaseBlock slug={slug} lang={lang} />
+        {/* Showcase Block */}
+        <ShowcaseBlock slug={slug} lang={lang} />
 
         {/* Footer note */}
         <div className="mt-12 pt-8 border-t border-[var(--rb-border-light)]">
           <p className="text-xs text-[var(--rb-muted-text)] text-center">
-            Rhode Showcase System · iCare · 17 unit types (M1–M10 + E1–E7) ·{' '}
+            Showcase System · iCare · 17 unit types (M1–M10 + E1–E7) ·{' '}
             <a
               href={`/icare/products/${slug}`}
               className="underline hover:text-[var(--rb-near-black)] transition-colors"
@@ -194,4 +194,4 @@ export const RhodeShowcasePreviewPage: React.FC<RhodeShowcasePreviewPageProps> =
   );
 };
 
-export default RhodeShowcasePreviewPage;
+export default ShowcasePreviewPage;

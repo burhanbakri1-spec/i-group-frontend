@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * IngredientSpotlight.tsx — M7 Rhode showcase unit.
+ * IngredientSpotlight.tsx — M7 showcase unit.
  * Two-column layout with hero image on the left and
  * featured ingredient cards on the right (sticky on desktop).
  * Includes ingredient list and also-made-with pill badges.
@@ -12,12 +12,12 @@ import { motion } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
-import { registerUnit } from '../../../lib/rhode/registry';
-import type { NormalizedRhodeUnit, IngredientSpotlightPayload } from '../../../types/rhode-showcase-units';
-import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/rhode/motion';
+import { registerUnit } from '../../../lib/showcase/registry';
+import type { NormalizedShowcaseUnit, IngredientSpotlightPayload } from '../../../types/showcase-units';
+import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
 
 interface Props {
-  unit: NormalizedRhodeUnit<IngredientSpotlightPayload>;
+  unit: NormalizedShowcaseUnit<IngredientSpotlightPayload>;
   lang?: 'en' | 'ar';
   shouldReduceMotion: boolean;
 }

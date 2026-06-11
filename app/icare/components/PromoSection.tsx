@@ -53,7 +53,7 @@ viewport={{ once: false }}
               </motion.h2>
             </div>
 
-            {/* Description - Rhode 12.8px / 400 / 19.2px / 0.256px rhythm */}
+            {/* Description - system 12.8px / 400 / 19.2px / 0.256px rhythm */}
             <motion.p
               className="mx-auto mb-8 max-w-[34.5rem] text-[12.8px] font-bold leading-[1.5] tracking-[0.02em] text-[#67645E] md:text-[12.8px]"
               initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
@@ -67,7 +67,7 @@ viewport={{ once: false }}
               }
             </motion.p>
 
-            {/* Button - Rhode pill 15.73px / 400 / 0.314px / uppercase */}
+            {/* Button - system pill 15.73px / 400 / 0.314px / uppercase */}
             <div className="flex flex-wrap justify-center gap-4">
               <motion.button
                 onClick={() => onNavigate('shop')}

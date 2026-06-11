@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * ResearchIngredients.tsx — E6 Rhode showcase unit.
+ * ResearchIngredients.tsx — E6 showcase unit.
  * 2-col layout: hero swatch on left, tabbed ingredient display on right.
  * Each tab shows: icon, rhythmic 3× label (name), description, also-made-with pills.
  * Tab content cross-fades with tabFade animation. RTL aware, shouldReduceMotion respected.
@@ -12,14 +12,14 @@ import { motion, AnimatePresence } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
-import { registerUnit } from '../../../lib/rhode/registry';
-import type { NormalizedRhodeUnit, ResearchIngredientsPayload } from '../../../types/rhode-showcase-units';
-import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT, tabFade } from '../../../lib/rhode/motion';
+import { registerUnit } from '../../../lib/showcase/registry';
+import type { NormalizedShowcaseUnit, ResearchIngredientsPayload } from '../../../types/showcase-units';
+import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT, tabFade } from '../../../lib/showcase/motion';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
-  unit: NormalizedRhodeUnit<ResearchIngredientsPayload>;
+  unit: NormalizedShowcaseUnit<ResearchIngredientsPayload>;
   lang?: 'en' | 'ar';
   shouldReduceMotion: boolean;
 }
@@ -44,7 +44,7 @@ const IngredientIcon: React.FC<IngredientIconProps> = ({ icon, className }) => {
 };
 
 // ─── Rhythmic 3× label (mirrors ValuePropsGrid TripleLabel pattern) ────────────
-// Ingredient name rendered at small / medium / large sizes for Rhode's
+// Ingredient name rendered at small / medium / large sizes for the system's
 // characteristic vertical visual rhythm.
 
 const TripleLabel: React.FC<{ label: string }> = ({ label }) => (
