@@ -162,20 +162,99 @@ function RhodeShowcaseSkeleton() {
     <section className="icare-rhode-showcase bg-[var(--rb-bg-warm-gray)] rounded-[16px] overflow-hidden py-8 md:py-12">
       <div className="max-w-[1600px] mx-auto px-4 md:px-8">
         <div className="flex flex-col gap-4 md:gap-6">
-          {[...Array(3)].map((_, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-[12px] p-8 animate-pulse motion-reduce:animate-none"
-            >
-              <div className="h-3 w-20 bg-[#E5E3DF] rounded mb-4" />
-              <div className="h-6 w-1/3 bg-[#E5E3DF] rounded mb-4" />
-              <div className="h-4 w-full bg-[#E5E3DF] rounded mb-2" />
-              <div className="h-4 w-2/3 bg-[#E5E3DF] rounded" />
+          <SkeletonByType />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** Render a single skeleton card whose shape loosely matches a known unit type. */
+function SkeletonByType() {
+  // Match the first registered unit so the skeleton feels contextual.
+  const firstType = useMemo(() => {
+    try {
+      const allTypes = [
+        'hero_gallery', 'benefits_grid', 'application_steps', 'key_ingredients',
+        'value_props_grid', 'visual_application', 'ingredient_spotlight',
+        'results_study', 'routine_map', 'reviews', 'comparison_chart',
+        'kit_contents', 'results_carousel', 'shade_selector',
+        'lifestyle_carousel', 'research_ingredients', 'sustainability',
+      ];
+      for (const t of allTypes) {
+        if (isRegistered(t)) return t;
+      }
+    } catch {
+      // registry may not be fully initialised during SSR — fall through
+    }
+    return null;
+  }, []);
+
+  if (firstType === 'hero_gallery' || firstType === 'lifestyle_carousel') {
+    return (
+      <div className="bg-white rounded-[12px] p-6 md:p-8 animate-pulse motion-reduce:animate-none">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="aspect-[4/3] bg-[#E5E3DF] rounded-lg" />
+          <div className="space-y-3">
+            <div className="h-3 w-24 bg-[#E5E3DF] rounded" />
+            <div className="h-6 w-3/4 bg-[#E5E3DF] rounded" />
+            <div className="h-4 w-full bg-[#E5E3DF] rounded" />
+            <div className="h-10 w-32 bg-[#E5E3DF] rounded-full mt-4" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (firstType === 'benefits_grid' || firstType === 'key_ingredients') {
+    return (
+      <div className="bg-white rounded-[12px] p-6 md:p-8 animate-pulse motion-reduce:animate-none">
+        <div className="h-3 w-24 bg-[#E5E3DF] rounded mb-4" />
+        <div className="h-7 w-1/2 bg-[#E5E3DF] rounded mb-6" />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="space-y-2">
+              <div className="h-10 w-10 bg-[#E5E3DF] rounded-full" />
+              <div className="h-3 w-full bg-[#E5E3DF] rounded" />
+              <div className="h-3 w-2/3 bg-[#E5E3DF] rounded" />
             </div>
           ))}
         </div>
       </div>
-    </section>
+    );
+  }
+
+  if (firstType === 'comparison_chart') {
+    return (
+      <div className="bg-white rounded-[12px] p-6 md:p-8 animate-pulse motion-reduce:animate-none">
+        <div className="h-3 w-24 bg-[#E5E3DF] rounded mb-4" />
+        <div className="h-7 w-1/3 bg-[#E5E3DF] rounded mb-6" />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="space-y-3">
+              <div className="aspect-square bg-[#E5E3DF] rounded-lg" />
+              <div className="h-4 w-3/4 bg-[#E5E3DF] rounded" />
+              <div className="h-3 w-1/2 bg-[#E5E3DF] rounded" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Default / fallback skeleton (media-left / text-right)
+  return (
+    <div className="bg-white rounded-[12px] p-8 animate-pulse motion-reduce:animate-none">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="aspect-[4/3] bg-[#E5E3DF] rounded-lg" />
+        <div className="space-y-3">
+          <div className="h-3 w-20 bg-[#E5E3DF] rounded" />
+          <div className="h-6 w-2/3 bg-[#E5E3DF] rounded" />
+          <div className="h-4 w-full bg-[#E5E3DF] rounded" />
+          <div className="h-4 w-5/6 bg-[#E5E3DF] rounded" />
+        </div>
+      </div>
+    </div>
   );
 }
 
