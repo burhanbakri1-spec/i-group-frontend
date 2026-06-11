@@ -140,7 +140,6 @@ export const translations = {
       addToBag: "Add to Bag",
       share: "Share",
       saveForLater: "Save for Later",
-      cartSubtotalLabel: "Subtotal",
     },
     product: {
       dailySkinEssential: "daily skin essential",
@@ -192,8 +191,6 @@ export const translations = {
       afterResult: "After result",
       resultImage: "Result image",
       routineStep: "Routine step",
-      retry: "Retry",
-      noRelatedProducts: "no related products are available yet",
     },
     pages: {
       shop: {
@@ -459,8 +456,12 @@ export const translations = {
      sidebarToggle: "فتح القائمة الجانبية",
      noProductsAvailable: "لا توجد منتجات متاحة",
      noCategoriesAvailable: "لا توجد فئات متاحة",
-     productPreviewsUnavailable: "معاينات المنتجات غير متاحة",
-     aboutAltBrand: "فلسفة آي كير",
+      productPreviewsUnavailable: "معاينات المنتجات غير متاحة",
+      announcementsAriaLabel: "الإعلانات",
+      resumeSlider: "استئناف شريط الإعلانات",
+      pauseSlider: "إيقاف شريط الإعلانات",
+      socialLinksComingSoon: "روابط التواصل الاجتماعي قريباً",
+      aboutAltBrand: "فلسفة آي كير",
      aboutAltTexture: "ملمس العناية بالبشرة",
      aboutAltValues: "رحلتنا مع القيم",
      aboutAltTeam: "عضو الفريق",
@@ -612,6 +613,11 @@ export const translations = {
       kitItem: "عنصر الطقم",
       application: "التطبيق",
       imageNotProvided: "لم يتم توفير صورة",
+      retry: "إعادة المحاولة",
+      noRelatedProducts: "لا توجد منتجات ذات صلة متاحة بعد",
+      categoryLabel: "التصنيف:",
+      originalValueLabel: "القيمة الأصلية:",
+      selectedCare: "العناية المختارة",
       productDetailsComingSoon: "تفاصيل المنتج قريباً",
       selectOption: "اختر الخيار",
       reviewFilter: "تصفية",
@@ -628,6 +634,7 @@ export const translations = {
       },
       hero: {
         fallbackTitle: "زبدة الحاجز",
+        imageAlt: "آي كير",
       },
       showcase: {
         featuredSkincare: "أساسيات العناية بالبشرة المميزة",
