@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { Language } from '../translations';
+import { Language, translations } from '../translations';
 import { Product } from '../types';
 import { fetchProductShortcut } from '../lib/catalog-client';
 import { useSiteContent } from '../hooks/useSiteContent';
@@ -17,6 +17,7 @@ interface ProductShowcaseProps {
 
 export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang, onProductSelect }) => {
   void products;
+  const t = translations[lang];
   const shouldReduceMotion = useReducedMotion();
   const { productShowcaseLoading, productShowcaseEmpty } = useSiteContent();
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -75,7 +76,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
       <ScrollReveal direction="bottom" viewportMargin="-60px">
         <div className="icare-morning-header">
             <h2 className="text-center text-[12.8px] font-bold uppercase leading-[1.5] tracking-[0.02em] text-[#67645E]">
-            {lang === 'en' ? 'featured skincare essentials' : 'أساسيات عناية مختارة'}
+            {t.pages.showcase.featuredSkincare}
           </h2>
         </div>
       </ScrollReveal>
@@ -107,7 +108,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
                   key={i}
                   onClick={() => setCurrentIndex(i)}
                   className={`w-1.5 h-1.5 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/20 ${i === currentIndex ? 'bg-white w-5 md:w-6' : 'bg-white/55'}`}
-                  aria-label={`Show product ${i + 1}`}
+                  aria-label={t.pages.showcase.showProduct.replace('{index}', String(i + 1))}
                 />
               ))}
             </div>
@@ -185,7 +186,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
 
                 <div className="space-y-0.5 md:space-y-2">
                   <div className="flex items-center gap-2">
-                    <ImageWithFallback src="/icare-logo.png" alt="icare" className="h-3 md:h-5 w-auto object-contain hidden sm:block" />
+                    <ImageWithFallback src="/icare-logo.png" alt={t.pages.showcase.imageAlt} className="h-3 md:h-5 w-auto object-contain hidden sm:block" />
                     <h3 className="text-[14px] sm:text-[20px] md:text-[28px] font-bold tracking-normal text-[#67645E] lowercase leading-[1.1]">
                       {current.title ?? current.name}
                     </h3>
@@ -201,7 +202,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
                   /* Rhode pill: 15.73px / 400 / 23.6px / 0.314px ls / uppercase. */
                   className="bg-[#67645E] text-white rounded-full w-full py-3 md:py-4 text-[15.73px] font-bold tracking-[0.02em] uppercase hover:bg-[#555] transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDECEB]"
                 >
-                  {lang === 'en' ? 'VIEW' : 'عرض'} — {current.originalPrice && <><span className="line-through text-white/60 mr-1">{current.originalPrice}</span> </>}{current.price}
+                  {t.pages.showcase.view} — {current.originalPrice && <><span className="line-through text-white/60 mr-1">{current.originalPrice}</span> </>}{current.price}
                 </motion.button>
               </motion.div>
             </AnimatePresence>

@@ -17,7 +17,7 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, lang }) => {
       image={heroImage}
       fallbackImage="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=2000"
       alt="iCare skincare campaign"
-      title={lang === 'en' ? heroHeadline : 'زبدة الحاجز'}
+      title={lang === 'en' ? heroHeadline : t.pages.hero.fallbackTitle}
       ctaLabel={t.shopNow}
       onCtaClick={() => onNavigate('shop')}
       priority

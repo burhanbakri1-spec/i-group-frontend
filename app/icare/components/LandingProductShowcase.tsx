@@ -5,7 +5,7 @@ import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
 import { SkeletonPulse } from './ui/skeletons';
 import { fetchCatalogProducts, fetchProductShortcut } from '../lib/catalog-client';
 import { useSiteContent } from '../hooks/useSiteContent';
-import { Language } from '../translations';
+import { Language, translations } from '../translations';
 import { Product } from '../types';
 
 interface LandingProductShowcaseProps {
@@ -15,14 +15,16 @@ interface LandingProductShowcaseProps {
 
 const SHOWCASE_PRODUCT_LIMIT = 10;
 
-const LandingProductShowcaseSkeleton = () => (
+const LandingProductShowcaseSkeleton = ({ lang }: { lang: Language }) => {
+  const t = translations[lang];
+  return (
     <section className="icare-index-section icare-landing-products">
     <div className="icare-landing-products__header">
       <SkeletonPulse className="h-10 w-72 rounded-[8px]" />
     </div>
     <SwipeRail
-      ariaLabel="Loading product showcase"
-      cursorLabel="swipe"
+      ariaLabel={t.pages.landingShowcase.loadingShowcase}
+      cursorLabel={t.pages.landingShowcase.swipe}
       className="icare-landing-products__rail"
       trackClassName="icare-landing-products__track"
     >
@@ -35,10 +37,12 @@ const LandingProductShowcaseSkeleton = () => (
       ))}
     </SwipeRail>
   </section>
-);
+  );
+};
 
 export const LandingProductShowcase: React.FC<LandingProductShowcaseProps> = ({ lang, onProductSelect }) => {
   const { trendingTitle } = useSiteContent(lang);
+  const t = translations[lang];
   const [products, setProducts] = useState<Product[] | null>(null);
 
   useEffect(() => {
@@ -63,14 +67,14 @@ export const LandingProductShowcase: React.FC<LandingProductShowcaseProps> = ({ 
   }, []);
 
   if (products === null) {
-    return <LandingProductShowcaseSkeleton />;
+    return <LandingProductShowcaseSkeleton lang={lang} />;
   }
 
   if (products.length === 0) {
     return (
       <section className="icare-index-section icare-landing-products">
         <div className="icare-landing-products__empty">
-          {lang === 'en' ? 'No products available' : 'لا توجد منتجات متاحة'}
+          {t.pages.landingShowcase.noProducts}
         </div>
       </section>
     );
@@ -81,15 +85,15 @@ export const LandingProductShowcase: React.FC<LandingProductShowcaseProps> = ({ 
       <ScrollReveal direction="bottom" viewportMargin="-60px">
         <div className="icare-landing-products__header">
           <h2 className="icare-landing-products__title">
-            {lang === 'en' ? (trendingTitle || 'trending essentials') : 'أساسيات رائجة'}
+            {trendingTitle || t.pages.landingShowcase.trendingEssentials}
           </h2>
         </div>
       </ScrollReveal>
 
       <ScrollReveal direction="bottom" delay={0.1} viewportMargin="-40px">
         <SwipeRail
-          ariaLabel={lang === 'en' ? 'Featured product showcase' : 'عرض المنتجات المختارة'}
-          cursorLabel={lang === 'en' ? 'swipe' : 'اسحب'}
+          ariaLabel={t.pages.landingShowcase.featuredShowcase}
+          cursorLabel={t.pages.landingShowcase.swipe}
           className="icare-landing-products__rail"
           trackClassName="icare-landing-products__track"
         >

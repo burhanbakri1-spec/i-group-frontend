@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ProductCard } from './ProductCard';
 import { ChevronDown, Grid2X2, LayoutGrid } from 'lucide-react';
 import { fetchCatalogProducts, fetchCategoryRoots } from '../lib/catalog-client';
-import { Language } from '../translations';
+import { Language, translations } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { Product, BackendCategory } from '../types';
 import { ProductGridSkeleton } from './ui/skeletons';
@@ -25,6 +25,7 @@ const getProductTimestamp = (product: Product) => {
 
 export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => {
   const { shopEmptyAll, shopEmptyFiltered, shopBackToAll, shopShowMore, shopSortLabel } = useSiteContent();
+  const t = translations[lang];
   const [catalogProducts, setCatalogProducts] = useState<Product[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [rootCategories, setRootCategories] = useState<BackendCategory[]>([]);
@@ -135,8 +136,8 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
         image="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1920"
         fallbackImage="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1920"
         alt="Shop iCare"
-        title={lang === 'en' ? 'curated care' : 'عناية مختارة'}
-        subtitle={lang === 'en' ? 'exploration of beauty' : 'استكشاف الجمال'}
+        title={t.pages.shop.title}
+        subtitle={t.pages.shop.subtitle}
         priority
       />
 
@@ -148,7 +149,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
               onClick={() => selectRoot(null)}
               className={`px-6 md:px-8 py-2.5 rounded-full text-[12px] font-black uppercase tracking-widest transition-colors ${CONTROL_FOCUS_CLASS} ${!activeMain ? 'bg-[#67645E] text-white' : 'bg-white text-[#67645E] border border-[#DDDDDD]'}`}
             >
-              {lang === 'en' ? 'shop all' : 'تسوق الكل'}
+              {t.pages.shop.shopAll}
             </button>
             {rootCategories.map((cat) => (
               <button
