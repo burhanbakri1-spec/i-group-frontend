@@ -1,5 +1,4 @@
 import React, { useRef } from "react";
-import FloatingProductCollage from "../components/FloatingProductCollage.jsx";
 import { brand } from "../data/brand.js";
 import { categories } from "../data/categories.js";
 import { homepageCategoryCards as defaultHomepageCategoryCards } from "../data/homeContent.js";
@@ -36,6 +35,53 @@ function getPromotedProducts(products) {
       return true;
     })
     .slice(0, 10);
+}
+
+function HomeCommunityGallery({ galleryImages = [] }) {
+  const images = galleryImages.filter(Boolean).slice(0, 4);
+
+  if (!images.length) return null;
+
+  return (
+    <section className="home-community-section" aria-labelledby="home-community-title">
+      <div className="home-community-inner">
+        <div className="home-community-heading">
+          <h2 id="home-community-title">Welcome to our community</h2>
+          <p>So nice to have you here - tag us @ebchemical</p>
+        </div>
+
+        <div className="home-community-gallery" aria-label="EB Chemical community gallery">
+          {images.map((image, index) => (
+            <a
+              aria-label="EB Chemical on Instagram"
+              className={`home-community-card home-community-card-${index + 1}`}
+              href="https://www.instagram.com/ebchemical"
+              key={`${image}-${index}`}
+              rel="noreferrer"
+              target="_blank"
+            >
+              <img
+                alt="EB Chemical community"
+                loading="lazy"
+                onError={(event) => {
+                  event.currentTarget.src = "/images/products/product-placeholder.svg";
+                }}
+                src={image}
+              />
+              <span className="home-community-card-meta">
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+                  <rect height="18" rx="5" width="18" x="3" y="3" />
+                  <circle cx="12" cy="12" r="4" />
+                  <circle cx="17" cy="7" r="1.4" />
+                </svg>
+                <span>@ebchemical</span>
+              </span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
 
 function ProductShowcaseSlider({ language, onViewProduct, products, title, variant = "primary" }) {
@@ -469,7 +515,7 @@ function WidePromoBanner({ language, onNavigate, image }) {
   const isArabic = language === "ar";
 
   return (
-    <section className="wide-promo-banner storefront-wide-section">
+    <section className="home-feature-banner-section wide-promo-banner storefront-wide-section">
       <img
         alt=""
         aria-hidden="true"
@@ -518,7 +564,7 @@ function SplitCategoryBanner({ language, onCategorySelect, products, websiteMedi
   ];
 
   return (
-    <section className="split-category-banner storefront-wide-section">
+    <section className="home-category-cards-section split-category-banner storefront-wide-section">
       {panels.map((panel) => (
         <button
           className="split-category-panel"
@@ -733,12 +779,7 @@ function HomePage({
         </section>
       )}
 
-      <FloatingProductCollage
-        galleryImages={communityGalleryImages}
-        language={language}
-        onViewProduct={onViewProduct}
-        products={products}
-      />
+      <HomeCommunityGallery galleryImages={communityGalleryImages} />
 
       <section className="newsletter-band storefront-section">
         <div>

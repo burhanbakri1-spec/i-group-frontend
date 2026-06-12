@@ -1,69 +1,289 @@
 import React from "react";
 import { getWebsiteMediaImage } from "../data/websiteMedia.js";
 
-const aboutImages = {
-  hero: "/images/products/multi-surface-cleaner.svg",
-  banner: "/images/products/car-interior-cleaner.svg",
-  cta: "/images/products/limescale-remover.svg",
+const fallbackImages = {
+  hero: "/products/limescale-remover-hover.jpg",
+  intro: "/products/limescale-remover-main.jpg",
+  banner: "/homepage-categories/home-care.jpg",
+  pillar1: "/images/products/limescale-remover.svg",
+  pillar2: "/images/products/fabric-cleaner.svg",
+  pillar3: "/images/products/car-interior-cleaner.svg",
+  cta: "/homepage-categories/car-care.jpg",
+  impact: "/homepage-categories/bathroom.jpg",
+  stat1: "/images/products/limescale-remover.svg",
+  stat2: "/images/products/fabric-cleaner.svg",
+  stat3: "/images/products/car-interior-cleaner.svg",
+};
+
+const content = {
+  en: {
+    heroTitle: "We're here to make cleaning simpler",
+    heroSubtitle: "Practical cleaning and care products for homes, cars, and everyday spaces.",
+    review: "Over 500+ orders from happy customers",
+    intro:
+      "At EB Chemical, we create practical cleaning and care products designed for everyday use. Our goal is to make home and car care easier, cleaner, and more effective through reliable products and simple routines.",
+    rethinkTitle: "Rethinking clean",
+    rethinkText:
+      "EB Chemical was created to make everyday cleaning simpler, more reliable, and more effective. We focus on practical products for homes, cars, and daily spaces, helping people get strong results with clear and easy routines.",
+    pillarsTitle: "A cleaner way forward",
+    pillarsSubtitle: "What if everyday cleaning could be easier, smarter, and more effective?",
+    ctaTitle: "Join us in making cleaning simpler",
+    ctaText:
+      "We create practical home and car care products designed to make everyday cleaning easier, cleaner, and more reliable.",
+    ctaButton: "Discover more",
+    impactTitle: "Impact",
+    impactMeta1: "MAKING EVERYDAY CLEANING COUNT",
+    impactMeta2: "SINCE WE STARTED",
+    impactText:
+      "We believe the results of good cleaning should be practical, visible, and reliable. These numbers represent our commitment to better routines for homes, cars, and everyday spaces.",
+  },
+  ar: {
+    heroTitle: "نحن هنا لجعل التنظيف أسهل",
+    heroSubtitle: "منتجات تنظيف وعناية عملية للمنزل والسيارة والمساحات اليومية.",
+    review: "أكثر من 500 طلب من عملاء سعداء",
+    intro:
+      "في EB Chemical، نطوّر منتجات تنظيف وعناية عملية مصممة للاستخدام اليومي. هدفنا أن نجعل العناية بالمنزل والسيارة أسهل وأنظف وأكثر فعالية من خلال منتجات موثوقة وروتين بسيط.",
+    rethinkTitle: "إعادة التفكير في التنظيف",
+    rethinkText:
+      "تأسست EB Chemical لجعل التنظيف اليومي أسهل وأكثر موثوقية وفعالية. نركز على منتجات عملية للمنازل والسيارات والمساحات اليومية، لمساعدة الناس على الحصول على نتائج قوية بروتين بسيط وواضح.",
+    pillarsTitle: "طريقة أنظف للأمام",
+    pillarsSubtitle: "ماذا لو كان التنظيف اليومي أسهل، أذكى، وأكثر فعالية؟",
+    ctaTitle: "انضم إلينا لجعل التنظيف أسهل",
+    ctaText:
+      "نقدم منتجات عملية للعناية بالمنزل والسيارة، مصممة لجعل التنظيف اليومي أسهل وأنظف وأكثر موثوقية.",
+    ctaButton: "اكتشف المزيد",
+    impactTitle: "الأثر",
+    impactMeta1: "نجعل التنظيف اليومي أكثر قيمة",
+    impactMeta2: "منذ أن بدأنا",
+    impactText:
+      "نؤمن أن نتائج التنظيف الجيد يجب أن تكون عملية وواضحة وموثوقة. تمثل هذه الأرقام التزامنا بروتين أفضل للمنازل والسيارات والمساحات اليومية.",
+  },
+};
+
+const pillars = {
+  en: [
+    {
+      key: "bottle",
+      title: "Better everyday products",
+      text: "Practical cleaning products designed to make daily home and car care easier, cleaner, and more reliable.",
+      image: fallbackImages.pillar1,
+    },
+    {
+      key: "concentrates",
+      title: "Simple routines",
+      text: "Clear cleaning solutions that help customers get strong results without complicated steps.",
+      image: fallbackImages.pillar2,
+    },
+    {
+      key: "materials",
+      title: "Effective care",
+      text: "Products made for real daily use across homes, cars, and shared spaces.",
+      image: fallbackImages.pillar3,
+    },
+  ],
+  ar: [
+    {
+      key: "bottle",
+      title: "منتجات يومية أفضل",
+      text: "منتجات تنظيف عملية مصممة لجعل العناية بالمنزل والسيارة أسهل وأنظف وأكثر موثوقية.",
+      image: fallbackImages.pillar1,
+    },
+    {
+      key: "concentrates",
+      title: "روتين بسيط",
+      text: "حلول تنظيف واضحة تساعد العملاء على الحصول على نتائج قوية بدون خطوات معقدة.",
+      image: fallbackImages.pillar2,
+    },
+    {
+      key: "materials",
+      title: "عناية فعالة",
+      text: "منتجات مناسبة للاستخدام اليومي في المنازل والسيارات والمساحات المشتركة.",
+      image: fallbackImages.pillar3,
+    },
+  ],
+};
+
+const stats = {
+  en: [
+    {
+      key: "products",
+      value: "243k",
+      label: "CLEANING ROUTINES SUPPORTED",
+      image: fallbackImages.stat1,
+    },
+    {
+      key: "orders",
+      value: "123kg",
+      label: "PRODUCT WASTE REDUCED",
+      image: fallbackImages.stat2,
+    },
+    {
+      key: "categories",
+      value: "123kg",
+      label: "EVERYDAY CARE IMPROVED",
+      image: fallbackImages.stat3,
+    },
+  ],
+  ar: [
+    {
+      key: "products",
+      value: "243k",
+      label: "روتين تنظيف مدعوم",
+      image: fallbackImages.stat1,
+    },
+    {
+      key: "orders",
+      value: "123kg",
+      label: "تقليل هدر المنتجات",
+      image: fallbackImages.stat2,
+    },
+    {
+      key: "categories",
+      value: "123kg",
+      label: "تحسين العناية اليومية",
+      image: fallbackImages.stat3,
+    },
+  ],
 };
 
 function AboutPage({ language = "en", onNavigate, websiteMedia = [] }) {
   const isArabic = language === "ar";
-  const images = {
-    hero: getWebsiteMediaImage(websiteMedia, "about_hero", aboutImages.hero),
-    banner: getWebsiteMediaImage(websiteMedia, "about_banner", aboutImages.banner),
-    cta: getWebsiteMediaImage(websiteMedia, "about_cta", aboutImages.cta),
-  };
+  const t = content[isArabic ? "ar" : "en"];
+  const items = pillars[isArabic ? "ar" : "en"];
+  const numbers = stats[isArabic ? "ar" : "en"];
+  const [activePillar, setActivePillar] = React.useState("");
+
+  const image = React.useCallback(
+    (key) => getWebsiteMediaImage(websiteMedia, `about_${key}`, fallbackImages[key]) || fallbackImages[key],
+    [websiteMedia]
+  );
 
   return (
-    <main className="about-editorial-page">
-      <section className="about-hero-section">
-        <img alt="" aria-hidden="true" src={images.hero} />
-        <div className="about-hero-copy">
-          <span className="about-review-badge">{isArabic ? "EB Chemical" : "EB Chemical"}</span>
-          <h1>{isArabic ? "نحن هنا لجعل التنظيف أسهل" : "We’re here to make cleaning simpler"}</h1>
-          <p>
-            {isArabic
-              ? "منتجات تنظيف وعناية عملية للمنزل والسيارة والمساحات اليومية."
-              : "Practical cleaning and care products for homes, cars, and everyday spaces."}
-          </p>
+    <main className="mission-page" dir={isArabic ? "rtl" : "ltr"}>
+      <section className="mission-hero">
+        <div className="mission-hero-content">
+          <h1 className="mission-hero-title">{t.heroTitle}</h1>
+          <p className="mission-hero-subtitle">{t.heroSubtitle}</p>
+          <div className="mission-review-row">
+            <span>{t.review}</span>
+            <div className="rating-box">
+              <span>4.85</span>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 0L13.09 6.26L20 7.12L14.14 12.17L15.12 19.02L10 15.71L4.87 19.02L5.85 12.17L0 7.12L6.91 6.26L10 0Z" fill="currentColor"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <picture>
+          <source srcSet={image("hero")} type="image/webp" />
+          <img className="mission-media" src={image("hero")} alt="" aria-hidden="true" loading="eager" fetchpriority="high" />
+        </picture>
+      </section>
+
+      <section className="mission-section mission-statement">
+        <p className="mission-statement-text">{t.intro}</p>
+      </section>
+
+      <div className="mission-sections-3-4">
+        <section className="mission-rethinking">
+          <div className="mission-rethinking-content">
+            <h2 className="mission-rethinking-title">{t.rethinkTitle}</h2>
+            <p className="mission-rethinking-text">{t.rethinkText}</p>
+          </div>
+          <picture>
+            <source srcSet={image("banner")} type="image/webp" />
+            <img className="mission-rethinking-bg" src={image("banner")} alt="" aria-hidden="true" loading="lazy" />
+          </picture>
+          <div className="mission-rethinking-overlay" />
+        </section>
+
+        <section className="mission-forward">
+          <div className="mission-forward-inner">
+            <div className="mission-forward-header">
+              <h2 className="mission-forward-title">{t.pillarsTitle}</h2>
+              <p className="mission-forward-subtitle">{t.pillarsSubtitle}</p>
+            </div>
+            <div className="mission-forward-grid">
+              {items.map((item) => {
+                const isOpen = activePillar === item.key;
+                return (
+                  <div
+                    className={`mission-forward-card${isOpen ? ' is-open' : ''}`}
+                    key={item.key}
+                    onClick={() => setActivePillar(isOpen ? '' : item.key)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActivePillar(isOpen ? '' : item.key); } }}
+                  >
+                    <img className="mission-forward-card-image" src={item.image} alt="" aria-hidden="true" loading="lazy" />
+                    <div className="mission-forward-card-overlay" />
+                    <h3 className="mission-forward-card-title">{item.title}</h3>
+                    <div className="mission-forward-card-plus">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 3V21" stroke="currentColor" strokeWidth="1.5" />
+                        <path d="M3 12L21 12" stroke="currentColor" strokeWidth="1.5" />
+                      </svg>
+                    </div>
+                    <div className="mission-forward-card-details">
+                      <p>{item.text}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <section className="mission-section mission-join">
+        <div className="mission-join-inner">
+          <div className="mission-join-media">
+            <picture>
+              <source srcSet={image("cta")} type="image/webp" />
+              <img className="mission-join-image" src={image("cta")} alt="" aria-hidden="true" />
+            </picture>
+          </div>
+          <div className="mission-join-content">
+            <h2 className="mission-join-title">{t.ctaTitle}</h2>
+            <div className="mission-join-text">
+              <p>{t.ctaText}</p>
+            </div>
+            <button className="mission-join-button" type="button" onClick={() => onNavigate?.("sustainability")}>
+              {t.ctaButton}
+            </button>
+          </div>
         </div>
       </section>
 
-      <section className="about-intro-section">
-        <p>
-          {isArabic
-            ? "في EB Chemical، نطوّر منتجات تنظيف وعناية عملية للاستخدام اليومي، لتصبح العناية بالمنزل والسيارة أسهل وأنظف وأكثر فعالية."
-            : "At EB Chemical, we create practical cleaning and care products for daily use, making home and car care easier, cleaner, and more effective."}
-        </p>
-      </section>
-
-      <section className="about-image-banner">
-        <img alt="" aria-hidden="true" src={images.banner} />
-        <div>
-          <h2>{isArabic ? "إعادة التفكير في التنظيف اليومي" : "Rethinking everyday cleaning"}</h2>
-          <p>
-            {isArabic
-              ? "نطوّر منتجات للعناية بالمنزل والسيارة تناسب الروتين اليومي وتساعد العملاء في الحفاظ على مساحات نظيفة ومنعشة بجهد أقل."
-              : "We design home and car care products that fit daily routines and help customers keep their spaces fresh with less effort."}
-          </p>
-        </div>
-      </section>
-
-      <section className="about-cta-section">
-        <div className="about-cta-image">
-          <img alt="" aria-hidden="true" src={images.cta} />
-        </div>
-        <div className="about-cta-copy">
-          <h2>{isArabic ? "انضم إلينا لجعل التنظيف أسهل" : "Join us in making cleaning simpler"}</h2>
-          <p>
-            {isArabic
-              ? "منتجات عملية للعناية بالمنزل والسيارة، مصممة لتنظيف يومي أسهل وأكثر موثوقية."
-              : "Practical home and car care products for easier, more reliable daily cleaning."}
-          </p>
-          <button className="primary-action large" onClick={() => onNavigate?.("products")} type="button">
-            {isArabic ? "اكتشف المزيد" : "Discover more"}
-          </button>
+      <section className="mission-section mission-impact">
+        <div className="mission-impact-inner">
+          <div className="mission-impact-header">
+            <h2 className="mission-impact-title">{t.impactTitle}</h2>
+            <div className="mission-impact-copy">
+              <p>{t.impactText}</p>
+            </div>
+          </div>
+          <div className="mission-impact-meta">
+            <span>{t.impactMeta1}</span>
+            <span>{t.impactMeta2}</span>
+          </div>
+          <div className="mission-impact-visual">
+            <img className="mission-impact-image" src={image("impact")} alt="" aria-hidden="true" />
+            <div className="mission-impact-overlay" />
+            <div className="mission-impact-stats">
+              {numbers.map((stat, i) => (
+                <div className={`mission-impact-stat-row mission-impact-stat-align-${i}`} key={stat.key}>
+                  <div className="mission-impact-stat-card">
+                    <img className="mission-impact-stat-icon" src={stat.image} alt="" aria-hidden="true" />
+                    <div className="mission-impact-stat-body">
+                      <span className="mission-impact-stat-number">{stat.value}</span>
+                      <span className="mission-impact-stat-label">{stat.label}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
     </main>

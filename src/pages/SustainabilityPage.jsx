@@ -1,119 +1,128 @@
 import React from "react";
 import { getWebsiteMediaImage } from "../data/websiteMedia.js";
 
-const referenceImages = {
-  hero: "https://kinfill.com/cdn/shop/files/7-hand-wash_ca230465-2716-45d5-a94d-aa758eea3c4d.jpg?v=1761639215&width=2000",
-  why: "https://kinfill.com/cdn/shop/files/about-kinfill.png?crop=center&height=1080&v=1761647602&width=1920",
-  refill: "https://kinfill.com/cdn/shop/files/sustainability-b-corp_1.jpg?crop=center&height=1080&v=1761643484&width=1920",
-  safe: "https://kinfill.com/cdn/shop/files/sustainability-safe-body-planet.jpg?crop=center&height=1080&v=1761640080&width=1920",
-  performance: "https://kinfill.com/cdn/shop/files/sustainability-performance.jpg?v=1761640082&width=1200",
-  impact: "https://kinfill.com/cdn/shop/files/background-impact.jpg?v=1746041840&width=1800",
-  stat1: "https://kinfill.com/cdn/shop/files/758411ca1bec7446b7001c23a5fc0ded.jpg?crop=center&height=240&v=1743773389&width=240",
-  stat2: "https://kinfill.com/cdn/shop/files/568df7bc6414b1c8b0c565bd5f3245f6.jpg?crop=center&height=240&v=1743773404&width=240",
-  stat3: "https://kinfill.com/cdn/shop/files/419a5c884dfb47477b9d1870d1d2ce87.png?crop=center&height=240&v=1743773418&width=240",
-  product1: "https://kinfill.com/cdn/shop/files/kinfill-baby-soap-bar-hypoallergenic-plastic-free.jpg?v=1770132324&width=600",
-  product2: "https://kinfill.com/cdn/shop/files/Porcelain_Yoga_Spray.jpg?v=1762785486&width=600",
-  product3: "https://kinfill.com/cdn/shop/files/1-pump-porcelain_3389268b-1f4c-45d9-a5d3-5fd0b5279b15.jpg?v=1762786399&width=600",
-  product4: "https://kinfill.com/cdn/shop/files/1-pump-cloud_c9a0c7c1-f0af-4c69-9853-8903f3dc21a8.jpg?v=1762789727&width=600",
-  cta: "https://kinfill.com/cdn/shop/files/dish-soap-2_968044b4-c1a6-4ad1-ade0-e8de01cc7eb5.jpg?v=1763563465&width=1200",
+const fallbackImages = {
+  hero: "/homepage-categories/bathroom.jpg",
+  why: "/homepage-categories/home-care.jpg",
+  bcorp: "/homepage-categories/bathroom.jpg",
+  safe: "/homepage-categories/home-care.jpg",
+  performance: "/products/limescale-remover-main.jpg",
+  impact: "/homepage-categories/car-care.jpg",
+  stat1: "/products/limescale-remover-hover.jpg",
+  stat2: "/images/products/fabric-cleaner.svg",
+  stat3: "/images/products/grease-oil-remover.svg",
+  accordion: "/products/limescale-remover-main.jpg",
+  cta: "/homepage-categories/laundry.jpg",
+  product: "/homepage-categories/bathroom.jpg",
 };
 
 const copy = {
   en: {
-    heroTitle: "Refills That Revolutionise",
-    heroSub: "Smarter living starts here",
-    reviews: "Over 500+ reviews from happy users",
-    rating: "4.85",
-    intro: "We design products that make everyday cleaning easier, more effective, and less wasteful.",
-    why: "Why Choose EB Chemical?",
-    benefits: [
-      { title: "Refillable design", text: "Less waste, same performance.", image: "refill" },
-      { title: "Responsible standards", text: "Clear quality control in every product.", image: "why" },
-      { title: "Safe for daily spaces", text: "Reliable formulas for homes and workplaces.", image: "safe" },
-      { title: "Performance trusted", text: "Strong cleaning with a lighter footprint.", image: "performance" },
-    ],
+    heroTitle: "Smarter cleaning starts here",
+    heroSubtitle: "Practical products designed for cleaner homes, cars, and everyday routines.",
+    review: "Over 500+ orders from happy customers",
+    intro:
+      "At EB Chemical, sustainability starts with practical choices. We focus on reliable cleaning and care products that help customers use the right solution, reduce unnecessary waste, and keep everyday spaces fresh with less effort.",
+    whyLabel: "Why Choose EB Chemical?",
+    refillableTitle: "Refillable design to last a lifetime",
+    refillableText:
+      "Our refillable system is built to reduce waste while keeping performance reliable. Each bottle is designed for repeated use, making it easy to maintain a cleaner routine at home and in the car.",
+    bCorpTitle: "Committed to quality and care",
+    bCorpText:
+      "We take responsibility seriously. Every product is formulated with care, using ingredients that are effective yet mindful of the spaces you live and work in.",
+    safeTitle: "Safe for you, your body, and the planet",
+    safeText:
+      "Our formulations are designed with safety in mind for your home, your family, and the environment. Non-toxic, biodegradable, and practical for everyday use.",
+    performanceTitle: "Performance you can trust",
+    performanceText:
+      "Every EB Chemical product is carefully formulated to deliver effective cleaning results without compromise. Our concentrates are designed to work hard while using less material, so you get the best clean with minimal impact.",
     impactTitle: "The Impact",
-    impactText: "Simple numbers. Clear progress.",
-    impactLine: "Making everyday routines count",
-    since: "Since we started",
-    stats: [
-      { image: "stat1", number: "500+", label: "orders handled" },
-      { image: "stat2", number: "20+", label: "products available" },
-      { image: "stat3", number: "4", label: "main categories" },
-    ],
-    most: "Most requested products",
-    products: [
-      { image: "product1", tag: "Daily Care", title: "Multi Surface Cleaner", meta: "From $9" },
-      { image: "product2", tag: "Car Care", title: "Car Shampoo", meta: "From $10" },
-      { image: "product3", tag: "Home Care", title: "Fabric Cleaner", meta: "From $8" },
-      { image: "product4", tag: "Cooling", title: "Radiator Water", meta: "From $7" },
-    ],
-    ourProducts: "Our products",
-    ourText: "Performance without unnecessary waste.",
-    accordions: [
-      { title: "Formulated with purpose", text: "Practical formulas for daily use." },
-      { title: "Refill-ready", text: "Reduced packaging by design." },
-      { title: "Built to last", text: "Durability for smarter routines." },
-    ],
-    ctaTitle: "Goodbye, waste. Hello, smarter cleaning.",
-    ctaText: "Explore all refillable products.",
+    impactText: "We could tell you all about it with words, but these numbers speak for themselves.",
+    stat1Value: "243k",
+    stat1Label: "plastic bottles saved",
+    stat2Value: "123kg",
+    stat2Label: "plastic bags saved",
+    stat3Value: "123kg",
+    stat3Label: "CO2 saved",
+    accordionTitle: "Our products",
+    accordionText:
+      "Designed for practical daily use, our products focus on performance, simplicity, and care for everyday spaces.",
+    accordion1Title: "Formulated with purpose",
+    accordion1Text:
+      "Our formulas are made to deliver reliable cleaning results for homes, cars, and daily routines. Biodegradable and effective.",
+    accordion2Title: "Refillable by design",
+    accordion2Text:
+      "Our product system supports practical use and helps reduce unnecessary packaging where possible. Refill, reuse, repeat.",
+    accordion3Title: "Built to last a lifetime",
+    accordion3Text:
+      "Each product is designed to be easy to use, easy to store, and suitable for everyday cleaning needs. Durable bottles built for repeated use.",
+    ctaTitle: "Ready to make the switch?",
+    ctaText: "Discover products designed for practical, sustainable living.",
     ctaButton: "Discover products",
-    ctaTag: "Cleaners",
+    goodbyeTitle: "Goodbye, waste. Hello, refills.",
+    goodbyeText: "Discover products with purpose.",
   },
   ar: {
-    heroTitle: "إعادة تعبئة تغيّر الروتين",
-    heroSub: "تنظيف أذكى يبدأ من هنا",
-    reviews: "+500 تقييم من عملائنا",
-    rating: "4.85",
-    intro: "نصمم منتجات تجعل التنظيف اليومي أسهل، أقوى، وبأقل هدر.",
-    why: "لماذا EB Chemical؟",
-    benefits: [
-      { title: "تصميم قابل لإعادة الاستخدام", text: "هدر أقل بنفس الأداء.", image: "refill" },
-      { title: "معايير أوضح", text: "رقابة جودة واضحة في كل منتج.", image: "why" },
-      { title: "آمنة للمساحات اليومية", text: "تركيبات موثوقة للبيت والعمل.", image: "safe" },
-      { title: "أداء موثوق", text: "تنظيف قوي بأثر أخف.", image: "performance" },
-    ],
+    heroTitle: "تنظيف أذكى يبدأ من هنا",
+    heroSubtitle: "منتجات عملية مصممة لمنزل وسيارة وروتين يومي أنظف.",
+    review: "أكثر من 500 طلب من عملاء سعداء",
+    intro:
+      "في EB Chemical، تبدأ الاستدامة من اختيارات عملية. نركز على منتجات تنظيف وعناية موثوقة تساعد العملاء على استخدام الحل المناسب، وتقليل الهدر غير الضروري، والحفاظ على المساحات اليومية نظيفة ومنعشة بجهد أقل.",
+    whyLabel: "لماذا تختار EB Chemical؟",
+    refillableTitle: "تصميم قابل لإعادة الاستخدام ليدوم مدى الحياة",
+    refillableText:
+      "نظام إعادة التعبئة لدينا مصمم لتقليل الهدر مع الحفاظ على أداء موثوق. كل عبوة مصممة للاستخدام المتكرر، مما يسهل الحفاظ على روتين نظيف في المنزل والسيارة.",
+    bCorpTitle: "ملتزمون بالجودة والرعاية",
+    bCorpText:
+      "نحن نأخذ المسؤولية على محمل الجد. كل منتج يتم تركيبه بعناية، باستخدام مكونات فعالة ومراعية للمساحات التي تعيش وتعمل فيها.",
+    safeTitle: "آمن لك ولجسمك وللكوكب",
+    safeText:
+      "تم تصميم تركيباتنا مع مراعاة السلامة لمنزلك وعائلتك والبيئة. غير سامة، قابلة للتحلل، وعملية للاستخدام اليومي.",
+    performanceTitle: "أداء يمكنك الوثوق به",
+    performanceText:
+      "كل منتج EB Chemical يتم تركيبه بعناية لتقديم نتائج تنظيف فعالة دون مساومة. تركيباتنا المركزة مصممة لتعمل بكفاءة مع استخدام مواد أقل.",
     impactTitle: "الأثر",
-    impactText: "أرقام بسيطة. تقدّم واضح.",
-    impactLine: "كل روتين يومي يصنع فرقًا",
-    since: "منذ البداية",
-    stats: [
-      { image: "stat1", number: "+500", label: "طلب مُدار" },
-      { image: "stat2", number: "+20", label: "منتج متاح" },
-      { image: "stat3", number: "4", label: "أقسام رئيسية" },
-    ],
-    most: "المنتجات الأكثر طلبًا",
-    products: [
-      { image: "product1", tag: "عناية يومية", title: "منظف متعدد الاستخدام", meta: "ابتداءً من $9" },
-      { image: "product2", tag: "عناية السيارة", title: "شامبو السيارة", meta: "ابتداءً من $10" },
-      { image: "product3", tag: "عناية المنزل", title: "منظف الأقمشة", meta: "ابتداءً من $8" },
-      { image: "product4", tag: "تبريد", title: "مياه رديتر", meta: "ابتداءً من $7" },
-    ],
-    ourProducts: "منتجاتنا",
-    ourText: "أداء قوي وبدون هدر زائد.",
-    accordions: [
-      { title: "تركيبات هادفة", text: "تركيبات عملية للاستخدام اليومي." },
-      { title: "جاهزة لإعادة التعبئة", text: "تقليل التغليف الزائد بالتصميم." },
-      { title: "مصممة لتدوم", text: "متانة لروتين أذكى." },
-    ],
-    ctaTitle: "وداعًا للهدر. مرحبًا بتنظيف أذكى.",
-    ctaText: "استكشف المنتجات القابلة لإعادة الاستخدام.",
+    impactText: "يمكننا شرح الكثير بالكلمات، لكن هذه الأرقام تتحدث بنفسها.",
+    stat1Value: "243 ألف",
+    stat1Label: "زجاجة بلاستيكية تم توفيرها",
+    stat2Value: "123 كجم",
+    stat2Label: "أكياس بلاستيكية تم توفيرها",
+    stat3Value: "123 كجم",
+    stat3Label: "ثاني أكسيد الكربون تم توفيره",
+    accordionTitle: "منتجاتنا",
+    accordionText:
+      "مصممة للاستخدام اليومي العملي، تركز منتجاتنا على الأداء والبساطة والعناية بالمساحات اليومية.",
+    accordion1Title: "تركيبات بهدف واضح",
+    accordion1Text:
+      "تركيباتنا مصممة لتقديم نتائج تنظيف موثوقة للمنزل والسيارة والروتين اليومي. قابلة للتحلل وفعالة.",
+    accordion2Title: "قابلة لإعادة التعبئة بالتصميم",
+    accordion2Text:
+      "نظام منتجاتنا يدعم الاستخدام العملي ويساعد على تقليل التغليف غير الضروري. أعد التعبئة، أعد الاستخدام، كرر.",
+    accordion3Title: "مصممة لتدوم مدى الحياة",
+    accordion3Text:
+      "كل منتج مصمم ليكون سهل الاستخدام والتخزين ومناسبًا لاحتياجات التنظيف اليومية. زجاجات متينة للاستخدام المتكرر.",
+    ctaTitle: "مستعد للتبديل؟",
+    ctaText: "اكتشف منتجات مصممة لحياة عملية ومستدامة.",
     ctaButton: "اكتشف المنتجات",
-    ctaTag: "منظفات",
+    goodbyeTitle: "وداعًا للهدر. مرحبًا بإعادة التعبئة.",
+    goodbyeText: "اكتشف منتجات ذات هدف.",
   },
 };
 
-function Accordion({ items }) {
+function SustainabilityAccordion({ items }) {
   const [active, setActive] = React.useState(0);
+
   return (
-    <div className="sus-kin-accordion">
-      {items.map((item, index) => (
-        <article key={item.title} className={active === index ? "is-open" : ""}>
+    <div className="sustainability-accordion">
+      {items.map(([title, text], index) => (
+        <article key={title} className={active === index ? "is-open" : ""}>
           <button type="button" onClick={() => setActive(active === index ? -1 : index)}>
-            <span>{item.title}</span>
+            <span>{title}</span>
             <span>{active === index ? "−" : "+"}</span>
           </button>
-          <p>{item.text}</p>
+          <div className="sustainability-accordion-content" style={{ maxHeight: active === index ? "200px" : "0", overflow: "hidden", transition: "max-height 0.3s ease" }}>
+            <p>{text}</p>
+          </div>
         </article>
       ))}
     </div>
@@ -123,98 +132,135 @@ function Accordion({ items }) {
 function SustainabilityPage({ language = "en", onNavigate, websiteMedia = [] }) {
   const isArabic = language === "ar";
   const t = copy[isArabic ? "ar" : "en"];
-  const img = React.useCallback(
-    (key) => getWebsiteMediaImage(websiteMedia, `sustainability_${key}`, referenceImages[key]) || referenceImages[key],
+
+  const image = React.useCallback(
+    (key) => getWebsiteMediaImage(websiteMedia, `sustainability_${key}`, fallbackImages[key]) || fallbackImages[key],
     [websiteMedia]
   );
 
+  const accordionItems = [
+    [t.accordion1Title, t.accordion1Text],
+    [t.accordion2Title, t.accordion2Text],
+    [t.accordion3Title, t.accordion3Text],
+  ];
+
+  const impactStats = [
+    { value: t.stat1Value, label: t.stat1Label, img: image("stat1") },
+    { value: t.stat2Value, label: t.stat2Label, img: image("stat2") },
+    { value: t.stat3Value, label: t.stat3Label, img: image("stat3") },
+  ];
+
   return (
-    <main className="sus-kin-page" dir={isArabic ? "rtl" : "ltr"}>
-      <section className="sus-kin-hero">
-        <img src={img("hero")} alt="" />
-        <div className="sus-kin-hero-copy">
+    <main className="sustainability-page" dir={isArabic ? "rtl" : "ltr"}>
+      <section className="sustainability-hero">
+        <picture>
+          <img className="sustainability-media" src={image("hero")} alt="" aria-hidden="true" />
+        </picture>
+        <div className="sustainability-hero-overlay" />
+        <div className="sustainability-hero-copy">
           <h1>{t.heroTitle}</h1>
-          <p>{t.heroSub}</p>
-          <div className="sus-kin-review">
-            <span>{t.reviews}</span>
-            <strong>{t.rating}</strong>
+          <p>{t.heroSubtitle}</p>
+          <div className="sustainability-review">
+            <span>{t.review}</span>
+            <strong>4.85 ★</strong>
           </div>
         </div>
       </section>
 
-      <section className="sus-kin-intro">
+      <section className="sustainability-section sustainability-intro">
         <p>{t.intro}</p>
       </section>
 
-      <section className="sus-kin-why">
-        <img src={img("why")} alt="" />
-        <h2>{t.why}</h2>
+      <section className="sustainability-section sustainability-why">
+        <div className="sustainability-why-bg">
+          <img className="sustainability-media" src={image("why")} alt="" aria-hidden="true" />
+          <div className="sustainability-why-overlay" />
+        </div>
+        <div className="sustainability-why-copy">
+          <h2>{t.whyLabel}</h2>
+        </div>
       </section>
 
-      <section className="sus-kin-benefits">
-        {t.benefits.map((item, index) => (
-          <article key={item.title} className={index % 2 ? "is-flipped" : ""}>
-            <div className="sus-kin-benefit-image"><img src={img(item.image)} alt="" /></div>
-            <div className="sus-kin-benefit-copy">
-              <h2>{item.title}</h2>
-              <p>{item.text}</p>
-            </div>
-          </article>
-        ))}
+      <section className="sustainability-section sustainability-text-block">
+        <h2>{t.refillableTitle}</h2>
+        <p>{t.refillableText}</p>
       </section>
 
-      <section className="sus-kin-impact">
-        <img className="sus-kin-impact-bg" src={img("impact")} alt="" />
-        <div className="sus-kin-impact-head">
+      <section className="sustainability-section sustainability-bcorp">
+        <img className="sustainability-media" src={image("bcorp")} alt="" aria-hidden="true" />
+        <div className="sustainability-bcorp-overlay" />
+        <div className="sustainability-bcorp-copy">
+          <h2>{t.bCorpTitle}</h2>
+          <p>{t.bCorpText}</p>
+        </div>
+      </section>
+
+      <section className="sustainability-section sustainability-safe">
+        <img className="sustainability-media" src={image("safe")} alt="" aria-hidden="true" />
+        <div className="sustainability-safe-overlay" />
+        <div className="sustainability-safe-copy">
+          <h2>{t.safeTitle}</h2>
+          <p>{t.safeText}</p>
+        </div>
+      </section>
+
+      <section className="sustainability-section sustainability-performance">
+        <div className="sustainability-performance-media">
+          <img src={image("performance")} alt="" aria-hidden="true" />
+        </div>
+        <div className="sustainability-performance-copy">
+          <h2>{t.performanceTitle}</h2>
+          <p>{t.performanceText}</p>
+        </div>
+      </section>
+
+      <section className="sustainability-section sustainability-impact">
+        <img className="sustainability-impact-bg" src={image("impact")} alt="" aria-hidden="true" />
+        <div className="sustainability-impact-heading">
           <h2>{t.impactTitle}</h2>
           <p>{t.impactText}</p>
         </div>
-        <div className="sus-kin-impact-body">
-          <p>{t.impactLine}</p>
-          <small>{t.since}</small>
-          <div className="sus-kin-stats">
-            {t.stats.map((stat) => (
-              <article key={stat.label}>
-                <img src={img(stat.image)} alt="" />
-                <strong>{stat.number}</strong>
-                <span>{stat.label}</span>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="sus-kin-most">
-        <h2>{t.most}</h2>
-        <div className="sus-kin-product-row">
-          {t.products.map((product) => (
-            <article key={product.title}>
-              <div><img src={img(product.image)} alt="" /></div>
-              <span>{product.tag}</span>
-              <h3>{product.title}</h3>
-              <p>{product.meta}</p>
+        <div className="sustainability-impact-stats">
+          {impactStats.map((stat) => (
+            <article key={stat.label} className="sustainability-stat-pill">
+              <img src={stat.img} alt="" aria-hidden="true" />
+              <strong>{stat.value}</strong>
+              <span>{stat.label}</span>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="sus-kin-products-info">
-        <div className="sus-kin-products-title">
-          <h2>{t.ourProducts}</h2>
-          <p>{t.ourText}</p>
+      <section className="sustainability-section sustainability-products-split">
+        <div className="sustainability-products-copy">
+          <h2>{t.accordionTitle}</h2>
+          <p>{t.accordionText}</p>
+          <SustainabilityAccordion items={accordionItems} />
         </div>
-        <Accordion items={t.accordions} />
+        <div className="sustainability-products-media">
+          <img src={image("accordion")} alt="" aria-hidden="true" />
+        </div>
       </section>
 
-      <section className="sus-kin-final">
-        <div className="sus-kin-final-product">
-          <img src={img("cta")} alt="" />
+      <section className="sustainability-section sustainability-cta-banner">
+        <div className="sustainability-cta-bg">
+          <img className="sustainability-media" src={image("cta")} alt="" aria-hidden="true" />
+          <div className="sustainability-cta-overlay" />
         </div>
-        <div className="sus-kin-final-copy">
+        <div className="sustainability-cta-copy">
           <h2>{t.ctaTitle}</h2>
           <p>{t.ctaText}</p>
           <button type="button" onClick={() => onNavigate?.("products")}>{t.ctaButton}</button>
-          <span>{t.ctaTag}</span>
+        </div>
+      </section>
+
+      <section className="sustainability-section sustainability-two-col">
+        <div className="sustainability-two-col-media">
+          <img src={image("product")} alt="" aria-hidden="true" />
+        </div>
+        <div className="sustainability-two-col-copy">
+          <h2>{t.goodbyeTitle}</h2>
+          <p>{t.goodbyeText}</p>
         </div>
       </section>
     </main>

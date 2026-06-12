@@ -388,33 +388,7 @@ function Header({
                 <Icon name="chevron" />
               </span>
             </button>
-            <div className={isMegaOpen ? "mega-menu shop-mega-menu-viewport open" : "mega-menu shop-mega-menu-viewport"}>
-              <nav className="mega-link-column" aria-label={shopLabel}>
-                {shopLinks.map((link) => (
-                  <button key={link.key} onClick={() => handleShopLink(link)} type="button">
-                    {language === "ar" ? link.labelAr : link.labelEn}
-                  </button>
-                ))}
-              </nav>
-              <div className="mega-feature-grid">
-                {megaFeatureCards.map((card) => (
-                  <button
-                    className="mega-image-card"
-                    key={card.titleEn}
-                    onClick={() => handleFeatureCard(card)}
-                    type="button"
-                  >
-                    <span>
-                      <img
-                        alt={language === "ar" ? card.titleAr : card.titleEn}
-                        src={card.image}
-                      />
-                    </span>
-                    <strong>{language === "ar" ? card.titleAr : card.titleEn}</strong>
-                  </button>
-                ))}
-              </div>
-            </div>
+
           </div>
           <div
             className="nav-menu-wrap about-menu-wrap"
@@ -433,35 +407,7 @@ function Header({
               {aboutLabel}
               <Icon name="chevron" />
             </button>
-            <div className={isAboutOpen ? "about-menu about-mega-menu open" : "about-menu about-mega-menu"}>
-              <nav className="about-link-column" aria-label={aboutLabel}>
-                {aboutMenuLinks.map((link) => (
-                  <button
-                    className={activePage === (link.activePage || link.action) ? "active" : ""}
-                    key={link.key}
-                    onClick={() => handleAboutLink(link)}
-                    type="button"
-                  >
-                    {language === "ar" ? link.labelAr : link.labelEn}
-                  </button>
-                ))}
-              </nav>
-              <div className="about-feature-grid">
-                {aboutFeatureCards.map((card) => (
-                  <button
-                    className="about-image-card"
-                    key={card.key}
-                    onClick={() => handleFeatureCard(card)}
-                    type="button"
-                  >
-                    <span>
-                      <img alt={language === "ar" ? card.titleAr : card.titleEn} src={card.image} />
-                    </span>
-                    <strong>{language === "ar" ? card.titleAr : card.titleEn}</strong>
-                  </button>
-                ))}
-              </div>
-            </div>
+
           </div>
           <button className={activePage === "how" ? "nav-link active" : "nav-link"} onClick={goToHow} type="button">
             {howLabel}
@@ -563,6 +509,83 @@ function Header({
         >
           <Icon name="menu" />
         </button>
+      </div>
+
+      {/* Shop dropdown — positioned as direct header child, no ancestor conflicts */}
+      <div
+        className={`header-mega-panel ${isMegaOpen ? "open" : ""}`}
+        onMouseEnter={clearMenuTimers}
+        onMouseLeave={scheduleCloseMegaMenu}
+      >
+        <div className="header-mega-panel-content">
+          <nav className="mega-link-column" aria-label={shopLabel}>
+            {shopLinks.map((link) => (
+              <button
+                className={activePage === "products" && link.key === "all" ? "active" : ""}
+                key={link.key}
+                onClick={() => handleShopLink(link)}
+                type="button"
+              >
+                {language === "ar" ? link.labelAr : link.labelEn}
+              </button>
+            ))}
+          </nav>
+          <div className="mega-feature-grid">
+            {megaFeatureCards.map((card) => (
+              <button
+                className="mega-image-card"
+                key={card.titleEn}
+                onClick={() => handleFeatureCard(card)}
+                type="button"
+              >
+                <span>
+                  <img
+                    alt={language === "ar" ? card.titleAr : card.titleEn}
+                    src={card.image}
+                  />
+                </span>
+                <strong>{language === "ar" ? card.titleAr : card.titleEn}</strong>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* About dropdown — positioned as direct header child, no ancestor conflicts */}
+      <div
+        className={`header-mega-panel ${isAboutOpen ? "open" : ""}`}
+        onMouseEnter={clearMenuTimers}
+        onMouseLeave={scheduleCloseAboutMenu}
+      >
+        <div className="header-mega-panel-content">
+          <nav className="about-link-column" aria-label={aboutLabel}>
+            {aboutMenuLinks.map((link) => (
+              <button
+                className={activePage === (link.activePage || link.action) ? "active" : ""}
+                key={link.key}
+                onClick={() => handleAboutLink(link)}
+                type="button"
+              >
+                {language === "ar" ? link.labelAr : link.labelEn}
+              </button>
+            ))}
+          </nav>
+          <div className="about-feature-grid">
+            {aboutFeatureCards.map((card) => (
+              <button
+                className="about-image-card"
+                key={card.key}
+                onClick={() => handleFeatureCard(card)}
+                type="button"
+              >
+                <span>
+                  <img alt={language === "ar" ? card.titleAr : card.titleEn} src={card.image} />
+                </span>
+                <strong>{language === "ar" ? card.titleAr : card.titleEn}</strong>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className={isSearchOpen ? "search-panel open" : "search-panel"}>
