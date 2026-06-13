@@ -412,7 +412,7 @@ export async function loadStoreFromSupabase() {
 }
 
 export async function saveStoreToSupabase(store, options = {}) {
-  const pruneMissing = options.pruneMissing !== false;
+  const pruneMissing = options.pruneMissing === true;
   const products = store.products || [];
   const orders = store.orders || [];
   const users = store.users || [];

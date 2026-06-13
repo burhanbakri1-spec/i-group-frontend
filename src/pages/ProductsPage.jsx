@@ -14,33 +14,189 @@ function getCategoryName(categoryId, language) {
   return getLocalized(category?.name, language);
 }
 
-function matchesMainFilter(product, activeCategory) {
-  if (activeCategory === "All") return true;
-  if (activeCategory === "accessories") {
-    return !["home-cleaning", "bathroom-cleaning", "car-care"].includes(product.categoryId);
-  }
-  return product.categoryId === activeCategory;
+const SHOP_CATEGORY_ALIASES = {
+  all: "All",
+  "shop-all": "All",
+  cleaning: "home-cleaning",
+  "cleaning-products": "home-cleaning",
+  "home-care": "home-cleaning",
+  "home-cleaners": "home-cleaning",
+  "bathroom-cleaners": "bathroom-cleaning",
+  fragrance: "fragrances",
+  scents: "fragrances",
+  "air-fresheners": "fragrances",
+  "limited-edition-scent": "fragrances",
+  bundles: "bundles-sets",
+  sets: "bundles-sets",
+  starter: "starter-kits",
+  "starter-kit": "starter-kits",
+  refills: "refills",
+  refill: "refills",
+};
+
+function normalizeShopCategoryKey(value) {
+  const key = String(value || "All").trim();
+  return SHOP_CATEGORY_ALIASES[key] || SHOP_CATEGORY_ALIASES[key.toLowerCase()] || key;
 }
 
-function matchesSecondaryFilter(product, secondaryFilter, index) {
-  if (!secondaryFilter) return true;
+function getProductLookupText(product) {
+  return [
+    product.categoryId,
+    product.categoryKey,
+    product.slug,
+    getLocalized(product.name, "en"),
+    getLocalized(product.name, "ar"),
+    product.badge && getLocalized(product.badge, "en"),
+    product.badge && getLocalized(product.badge, "ar"),
+    ...(Array.isArray(product.tags) ? product.tags : []),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+}
 
-  const name = `${getLocalized(product.name, "en")} ${getLocalized(product.name, "ar")} ${product.slug || ""}`.toLowerCase();
-  const sizeText = product.sizes?.map((size) => size.size).join(" ").toLowerCase() || "";
+function hasProductType(product, typeId) {
+  return product.detailOptions?.productTypes?.some((type) => type.id === typeId);
+}
 
-  if (secondaryFilter === "starter") {
-    return index < 8 || product.featured || product.bestSeller || name.includes("kit");
+function hasBulkOrRefillSize(product) {
+  return product.sizes?.some((size) => {
+    const sizeText = String(size.size || "").toLowerCase();
+    return sizeText.includes("5l") || sizeText.includes("18l");
+  });
+}
+
+function matchesShopCategory(product, categoryConfig) {
+  if (!categoryConfig || categoryConfig.productCategoryKeys.includes("all")) {
+    return true;
   }
 
-  if (secondaryFilter === "refills") {
-    return sizeText.includes("5l") || sizeText.includes("18l") || name.includes("refill");
+  if (categoryConfig.productCategoryKeys.includes(product.categoryId)) {
+    return true;
   }
 
-  if (secondaryFilter === "set") {
-    return product.offer || product.discount || product.bestSeller || name.includes("set");
+  if (categoryConfig.matcher?.(product)) {
+    return true;
   }
 
-  return true;
+  const lookup = getProductLookupText(product);
+  return categoryConfig.productCategoryKeys.some((key) => lookup.includes(String(key).toLowerCase()));
+}
+
+function createShopCategoryConfig(allHeroImage) {
+  return {
+    All: {
+      key: "All",
+      label: { en: "All products", ar: "كل المنتجات" },
+      title: { en: "A better system for everyday essentials", ar: "نظام أفضل لاحتياجاتك اليومية" },
+      subtitle: { en: null, ar: null },
+      image: allHeroImage,
+      productCategoryKeys: ["all"],
+      heroLayout: "shop-all",
+    },
+    "home-cleaning": {
+      key: "home-cleaning",
+      label: { en: "Home Cleaners", ar: "منظفات المنزل" },
+      title: { en: "Home Cleaners", ar: "منظفات المنزل" },
+      subtitle: {
+        en: "Practical cleaning products for everyday home care.",
+        ar: "منتجات تنظيف عملية للعناية اليومية بالمنزل.",
+      },
+      image: "/homepage-categories/home-care.jpg",
+      productCategoryKeys: ["home-cleaning", "home-cleaners", "cleaning-products"],
+      heroLayout: "home-care",
+    },
+    "bathroom-cleaning": {
+      key: "bathroom-cleaning",
+      label: { en: "Bathroom Cleaners", ar: "منظفات الحمام" },
+      title: { en: "Bathroom Cleaners", ar: "منظفات الحمام" },
+      subtitle: {
+        en: "Care for sinks, showers, tiles, and limescale-prone surfaces.",
+        ar: "عناية بالمغاسل والدش والبلاط والأسطح المعرضة للتكلسات.",
+      },
+      image: "/homepage-categories/bathroom.jpg",
+      productCategoryKeys: ["bathroom-cleaning", "bathroom-cleaners"],
+      heroLayout: "shop-all",
+    },
+    "car-care": {
+      key: "car-care",
+      label: { en: "Car Care", ar: "العناية بالسيارة" },
+      title: { en: "Car Care", ar: "العناية بالسيارة" },
+      subtitle: {
+        en: "Clean, polish, and refresh your car inside and out.",
+        ar: "نظّف ولمّع وأنعش سيارتك من الداخل والخارج.",
+      },
+      image: "/homepage-categories/car-care.jpg",
+      productCategoryKeys: ["car-care"],
+      heroLayout: "shop-all",
+    },
+    accessories: {
+      key: "accessories",
+      label: { en: "Accessories", ar: "الإكسسوارات" },
+      title: { en: "Accessories", ar: "الإكسسوارات" },
+      subtitle: {
+        en: "Useful add-ons for simpler cleaning routines.",
+        ar: "إضافات عملية تجعل روتين التنظيف أسهل.",
+      },
+      image: "/homepage-categories/kitchen-new.jpg",
+      productCategoryKeys: ["accessories", "accessory"],
+      heroLayout: "shop-all",
+    },
+    refills: {
+      key: "refills",
+      label: { en: "Refills", ar: "إعادة التعبئة" },
+      title: { en: "Refills", ar: "إعادة التعبئة" },
+      subtitle: {
+        en: "Larger practical sizes for products you use often.",
+        ar: "أحجام عملية أكبر للمنتجات التي تستخدمها باستمرار.",
+      },
+      image: "/products/limescale-remover-hover.jpg",
+      productCategoryKeys: ["refills", "refill"],
+      matcher: (product) => hasProductType(product, "refill") || hasBulkOrRefillSize(product),
+      heroLayout: "shop-all",
+    },
+    "bundles-sets": {
+      key: "bundles-sets",
+      label: { en: "Bundles/Sets", ar: "المجموعات" },
+      title: { en: "Bundles/Sets", ar: "المجموعات" },
+      subtitle: {
+        en: "Grouped essentials for home, car, and everyday care.",
+        ar: "أساسيات مجمعة للمنزل والسيارة والعناية اليومية.",
+      },
+      image: "/homepage-categories/home-care.jpg",
+      productCategoryKeys: ["bundles-sets", "bundles", "sets", "set"],
+      matcher: (product) => product.offer || product.discount || getProductLookupText(product).includes("set"),
+      heroLayout: "shop-all",
+    },
+    "starter-kits": {
+      key: "starter-kits",
+      label: { en: "Starter Kits", ar: "مجموعات البداية" },
+      title: { en: "Starter Kits", ar: "مجموعات البداية" },
+      subtitle: {
+        en: "Everything you need to start a cleaner routine.",
+        ar: "كل ما تحتاجه لبدء روتين تنظيف أسهل.",
+      },
+      image: "/products/limescale-remover-main.jpg",
+      productCategoryKeys: ["starter-kits", "starter-kit", "kit"],
+      matcher: (product) => {
+        const lookup = getProductLookupText(product);
+        return hasProductType(product, "starter") || lookup.includes("starter") || lookup.includes("kit");
+      },
+      heroLayout: "shop-all",
+    },
+    fragrances: {
+      key: "fragrances",
+      label: { en: "Fragrances", ar: "المعطرات" },
+      title: { en: "Fragrances", ar: "المعطرات" },
+      subtitle: {
+        en: "Fresh scents made for everyday spaces.",
+        ar: "روائح منعشة مصممة للمساحات اليومية.",
+      },
+      image: "/images/products/ocean-breeze-home-car-fragrance.svg",
+      productCategoryKeys: ["fragrances", "air-fresheners", "scents"],
+      heroLayout: "shop-all",
+    },
+  };
 }
 
 function ShopProductCard({ language, onAddToCart, onViewProduct, product, t }) {
@@ -133,66 +289,148 @@ function ProductsPage({
   websiteMedia = [],
 }) {
   const isArabic = language === "ar";
-  const [secondaryFilter, setSecondaryFilter] = React.useState("");
   const heroFallbackImage =
     products.find((product) => product.categoryId === "home-cleaning")?.image ||
     products[0]?.image ||
     placeholderImage;
-  const heroImage = getWebsiteMediaImage(websiteMedia, "products_hero_image", heroFallbackImage);
-  const visibleProducts = products.filter((product, index) =>
-    matchesMainFilter(product, activeCategory) &&
-    matchesSecondaryFilter(product, secondaryFilter, index)
+  const allHeroImage = getWebsiteMediaImage(websiteMedia, "products_hero_image", heroFallbackImage);
+  const shopCategoryConfig = React.useMemo(
+    () => createShopCategoryConfig(allHeroImage),
+    [allHeroImage]
+  );
+  const activeCategoryKey = normalizeShopCategoryKey(activeCategory);
+  const heroEntry = shopCategoryConfig[activeCategoryKey] || shopCategoryConfig["All"];
+  const heroImage = heroEntry.image;
+  const heroTitle = isArabic ? heroEntry.title.ar : heroEntry.title.en;
+  const heroSubtitle = isArabic ? heroEntry.subtitle.ar : heroEntry.subtitle.en;
+  const visibleProducts = products.filter((product) =>
+    matchesShopCategory(product, heroEntry)
   );
   const mainFilters = [
-    { id: "All", label: isArabic ? "كل المنتجات" : "All products" },
-    { id: "home-cleaning", label: isArabic ? "منظفات المنزل" : "Home Cleaners" },
-    { id: "bathroom-cleaning", label: isArabic ? "منظفات الحمام" : "Bathroom Cleaning" },
-    { id: "car-care", label: isArabic ? "العناية بالسيارة" : "Car Care" },
-    { id: "accessories", label: isArabic ? "الإكسسوارات" : "Accessories" },
-  ];
-  const secondaryFilters = [
-    { id: "starter", label: isArabic ? "مجموعة بداية" : "Starter kit" },
-    { id: "refills", label: isArabic ? "عبوات إعادة تعبئة" : "Refills" },
-    { id: "set", label: isArabic ? "مجموعة" : "Set" },
-  ];
+    "All",
+    "home-cleaning",
+    "bathroom-cleaning",
+    "car-care",
+    "accessories",
+    "refills",
+    "bundles-sets",
+    "starter-kits",
+    "fragrances",
+  ].map((key) => ({
+    id: key,
+    label: getLocalized(shopCategoryConfig[key].label, language),
+  }));
 
   return (
     <section className="page-shell products-page shop-page">
-      <div className="shop-hero-banner">
-        <img
-          alt=""
-          aria-hidden="true"
-          loading="lazy"
-          onError={(event) => {
-            event.currentTarget.src = placeholderImage;
-          }}
-          src={heroImage}
-        />
-        <div>
-          <p className="eyebrow">{t("products.eyebrow")}</p>
-          <h1>{isArabic ? "نظام أفضل للعناية اليومية" : "A better system for everyday care"}</h1>
+      {activeCategoryKey === "home-cleaning" && heroEntry.heroLayout === "home-care" ? (
+        <section className="collection-hero--home-care">
+          <div className="collection-hero--home-care__bg">
+            <img className="collection-hero--home-care__image" src={heroImage} alt="" loading="lazy" />
+          </div>
+          <div className="collection-hero--home-care__overlay" />
+          <div className="collection-hero--home-care__content">
+            <h1 className="collection-hero--home-care__title">{heroTitle}</h1>
+            {heroSubtitle && (
+              <div className="collection-hero--home-care__subtitle">
+                <p>{heroSubtitle}</p>
+              </div>
+            )}
+          </div>
+        </section>
+      ) : (
+        <div className={`shop-hero-banner${heroEntry.heroLayout === "shop-all" ? " shop-hero-banner--shop-all shop-hero-banner--shop-all-fix" : ""}`}>
+          <img
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            onError={(event) => {
+              event.currentTarget.src = placeholderImage;
+            }}
+            src={heroImage}
+          />
+          <div className="shop-hero-banner-content">
+            <h1>{heroTitle}</h1>
+            {heroSubtitle && <p>{heroSubtitle}</p>}
+          </div>
         </div>
-      </div>
+      )}
+
+      {activeCategoryKey === "home-cleaning" && (
+        <section className="homecare-feature-section">
+          <div className="homecare-feature-grid">
+            <div className="homecare-feature-card">
+              <div className="homecare-feature-card__image-col">
+                <div className="homecare-feature-card__image-wrap">
+                  <img
+                    src="/products/limescale-remover-main.jpg"
+                    alt="The Dish Soap"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+              <div className="homecare-feature-card__text-col">
+                <h2 className="homecare-feature-card__title">
+                  {isArabic ? "سائل غسيل الصحون" : "The Dish Soap"}
+                </h2>
+                <div className="homecare-feature-card__desc">
+                  <p>
+                    {isArabic
+                      ? "فعّال جدًا ضد الدهون، ولطيف على البشرة. تنظيف عملي وناعم برائحة خفيفة."
+                      : "Highly effective against grease, while gentle on your skin. It's an effective, skin-friendly clean with a subtle scent."}
+                  </p>
+                </div>
+                <div className="homecare-feature-card__price">
+                  {isArabic ? "18 شيكل" : "₪18"}
+                </div>
+                <div className="homecare-feature-card__button-row">
+                  <button
+                    className="homecare-feature-card__btn"
+                    type="button"
+                    onClick={() => onViewProduct?.("fabric-cleaner")}
+                  >
+                    {isArabic ? "اعرف المزيد" : "Learn more"}
+                  </button>
+                </div>
+                <div className="homecare-feature-card__colours">
+                  <span className="homecare-feature-card__swatch" style={{ background: "#fffff7" }} />
+                  <span className="homecare-feature-card__colours-text">
+                    {isArabic ? "5 ألوان" : "5 colours"}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="homecare-feature-side">
+              <div className="homecare-feature-side__image-wrap">
+                <img
+                  className="homecare-feature-side__image"
+                  src="/products/limescale-remover-hover.jpg"
+                  alt=""
+                  loading="lazy"
+                />
+                <div className="homecare-feature-side__note">
+                  <p
+                    className="homecare-feature-side__note-text"
+                    dangerouslySetInnerHTML={{
+                      __html: isArabic
+                        ? 'أعد التعبئة كل شهر ولا تنفد منتجاتك. اقرأ المزيد عن نظام إعادة التعبئة <a href="/refills">هنا</a>.'
+                        : 'Refill every month and never get out of stock. Read more about our refill system <a href="/refills">here</a>.',
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       <div className="shop-filter-panel" aria-label={t("products.eyebrow")}>
         <div className="shop-filter-row main">
           {mainFilters.map((filter) => (
             <button
-              className={activeCategory === filter.id ? "shop-filter-chip active" : "shop-filter-chip"}
+              className={activeCategoryKey === filter.id ? "shop-filter-chip active" : "shop-filter-chip"}
               key={filter.id}
               onClick={() => onCategoryChange(filter.id)}
-              type="button"
-            >
-              {filter.label}
-            </button>
-          ))}
-        </div>
-        <div className="shop-filter-row secondary">
-          {secondaryFilters.map((filter) => (
-            <button
-              className={secondaryFilter === filter.id ? "shop-filter-chip active" : "shop-filter-chip"}
-              key={filter.id}
-              onClick={() => setSecondaryFilter((current) => (current === filter.id ? "" : filter.id))}
               type="button"
             >
               {filter.label}

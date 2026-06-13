@@ -33,7 +33,7 @@ export const categories = [
     id: "car-care",
     name: {
       en: "Car Care",
-      ar: "العناية بالسيارات",
+      ar: "العناية بالسيارة",
     },
     description: {
       en: "Shampoos, polish, interior cleaners, and degreasers for a cleaner drive.",
@@ -48,11 +48,11 @@ export const categories = [
     id: "fragrances",
     name: {
       en: "Fragrances",
-      ar: "العطور",
+      ar: "المعطرات",
     },
     description: {
       en: "Simple home and car fragrances for a clean, comfortable atmosphere.",
-      ar: "عطور بسيطة للمنزل والسيارة لأجواء نظيفة ومريحة.",
+      ar: "معطرات بسيطة للمنزل والسيارة لأجواء نظيفة ومريحة.",
     },
     accent: {
       en: "Home and car",
@@ -67,7 +67,7 @@ export const categories = [
     },
     description: {
       en: "Radiator water products in practical everyday sizes.",
-      ar: "منتجات ماء الرديتر بأحجام عملية مناسبة للاستخدام اليومي.",
+      ar: "منتجات ماء الروديتر بأحجام عملية مناسبة للاستخدام اليومي.",
     },
     accent: {
       en: "Cooling support",

@@ -19,7 +19,7 @@ router.put("/", async (req, res) => {
 
 router.delete("/", async (req, res) => {
   carts.delete(req.user.id);
-  await persistStore();
+  await persistStore({ pruneMissing: true });
   res.status(204).end();
 });
 

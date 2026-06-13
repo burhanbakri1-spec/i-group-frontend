@@ -54,7 +54,7 @@ router.delete("/:id", requireAuth, requireAdmin, async (req, res) => {
   if (index === -1) return res.status(404).json({ message: "Employee not found." });
 
   users.splice(index, 1);
-  await persistStore();
+  await persistStore({ pruneMissing: true });
   return res.status(204).end();
 });
 

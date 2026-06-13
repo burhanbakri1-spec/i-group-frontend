@@ -87,7 +87,7 @@ router.delete("/:id", requireAuth, requireMediaEditor, async (req, res) => {
   if (index === -1) return res.status(404).json({ message: "Website media item not found." });
 
   websiteMedia.splice(index, 1);
-  await persistStore();
+  await persistStore({ pruneMissing: true });
   return res.status(204).end();
 });
 

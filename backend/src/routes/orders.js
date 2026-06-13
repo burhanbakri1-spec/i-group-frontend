@@ -99,7 +99,7 @@ router.delete("/:id", async (req, res) => {
   if (index === -1) return res.status(404).json({ message: "Order not found." });
 
   orders.splice(index, 1);
-  await persistStore();
+  await persistStore({ pruneMissing: true });
   return res.status(204).end();
 });
 

@@ -2,6 +2,15 @@ import { Router } from "express";
 import { persistStore, productCatalog } from "../data/store.js";
 
 const router = Router();
+const placeholderImage = "/images/products/product-placeholder.svg";
+
+function isRealImageUrl(value) {
+  return typeof value === "string" && value.trim() && value.trim() !== placeholderImage;
+}
+
+function preserveImageUrl(existingValue, incomingValue) {
+  return isRealImageUrl(incomingValue) ? incomingValue.trim() : existingValue || incomingValue || "";
+}
 
 function normalizeGalleryImages(product) {
   const source = product.gallery_images || product.galleryImages || [];
@@ -60,7 +69,7 @@ function sizesFromVariants(variants, fallbackSizes = []) {
 }
 
 function normalizeProduct(product) {
-  const image = product.image || "/images/products/product-placeholder.svg";
+  const image = product.image || placeholderImage;
   const hoverImage =
     product.hoverImage ||
     product.secondaryImage ||
@@ -78,8 +87,68 @@ function normalizeProduct(product) {
     sizes: sizesFromVariants(variants, product.sizes || []),
     gallery_images: galleryImages,
     galleryImages: galleryImages.map((entry) => entry.image_url),
-    fallbackImage: product.fallbackImage || "/images/products/product-placeholder.svg",
+    fallbackImage: product.fallbackImage || placeholderImage,
   };
+}
+
+function hasOwn(object, key) {
+  return Object.prototype.hasOwnProperty.call(object, key);
+}
+
+function variantSignature(variant = {}) {
+  return `${variant.color_name || variant.colorName || ""}__${variant.size || ""}`.toLowerCase();
+}
+
+function mergeVariantImageUrls(existingProduct, incomingVariants) {
+  if (!Array.isArray(incomingVariants)) {
+    return incomingVariants;
+  }
+
+  const existingVariants = normalizeVariants(existingProduct);
+  const existingById = new Map(existingVariants.map((variant) => [variant.id, variant]));
+  const existingBySignature = new Map(existingVariants.map((variant) => [variantSignature(variant), variant]));
+
+  return incomingVariants.map((variant) => {
+    const incomingImage = variant.image_url || variant.imageUrl || variant.image || "";
+    if (isRealImageUrl(incomingImage)) {
+      return variant;
+    }
+
+    const existing =
+      existingById.get(variant.id) ||
+      existingBySignature.get(variantSignature(variant));
+    const existingImage = existing?.image_url || existing?.imageUrl || existing?.image || "";
+
+    return existingImage ? { ...variant, image_url: existingImage } : variant;
+  });
+}
+
+function mergeProductUpdate(existingProduct, incomingProduct) {
+  const merged = {
+    ...existingProduct,
+    ...incomingProduct,
+    image: preserveImageUrl(existingProduct.image, incomingProduct.image),
+    hoverImage: preserveImageUrl(
+      existingProduct.hoverImage || existingProduct.secondaryImage,
+      incomingProduct.hoverImage || incomingProduct.secondaryImage,
+    ),
+    updatedAt: new Date().toISOString(),
+  };
+
+  if (hasOwn(incomingProduct, "variants")) {
+    merged.variants = mergeVariantImageUrls(existingProduct, incomingProduct.variants);
+  }
+
+  if (hasOwn(incomingProduct, "gallery_images") || hasOwn(incomingProduct, "galleryImages")) {
+    const incomingGallery = normalizeGalleryImages(incomingProduct);
+    const existingGallery = normalizeGalleryImages(existingProduct);
+    const shouldClearGallery = incomingProduct.clearGalleryImages === true;
+    const mergedGallery = shouldClearGallery ? [] : incomingGallery.length ? incomingGallery : existingGallery;
+    merged.gallery_images = mergedGallery;
+    merged.galleryImages = mergedGallery.map((entry) => entry.image_url);
+  }
+
+  return merged;
 }
 
 router.get("/", (_req, res) => {
@@ -102,11 +171,10 @@ router.put("/:id", async (req, res) => {
   if (index === -1) {
     return res.status(404).json({ message: "Product not found." });
   }
-  productCatalog[index] = normalizeProduct({
-    ...productCatalog[index],
+  productCatalog[index] = normalizeProduct(mergeProductUpdate(productCatalog[index], {
     ...req.body,
     id: req.params.id,
-  });
+  }));
   await persistStore();
   return res.json(productCatalog[index]);
 });
@@ -117,7 +185,7 @@ router.delete("/:id", async (req, res) => {
     return res.status(404).json({ message: "Product not found." });
   }
   productCatalog.splice(index, 1);
-  await persistStore();
+  await persistStore({ pruneMissing: true });
   return res.status(204).end();
 });
 

@@ -2,12 +2,13 @@ import React from "react";
 import { getWebsiteMediaImage } from "../data/websiteMedia.js";
 
 const cleanupImages = {
-  hero: "/images/products/green-radiator-water.svg",
-  galleryOne: "/images/products/fabric-cleaner.svg",
-  galleryTwo: "/images/products/car-interior-cleaner.svg",
-  galleryThree: "/images/products/grease-oil-remover.svg",
-  galleryFour: "/images/products/stone-marble-floor-cleaner.svg",
-  galleryFive: "/images/products/ocean-breeze-home-car-fragrance.svg",
+  hero: "/homepage-categories/home-care.jpg",
+  galleryOne: "/homepage-categories/home-care.jpg",
+  galleryTwo: "/homepage-categories/kitchen.jpg",
+  galleryThree: "/homepage-categories/laundry.jpg",
+  galleryFour: "/homepage-categories/car-care.jpg",
+  galleryFive: "/homepage-categories/bathroom.jpg",
+  gallerySix: "/homepage-categories/home-care.jpg",
   cta: "/images/products/carpet-rug-cleaner.svg",
   community: "/images/products/porcelain-ceramic-floor-cleaner.svg",
   collaborations: "/images/products/limescale-remover.svg",
@@ -16,9 +17,9 @@ const cleanupImages = {
 
 const content = {
   en: {
-    heroTitle: "We started with your home,\nnow we're cleaning up our community.",
+    heroTitle: "We started with your home, and we're helping clean the spaces around it.",
     heroText:
-      "At EB Chemical, we believe a cleaner home starts with a cleaner environment. Our cleanup initiatives bring people together to care for shared spaces and build a healthier community.",
+      "EB Chemical creates practical cleaning and care products for everyday spaces, with a focus on cleaner homes, cars, and shared environments.",
     galleryTitle: "CleanUps",
     ctaTitle: "Sign up for the next CleanUp",
     ctaText:
@@ -26,29 +27,34 @@ const content = {
     signUp: "Sign up",
     gallery: [
       {
-        location: "Ramallah, Palestine",
-        title: "Community CleanUp Day",
+        location: "Gaza, Palestine",
+        title: "EB Chemical Community CleanUp",
         image: cleanupImages.galleryOne,
       },
       {
-        location: "Ramallah, Palestine",
-        title: "Public Park CleanUp",
+        location: "Nablus, Palestine",
+        title: "Care Products Team CleanUp",
         image: cleanupImages.galleryTwo,
       },
       {
         location: "Ramallah, Palestine",
-        title: "School Area CleanUp",
+        title: "Shared Spaces CleanUp",
         image: cleanupImages.galleryThree,
       },
       {
-        location: "Inside Palestine",
-        title: "Neighborhood CleanUp Initiative",
+        location: "Palestine",
+        title: "Everyday Cleaning Awareness Day",
         image: cleanupImages.galleryFour,
       },
       {
-        location: "Inside Palestine",
-        title: "Green Spaces CleanUp",
+        location: "Hebron, Palestine",
+        title: "Home Care CleanUp Day",
         image: cleanupImages.galleryFive,
+      },
+      {
+        location: "Bethlehem, Palestine",
+        title: "Cleaner Streets Awareness Event",
+        image: cleanupImages.gallerySix,
       },
     ],
     tabs: [
@@ -57,7 +63,9 @@ const content = {
         label: "Community",
         title: "Community",
         description:
-          "Our CleanUp activities are built around people. We work with local volunteers, customers, and partners in Ramallah and inside Palestine to create cleaner shared spaces and encourage everyday responsibility.",
+          "We believe cleaner spaces start with people. EB Chemical supports community-driven cleaning efforts that bring people together around practical care.",
+        button: "Join us",
+        buttonAction: "social",
         image: cleanupImages.community,
       },
       {
@@ -65,7 +73,9 @@ const content = {
         label: "Collaborations",
         title: "Collaborations",
         description:
-          "We welcome collaborations with local organizations, schools, businesses, and community groups that want to support cleaner and healthier environments.",
+          "Are you interested in hosting a CleanUp event with EB Chemical? Send us a message and let's work together to create cleaner shared spaces.",
+        button: "Sign up",
+        buttonAction: "social",
         image: cleanupImages.collaborations,
       },
       {
@@ -73,15 +83,17 @@ const content = {
         label: "Locations",
         title: "Locations",
         description:
-          "We're always exploring new locations for our CleanUp events in Ramallah and inside Palestine. Subscribe to be the first to find out about new events near your community.",
+          "We focus on everyday spaces where cleaning matters most, from homes and workplaces to cars, shops, and shared environments.",
+        button: "Explore locations",
+        buttonAction: "products",
         image: cleanupImages.locations,
       },
     ],
   },
   ar: {
-    heroTitle: "بدأنا من بيتك،\nوالآن نعمل لتنظيف مجتمعنا.",
+    heroTitle: "بدأنا من منزلك، ونساعد في تنظيف المساحات من حولك.",
     heroText:
-      "في EB Chemical نؤمن أن النظافة تبدأ من البيت وتمتد إلى البيئة من حولنا. من خلال مبادرات التنظيف، نسعى للمشاركة في صناعة مساحات أنظف وأكثر صحة للجميع.",
+      "تقدّم EB Chemical منتجات تنظيف وعناية عملية للمساحات اليومية، مع التركيز على منازل وسيارات وبيئات مشتركة أكثر نظافة.",
     galleryTitle: "حملات التنظيف",
     ctaTitle: "سجّل في حملة التنظيف القادمة",
     ctaText:
@@ -89,29 +101,34 @@ const content = {
     signUp: "سجّل الآن",
     gallery: [
       {
-        location: "رام الله، فلسطين",
-        title: "يوم تنظيف مجتمعي",
+        location: "غزة، فلسطين",
+        title: "حملة تنظيف مجتمعية من EB Chemical",
         image: cleanupImages.galleryOne,
       },
       {
-        location: "رام الله، فلسطين",
-        title: "حملة تنظيف الحديقة العامة",
+        location: "نابلس، فلسطين",
+        title: "حملة تنظيف فريق منتجات العناية",
         image: cleanupImages.galleryTwo,
       },
       {
         location: "رام الله، فلسطين",
-        title: "تنظيف محيط المدارس",
+        title: "حملة تنظيف المساحات المشتركة",
         image: cleanupImages.galleryThree,
       },
       {
-        location: "الداخل الفلسطيني",
-        title: "مبادرة تنظيف الأحياء",
+        location: "فلسطين",
+        title: "يوم التوعية بالتنظيف اليومي",
         image: cleanupImages.galleryFour,
       },
       {
-        location: "الداخل الفلسطيني",
-        title: "حملة تنظيف المساحات الخضراء",
+        location: "الخليل، فلسطين",
+        title: "يوم تنظيف العناية المنزلية",
         image: cleanupImages.galleryFive,
+      },
+      {
+        location: "بيت لحم، فلسطين",
+        title: "فعالية التوعية بشوارع أنظف",
+        image: cleanupImages.gallerySix,
       },
     ],
     tabs: [
@@ -120,7 +137,9 @@ const content = {
         label: "المجتمع",
         title: "المجتمع",
         description:
-          "تعتمد حملات التنظيف لدينا على مشاركة الناس. نعمل مع المتطوعين والعملاء والشركاء المحليين في رام الله والداخل الفلسطيني لصناعة مساحات مشتركة أنظف وتعزيز المسؤولية اليومية تجاه البيئة.",
+          "نؤمن أن المساحات الأنظف تبدأ من الناس. تدعم EB Chemical جهود التنظيف المجتمعية التي تجمع الناس حول العناية العملية.",
+        button: "انضم إلينا",
+        buttonAction: "social",
         image: cleanupImages.community,
       },
       {
@@ -128,7 +147,9 @@ const content = {
         label: "التعاونات",
         title: "التعاونات",
         description:
-          "نرحب بالتعاون مع المؤسسات المحلية والمدارس والشركات والمجموعات المجتمعية التي ترغب في دعم بيئة أنظف وأكثر صحة.",
+          "هل ترغب في تنظيم فعالية تنظيف بالتعاون مع EB Chemical؟ أرسل لنا رسالة لنعمل معًا على إنشاء مساحات مشتركة أكثر نظافة.",
+        button: "سجّل الآن",
+        buttonAction: "social",
         image: cleanupImages.collaborations,
       },
       {
@@ -136,7 +157,9 @@ const content = {
         label: "المواقع",
         title: "المواقع",
         description:
-          "نبحث دائمًا عن مواقع جديدة لحملات التنظيف في رام الله والداخل الفلسطيني. اشترك لتكون أول من يعرف عن الفعاليات الجديدة القريبة من مجتمعك.",
+          "نركّز على المساحات اليومية التي يكون فيها التنظيف مهمًا، من المنازل وأماكن العمل إلى السيارات والمتاجر والبيئات المشتركة.",
+        button: "استكشف المواقع",
+        buttonAction: "products",
         image: cleanupImages.locations,
       },
     ],
@@ -156,18 +179,25 @@ function CleanupsPage({ language = "en", onNavigate, websiteMedia = [] }) {
   }));
   const heroImage = getWebsiteMediaImage(websiteMedia, "cleanups_hero", cleanupImages.hero);
   const ctaImage = getWebsiteMediaImage(websiteMedia, "cleanups_cta", cleanupImages.cta);
-  const galleryRef = React.useRef(null);
   const tabsRef = React.useRef(null);
-  const [activeTab, setActiveTab] = React.useState("locations");
-  const activeTabContent =
-    tabs.find((tab) => tab.key === activeTab) || tabs[tabs.length - 1];
+  const rotateRef = React.useRef(null);
+  const [activeTabIndex, setActiveTabIndex] = React.useState(1);
+  const activeTabContent = tabs[activeTabIndex] || tabs[tabs.length - 1];
 
-  function scrollGallery(direction) {
-    const track = galleryRef.current;
-    if (!track) return;
-    const card = track.querySelector(".cleanup-gallery-card");
-    const distance = card ? card.getBoundingClientRect().width + 18 : track.clientWidth * 0.82;
-    track.scrollBy({ left: (isArabic ? -direction : direction) * distance, behavior: "smooth" });
+  React.useEffect(() => {
+    function tick() {
+      setActiveTabIndex((prev) => (prev + 1) % tabs.length);
+    }
+    rotateRef.current = setInterval(tick, 4000);
+    return () => clearInterval(rotateRef.current);
+  }, [tabs.length]);
+
+  function handleTabClick(index) {
+    setActiveTabIndex(index);
+    clearInterval(rotateRef.current);
+    rotateRef.current = setInterval(() => {
+      setActiveTabIndex((prev) => (prev + 1) % tabs.length);
+    }, 4000);
   }
 
   function scrollToSignup() {
@@ -177,36 +207,31 @@ function CleanupsPage({ language = "en", onNavigate, websiteMedia = [] }) {
   return (
     <section className="cleanups-page">
       <section className="cleanups-hero-section">
-        <img alt="" aria-hidden="true" src={heroImage} />
-        <div className="cleanups-hero-copy">
-          <span>EB Chemical Cleanups</span>
-          <h1>{text.heroTitle}</h1>
-          <p>{text.heroText}</p>
+        <div className="cleanups-hero-inner">
+          <img className="cleanups-hero-image" alt="" aria-hidden="true" src={heroImage} />
+          <div className="cleanups-hero-content">
+            <h1 className="cleanups-hero-title">{text.heroTitle}</h1>
+            <p className="cleanups-hero-description">{text.heroText}</p>
+          </div>
         </div>
       </section>
 
-      <section className="cleanups-gallery-section" aria-label={text.galleryTitle}>
-        <div className="cleanups-section-head">
-          <h2>{text.galleryTitle}</h2>
-          <div className="cleanups-slider-controls">
-            <button aria-label={isArabic ? "السابق" : "Previous"} onClick={() => scrollGallery(-1)} type="button">
-              ‹
-            </button>
-            <button aria-label={isArabic ? "التالي" : "Next"} onClick={() => scrollGallery(1)} type="button">
-              ›
-            </button>
-          </div>
+      <section className="cleanups-events-section" aria-label={text.galleryTitle}>
+        <div className="cleanups-events-header">
+          <h2 className="cleanups-events-title">{text.galleryTitle}</h2>
         </div>
-
-        <div className="cleanups-gallery-track" ref={galleryRef}>
+        <div className="cleanups-events-track">
           {gallery.map((item) => (
-            <article className="cleanup-gallery-card" key={item.title}>
-              <img alt="" aria-hidden="true" src={item.image} />
-              <div>
-                <small>{item.location}</small>
-                <h3>{item.title}</h3>
+            <div className="cleanups-event-card" key={item.title}>
+              <div className="cleanups-event-card-inner">
+                <div className="cleanups-event-card-content" dir={isArabic ? "rtl" : "ltr"}>
+                  <p className="cleanups-event-card-location">{item.location}</p>
+                  <h3 className="cleanups-event-card-title">{item.title}</h3>
+                </div>
+                <div className="cleanups-event-card-overlay" />
+                <img alt="" aria-hidden="true" src={item.image} loading="lazy" />
               </div>
-            </article>
+            </div>
           ))}
         </div>
       </section>
@@ -224,28 +249,28 @@ function CleanupsPage({ language = "en", onNavigate, websiteMedia = [] }) {
 
       <section className="cleanups-tabs-section" ref={tabsRef}>
         <div className="cleanups-tabs-image">
-          <img alt="" aria-hidden="true" src={activeTabContent.image} />
+          <img alt="" aria-hidden="true" src={activeTabContent.image} loading="lazy" />
         </div>
-        <div className="cleanups-tabs-content">
-          <div className="cleanups-tabs-copy" key={activeTabContent.key}>
-            <span>EB Chemical</span>
-            <h2>{activeTabContent.title}</h2>
-            <p>{activeTabContent.description}</p>
-            <button className="cleanup-yellow-button" onClick={() => onNavigate?.("social")} type="button">
-              {text.signUp}
+        <div className="cleanups-tabs-panel">
+          <div className="cleanups-tabs-body" key={activeTabContent.key}>
+            <h2 className="cleanups-tabs-heading">{activeTabContent.title}</h2>
+            <p className="cleanups-tabs-description">{activeTabContent.description}</p>
+            <button className="cleanup-yellow-button" onClick={() => onNavigate?.(activeTabContent.buttonAction || "social")} type="button">
+              {activeTabContent.button || text.signUp}
             </button>
           </div>
           <div className="cleanups-tab-list" role="tablist" aria-label={text.galleryTitle}>
-            {tabs.map((tab) => (
+            {tabs.map((tab, index) => (
               <button
-                aria-selected={activeTab === tab.key}
-                className={activeTab === tab.key ? "active" : ""}
+                aria-selected={activeTabIndex === index}
+                className={`cleanups-tab-item${activeTabIndex === index ? " active" : ""}`}
                 key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
+                onClick={() => handleTabClick(index)}
                 role="tab"
                 type="button"
               >
-                {tab.label}
+                <span className="cleanups-tab-label">{tab.label}</span>
+                <span className={`cleanups-tab-underline${activeTabIndex === index ? " active" : ""}`} />
               </button>
             ))}
           </div>

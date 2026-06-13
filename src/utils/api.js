@@ -80,7 +80,12 @@ export async function uploadImage(file) {
     throw new Error(data.message || "Image upload failed.");
   }
 
-  return data;
+  const url = data.url || data.path || "";
+  return {
+    ...data,
+    url,
+    path: data.path || url,
+  };
 }
 
 export async function uploadImages(files = []) {
@@ -107,5 +112,13 @@ export async function uploadImages(files = []) {
     throw new Error(data.message || "Images upload failed.");
   }
 
-  return data.files || (data.path || data.url ? [data] : []);
+  const uploaded = data.files || (data.path || data.url ? [data] : []);
+  return uploaded.map((file) => {
+    const url = file.url || file.path || "";
+    return {
+      ...file,
+      url,
+      path: file.path || url,
+    };
+  });
 }

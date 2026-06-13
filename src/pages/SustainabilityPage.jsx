@@ -360,6 +360,8 @@ function SustainabilityPage({ language = "en", onNavigate, onViewProduct, produc
     { value: t.stat3Value, label: t.stat3Label, img: image("stat3") },
   ];
 
+  const featuredProduct = products?.[0] || null;
+
   return (
     <>
       <main className="sustainability-page" dir={isArabic ? "rtl" : "ltr"}>
@@ -483,6 +485,97 @@ function SustainabilityPage({ language = "en", onNavigate, onViewProduct, produc
               <div className="sustainability-products-section-media">
                 <div className="sustainability-products-section-image-wrap">
                   <img className="sustainability-products-section-img" src={image("products")} alt="" aria-hidden="true" loading="lazy" />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="sustainability-discover-cta">
+            <div className="sustainability-discover-cta-inner">
+              <div className="sustainability-discover-cta-content">
+                <button
+                  className="sustainability-discover-cta-btn"
+                  type="button"
+                  onClick={() => onNavigate("products")}
+                >
+                  {isArabic ? "اكتشف المنتجات" : "Discover products"}
+                </button>
+              </div>
+              <img
+                className="sustainability-discover-cta-img"
+                src={image("cta")}
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+              />
+              <div className="sustainability-discover-cta-overlay" />
+            </div>
+          </section>
+
+          <section className="sustainability-split-product-cta">
+            <div className="sustainability-split-product-cta-inner">
+              <a
+                className="sustainability-split-product-cta-right"
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (featuredProduct?.slug) onViewProduct(featuredProduct.slug);
+                }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    if (featuredProduct?.slug) onViewProduct(featuredProduct.slug);
+                  }
+                }}
+              >
+                <div className="sustainability-split-product-cta-image-wrap">
+                  <img
+                    className="sustainability-split-product-cta-image"
+                    src={image("product")}
+                    alt=""
+                    aria-hidden="true"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="sustainability-split-product-cta-callout">
+                  <div className="sustainability-split-product-cta-callout-dot" />
+                  <div className="sustainability-split-product-cta-callout-line" />
+                  <div className="sustainability-split-product-cta-callout-card">
+                    <img
+                      className="sustainability-split-product-cta-callout-thumb"
+                      src={featuredProduct?.image || "/images/products/product-placeholder.svg"}
+                      alt=""
+                      loading="lazy"
+                    />
+                    <div className="sustainability-split-product-cta-callout-info">
+                      <span className="sustainability-split-product-cta-callout-name">
+                        {getLocalized(featuredProduct?.name, language) || (isArabic ? "منظف متعدد الأسطح" : "Multi Surface Cleaner")}
+                      </span>
+                      <span className="sustainability-split-product-cta-callout-price">
+                        {featuredProduct?.sizes?.[0]?.price ? `${featuredProduct.sizes[0].price} ${isArabic ? "شيكل" : "ILS"}` : ""}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </a>
+
+              <div className="sustainability-split-product-cta-left">
+                <div className="sustainability-split-product-cta-left-content">
+                  <h2 className="sustainability-split-product-cta-heading">
+                    {isArabic ? "وداعًا للهدر. أهلاً بمنتجات عناية مصممة بهدف." : "Goodbye, waste. Hello, care products made with purpose."}
+                  </h2>
+                  <p className="sustainability-split-product-cta-subtitle">
+                    {isArabic ? "اكتشف منتجات EB Chemical العملية المصممة للتنظيف والعناية اليومية." : "Explore practical EB Chemical products designed for everyday cleaning and care."}
+                  </p>
+                  <button
+                    className="sustainability-split-product-cta-btn"
+                    type="button"
+                    onClick={() => onNavigate("products")}
+                  >
+                    {isArabic ? "المنظفات" : "Cleaners"}
+                  </button>
                 </div>
               </div>
             </div>

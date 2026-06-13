@@ -104,7 +104,7 @@ router.delete("/:id", requireAuth, async (req, res) => {
   if (index === -1) return res.status(404).json({ message: "Review not found." });
 
   reviews.splice(index, 1);
-  await persistStore();
+  await persistStore({ pruneMissing: true });
   return res.status(204).end();
 });
 

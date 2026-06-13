@@ -111,6 +111,10 @@ function buildPublicUrl(req, filename) {
   return `${protocol}://${req.get("host")}/uploads/${filename}`;
 }
 
+function requiresPersistentStorage() {
+  return process.env.NODE_ENV === "production" || Boolean(process.env.VERCEL);
+}
+
 router.post(
   "/",
   requireAuth,
@@ -127,7 +131,15 @@ router.post(
       return res.status(400).json({ message: "No image file was uploaded." });
     }
 
-    if (!isSupabaseStorageConfigured()) {
+    const useSupabaseStorage = isSupabaseStorageConfigured();
+
+    if (!useSupabaseStorage && requiresPersistentStorage()) {
+      return res.status(500).json({
+        message: "Persistent image storage is not configured. Set SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, and SUPABASE_BUCKET.",
+      });
+    }
+
+    if (!useSupabaseStorage) {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
 
@@ -143,7 +155,7 @@ router.post(
         return res.status(400).json({ message: "Unsupported image file type." });
       }
 
-      if (isSupabaseStorageConfigured()) {
+      if (useSupabaseStorage) {
         savedFiles.push(
           await uploadImageToSupabaseStorage({
             filename,

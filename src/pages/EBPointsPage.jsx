@@ -85,16 +85,21 @@ function EBPointsPage({ currentUser, language, onNavigate, websiteMedia = [] }) 
           <h1>{isArabic ? "برنامج نقاط EB" : "EB Points Loyalty Program"}</h1>
           <p>
             {isArabic
-              ? "اكسب نقاط مكافآت مع كل عملية شراء، واستبدل نقاط EB بخصومات على طلباتك القادمة. كل 100 نقطة EB تمنحك خصم 5%."
-              : "Earn reward points on every purchase. Redeem your EB Points for discounts on future orders. 100 EB Points = 5% discount."}
+              ? "اكسب نقاط مكافآت مع كل عملية شراء. استخدمها للحصول على خصومات في مشترياتك القادمة. كل 100 نقطة EB = 5 شيكل"
+              : "Earn reward points on every purchase. Redeem for discounts on future purchases. 100 EB Points = ₪5"}
           </p>
-          <div className="eb-points-rating-row">
-            <span>
+          <div className="eb-points-hero-rating">
+            <span className="eb-points-hero-rating-text">
               {isArabic
-                ? "أكثر من 434+ تقييم من عملاء سعداء"
-                : "Over 434+ reviews from happy customers"}
+                ? "أكثر من 500+ طلب من عملاء سعداء"
+                : "Over 500+ orders from happy customers"}
             </span>
-            <strong>4.85 <span>★</span></strong>
+            <span className="eb-points-hero-stars">
+              <strong>4.85</strong>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 0L13.09 6.26L20 7.12L14.14 12.17L15.12 19.02L10 15.71L4.87 19.02L5.85 12.17L0 7.12L6.91 6.26L10 0Z" fill="currentColor" />
+              </svg>
+            </span>
           </div>
         </div>
       </section>
@@ -127,8 +132,8 @@ function EBPointsPage({ currentUser, language, onNavigate, websiteMedia = [] }) 
           <h2>{isArabic ? "وفّر مع كل طلب" : "Save with every order"}</h2>
           <p>
             {isArabic
-              ? "تابع نقاط EB من صفحة حسابك واعرف كم وفّرت على طلباتك القادمة."
-              : "Track your EB Points from your account page and see how much you’ve already saved on future purchases."}
+              ? "اكتشف عدد نقاط EB التي جمعتها بالفعل من خلال صفحة حسابك."
+              : "Find out how many EB Points you've already saved in your account page."}
           </p>
           <button
             className="eb-points-yellow-button"

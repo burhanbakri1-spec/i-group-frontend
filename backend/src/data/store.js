@@ -368,17 +368,16 @@ function persistLocalStore(store) {
   return store;
 }
 
-export async function persistStore() {
+export async function persistStore(options = {}) {
   const store = currentStoreSnapshot();
 
-  if (isSupabaseConfigured() && canPersistToSupabase) {
-    try {
-      await saveStoreToSupabase(store);
-      return store;
-    } catch (error) {
-      console.error("Could not persist store to Supabase. Falling back to local store.", error.message);
-      canPersistToSupabase = false;
+  if (isSupabaseConfigured()) {
+    if (!canPersistToSupabase) {
+      throw new Error("Supabase persistence is configured but unavailable. Refusing local fallback for persistent data.");
     }
+
+    await saveStoreToSupabase(store, { pruneMissing: options.pruneMissing === true });
+    return store;
   }
 
   return persistLocalStore(store);
