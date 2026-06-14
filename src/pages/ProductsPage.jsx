@@ -142,6 +142,18 @@ function createShopCategoryConfig(allHeroImage) {
       productCategoryKeys: ["accessories", "accessory"],
       heroLayout: "shop-all",
     },
+    "hand-body": {
+      key: "hand-body",
+      label: { en: "Hand & Body", ar: "العناية بالجسم واليدين" },
+      title: { en: "Hand & Body", ar: "العناية بالجسم واليدين" },
+      subtitle: {
+        en: "Care essentials for hands, body, and daily routines.",
+        ar: "أساسيات عناية لليدين والجسم والروتين اليومي.",
+      },
+      image: "/homepage-categories/home-care.jpg",
+      productCategoryKeys: ["hand-body", "hand-and-body", "body-care", "hand-care"],
+      heroLayout: "shop-all",
+    },
     refills: {
       key: "refills",
       label: { en: "Refills", ar: "إعادة التعبئة" },
@@ -196,6 +208,18 @@ function createShopCategoryConfig(allHeroImage) {
       productCategoryKeys: ["fragrances", "air-fresheners", "scents"],
       heroLayout: "shop-all",
     },
+    "radiator-water": {
+      key: "radiator-water",
+      label: { en: "Radiator Water", ar: "ماء الرديتر" },
+      title: { en: "Radiator Water", ar: "ماء الرديتر" },
+      subtitle: {
+        en: "Practical radiator water products for daily vehicle care.",
+        ar: "منتجات ماء رديتر عملية للعناية اليومية بالسيارة.",
+      },
+      image: "/images/products/green-radiator-water.svg",
+      productCategoryKeys: ["radiator-water"],
+      heroLayout: "shop-all",
+    },
   };
 }
 
@@ -216,12 +240,17 @@ function ShopProductCard({ language, onAddToCart, onViewProduct, product, t }) {
     (isArabic
       ? "حل عملي للعناية اليومية والتنظيف."
       : "A practical solution for daily cleaning and care.");
-  const badge = getLocalized(product.badge, language);
+  const badge =
+    getLocalized(product.badge, language) ||
+    getLocalized(product.tag, language) ||
+    getLocalized(product.label, language) ||
+    getLocalized(product.categoryLabel, language);
   const rating = Number(product.rating || product.reviewRating || 5);
+  const reviewCount = product.reviewCount ?? product.reviews?.length ?? 0;
   const oldPrice = product.oldPrice || product.compareAtPrice || product.wasPrice;
 
   return (
-    <article className="shop-product-card">
+    <article className={hasHoverImage ? "shop-product-card has-hover-image" : "shop-product-card"}>
       <button
         className="shop-product-image-wrap"
         onClick={() => onViewProduct(product.slug)}
@@ -255,8 +284,18 @@ function ShopProductCard({ language, onAddToCart, onViewProduct, product, t }) {
         <small>{getCategoryName(product.categoryId, language)}</small>
         <h2>{name}</h2>
         <p>{description}</p>
-        <div className="shop-product-rating" aria-label={`${rating} stars`}>
-          {"\u2605".repeat(Math.max(0, Math.min(5, Math.round(rating))))}
+        <div
+          className="shop-product-rating"
+          aria-label={`${rating} stars, ${reviewCount} reviews`}
+        >
+          <span className="shop-product-stars" aria-hidden="true">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <svg key={index} viewBox="0 0 16 16" focusable="false">
+                <path d="M8 1L10.0636 5.75252L15 6.34753L11.339 9.87976L12.3263 15L8 12.4305L3.67376 15L4.661 9.87976L1 6.34753L5.93638 5.75252L8 1Z" />
+              </svg>
+            ))}
+          </span>
+          <span className="shop-product-review-count">({reviewCount})</span>
         </div>
         <div className="shop-product-price-row">
           <strong>
@@ -306,20 +345,15 @@ function ProductsPage({
   const visibleProducts = products.filter((product) =>
     matchesShopCategory(product, heroEntry)
   );
-  const mainFilters = [
-    "All",
-    "home-cleaning",
-    "bathroom-cleaning",
-    "car-care",
-    "accessories",
-    "refills",
-    "bundles-sets",
-    "starter-kits",
-    "fragrances",
-  ].map((key) => ({
-    id: key,
-    label: getLocalized(shopCategoryConfig[key].label, language),
-  }));
+  const filterRows = [
+    ["All", "home-cleaning", "hand-body", "car-care", "accessories"],
+    ["starter-kits", "refills", "bundles-sets"],
+  ].map((row) =>
+    row.map((key) => ({
+      id: key,
+      label: getLocalized(shopCategoryConfig[key].label, language),
+    })),
+  );
 
   return (
     <section className="page-shell products-page shop-page">
@@ -425,18 +459,23 @@ function ProductsPage({
       )}
 
       <div className="shop-filter-panel" aria-label={t("products.eyebrow")}>
-        <div className="shop-filter-row main">
-          {mainFilters.map((filter) => (
-            <button
-              className={activeCategoryKey === filter.id ? "shop-filter-chip active" : "shop-filter-chip"}
-              key={filter.id}
-              onClick={() => onCategoryChange(filter.id)}
-              type="button"
-            >
-              {filter.label}
-            </button>
-          ))}
-        </div>
+        {filterRows.map((row, rowIndex) => (
+          <div
+            className={rowIndex === 0 ? "shop-filter-row main" : "shop-filter-row secondary"}
+            key={`filter-row-${rowIndex}`}
+          >
+            {row.map((filter) => (
+              <button
+                className={activeCategoryKey === filter.id ? "shop-filter-chip active" : "shop-filter-chip"}
+                key={filter.id}
+                onClick={() => onCategoryChange(filter.id)}
+                type="button"
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
+        ))}
       </div>
 
       <div className="shop-product-grid">

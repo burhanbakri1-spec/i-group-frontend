@@ -4,7 +4,7 @@ import { hasPermission } from "../data/permissions.js";
 import WorkTimer from "./WorkTimer.jsx";
 
 const shopLinks = [
-  { key: "all", labelEn: "Shop All", labelAr: "عرض الكل", action: "products" },
+  { key: "all", labelEn: "Shop All", labelAr: "كل المنتجات", action: "products" },
   {
     key: "cleaning",
     labelEn: "Cleaning Products",
@@ -14,7 +14,7 @@ const shopLinks = [
   {
     key: "car",
     labelEn: "Car Care",
-    labelAr: "العناية بالسيارات",
+    labelAr: "العناية بالسيارة",
     categoryId: "car-care",
   },
   {
@@ -34,12 +34,6 @@ const shopLinks = [
     labelEn: "Radiator Water",
     labelAr: "ماء الرديتر",
     categoryId: "radiator-water",
-  },
-  {
-    key: "accessories",
-    labelEn: "Accessories",
-    labelAr: "الإكسسوارات",
-    action: "products",
   },
 ];
 
@@ -128,7 +122,10 @@ function Header({
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [isHomeHeroActive, setIsHomeHeroActive] = React.useState(activePage === "home");
+  const [dropdownStyles, setDropdownStyles] = React.useState({ shop: {}, about: {} });
   const headerRef = React.useRef(null);
+  const shopMenuRef = React.useRef(null);
+  const aboutMenuRef = React.useRef(null);
   const aboutCloseTimer = React.useRef(null);
   const megaCloseTimer = React.useRef(null);
   const shopLabel = language === "ar" ? "المتجر" : "Shop";
@@ -199,6 +196,42 @@ function Header({
     document.addEventListener("pointerdown", closeMenus);
     return () => document.removeEventListener("pointerdown", closeMenus);
   }, []);
+
+  React.useEffect(() => {
+    function closeOnEscape(event) {
+      if (event.key === "Escape") {
+        setIsMegaOpen(false);
+        setIsAboutOpen(false);
+        setIsAccountOpen(false);
+        setIsSearchOpen(false);
+      }
+    }
+
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, []);
+
+  React.useEffect(() => {
+    if (!isMegaOpen && !isAboutOpen) return undefined;
+
+    function refreshOpenDropdowns() {
+      if (isMegaOpen) {
+        updateDropdownPosition("shop");
+      }
+      if (isAboutOpen) {
+        updateDropdownPosition("about");
+      }
+    }
+
+    refreshOpenDropdowns();
+    window.addEventListener("resize", refreshOpenDropdowns);
+    window.addEventListener("scroll", refreshOpenDropdowns, { passive: true });
+
+    return () => {
+      window.removeEventListener("resize", refreshOpenDropdowns);
+      window.removeEventListener("scroll", refreshOpenDropdowns);
+    };
+  }, [isMegaOpen, isAboutOpen, language]);
 
   React.useEffect(() => {
     if (activePage !== "home") {
@@ -323,8 +356,38 @@ function Header({
     window.clearTimeout(megaCloseTimer.current);
   }
 
+  function getDropdownStyle(menuElement) {
+    if (!menuElement || typeof window === "undefined") return {};
+
+    const triggerRect = menuElement.getBoundingClientRect();
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 1024;
+    const panelWidth = Math.min(980, Math.max(280, viewportWidth - 32));
+    const viewportPadding = 16;
+    const preferredLeft =
+      language === "ar"
+        ? triggerRect.right - panelWidth
+        : triggerRect.left;
+    const clampedLeft = Math.min(
+      Math.max(preferredLeft, viewportPadding),
+      Math.max(viewportPadding, viewportWidth - panelWidth - viewportPadding)
+    );
+
+    return {
+      "--header-dropdown-left": `${clampedLeft}px`,
+      "--header-dropdown-top": `${triggerRect.bottom + 12}px`,
+      "--header-dropdown-width": `${panelWidth}px`,
+    };
+  }
+
+  function updateDropdownPosition(type) {
+    const ref = type === "shop" ? shopMenuRef : aboutMenuRef;
+    const nextStyle = getDropdownStyle(ref.current);
+    setDropdownStyles((current) => ({ ...current, [type]: nextStyle }));
+  }
+
   function openMegaMenu() {
     clearMenuTimers();
+    updateDropdownPosition("shop");
     setIsMegaOpen(true);
     setIsAboutOpen(false);
     setIsAccountOpen(false);
@@ -337,6 +400,7 @@ function Header({
 
   function openAboutMenu() {
     clearMenuTimers();
+    updateDropdownPosition("about");
     setIsAboutOpen(true);
     setIsMegaOpen(false);
     setIsAccountOpen(false);
@@ -370,6 +434,7 @@ function Header({
         <nav className="main-nav" aria-label="Main navigation">
           <div
             className="nav-menu-wrap shop-menu-wrap"
+            ref={shopMenuRef}
             onMouseEnter={openMegaMenu}
             onMouseLeave={scheduleCloseMegaMenu}
           >
@@ -377,6 +442,7 @@ function Header({
               aria-expanded={isMegaOpen}
               className={activePage === "products" ? "nav-link active" : "nav-link"}
               onClick={() => {
+                updateDropdownPosition("shop");
                 setIsMegaOpen((open) => !open);
                 setIsAboutOpen(false);
                 setIsAccountOpen(false);
@@ -392,12 +458,14 @@ function Header({
           </div>
           <div
             className="nav-menu-wrap about-menu-wrap"
+            ref={aboutMenuRef}
             onMouseEnter={openAboutMenu}
             onMouseLeave={scheduleCloseAboutMenu}
           >
             <button
               className={["about", "how", "sustainability", "cleanups", "eb-points"].includes(activePage) ? "nav-link active" : "nav-link"}
               onClick={() => {
+                updateDropdownPosition("about");
                 setIsAboutOpen((open) => !open);
                 setIsMegaOpen(false);
                 setIsAccountOpen(false);
@@ -514,6 +582,7 @@ function Header({
       {/* Shop dropdown — positioned as direct header child, no ancestor conflicts */}
       <div
         className={`header-mega-panel ${isMegaOpen ? "open" : ""}`}
+        style={dropdownStyles.shop}
         onMouseEnter={clearMenuTimers}
         onMouseLeave={scheduleCloseMegaMenu}
       >
@@ -554,6 +623,7 @@ function Header({
       {/* About dropdown — positioned as direct header child, no ancestor conflicts */}
       <div
         className={`header-mega-panel ${isAboutOpen ? "open" : ""}`}
+        style={dropdownStyles.about}
         onMouseEnter={clearMenuTimers}
         onMouseLeave={scheduleCloseAboutMenu}
       >
