@@ -221,7 +221,9 @@ function App() {
   React.useEffect(() => {
     loadOrders(currentUser);
     loadEmployees(currentUser);
-    loadReviews(currentUser);
+    if (currentUser?.role === "admin") {
+      loadReviews(currentUser);
+    }
     loadWorkSession(currentUser);
     loadWebsiteMedia(currentUser);
   }, [currentUser]);
@@ -1053,9 +1055,6 @@ function App() {
             onStatusChange={handleOrderStatusChange}
             orders={orders}
             products={demoProducts}
-            homepageOffers={homepageOffers}
-            homepageCategoryCards={homepageCategoryCards}
-            reviews={reviews}
             t={t}
             workSession={workSession}
             websiteMedia={websiteMedia}

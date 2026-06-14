@@ -63,13 +63,18 @@ export async function apiRequest(path, options = {}) {
 
 export async function uploadImage(file) {
   const token = getToken();
+
+  if (!token) {
+    throw new Error("Authentication required.");
+  }
+
   const formData = new FormData();
   formData.append("image", file);
 
   const response = await fetch(`${apiBaseUrl}/uploads`, {
     method: "POST",
     headers: {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      Authorization: `Bearer ${token}`,
     },
     body: formData,
   });
@@ -95,13 +100,18 @@ export async function uploadImages(files = []) {
   }
 
   const token = getToken();
+
+  if (!token) {
+    throw new Error("Authentication required.");
+  }
+
   const formData = new FormData();
   fileList.forEach((file) => formData.append("image", file));
 
   const response = await fetch(`${apiBaseUrl}/uploads`, {
     method: "POST",
     headers: {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      Authorization: `Bearer ${token}`,
     },
     body: formData,
   });

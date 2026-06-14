@@ -12,6 +12,12 @@ const shopLinks = [
     categoryId: "home-cleaning",
   },
   {
+    key: "bathroom",
+    labelEn: "Bathroom Cleaners",
+    labelAr: "منظفات الحمام",
+    categoryId: "bathroom-cleaning",
+  },
+  {
     key: "car",
     labelEn: "Car Care",
     labelAr: "العناية بالسيارة",

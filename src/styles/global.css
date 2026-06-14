@@ -13666,8 +13666,8 @@ html[dir="rtl"] .cleanups-tabs-section {
   flex-direction: column;
   gap: clamp(16px, 2vw, 24px);
   min-height: 100vh;
-  max-height: 100vh;
-  overflow-y: auto;
+  max-height: none;
+  overflow: visible;
   padding: clamp(104px, 10vw, 158px) clamp(28px, 4vw, 64px) 48px;
   background: #fffdf8;
 }
@@ -14607,8 +14607,8 @@ html[dir="rtl"] .detail-safe-section {
   }
 
   .detail-purchase-panel {
-    max-height: 100vh;
-    overflow-y: auto;
+    max-height: none;
+    overflow: visible;
     padding: clamp(92px, 9vw, 128px) clamp(16px, 3vw, 34px) 34px;
   }
 
@@ -14623,6 +14623,29 @@ html[dir="rtl"] .detail-safe-section {
 }
 
 @media (max-width: 720px) {
+  .detail-hero-grid {
+    grid-template-columns: 1fr;
+    min-height: auto !important;
+  }
+
+  .detail-packshot-column,
+  .detail-scroll-gallery,
+  .detail-purchase-panel {
+    position: relative;
+    top: auto;
+    min-height: auto;
+  }
+
+  .detail-scroll-gallery {
+    height: auto;
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .detail-gallery-track {
+    transform: none !important;
+  }
+
   .detail-packshot-column {
     padding-inline: 0;
   }
@@ -14707,16 +14730,16 @@ html[dir="rtl"] .detail-safe-section {
 
 @media (min-width: 521px) and (max-width: 720px) {
   .detail-hero-grid {
-    grid-template-columns: minmax(110px, 0.68fr) minmax(220px, 1.22fr) minmax(170px, 0.86fr);
-    min-height: 100vh !important;
+    grid-template-columns: 1fr;
+    min-height: auto !important;
   }
 
   .detail-packshot-column,
   .detail-scroll-gallery,
   .detail-purchase-panel {
-    position: sticky;
-    top: 0;
-    min-height: 100vh;
+    position: relative;
+    top: auto;
+    min-height: auto;
   }
 
   .detail-packshot-card {
@@ -14731,9 +14754,9 @@ html[dir="rtl"] .detail-safe-section {
 
   .detail-scroll-gallery {
     display: block;
-    height: 100vh;
-    min-height: 100vh;
-    overflow: hidden;
+    height: auto;
+    min-height: auto;
+    overflow: visible;
   }
 
   .detail-gallery-track {
@@ -14746,8 +14769,8 @@ html[dir="rtl"] .detail-safe-section {
   }
 
   .detail-purchase-panel {
-    max-height: 100vh;
-    overflow-y: auto;
+    max-height: none;
+    overflow: visible;
     padding: 78px 12px 18px;
   }
 

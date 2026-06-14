@@ -1,12 +1,8 @@
 import { Router } from "express";
-import { persistStore, sessions, users, workSessions } from "../data/store.js";
-import { getSessionUser, publicUser, requireAuth } from "../middleware/auth.js";
+import { persistStore, users, workSessions } from "../data/store.js";
+import { getSessionUser, publicUser, requireAuth, signToken } from "../middleware/auth.js";
 
 const router = Router();
-
-function createToken() {
-  return `ep-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-}
 
 function isStaffRole(role) {
   return role === "employee" || role === "staff";
@@ -43,8 +39,7 @@ router.post("/login", async (req, res) => {
     return res.status(401).json({ message: "Invalid email or password." });
   }
 
-  const token = createToken();
-  sessions.set(token, user);
+  const token = signToken(user);
   return res.json({
     token,
     user: publicUser(user),
@@ -73,8 +68,7 @@ router.post("/register", async (req, res) => {
   };
   users.push(user);
   await persistStore();
-  const token = createToken();
-  sessions.set(token, user);
+  const token = signToken(user);
   return res.status(201).json({ token, user: publicUser(user) });
 });
 
@@ -83,10 +77,7 @@ router.get("/me", requireAuth, (req, res) => {
 });
 
 router.post("/logout", async (req, res) => {
-  const authHeader = req.headers.authorization || "";
-  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
   const user = getSessionUser(req);
-  if (token) sessions.delete(token);
 
   let workSession = null;
   if (isStaffRole(user?.role)) {

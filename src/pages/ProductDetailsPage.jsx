@@ -290,7 +290,7 @@ function ProductDetailsPage({
       } else if (heroRect.top >= window.innerHeight) {
         setGalleryOffset(0);
       } else {
-        setGalleryOffset(galleryOffsetRef.current);
+        setGalleryOffset(-heroRect.top);
       }
     }
 
@@ -299,39 +299,15 @@ function ProductDetailsPage({
       frameId = window.requestAnimationFrame(() => syncGalleryDimensions());
     }
 
-    function handleWheel(event) {
-      if (window.matchMedia("(max-width: 720px)").matches) return;
-
-      const heroRect = hero.getBoundingClientRect();
-      const isHeroActive = heroRect.top < window.innerHeight * 0.92 && heroRect.bottom > window.innerHeight * 0.18;
-      if (!isHeroActive) return;
-
-      const moveRange = galleryMoveRangeRef.current;
-      if (moveRange <= 0) return;
-
-      const currentOffset = galleryOffsetRef.current;
-      const nextOffset = currentOffset + event.deltaY;
-      const canMoveDown = event.deltaY > 0 && currentOffset < moveRange - 1;
-      const canMoveUp = event.deltaY < 0 && currentOffset > 1;
-
-      if (canMoveDown || canMoveUp) {
-        event.preventDefault();
-        window.cancelAnimationFrame(frameId);
-        frameId = window.requestAnimationFrame(() => setGalleryOffset(nextOffset));
-      }
-    }
-
     syncGalleryDimensions();
     refreshTimer = window.setTimeout(requestUpdate, 350);
     window.addEventListener("scroll", requestUpdate, { passive: true });
     window.addEventListener("resize", requestUpdate);
-    window.addEventListener("wheel", handleWheel, { passive: false });
     return () => {
       window.clearTimeout(refreshTimer);
       window.cancelAnimationFrame(frameId);
       window.removeEventListener("scroll", requestUpdate);
       window.removeEventListener("resize", requestUpdate);
-      window.removeEventListener("wheel", handleWheel);
     };
   }, [product, selectedType, selectedColor, selectedSize]);
 

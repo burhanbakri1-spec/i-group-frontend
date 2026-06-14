@@ -92,6 +92,41 @@ function rowDate(value) {
   return value || new Date().toISOString();
 }
 
+function uniqueRowId(baseId, usedIds) {
+  let candidate = baseId;
+  let suffix = 1;
+
+  while (usedIds.has(candidate)) {
+    candidate = `${baseId}-${suffix}`;
+    suffix += 1;
+  }
+
+  usedIds.add(candidate);
+  return candidate;
+}
+
+function ensureUniqueRowIds(rows, fallbackIdForRow) {
+  const usedIds = new Set();
+
+  return rows.map((row, index) => {
+    const preferredId = row.id ? String(row.id) : "";
+    const fallbackId = fallbackIdForRow(row, index);
+    const needsFallback = !preferredId || usedIds.has(preferredId);
+    const id = uniqueRowId(needsFallback ? fallbackId : preferredId, usedIds);
+
+    return {
+      ...row,
+      id,
+      data: row.data
+        ? {
+            ...row.data,
+            id,
+          }
+        : row.data,
+    };
+  });
+}
+
 function productRow(product) {
   const firstVariant = Array.isArray(product.variants) ? product.variants[0] : null;
   return {
@@ -115,25 +150,27 @@ function productRow(product) {
 }
 
 function variantRows(product) {
-  return (product.variants || []).map((variant, index) => ({
+  const rows = (product.variants || []).map((variant, index) => ({
     id: variant.id || `${product.id}-variant-${index}`,
     product_id: product.id,
     color_name: variant.color_name || variant.colorName || "Default",
-    color_value: variant.color_value || variant.colorValue || "",
+    color_value: variant.color_value || variant.colorValue || variant.colorHex || "",
     size: variant.size || "500ml",
     price: Number(variant.price || 0),
     stock: Number(variant.stock ?? 0),
-    image_url: variant.image_url || variant.imageUrl || "",
+    image_url: variant.image_url || variant.imageUrl || variant.image || "",
     sort_order: Number(variant.sort_order ?? variant.sortOrder ?? index),
     data: variant,
     created_at: rowDate(variant.createdAt),
     updated_at: rowDate(variant.updatedAt),
   }));
+
+  return ensureUniqueRowIds(rows, (row, index) => `${row.product_id}-variant-${index}`);
 }
 
 function galleryRows(product) {
   const source = product.gallery_images || product.galleryImages || [];
-  return source
+  const rows = source
     .map((entry, index) => {
       const imageUrl = typeof entry === "string" ? entry : entry?.image_url || entry?.image || entry?.url;
       if (!imageUrl) return null;
@@ -148,6 +185,8 @@ function galleryRows(product) {
       };
     })
     .filter(Boolean);
+
+  return ensureUniqueRowIds(rows, (row, index) => `${row.product_id}-gallery-${index}`);
 }
 
 function userRow(user) {
@@ -424,8 +463,14 @@ export async function saveStoreToSupabase(store, options = {}) {
   const carts = Object.entries(store.carts || {});
 
   const productRows = products.map(productRow);
-  const productVariantRows = products.flatMap(variantRows);
-  const productGalleryRows = products.flatMap(galleryRows);
+  const productVariantRows = ensureUniqueRowIds(
+    products.flatMap(variantRows),
+    (row, index) => `${row.product_id}-variant-${index}`
+  );
+  const productGalleryRows = ensureUniqueRowIds(
+    products.flatMap(galleryRows),
+    (row, index) => `${row.product_id}-gallery-${index}`
+  );
   const orderRows = orders.map(orderRow);
   const itemRows = orders.flatMap(orderItemRows);
   const userRows = users.map(userRow);
@@ -476,7 +521,23 @@ export async function saveStoreToSupabase(store, options = {}) {
 
   await upsertRows("users", userRows);
   await upsertRows("products", productRows);
+  // Delete orphaned variant rows before re-inserting current set
+  const productVariantProductIds = [...new Set(productVariantRows.map((row) => row.product_id))];
+  for (const pid of productVariantProductIds) {
+    await supabaseFetch(`/rest/v1/product_variants?product_id=eq.${encodeURIComponent(pid)}`, {
+      method: "DELETE",
+      headers: { Prefer: "return=minimal" },
+    });
+  }
   await upsertRows("product_variants", productVariantRows);
+  // Delete orphaned gallery rows before re-inserting current set
+  const productGalleryProductIds = [...new Set(productGalleryRows.map((row) => row.product_id))];
+  for (const pid of productGalleryProductIds) {
+    await supabaseFetch(`/rest/v1/product_gallery_images?product_id=eq.${encodeURIComponent(pid)}`, {
+      method: "DELETE",
+      headers: { Prefer: "return=minimal" },
+    });
+  }
   await upsertRows("product_gallery_images", productGalleryRows);
   await upsertRows("orders", orderRows);
   await upsertRows("order_items", itemRows);
