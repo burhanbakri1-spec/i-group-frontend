@@ -13678,8 +13678,13 @@ html[dir="rtl"] .cleanups-tabs-section {
     height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
+    overscroll-behavior-y: auto;
+    scrollbar-width: none;
     transform: none;
-    scrollbar-width: thin;
+  }
+
+  .detail-kinfill-gallery-column::-webkit-scrollbar {
+    display: none;
   }
 
   .detail-kinfill-gallery-picture {
@@ -13694,14 +13699,27 @@ html[dir="rtl"] .cleanups-tabs-section {
     object-position: center;
   }
 
-  .detail-purchase-panel,
-  .product-detail-info-panel {
+  .product-detail-redesign .detail-purchase-panel,
+  .product-detail-redesign .product-detail-info-panel {
     height: 100vh;
-    min-height: 0;
     max-height: 100vh;
-    overflow-y: auto;
+    min-height: 0;
+    overflow: hidden !important;
     position: relative;
     align-self: stretch;
+  }
+
+  .detail-details-scroll-inner {
+    display: block;
+    width: 100%;
+    will-change: transform;
+    transform: translateY(0);
+    transition: none !important;
+  }
+
+  .detail-purchase-panel::-webkit-scrollbar,
+  .product-detail-info-panel::-webkit-scrollbar {
+    display: none;
   }
 }
 .detail-purchase-panel {
@@ -21750,12 +21768,3 @@ html[dir="ltr"] .header-mega-panel.open,
   }
 }
 
-@media (min-width: 1024px) {
-  .detail-kinfill-hero > .detail-purchase-panel {
-    position: sticky;
-    top: 0;
-    height: fit-content;
-    min-height: 0;
-    align-self: start;
-  }
-}
