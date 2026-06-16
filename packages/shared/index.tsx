@@ -20,7 +20,7 @@ type BrandSettings = {
 };
 
 type JsonRequestInit = Omit<RequestInit, 'body'> & {
-  body?: BodyInit | Record<string, unknown>;
+  body?: BodyInit | string | Record<string, unknown>;
 };
 
 const defaultBrandSettings: BrandSettings = {
@@ -49,9 +49,9 @@ export function useBrandSettings() {
 export async function apiRequest(path: string, init?: JsonRequestInit) {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
   const { body, ...requestInit } = init ?? {};
-  const requestBody = body && !(body instanceof FormData) && typeof body === 'object'
-    ? JSON.stringify(body)
-    : body;
+  const requestBody: BodyInit = (body instanceof FormData || typeof body === 'string')
+    ? body
+    : body ? JSON.stringify(body) : undefined;
 
   const response = await fetch(normalizedPath, {
     ...requestInit,

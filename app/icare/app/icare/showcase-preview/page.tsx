@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import ShowcaseBlock from '../../../components/showcase/ShowcaseBlock';
+import { ShowcaseBlock } from '../../../components/showcase/ShowcaseBlock';
 import { SHOWCASE_FALLBACK } from '../../../lib/showcase/fallback';
 import type { ShowcaseUnit } from '../../../types/showcase-units';
 

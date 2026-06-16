@@ -4,7 +4,7 @@
  * REQ-C3-1, REQ-C3-2
  */
 
-import type { ComponentType } from 'react';
+import type { ReactNode } from 'react';
 import type { NormalizedShowcaseUnit, ShowcaseUnitType } from '../../types/showcase-units';
 
 export type UnitComponentProps<P = unknown> = {
@@ -14,7 +14,7 @@ export type UnitComponentProps<P = unknown> = {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type UnitComponent = ComponentType<UnitComponentProps<any>>;
+type UnitComponent = (...args: any[]) => any;
 
 const registry = new Map<ShowcaseUnitType, UnitComponent>();
 

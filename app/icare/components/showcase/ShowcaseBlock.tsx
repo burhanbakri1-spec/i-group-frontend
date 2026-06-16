@@ -22,23 +22,23 @@ import type { ShowcaseUnit } from '../../types/showcase-units';
 import { clsx } from 'clsx';
 
 // ─── Self-register all unit components ─────────────────────────────────────────
-import '../units/HeroGallery';
-import '../units/BenefitsGrid';
-import '../units/ApplicationSteps';
-import '../units/KeyIngredients';
-import '../units/ValuePropsGrid';
-import '../units/VisualApplication';
-import '../units/IngredientSpotlight';
-import '../units/ResultsStudy';
-import '../units/RoutineMap';
-import '../units/Reviews';
-import '../units/ComparisonChart';
-import '../units/KitContents';
-import '../units/ResultsCarousel';
-import '../units/ShadeSelector';
-import '../units/LifestyleCarousel';
-import '../units/ResearchIngredients';
-import '../units/Sustainability';
+import './units/HeroGallery.tsx';
+import './units/BenefitsGrid.tsx';
+import './units/ApplicationSteps.tsx';
+import './units/KeyIngredients.tsx';
+import './units/ValuePropsGrid.tsx';
+import './units/VisualApplication.tsx';
+import './units/IngredientSpotlight.tsx';
+import './units/ResultsStudy.tsx';
+import './units/RoutineMap.tsx';
+import './units/Reviews.tsx';
+import './units/ComparisonChart.tsx';
+import './units/KitContents.tsx';
+import './units/ResultsCarousel.tsx';
+import './units/ShadeSelector.tsx';
+import './units/LifestyleCarousel.tsx';
+import './units/ResearchIngredients.tsx';
+import './units/Sustainability.tsx';
 
 interface ShowcaseBlockProps {
   slug?: string;

@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@igroup/shared": "*",
+    "@igroup/shared": "file:../../packages/shared",
     "framer-motion": "^12.5.0",
     "lucide-react": "^0.484.0",
     "next": "^15.2.4",

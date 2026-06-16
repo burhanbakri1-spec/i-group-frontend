@@ -2,6 +2,7 @@
   "name": "ba-group",
   "version": "0.1.0",
   "private": true,
+
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -12,6 +13,7 @@
     "playwright": "playwright"
   },
   "dependencies": {
+    "@igroup/shared": "file:packages/shared",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",

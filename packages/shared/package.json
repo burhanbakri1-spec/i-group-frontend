@@ -1,0 +1,10 @@
+{
+  "name": "@igroup/shared",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./index.tsx",
+  "types": "./index.tsx",
+  "exports": {
+    ".": "./index.tsx"
+  }
+}
