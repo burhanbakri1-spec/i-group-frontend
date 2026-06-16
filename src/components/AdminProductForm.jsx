@@ -137,6 +137,8 @@ function productToForm(product) {
     return createEmptyForm();
   }
 
+  const dsi = product.detailSectionImages || product.detail_section_images || {};
+
   return {
     id: product.id,
     slug: product.slug,
@@ -152,6 +154,12 @@ function productToForm(product) {
     badgeEn: product.badge?.en || "Featured",
     badgeAr: product.badge?.ar || "منتج مميز",
     stockStatus: product.stockStatus || "In stock",
+    dsiHowItWorks: dsi.howItWorks || "",
+    dsiImpact: dsi.impact || "",
+    dsiSafeToUse: dsi.safeToUse || "",
+    dsiPracticalBanner: dsi.practicalBanner || "",
+    dsiIngredients: dsi.ingredients || "",
+    dsiFaq: dsi.faq || "",
   };
 }
 
@@ -457,6 +465,14 @@ function AdminProductForm({ editingProduct, language, onCancel, onSave, t }) {
         ar: form.badgeAr,
       },
       stockStatus: form.stockStatus,
+      detailSectionImages: {
+        howItWorks: form.dsiHowItWorks || "",
+        impact: form.dsiImpact || "",
+        safeToUse: form.dsiSafeToUse || "",
+        practicalBanner: form.dsiPracticalBanner || "",
+        ingredients: form.dsiIngredients || "",
+        faq: form.dsiFaq || "",
+      },
       usageNotes: {
         en: "Product managed from the admin dashboard.",
         ar: "منتج يتم إدارته من لوحة التحكم.",
@@ -534,6 +550,46 @@ function AdminProductForm({ editingProduct, language, onCancel, onSave, t }) {
         "admin.uploadHoverImage",
         "admin.hoverImagePreview",
       )}
+      <div className="full-field">
+        <strong>{language === "ar" ? "صور أقسام تفاصيل المنتج" : "Product Details Section Images"}</strong>
+        <div className="admin-dsi-grid">
+          {[
+            { key: "dsiHowItWorks", label: language === "ar" ? "صورة قسم طريقة الاستخدام" : "How it Works image" },
+            { key: "dsiImpact", label: language === "ar" ? "صورة قسم التأثير" : "Impact section image" },
+            { key: "dsiSafeToUse", label: language === "ar" ? "صورة قسم الأمان" : "Safe to use image" },
+            { key: "dsiPracticalBanner", label: language === "ar" ? "صورة البانر" : "Practical banner image" },
+            { key: "dsiIngredients", label: language === "ar" ? "صورة قسم المكونات" : "Ingredients section image" },
+            { key: "dsiFaq", label: language === "ar" ? "صورة قسم الأسئلة" : "FAQ side image" },
+          ].map(({ key, label }) => {
+            const isUploading = uploadingField === key;
+            return (
+              <label key={key}>
+                {label}
+                <span className="image-upload-row">
+                  <input name={key} onChange={handleChange} value={form[key] || ""} />
+                  <span className="upload-button-shell">
+                    <input
+                      accept="image/*"
+                      aria-label={label}
+                      onChange={(event) => handleImageUpload(key, event)}
+                      type="file"
+                    />
+                    <span>{isUploading ? t("admin.uploading") : t("admin.uploadImage")}</span>
+                  </span>
+                </span>
+                {form[key] && (
+                  <img
+                    alt=""
+                    className="admin-image-preview small-preview"
+                    src={form[key]}
+                    onError={(event) => { event.currentTarget.src = placeholderImage; }}
+                  />
+                )}
+              </label>
+            );
+          })}
+        </div>
+      </div>
       <div className="full-field admin-gallery-editor">
         <div className="admin-inline-heading">
           <strong>{language === "ar" ? "صور المعرض العمودي" : "Vertical Gallery Images"}</strong>

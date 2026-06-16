@@ -313,6 +313,7 @@ function ProductDetailsPage({
   const faqItems = product.faq || getFallbackFaq();
   const productInfo = product.productInfo || getFallbackInfo();
   const relatedProducts = getRelatedProducts();
+  const detailImages = product.detailSectionImages || product.detail_section_images || {};
   const floatingLabel = `${selectedColor !== "Default" ? `${selectedColor} / ` : ""}${selectedOption.size}`;
 
   function getStatements() {
@@ -649,7 +650,7 @@ function ProductDetailsPage({
           </div>
         </div>
         <figure className="detail-how-image">
-          <ProductImage alt={localized(steps[activeStep]?.title, language)} src={steps[activeStep]?.image || product.image} />
+          <ProductImage alt={localized(steps[activeStep]?.title, language)} src={steps[activeStep]?.image || detailImages.howItWorks || product.image} />
         </figure>
       </section>
 
@@ -659,13 +660,13 @@ function ProductDetailsPage({
           <ProductImage
             alt={productName}
             className="impact-left"
-            src={product.image}
+            src={detailImages.impact || product.image}
             style={{ transform: `translateY(${parallax * 82}px) rotate(${-6 - parallax * 2}deg)` }}
           />
           <ProductImage
             alt={productName}
             className="impact-right"
-            src={product.hoverImage || product.image}
+            src={detailImages.impact || product.hoverImage || product.image}
             style={{ transform: `translate(${parallax * 74}px, ${parallax * -96}px) rotate(${6 + parallax * 2}deg)` }}
           />
         </div>
@@ -673,7 +674,7 @@ function ProductDetailsPage({
 
       <section className="detail-safe-section">
         <figure>
-          <ProductImage alt={productName} src={product.hoverImage || product.image} />
+          <ProductImage alt={productName} src={detailImages.safeToUse || product.hoverImage || product.image} />
         </figure>
         <div className="detail-safe-copy">
           <h2>{txt.safe}</h2>
@@ -702,7 +703,7 @@ function ProductDetailsPage({
         onTouchEnd={(event) => handleStatementDragEnd(event.changedTouches[0]?.clientX || 0)}
         onTouchStart={(event) => setDragStart(event.touches[0]?.clientX || 0)}
       >
-        <ProductImage alt={productName} src={product.hoverImage || product.image} />
+        <ProductImage alt={productName} src={detailImages.practicalBanner || product.hoverImage || product.image} />
         <div className="detail-statement-track" style={{ transform: `translateX(${language === "ar" ? activeStatement * 100 : activeStatement * -100}%)` }}>
           {statements.map((statement, index) => (
             <h2 key={`${statement}-${index}`}>{statement}</h2>
@@ -722,7 +723,7 @@ function ProductDetailsPage({
           <button className="detail-light-button" type="button">{txt.ingredients}</button>
         </div>
         <figure>
-          <ProductImage alt={productName} src={product.image} />
+          <ProductImage alt={productName} src={detailImages.ingredients || product.image} />
         </figure>
       </section>
 
@@ -760,7 +761,7 @@ function ProductDetailsPage({
 
       <section className="detail-faq-section">
         <figure>
-          <ProductImage alt={productName} src={product.hoverImage || product.image} />
+          <ProductImage alt={productName} src={detailImages.faq || product.hoverImage || product.image} />
         </figure>
         <div>
           <h2>{txt.faqTitle}</h2>

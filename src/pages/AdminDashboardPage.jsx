@@ -280,6 +280,14 @@ function createProductFromForm(form) {
         : "Out of Stock",
     metaTitle: form.metaTitle,
     metaDescription: form.metaDescription,
+    detailSectionImages: {
+      howItWorks: form.dsiHowItWorks || "",
+      impact: form.dsiImpact || "",
+      safeToUse: form.dsiSafeToUse || "",
+      practicalBanner: form.dsiPracticalBanner || "",
+      ingredients: form.dsiIngredients || "",
+      faq: form.dsiFaq || "",
+    },
     createdAt: form.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -568,6 +576,12 @@ function ProductWizard({ categories, editingProduct, onCancel, onSave }) {
     videoUrl: editingProduct?.videoUrl || "",
     metaTitle: editingProduct?.metaTitle || "",
     metaDescription: editingProduct?.metaDescription || "",
+    dsiHowItWorks: (editingProduct?.detailSectionImages || editingProduct?.detail_section_images || {}).howItWorks || "",
+    dsiImpact: (editingProduct?.detailSectionImages || editingProduct?.detail_section_images || {}).impact || "",
+    dsiSafeToUse: (editingProduct?.detailSectionImages || editingProduct?.detail_section_images || {}).safeToUse || "",
+    dsiPracticalBanner: (editingProduct?.detailSectionImages || editingProduct?.detail_section_images || {}).practicalBanner || "",
+    dsiIngredients: (editingProduct?.detailSectionImages || editingProduct?.detail_section_images || {}).ingredients || "",
+    dsiFaq: (editingProduct?.detailSectionImages || editingProduct?.detail_section_images || {}).faq || "",
     label: editingProduct?.badge?.en || "",
     labelAr: editingProduct?.badge?.ar || "",
     active: editingProduct?.isActive !== false,
@@ -928,6 +942,21 @@ function ProductWizard({ categories, editingProduct, onCancel, onSave }) {
                 ))}
               </div>
               {uploadError && <div className="message-panel error full-field">{uploadError}</div>}
+            </div>
+            <div className="full-field">
+              <strong>Product Details Section Images</strong>
+              <div className="admin-dsi-grid">
+                {[
+                  { key: "dsiHowItWorks", label: "How it Works image" },
+                  { key: "dsiImpact", label: "Impact section image" },
+                  { key: "dsiSafeToUse", label: "Safe to use image" },
+                  { key: "dsiPracticalBanner", label: "Practical banner image" },
+                  { key: "dsiIngredients", label: "Ingredients section image" },
+                  { key: "dsiFaq", label: "FAQ side image" },
+                ].map(({ key, label }) => (
+                  <MediaField key={key} label={label} name={key} value={form[key] || ""} onChange={change} />
+                ))}
+              </div>
             </div>
           </>
         )}
