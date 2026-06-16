@@ -14,9 +14,17 @@ interface ImageWithFallbackProps {
   height?: number;
 }
 
+/**
+ * Native sources are rendered with a plain `<img>` (not next/image) so we
+ * don't need width/height and don't go through the next/image optimizer for
+ * relative paths (next/image can't resolve relative paths without a loader).
+ * The canonical upload prefix `/public/uploads/` is what the admin upload
+ * endpoint returns — it MUST be in this list, otherwise uploaded images
+ * fall through to the next/image branch and render as "no image".
+ */
 const isNativeImageSource = (src: string) => {
   if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('//')) return true;
-  if (src.startsWith('/api/icare/uploads/') || src.startsWith('/uploads/')) return true;
+  if (src.startsWith('/public/uploads/') || src.startsWith('/api/icare/uploads/') || src.startsWith('/uploads/')) return true;
   return false;
 };
 

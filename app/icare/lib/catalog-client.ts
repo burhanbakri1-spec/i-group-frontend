@@ -706,6 +706,142 @@ export const fetchProductShowcase = async (slug: string): Promise<import('../typ
       'sustainability',
     ]);
 
+    /**
+     * Hydrate a showcase unit's `payload` from its top-level `image` field
+     * when the payload is missing the image location its type expects.
+     *
+     * The admin form writes the per-unit cover image to the top-level
+     * `image` column (`ProductShowcase.image` in the backend), and the
+     * showcase zod schemas require the image to live inside `payload`
+     * (e.g. `payload.images[].url` for `hero_gallery`). When the admin
+     * hasn't yet populated the per-type payload, this fallback lifts the
+     * top-level image into the expected slot so the unit still renders.
+     *
+     * Returns `null` when no hydration is needed (payload already has the
+     * expected image, or the type doesn't need one). The caller re-validates
+     * after hydration and only uses the result if the schema now passes.
+     */
+    const hydratePayloadWithUnitImage = (
+      type: string,
+      payload: unknown,
+      unitImage: string,
+      unitTitle: string | null | undefined,
+    ): Record<string, unknown> | null => {
+      const urlObj = { url: unitImage, alt: unitTitle ?? 'Showcase image' };
+      const p = (payload ?? {}) as Record<string, unknown>;
+
+      switch (type) {
+        case 'hero_gallery':
+          if (!Array.isArray(p.images) || p.images.length === 0) {
+            return { ...p, images: [urlObj] };
+          }
+          return null;
+        case 'key_ingredients': {
+          if (Array.isArray(p.heroIngredients) && p.heroIngredients.length > 0) return null;
+          return {
+            ...p,
+            heroIngredients: [{ name: unitTitle ?? 'Featured', description: '', image: urlObj }],
+          };
+        }
+        case 'application_steps':
+        case 'visual_application': {
+          if (Array.isArray(p.steps) && p.steps.length > 0) return null;
+          return {
+            ...p,
+            steps: [{ id: 'step-1', title: unitTitle ?? 'Step 1', image: urlObj }],
+          };
+        }
+        case 'value_props_grid': {
+          if (Array.isArray(p.props) && p.props.length > 0) return null;
+          return { ...p, props: [{ label: unitTitle ?? 'Value' }] };
+        }
+        case 'ingredient_spotlight':
+        case 'research_ingredients': {
+          if (p.heroImage) return null;
+          return { ...p, heroImage: urlObj };
+        }
+        case 'results_study': {
+          if (Array.isArray(p.heroImages) && p.heroImages.length > 0) return null;
+          return { ...p, heroImages: [urlObj] };
+        }
+        case 'routine_map': {
+          if (Array.isArray(p.steps) && p.steps.length > 0) return null;
+          return {
+            ...p,
+            steps: [
+              {
+                id: 'step-1',
+                number: 1,
+                label: unitTitle ?? 'Step 1',
+                productName: unitTitle ?? '',
+                lifestyleImage: urlObj,
+              },
+            ],
+          };
+        }
+        case 'comparison_chart':
+        case 'kit_contents': {
+          if (Array.isArray(p.products) && p.products.length > 0) return null;
+          return {
+            ...p,
+            products: [
+              {
+                slug: '',
+                name: unitTitle ?? '',
+                shortName: unitTitle ?? '',
+                tagline: '',
+                image: urlObj,
+                fields: { whatItIs: '', bestFor: '', whereItFits: '', keyIngredients: '' },
+              },
+            ],
+          };
+        }
+        case 'results_carousel': {
+          if (Array.isArray(p.cards) && p.cards.length > 0) return null;
+          return {
+            ...p,
+            cards: [
+              {
+                id: 'card-1',
+                productName: unitTitle ?? '',
+                metricValue: '',
+                metricLabel: '',
+                image: urlObj,
+              },
+            ],
+          };
+        }
+        case 'shade_selector': {
+          if (Array.isArray(p.shades) && p.shades.length > 0) return null;
+          return {
+            ...p,
+            shades: [
+              {
+                id: 'shade-1',
+                name: unitTitle ?? 'Shade',
+                description: '',
+                image: urlObj,
+                isNew: false,
+                isOutOfStock: false,
+                group: 'core',
+              },
+            ],
+          };
+        }
+        case 'lifestyle_carousel': {
+          if (Array.isArray(p.images) && p.images.length > 0) return null;
+          return { ...p, images: [{ id: 'lc-1', image: urlObj }] };
+        }
+        case 'benefits_grid':
+        case 'reviews':
+        case 'sustainability':
+          // These types do not require an image; pass through.
+          return null;
+        default:
+          return null;
+      }
+    };
+
     const validatedUnits = [] as import('../types/showcase-units').ShowcaseUnit[];
 
     for (const unit of units as BackendShowcaseUnit[]) {
@@ -722,7 +858,25 @@ export const fetchProductShowcase = async (slug: string): Promise<import('../typ
         continue;
       }
 
-      const payloadResult = payloadSchema.safeParse(unit.payload);
+      // Try the payload as-is first. If it fails and the unit has a
+      // top-level image, attempt one hydration pass from that image and
+      // re-validate. This is the bridge between the admin's "image
+      // field on the form" UX and the FE's per-type zod schemas.
+      let payloadToValidate: unknown = unit.payload;
+      let payloadResult = payloadSchema.safeParse(payloadToValidate);
+      if (!payloadResult.success && typeof unit.image === 'string' && unit.image.trim() !== '') {
+        const hydrated = hydratePayloadWithUnitImage(
+          confirmedType,
+          unit.payload,
+          unit.image.trim(),
+          unit.title,
+        );
+        if (hydrated) {
+          payloadToValidate = hydrated;
+          payloadResult = payloadSchema.safeParse(payloadToValidate);
+        }
+      }
+
       if (!payloadResult.success) {
         console.warn('[fetchProductShowcase] Skipping unit with invalid payload, type:', confirmedType, 'errors:', payloadResult.error.issues?.map(i => i.message).join(', '));
         continue;

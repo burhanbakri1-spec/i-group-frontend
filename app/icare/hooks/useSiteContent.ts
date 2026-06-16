@@ -7,6 +7,7 @@ import {
 } from '../types';
 import { parseShippingPageContent } from '../lib/settings';
 import { normalizeSocialLinksResponse } from '../lib/social-links';
+import { resolveMediaUrl } from '../lib/media-url';
 
 const EMPTY_SHIPPING_PAGE_CONTENT: ShippingPageContent = {
   title: '',
@@ -92,7 +93,7 @@ export const useSiteContent = (lang: Language) => {
       metaDescription: g.meta_description || g.site_description,
       siteDescription: g.site_description,
       siteUrl: g.site_url,
-      ogImage: g.og_image,
+      ogImage: resolveMediaUrl(g.og_image),
 
       // ── Announcement ──
       announcementText: resolveSetting(s.announcement_text, g.announcement_text) ?? '',
@@ -101,7 +102,7 @@ export const useSiteContent = (lang: Language) => {
 
       // ── Home Hero ──
       heroHeadline: g.home_hero_headline,
-      heroImage: g.home_hero_image,
+      heroImage: resolveMediaUrl(g.home_hero_image),
 
       // ── Home Sections ──
       trendingTitle: g.home_trending_title,
@@ -110,27 +111,27 @@ export const useSiteContent = (lang: Language) => {
       promoHeadline: g.home_promo_headline,
       promoDescription: g.home_promo_description,
       promoCtaLabel: g.home_promo_cta_label,
-      promoImage: g.home_promo_image,
+      promoImage: resolveMediaUrl(g.home_promo_image),
       philosophyHeadline: g.home_philosophy_headline,
       philosophyText: g.home_philosophy_text,
       philosophyCta: g.home_philosophy_cta,
-      philosophyImage: g.home_philosophy_image,
+      philosophyImage: resolveMediaUrl(g.home_philosophy_image),
       commitmentHeadline: g.home_commitment_headline,
       commitmentCta: g.home_commitment_cta,
-      commitmentImage: g.home_commitment_image,
+      commitmentImage: resolveMediaUrl(g.home_commitment_image),
       socialGridHeading: g.home_social_grid_heading,
       socialGridCta: g.home_social_grid_cta,
-      socialGridImage1: g.home_social_grid_image_1,
-      socialGridImage2: g.home_social_grid_image_2,
-      socialGridImage3: g.home_social_grid_image_3,
-      socialGridImage4: g.home_social_grid_image_4,
+      socialGridImage1: resolveMediaUrl(g.home_social_grid_image_1),
+      socialGridImage2: resolveMediaUrl(g.home_social_grid_image_2),
+      socialGridImage3: resolveMediaUrl(g.home_social_grid_image_3),
+      socialGridImage4: resolveMediaUrl(g.home_social_grid_image_4),
       productShowcaseLoading: g.product_showcase_loading,
       productShowcaseEmpty: g.product_showcase_empty,
 
       // ── About Page ──
       aboutHeroHeadline: g.about_hero_headline,
       aboutHeroCta: g.about_hero_cta,
-      aboutHeroImage: g.about_hero_image,
+      aboutHeroImage: resolveMediaUrl(g.about_hero_image),
       aboutIntentionalTitle: g.home_intentional_title,
       aboutIntentionalText: g.home_intentional_text,
       aboutFoundationLabel: g.home_foundation_label,
@@ -139,22 +140,22 @@ export const useSiteContent = (lang: Language) => {
       aboutFoundationText2: g.home_foundation_text_2,
       aboutTeamMember1Name: g.about_team_member_1_name,
       aboutTeamMember1Title: g.about_team_member_1_title,
-      aboutTeamMember1Image: g.about_team_member_1_image,
+      aboutTeamMember1Image: resolveMediaUrl(g.about_team_member_1_image),
       aboutTeamMember2Name: g.about_team_member_2_name,
       aboutTeamMember2Title: g.about_team_member_2_title,
-      aboutTeamMember2Image: g.about_team_member_2_image,
+      aboutTeamMember2Image: resolveMediaUrl(g.about_team_member_2_image),
       aboutTeamMember3Name: g.about_team_member_3_name,
       aboutTeamMember3Title: g.about_team_member_3_title,
-      aboutTeamMember3Image: g.about_team_member_3_image,
+      aboutTeamMember3Image: resolveMediaUrl(g.about_team_member_3_image),
       aboutFounderNoteHeading: g.home_founder_note_heading,
       aboutFounderLetter: g.home_founder_letter,
       aboutTeamLabel: g.home_team_label,
       aboutTeamTitle: g.home_team_title,
       aboutTeamDescription: g.home_team_description,
-      aboutValuesImage: g.about_values_image,
-      aboutFoundationImage: g.about_foundation_image,
-      aboutIntentionalImage: g.about_intentional_image,
-      aboutFounderSignatureImage: g.about_founder_signature_image,
+      aboutValuesImage: resolveMediaUrl(g.about_values_image),
+      aboutFoundationImage: resolveMediaUrl(g.about_foundation_image),
+      aboutIntentionalImage: resolveMediaUrl(g.about_intentional_image),
+      aboutFounderSignatureImage: resolveMediaUrl(g.about_founder_signature_image),
 
       // ── Shop ──
       shopEmptyAll: g.shop_empty_all,
@@ -225,7 +226,7 @@ export const useSiteContent = (lang: Language) => {
       authSubmitSignup: g.auth_submit_signup,
       authToggleToRegister: g.auth_toggle_to_register,
       authToggleToLogin: g.auth_toggle_to_login,
-      authLoginImage: g.auth_login_image,
+      authLoginImage: resolveMediaUrl(g.auth_login_image),
       authLoginTagline: g.auth_login_tagline,
 
       // ── Search ──
@@ -239,15 +240,15 @@ export const useSiteContent = (lang: Language) => {
       searchCollectionsUnavailable: g.search_collections_unavailable,
 
       // ── Vlog ──
-      vlogHeroImage: g.vlog_hero_image,
+      vlogHeroImage: resolveMediaUrl(g.vlog_hero_image),
       vlogHeroTitle: g.vlog_hero_title,
 
       // ── FAQ ──
-      faqHeroImage: g.faq_hero_image,
+      faqHeroImage: resolveMediaUrl(g.faq_hero_image),
       faqHeroTitle: g.faq_hero_title,
 
       // ── Contact ──
-      contactHeroImage: g.contact_hero_image,
+      contactHeroImage: resolveMediaUrl(g.contact_hero_image),
       contactHeroHeading: c.contact_hero_heading,
       contactInfoTitle: c.contact_info_title,
       contactSupportInfo: c.contact_support_info,
@@ -262,7 +263,7 @@ export const useSiteContent = (lang: Language) => {
 
       // ── Store Locator ──
       storeLocatorTagline: g.store_locator_tagline,
-      storeLocatorMapImage: g.store_locator_map_image,
+      storeLocatorMapImage: resolveMediaUrl(g.store_locator_map_image),
       storeLocatorNoResults: g.store_locator_no_results,
 
       // ── Wishlist ──
