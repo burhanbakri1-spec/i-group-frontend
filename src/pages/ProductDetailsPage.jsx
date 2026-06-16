@@ -228,6 +228,7 @@ function ProductDetailsPage({
   }, [product]);
 
   React.useEffect(() => {
+    if (getStatements().length <= 1) return;
     const timer = window.setInterval(() => {
       setActiveStatement((index) => (index + 1) % getStatements().length);
     }, 4000);
@@ -317,6 +318,10 @@ function ProductDetailsPage({
   const floatingLabel = `${selectedColor !== "Default" ? `${selectedColor} / ` : ""}${selectedOption.size}`;
 
   function getStatements() {
+    const customStatements = product.detailStatements || product.detail_statements;
+    if (customStatements?.length) {
+      return customStatements.map((s) => (typeof s === "string" ? s : localized(s, language)));
+    }
     return localized(product?.statements, language, [
       language === "ar"
         ? "منتج عملي مصمم لتنظيف فعّال وسهولة استخدام يومية."
@@ -644,13 +649,13 @@ function ProductDetailsPage({
           <div className="detail-step-thumbs">
             {steps.map((step, index) => (
               <button className={activeStep === index ? "active" : ""} key={`${localized(step.title, language)}-${index}`} onClick={() => setActiveStep(index)} type="button">
-                <ProductImage alt={localized(step.title, language)} src={step.image || product.image} />
+                <ProductImage alt={localized(step.title, language)} src={step.image || detailImages[`howItWorks${index + 1}`] || detailImages.howItWorks || product.image} />
               </button>
             ))}
           </div>
         </div>
         <figure className="detail-how-image">
-          <ProductImage alt={localized(steps[activeStep]?.title, language)} src={steps[activeStep]?.image || detailImages.howItWorks || product.image} />
+          <ProductImage alt={localized(steps[activeStep]?.title, language)} src={steps[activeStep]?.image || detailImages[`howItWorks${activeStep + 1}`] || detailImages.howItWorks || product.image} />
         </figure>
       </section>
 
@@ -660,13 +665,13 @@ function ProductDetailsPage({
           <ProductImage
             alt={productName}
             className="impact-left"
-            src={detailImages.impact || product.image}
+            src={detailImages.impact1 || detailImages.impact || product.image}
             style={{ transform: `translateY(${parallax * 82}px) rotate(${-6 - parallax * 2}deg)` }}
           />
           <ProductImage
             alt={productName}
             className="impact-right"
-            src={detailImages.impact || product.hoverImage || product.image}
+            src={detailImages.impact2 || detailImages.impact || product.hoverImage || product.image}
             style={{ transform: `translate(${parallax * 74}px, ${parallax * -96}px) rotate(${6 + parallax * 2}deg)` }}
           />
         </div>

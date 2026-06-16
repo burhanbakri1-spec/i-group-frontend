@@ -2,6 +2,7 @@ import React from "react";
 import { brand } from "../data/brand.js";
 import { hasPermission } from "../data/permissions.js";
 import WorkTimer from "./WorkTimer.jsx";
+import { getWebsiteMediaImage } from "../data/websiteMedia.js";
 
 const shopLinks = [
   { key: "all", labelEn: "Shop All", labelAr: "كل المنتجات", action: "products" },
@@ -115,6 +116,7 @@ function Header({
   onNavigate,
   products = [],
   t,
+  websiteMedia = [],
   workSession,
 }) {
   const isAdmin = currentUser?.role === "admin";
@@ -144,13 +146,13 @@ function Header({
       {
         titleEn: "Start here",
         titleAr: "ابدأ من هنا",
-        image: "/images/products/fabric-cleaner.svg",
+        image: getWebsiteMediaImage(websiteMedia, "header_mega_card_0", "/images/products/fabric-cleaner.svg"),
         action: "products",
       },
       {
         titleEn: "Shop featured products",
         titleAr: "تسوق المنتجات المميزة",
-        image: "/images/products/car-shampoo.svg",
+        image: getWebsiteMediaImage(websiteMedia, "header_mega_card_1", "/images/products/car-shampoo.svg"),
         categoryId: "car-care",
       },
     ];
@@ -167,7 +169,7 @@ function Header({
         productSlug: product.slug,
       };
     });
-  }, [products]);
+  }, [products, websiteMedia]);
 
 
   const searchResults = React.useMemo(() => {
@@ -433,7 +435,7 @@ function Header({
           <img
             alt={`${brand.logoText} logo`}
             className="brand-logo-image"
-            src="/images/brand/ep-chemical-logo.png"
+            src={getWebsiteMediaImage(websiteMedia, "header_logo", "/images/brand/ep-chemical-logo.png")}
           />
         </button>
 
@@ -655,7 +657,7 @@ function Header({
                 type="button"
               >
                 <span>
-                  <img alt={language === "ar" ? card.titleAr : card.titleEn} src={card.image} />
+                  <img alt={language === "ar" ? card.titleAr : card.titleEn} src={getWebsiteMediaImage(websiteMedia, `header_about_card_${card.key}`, card.image)} />
                 </span>
                 <strong>{language === "ar" ? card.titleAr : card.titleEn}</strong>
               </button>

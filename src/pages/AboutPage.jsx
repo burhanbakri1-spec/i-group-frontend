@@ -64,41 +64,47 @@ const pillars = {
   en: [
     {
       key: "bottle",
+      imageKey: "pillar1",
       title: "Better everyday products",
       text: "Practical cleaning products designed to make daily home and car care easier, cleaner, and more reliable.",
-      image: fallbackImages.pillar1,
+      fallbackImage: fallbackImages.pillar1,
     },
     {
       key: "concentrates",
+      imageKey: "pillar2",
       title: "Simple routines",
       text: "Clear cleaning solutions that help customers get strong results without complicated steps.",
-      image: fallbackImages.pillar2,
+      fallbackImage: fallbackImages.pillar2,
     },
     {
       key: "materials",
+      imageKey: "pillar3",
       title: "Effective care",
       text: "Products made for real daily use across homes, cars, and shared spaces.",
-      image: fallbackImages.pillar3,
+      fallbackImage: fallbackImages.pillar3,
     },
   ],
   ar: [
     {
       key: "bottle",
+      imageKey: "pillar1",
       title: "منتجات يومية أفضل",
       text: "منتجات تنظيف عملية مصممة لجعل العناية بالمنزل والسيارة أسهل وأنظف وأكثر موثوقية.",
-      image: fallbackImages.pillar1,
+      fallbackImage: fallbackImages.pillar1,
     },
     {
       key: "concentrates",
+      imageKey: "pillar2",
       title: "روتين بسيط",
       text: "حلول تنظيف واضحة تساعد العملاء على الحصول على نتائج قوية بدون خطوات معقدة.",
-      image: fallbackImages.pillar2,
+      fallbackImage: fallbackImages.pillar2,
     },
     {
       key: "materials",
+      imageKey: "pillar3",
       title: "عناية فعالة",
       text: "منتجات مناسبة للاستخدام اليومي في المنازل والسيارات والمساحات المشتركة.",
-      image: fallbackImages.pillar3,
+      fallbackImage: fallbackImages.pillar3,
     },
   ],
 };
@@ -107,41 +113,47 @@ const stats = {
   en: [
     {
       key: "products",
+      imageKey: "stat1",
       value: "243k",
       label: "CLEANING ROUTINES SUPPORTED",
-      image: fallbackImages.stat1,
+      fallbackImage: fallbackImages.stat1,
     },
     {
       key: "orders",
+      imageKey: "stat2",
       value: "123kg",
       label: "PRODUCT WASTE REDUCED",
-      image: fallbackImages.stat2,
+      fallbackImage: fallbackImages.stat2,
     },
     {
       key: "categories",
+      imageKey: "stat3",
       value: "123kg",
       label: "EVERYDAY CARE IMPROVED",
-      image: fallbackImages.stat3,
+      fallbackImage: fallbackImages.stat3,
     },
   ],
   ar: [
     {
       key: "products",
+      imageKey: "stat1",
       value: "243k",
       label: "روتين تنظيف مدعوم",
-      image: fallbackImages.stat1,
+      fallbackImage: fallbackImages.stat1,
     },
     {
       key: "orders",
+      imageKey: "stat2",
       value: "123kg",
       label: "تقليل هدر المنتجات",
-      image: fallbackImages.stat2,
+      fallbackImage: fallbackImages.stat2,
     },
     {
       key: "categories",
+      imageKey: "stat3",
       value: "123kg",
       label: "تحسين العناية اليومية",
-      image: fallbackImages.stat3,
+      fallbackImage: fallbackImages.stat3,
     },
   ],
 };
@@ -215,7 +227,7 @@ function AboutPage({ language = "en", onNavigate, websiteMedia = [] }) {
                     tabIndex={0}
                     onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActivePillar(isOpen ? '' : item.key); } }}
                   >
-                    <img className="mission-forward-card-image" src={item.image} alt="" aria-hidden="true" loading="lazy" />
+                    <img className="mission-forward-card-image" src={image(item.imageKey) || item.fallbackImage} alt="" aria-hidden="true" loading="lazy" />
                     <div className="mission-forward-card-overlay" />
                     <h3 className="mission-forward-card-title">{item.title}</h3>
                     <div className="mission-forward-card-plus">
@@ -274,7 +286,7 @@ function AboutPage({ language = "en", onNavigate, websiteMedia = [] }) {
               {numbers.map((stat, i) => (
                 <div className={`mission-impact-stat-row mission-impact-stat-pos-${i}`} key={stat.key}>
                   <div className="mission-impact-stat-card">
-                    <img className="mission-impact-stat-icon" src={stat.image} alt="" aria-hidden="true" />
+                    <img className="mission-impact-stat-icon" src={image(stat.imageKey) || stat.fallbackImage} alt="" aria-hidden="true" />
                     <div className="mission-impact-stat-body">
                       <span className="mission-impact-stat-number">{stat.value}</span>
                       <span className="mission-impact-stat-label">{stat.label}</span>

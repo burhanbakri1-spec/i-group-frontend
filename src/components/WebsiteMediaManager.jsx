@@ -27,6 +27,7 @@ const groupLabels = {
   eb_points: { en: "Static Sections - EB Points", ar: "الأقسام الثابتة - نقاط EB" },
   how_it_works: { en: "Static Sections - How It Works", ar: "الأقسام الثابتة - كيف يعمل" },
   ads: { en: "Ads / Banners", ar: "الإعلانات والبنرات" },
+  header_dropdown: { en: "Header Dropdown Images", ar: "صور القوائم المنسدلة في الرأس" },
   sections: { en: "Other Static Website Images", ar: "صور الموقع الثابتة الأخرى" },
 };
 

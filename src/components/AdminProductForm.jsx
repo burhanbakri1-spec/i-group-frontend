@@ -19,6 +19,7 @@ const emptyForm = {
   badgeEn: "Featured",
   badgeAr: "منتج مميز",
   stockStatus: "In stock",
+  detailStatements: [],
 };
 
 function normalizeVariant(variant = {}, index = 0, product = {}) {
@@ -155,11 +156,17 @@ function productToForm(product) {
     badgeAr: product.badge?.ar || "منتج مميز",
     stockStatus: product.stockStatus || "In stock",
     dsiHowItWorks: dsi.howItWorks || "",
+    dsiHowItWorks1: dsi.howItWorks1 || "",
+    dsiHowItWorks2: dsi.howItWorks2 || "",
+    dsiHowItWorks3: dsi.howItWorks3 || "",
     dsiImpact: dsi.impact || "",
+    dsiImpact1: dsi.impact1 || "",
+    dsiImpact2: dsi.impact2 || "",
     dsiSafeToUse: dsi.safeToUse || "",
     dsiPracticalBanner: dsi.practicalBanner || "",
     dsiIngredients: dsi.ingredients || "",
     dsiFaq: dsi.faq || "",
+    detailStatements: product.detailStatements || product.detail_statements || [],
   };
 }
 
@@ -467,12 +474,18 @@ function AdminProductForm({ editingProduct, language, onCancel, onSave, t }) {
       stockStatus: form.stockStatus,
       detailSectionImages: {
         howItWorks: form.dsiHowItWorks || "",
+        howItWorks1: form.dsiHowItWorks1 || "",
+        howItWorks2: form.dsiHowItWorks2 || "",
+        howItWorks3: form.dsiHowItWorks3 || "",
         impact: form.dsiImpact || "",
+        impact1: form.dsiImpact1 || "",
+        impact2: form.dsiImpact2 || "",
         safeToUse: form.dsiSafeToUse || "",
         practicalBanner: form.dsiPracticalBanner || "",
         ingredients: form.dsiIngredients || "",
         faq: form.dsiFaq || "",
       },
+      detailStatements: form.detailStatements || [],
       usageNotes: {
         en: "Product managed from the admin dashboard.",
         ar: "منتج يتم إدارته من لوحة التحكم.",
@@ -554,8 +567,11 @@ function AdminProductForm({ editingProduct, language, onCancel, onSave, t }) {
         <strong>{language === "ar" ? "صور أقسام تفاصيل المنتج" : "Product Details Section Images"}</strong>
         <div className="admin-dsi-grid">
           {[
-            { key: "dsiHowItWorks", label: language === "ar" ? "صورة قسم طريقة الاستخدام" : "How it Works image" },
-            { key: "dsiImpact", label: language === "ar" ? "صورة قسم التأثير" : "Impact section image" },
+            { key: "dsiHowItWorks1", label: language === "ar" ? "صورة طريقة الاستخدام 1" : "How it Works image 1" },
+            { key: "dsiHowItWorks2", label: language === "ar" ? "صورة طريقة الاستخدام 2" : "How it Works image 2" },
+            { key: "dsiHowItWorks3", label: language === "ar" ? "صورة طريقة الاستخدام 3" : "How it Works image 3" },
+            { key: "dsiImpact1", label: language === "ar" ? "صورة التأثير 1" : "Impact section image 1" },
+            { key: "dsiImpact2", label: language === "ar" ? "صورة التأثير 2" : "Impact section image 2" },
             { key: "dsiSafeToUse", label: language === "ar" ? "صورة قسم الأمان" : "Safe to use image" },
             { key: "dsiPracticalBanner", label: language === "ar" ? "صورة البانر" : "Practical banner image" },
             { key: "dsiIngredients", label: language === "ar" ? "صورة قسم المكونات" : "Ingredients section image" },
@@ -588,6 +604,59 @@ function AdminProductForm({ editingProduct, language, onCancel, onSave, t }) {
               </label>
             );
           })}
+        </div>
+      </div>
+      <div className="full-field">
+        <strong>{language === "ar" ? "عبارات بانر تفاصيل المنتج" : "Product Details Banner Statements"}</strong>
+        <div className="admin-dsi-grid">
+          {(form.detailStatements || []).map((statement, index) => (
+            <div className="admin-media-field" key={index}>
+              <label>
+                {language === "ar" ? `البيان ${index + 1} - الإنجليزية` : `Statement ${index + 1} - English`}
+                <input
+                  value={statement.en || ""}
+                  onChange={(event) => {
+                    const updated = [...(form.detailStatements || [])];
+                    updated[index] = { ...updated[index], en: event.target.value, ar: updated[index]?.ar || "" };
+                    setForm((current) => ({ ...current, detailStatements: updated }));
+                  }}
+                />
+              </label>
+              <label>
+                {language === "ar" ? `البيان ${index + 1} - العربية` : `Statement ${index + 1} - Arabic`}
+                <input
+                  value={statement.ar || ""}
+                  onChange={(event) => {
+                    const updated = [...(form.detailStatements || [])];
+                    updated[index] = { ...updated[index], ar: event.target.value, en: updated[index]?.en || "" };
+                    setForm((current) => ({ ...current, detailStatements: updated }));
+                  }}
+                />
+              </label>
+              <button
+                className="text-action danger"
+                onClick={() => {
+                  const updated = (form.detailStatements || []).filter((_, i) => i !== index);
+                  setForm((current) => ({ ...current, detailStatements: updated }));
+                }}
+                type="button"
+              >
+                {language === "ar" ? "إزالة" : "Remove"}
+              </button>
+            </div>
+          ))}
+          <button
+            className="secondary-action compact-action"
+            onClick={() =>
+              setForm((current) => ({
+                ...current,
+                detailStatements: [...(current.detailStatements || []), { en: "", ar: "" }],
+              }))
+            }
+            type="button"
+          >
+            {language === "ar" ? "+ إضافة بيان" : "+ Add statement"}
+          </button>
         </div>
       </div>
       <div className="full-field admin-gallery-editor">

@@ -83,7 +83,10 @@ function matchesShopCategory(product, categoryConfig) {
   return categoryConfig.productCategoryKeys.some((key) => lookup.includes(String(key).toLowerCase()));
 }
 
-function createShopCategoryConfig(allHeroImage) {
+function createShopCategoryConfig(allHeroImage, websiteMedia = []) {
+  function heroImage(key, fallback) {
+    return getWebsiteMediaImage(websiteMedia, `products_hero_${key}`, fallback);
+  }
   return {
     All: {
       key: "All",
@@ -102,7 +105,7 @@ function createShopCategoryConfig(allHeroImage) {
         en: "Practical cleaning products for everyday home care.",
         ar: "منتجات تنظيف عملية للعناية اليومية بالمنزل.",
       },
-      image: "/homepage-categories/home-care.jpg",
+      image: heroImage("home_cleaning", "/homepage-categories/home-care.jpg"),
       productCategoryKeys: ["home-cleaning", "home-cleaners", "cleaning-products"],
       heroLayout: "home-care",
     },
@@ -114,7 +117,7 @@ function createShopCategoryConfig(allHeroImage) {
         en: "Care for sinks, showers, tiles, and limescale-prone surfaces.",
         ar: "عناية بالمغاسل والدش والبلاط والأسطح المعرضة للتكلسات.",
       },
-      image: "/homepage-categories/bathroom.jpg",
+      image: heroImage("bathroom_cleaning", "/homepage-categories/bathroom.jpg"),
       productCategoryKeys: ["bathroom-cleaning", "bathroom-cleaners"],
       heroLayout: "shop-all",
     },
@@ -126,7 +129,7 @@ function createShopCategoryConfig(allHeroImage) {
         en: "Clean, polish, and refresh your car inside and out.",
         ar: "نظّف ولمّع وأنعش سيارتك من الداخل والخارج.",
       },
-      image: "/homepage-categories/car-care.jpg",
+      image: heroImage("car_care", "/homepage-categories/car-care.jpg"),
       productCategoryKeys: ["car-care"],
       heroLayout: "shop-all",
     },
@@ -138,7 +141,7 @@ function createShopCategoryConfig(allHeroImage) {
         en: "Useful add-ons for simpler cleaning routines.",
         ar: "إضافات عملية تجعل روتين التنظيف أسهل.",
       },
-      image: "/homepage-categories/kitchen-new.jpg",
+      image: heroImage("accessories", "/homepage-categories/kitchen-new.jpg"),
       productCategoryKeys: ["accessories", "accessory"],
       heroLayout: "shop-all",
     },
@@ -150,7 +153,7 @@ function createShopCategoryConfig(allHeroImage) {
         en: "Care essentials for hands, body, and daily routines.",
         ar: "أساسيات عناية لليدين والجسم والروتين اليومي.",
       },
-      image: "/homepage-categories/home-care.jpg",
+      image: heroImage("hand_body", "/homepage-categories/home-care.jpg"),
       productCategoryKeys: ["hand-body", "hand-and-body", "body-care", "hand-care"],
       heroLayout: "shop-all",
     },
@@ -162,7 +165,7 @@ function createShopCategoryConfig(allHeroImage) {
         en: "Larger practical sizes for products you use often.",
         ar: "أحجام عملية أكبر للمنتجات التي تستخدمها باستمرار.",
       },
-      image: "/products/limescale-remover-hover.jpg",
+      image: heroImage("refills", "/products/limescale-remover-hover.jpg"),
       productCategoryKeys: ["refills", "refill"],
       matcher: (product) => hasProductType(product, "refill") || hasBulkOrRefillSize(product),
       heroLayout: "shop-all",
@@ -175,7 +178,7 @@ function createShopCategoryConfig(allHeroImage) {
         en: "Grouped essentials for home, car, and everyday care.",
         ar: "أساسيات مجمعة للمنزل والسيارة والعناية اليومية.",
       },
-      image: "/homepage-categories/home-care.jpg",
+      image: heroImage("bundles_sets", "/homepage-categories/home-care.jpg"),
       productCategoryKeys: ["bundles-sets", "bundles", "sets", "set"],
       matcher: (product) => product.offer || product.discount || getProductLookupText(product).includes("set"),
       heroLayout: "shop-all",
@@ -188,7 +191,7 @@ function createShopCategoryConfig(allHeroImage) {
         en: "Everything you need to start a cleaner routine.",
         ar: "كل ما تحتاجه لبدء روتين تنظيف أسهل.",
       },
-      image: "/products/limescale-remover-main.jpg",
+      image: heroImage("starter_kits", "/products/limescale-remover-main.jpg"),
       productCategoryKeys: ["starter-kits", "starter-kit", "kit"],
       matcher: (product) => {
         const lookup = getProductLookupText(product);
@@ -204,7 +207,7 @@ function createShopCategoryConfig(allHeroImage) {
         en: "Fresh scents made for everyday spaces.",
         ar: "روائح منعشة مصممة للمساحات اليومية.",
       },
-      image: "/images/products/ocean-breeze-home-car-fragrance.svg",
+      image: heroImage("fragrances", "/images/products/ocean-breeze-home-car-fragrance.svg"),
       productCategoryKeys: ["fragrances", "air-fresheners", "scents"],
       heroLayout: "shop-all",
     },
@@ -216,7 +219,7 @@ function createShopCategoryConfig(allHeroImage) {
         en: "Practical radiator water products for daily vehicle care.",
         ar: "منتجات ماء رديتر عملية للعناية اليومية بالسيارة.",
       },
-      image: "/images/products/green-radiator-water.svg",
+      image: heroImage("radiator_water", "/images/products/green-radiator-water.svg"),
       productCategoryKeys: ["radiator-water"],
       heroLayout: "shop-all",
     },
@@ -334,8 +337,8 @@ function ProductsPage({
     placeholderImage;
   const allHeroImage = getWebsiteMediaImage(websiteMedia, "products_hero_image", heroFallbackImage);
   const shopCategoryConfig = React.useMemo(
-    () => createShopCategoryConfig(allHeroImage),
-    [allHeroImage]
+    () => createShopCategoryConfig(allHeroImage, websiteMedia),
+    [allHeroImage, websiteMedia]
   );
   const activeCategoryKey = normalizeShopCategoryKey(activeCategory);
   const heroEntry = shopCategoryConfig[activeCategoryKey] || shopCategoryConfig["All"];
@@ -397,7 +400,7 @@ function ProductsPage({
               <div className="homecare-feature-card__image-col">
                 <div className="homecare-feature-card__image-wrap">
                   <img
-                    src="/products/limescale-remover-main.jpg"
+                    src={getWebsiteMediaImage(websiteMedia, "products_feature_dishsoap", "/products/limescale-remover-main.jpg")}
                     alt="The Dish Soap"
                     loading="lazy"
                   />
@@ -438,7 +441,7 @@ function ProductsPage({
               <div className="homecare-feature-side__image-wrap">
                 <img
                   className="homecare-feature-side__image"
-                  src="/products/limescale-remover-hover.jpg"
+                  src={getWebsiteMediaImage(websiteMedia, "products_feature_side", "/products/limescale-remover-hover.jpg")}
                   alt=""
                   loading="lazy"
                 />

@@ -282,12 +282,18 @@ function createProductFromForm(form) {
     metaDescription: form.metaDescription,
     detailSectionImages: {
       howItWorks: form.dsiHowItWorks || "",
+      howItWorks1: form.dsiHowItWorks1 || "",
+      howItWorks2: form.dsiHowItWorks2 || "",
+      howItWorks3: form.dsiHowItWorks3 || "",
       impact: form.dsiImpact || "",
+      impact1: form.dsiImpact1 || "",
+      impact2: form.dsiImpact2 || "",
       safeToUse: form.dsiSafeToUse || "",
       practicalBanner: form.dsiPracticalBanner || "",
       ingredients: form.dsiIngredients || "",
       faq: form.dsiFaq || "",
     },
+    detailStatements: form.detailStatements || [],
     createdAt: form.createdAt || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -577,7 +583,12 @@ function ProductWizard({ categories, editingProduct, onCancel, onSave }) {
     metaTitle: editingProduct?.metaTitle || "",
     metaDescription: editingProduct?.metaDescription || "",
     dsiHowItWorks: (editingProduct?.detailSectionImages || editingProduct?.detail_section_images || {}).howItWorks || "",
+    dsiHowItWorks1: (editingProduct?.detailSectionImages || editingProduct?.detail_section_images || {}).howItWorks1 || "",
+    dsiHowItWorks2: (editingProduct?.detailSectionImages || editingProduct?.detail_section_images || {}).howItWorks2 || "",
+    dsiHowItWorks3: (editingProduct?.detailSectionImages || editingProduct?.detail_section_images || {}).howItWorks3 || "",
     dsiImpact: (editingProduct?.detailSectionImages || editingProduct?.detail_section_images || {}).impact || "",
+    dsiImpact1: (editingProduct?.detailSectionImages || editingProduct?.detail_section_images || {}).impact1 || "",
+    dsiImpact2: (editingProduct?.detailSectionImages || editingProduct?.detail_section_images || {}).impact2 || "",
     dsiSafeToUse: (editingProduct?.detailSectionImages || editingProduct?.detail_section_images || {}).safeToUse || "",
     dsiPracticalBanner: (editingProduct?.detailSectionImages || editingProduct?.detail_section_images || {}).practicalBanner || "",
     dsiIngredients: (editingProduct?.detailSectionImages || editingProduct?.detail_section_images || {}).ingredients || "",
@@ -586,8 +597,8 @@ function ProductWizard({ categories, editingProduct, onCancel, onSave }) {
     labelAr: editingProduct?.badge?.ar || "",
     active: editingProduct?.isActive !== false,
     featured: Boolean(editingProduct?.isFeatured),
-    newArrival: Boolean(editingProduct?.isNewArrival),
     bestseller: Boolean(editingProduct?.isBestseller),
+    detailStatements: editingProduct?.detailStatements || editingProduct?.detail_statements || [],
   }));
 
   const tabs = ["basic", "variants", "media", "seo", "showcase"];
@@ -947,8 +958,11 @@ function ProductWizard({ categories, editingProduct, onCancel, onSave }) {
               <strong>Product Details Section Images</strong>
               <div className="admin-dsi-grid">
                 {[
-                  { key: "dsiHowItWorks", label: "How it Works image" },
-                  { key: "dsiImpact", label: "Impact section image" },
+                  { key: "dsiHowItWorks1", label: "How it Works image 1" },
+                  { key: "dsiHowItWorks2", label: "How it Works image 2" },
+                  { key: "dsiHowItWorks3", label: "How it Works image 3" },
+                  { key: "dsiImpact1", label: "Impact section image 1" },
+                  { key: "dsiImpact2", label: "Impact section image 2" },
                   { key: "dsiSafeToUse", label: "Safe to use image" },
                   { key: "dsiPracticalBanner", label: "Practical banner image" },
                   { key: "dsiIngredients", label: "Ingredients section image" },
@@ -956,6 +970,65 @@ function ProductWizard({ categories, editingProduct, onCancel, onSave }) {
                 ].map(({ key, label }) => (
                   <MediaField key={key} label={label} name={key} value={form[key] || ""} onChange={change} />
                 ))}
+              </div>
+            </div>
+            <div className="full-field">
+              <strong>Product Details Banner Statements</strong>
+              <div className="admin-dsi-grid">
+                {(form.detailStatements || []).map((statement, index) => (
+                  <div className="admin-media-field" key={index}>
+                    <label>
+                      Statement {index + 1} - English
+                      <input
+                        value={statement.en || ""}
+                        onChange={(event) =>
+                          setForm((current) => {
+                            const updated = [...(current.detailStatements || [])];
+                            updated[index] = { ...updated[index], en: event.target.value, ar: updated[index]?.ar || "" };
+                            return { ...current, detailStatements: updated };
+                          })
+                        }
+                      />
+                    </label>
+                    <label>
+                      Statement {index + 1} - Arabic
+                      <input
+                        value={statement.ar || ""}
+                        onChange={(event) =>
+                          setForm((current) => {
+                            const updated = [...(current.detailStatements || [])];
+                            updated[index] = { ...updated[index], ar: event.target.value, en: updated[index]?.en || "" };
+                            return { ...current, detailStatements: updated };
+                          })
+                        }
+                      />
+                    </label>
+                    <button
+                      className="text-action danger"
+                      onClick={() =>
+                        setForm((current) => ({
+                          ...current,
+                          detailStatements: (current.detailStatements || []).filter((_, i) => i !== index),
+                        }))
+                      }
+                      type="button"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+                <button
+                  className="secondary-action compact-action"
+                  onClick={() =>
+                    setForm((current) => ({
+                      ...current,
+                      detailStatements: [...(current.detailStatements || []), { en: "", ar: "" }],
+                    }))
+                  }
+                  type="button"
+                >
+                  + Add statement
+                </button>
               </div>
             </div>
           </>

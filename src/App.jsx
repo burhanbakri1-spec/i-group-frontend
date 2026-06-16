@@ -878,6 +878,7 @@ function App() {
         cartCount={cartCount}
         language={language}
         products={demoProducts}
+        websiteMedia={websiteMedia}
         onLanguageChange={() =>
           setLanguage((currentLanguage) =>
             currentLanguage === "en" ? "ar" : "en"
