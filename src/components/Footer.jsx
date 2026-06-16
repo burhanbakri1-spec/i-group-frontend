@@ -4,37 +4,54 @@ import { brand } from "../data/brand.js";
 function Footer({ onNavigate, t }) {
   return (
     <footer className="site-footer">
-      <div className="footer-newsletter">
-        <h2>{t("footer.newsletterTitle")}</h2>
-        <p>{t("home.socialText")}</p>
-        <div className="newsletter-form">
-          <input aria-label="Email" placeholder={t("footer.emailPlaceholder")} />
-          <button className="primary-action" type="button">{t("footer.subscribe")}</button>
+      <div className="footer-inner">
+        <div className="footer-col footer-col-newsletter">
+          <div className="footer-newsletter-card">
+            <h3>{t("footer.newsletterTitle")}</h3>
+            <p>Follow updates, product care tips, and upcoming offers from EB Chemical.</p>
+            <div className="footer-newsletter-form">
+              <input aria-label="Email" placeholder={t("footer.emailPlaceholder")} />
+              <button type="button">{t("footer.subscribe")}</button>
+            </div>
+          </div>
+        </div>
+
+        <div className="footer-col footer-col-shop">
+          <h4>{t("footer.shop")}</h4>
+          <p className="footer-brand-text">{t("footer.description")}</p>
+          <nav>
+            <button onClick={() => onNavigate("products")} type="button">{t("footer.products")}</button>
+            <button type="button">Cleaning Products</button>
+            <button type="button">Car Care</button>
+            <button type="button">Bundles & Sets</button>
+            <button type="button">Refills</button>
+            <button type="button">Accessories</button>
+          </nav>
+        </div>
+
+        <div className="footer-col footer-col-about">
+          <h4>About</h4>
+          <nav>
+            <button onClick={() => onNavigate("about")} type="button">About us</button>
+            <button type="button">How it Works</button>
+            <button type="button">Sustainability</button>
+            <button type="button">Stories</button>
+            <button type="button">Careers</button>
+            <button type="button">Wholesale</button>
+          </nav>
+        </div>
+
+        <div className="footer-col footer-col-help">
+          <h4>Help & support</h4>
+          <nav>
+            <button type="button">Frequently asked questions</button>
+            <button type="button">Shipping Information</button>
+            <button type="button">{t("footer.contact")}</button>
+            <a href={`https://wa.me/${brand.whatsappLinkNumber}`}>WhatsApp</a>
+            <button type="button">Terms & Conditions</button>
+          </nav>
         </div>
       </div>
-
-      <div className="footer-brand-block">
-        <button className="footer-logo" onClick={() => onNavigate("home")}>
-          {brand.logoText}
-        </button>
-        <p>{t("footer.description")}</p>
-      </div>
-
-      <div className="footer-links">
-        <strong>{t("footer.shop")}</strong>
-        <button onClick={() => onNavigate("products")} type="button">
-          {t("nav.products")}
-        </button>
-        <button onClick={() => onNavigate("about")} type="button">
-          {t("nav.about")}
-        </button>
-        <button onClick={() => onNavigate("social")} type="button">
-          {t("nav.social")}
-        </button>
-        <a href={`https://wa.me/${brand.whatsappLinkNumber}`}>WhatsApp</a>
-      </div>
-
-      <p className="footer-note">{t("footer.description")}</p>
     </footer>
   );
 }

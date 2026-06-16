@@ -212,10 +212,7 @@ function ProductDetailsPage({
   const reviewsRef = React.useRef(null);
   const relatedRef = React.useRef(null);
   const impactRef = React.useRef(null);
-  const heroScrollRef = React.useRef(null);
   const galleryScrollRef = React.useRef(null);
-  const detailsPanelRef = React.useRef(null);
-  const detailsInnerRef = React.useRef(null);
 
   React.useEffect(() => {
     const nextVariants = normalizeProductVariants(product);
@@ -252,104 +249,6 @@ function ProductDetailsPage({
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  React.useEffect(() => {
-    const hero = heroScrollRef.current;
-    const gallery = galleryScrollRef.current;
-    const detailsPanel = detailsPanelRef.current;
-    const detailsInner = detailsInnerRef.current;
-
-    if (!hero || !gallery || !detailsPanel || !detailsInner) return undefined;
-
-    let sharedScroll = 0;
-    let syncing = false;
-
-    function getGalleryMax() {
-      return Math.max(0, gallery.scrollHeight - gallery.clientHeight);
-    }
-
-    function getDetailsMax() {
-      return Math.max(0, detailsInner.scrollHeight - detailsPanel.clientHeight);
-    }
-
-    function getSharedMax() {
-      return Math.max(getGalleryMax(), getDetailsMax());
-    }
-
-    function applySharedScroll() {
-      const galleryMax = getGalleryMax();
-      const detailsMax = getDetailsMax();
-      const sharedMax = Math.max(galleryMax, detailsMax);
-
-      if (sharedMax <= 0) return;
-
-      const galleryTop = Math.min(sharedScroll, galleryMax);
-      const detailsMove = Math.min(sharedScroll, detailsMax);
-
-      syncing = true;
-      gallery.scrollTop = galleryTop;
-      detailsInner.style.transform = `translateY(${-detailsMove}px)`;
-
-      window.requestAnimationFrame(() => {
-        syncing = false;
-      });
-    }
-
-    function handleWheel(event) {
-      if (window.innerWidth < 1024) return;
-
-      const sharedMax = getSharedMax();
-      if (sharedMax <= 0) return;
-
-      const next = Math.max(0, Math.min(sharedMax, sharedScroll + event.deltaY));
-
-      const atTop = sharedScroll <= 0;
-      const atBottom = sharedScroll >= sharedMax - 1;
-
-      const wantsPageScrollUp = event.deltaY < 0 && atTop;
-      const wantsPageScrollDown = event.deltaY > 0 && atBottom;
-
-      if (wantsPageScrollUp || wantsPageScrollDown) {
-        return;
-      }
-
-      event.preventDefault();
-      sharedScroll = next;
-      applySharedScroll();
-    }
-
-    function handleGalleryScroll() {
-      if (window.innerWidth < 1024 || syncing) return;
-
-      sharedScroll = Math.max(sharedScroll, gallery.scrollTop);
-      sharedScroll = Math.min(sharedScroll, getSharedMax());
-
-      applySharedScroll();
-    }
-
-    function handleResize() {
-      if (window.innerWidth < 1024) {
-        detailsInner.style.transform = "";
-        return;
-      }
-
-      sharedScroll = Math.min(sharedScroll, getSharedMax());
-      applySharedScroll();
-    }
-
-    hero.addEventListener("wheel", handleWheel, { passive: false, capture: true });
-    gallery.addEventListener("scroll", handleGalleryScroll, { passive: true });
-    window.addEventListener("resize", handleResize);
-
-    handleResize();
-
-    return () => {
-      hero.removeEventListener("wheel", handleWheel, { capture: true });
-      gallery.removeEventListener("scroll", handleGalleryScroll);
-      window.removeEventListener("resize", handleResize);
-      detailsInner.style.transform = "";
-    };
   }, []);
 
   React.useEffect(() => {
@@ -518,7 +417,7 @@ function ProductDetailsPage({
 
   return (
     <main className="product-detail-redesign">
-      <section className="detail-kinfill-hero" ref={heroScrollRef}>
+      <section className="detail-kinfill-hero">
         <div className="detail-kinfill-media">
           {product.badge && <span className="detail-subscribe-badge">{localized(product.badge, language)}</span>}
           <div className="detail-kinfill-main-column">
@@ -550,8 +449,7 @@ function ProductDetailsPage({
           </div>
         </div>
 
-        <aside className="detail-purchase-panel product-detail-info-panel" ref={detailsPanelRef}>
-          <div className="detail-details-scroll-inner" ref={detailsInnerRef}>
+        <aside className="detail-purchase-panel product-detail-info-panel">
           <div className="pi-section-header">
             <button className="pi-back" onClick={() => onNavigate("products")} type="button">
               {txt.back}
@@ -706,7 +604,6 @@ function ProductDetailsPage({
                 </div>
               </div>
             )}
-          </div>
           </div>
         </aside>
       </section>
