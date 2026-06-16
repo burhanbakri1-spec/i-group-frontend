@@ -291,7 +291,6 @@ function HowItWorksPage({ language = "en", onNavigate, onViewProduct, products =
     <main className="how-page" dir={isArabic ? "rtl" : "ltr"}>
       <section className="how-hero">
         <img className="how-hero-bg" src={image("hero")} alt="" aria-hidden="true" />
-        <div className="how-hero-overlay" />
         <div className="how-hero-content">
           <h1 className="how-hero-title">{t.heroTitle}</h1>
           <p className="how-hero-subtitle">{t.heroSubtitle}</p>

@@ -256,12 +256,6 @@ html[dir="rtl"] body {
   object-fit: cover;
 }
 
-.how-page .how-hero-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: linear-gradient(90deg, rgba(22,18,15,0.72), rgba(22,18,15,0.24) 54%, rgba(22,18,15,0.1));
-}
 
 .how-page .how-hero-content {
   position: absolute;
@@ -12588,19 +12582,7 @@ html[dir="rtl"] .about-image-banner::after {
 }
 
 .how-hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background:
-    linear-gradient(90deg, rgba(6, 31, 51, 0.82), rgba(6, 31, 51, 0.36), rgba(6, 31, 51, 0.08)),
-    radial-gradient(circle at 78% 30%, rgba(29, 183, 216, 0.18), transparent 36%);
-}
-
-html[dir="rtl"] .how-hero::after {
-  background:
-    linear-gradient(270deg, rgba(6, 31, 51, 0.82), rgba(6, 31, 51, 0.36), rgba(6, 31, 51, 0.08)),
-    radial-gradient(circle at 22% 30%, rgba(29, 183, 216, 0.18), transparent 36%);
+  display: none;
 }
 
 .how-hero-copy {
@@ -13049,12 +13031,13 @@ html[dir="rtl"] .how-products-progress span {
   margin: clamp(18px, 3vw, 34px) auto 0;
   overflow: hidden;
   border-radius: clamp(26px, 3vw, 42px);
-  background: #061f33;
+  background: transparent;
   isolation: isolate;
 }
 
 .cleanups-hero-section {
   margin-top: clamp(92px, 11vw, 128px);
+  background: transparent;
 }
 
 .cleanups-hero-section > img,
@@ -13069,7 +13052,6 @@ html[dir="rtl"] .how-products-progress span {
   object-fit: cover;
 }
 
-.cleanups-hero-section::after,
 .cleanups-signup-banner::after,
 .cleanup-gallery-card::after {
   content: "";
@@ -13080,15 +13062,11 @@ html[dir="rtl"] .how-products-progress span {
 }
 
 .cleanups-hero-section::after {
-  background:
-    linear-gradient(90deg, rgba(6, 31, 51, 0.82), rgba(6, 31, 51, 0.42), rgba(6, 31, 51, 0.1)),
-    radial-gradient(circle at 82% 28%, rgba(29, 183, 216, 0.18), transparent 36%);
+  background: none;
 }
 
 html[dir="rtl"] .cleanups-hero-section::after {
-  background:
-    linear-gradient(270deg, rgba(6, 31, 51, 0.82), rgba(6, 31, 51, 0.42), rgba(6, 31, 51, 0.1)),
-    radial-gradient(circle at 18% 28%, rgba(29, 183, 216, 0.18), transparent 36%);
+  background: none;
 }
 
 .cleanups-hero-copy {
@@ -13151,11 +13129,44 @@ html[dir="rtl"] .cleanups-signup-copy h2 {
   text-shadow: 0 3px 18px rgba(0, 0, 0, 0.38);
 }
 
-/* Hero override to match Kinfill cleanups reference */
+/* Hero override — remove ALL overlays from CleanUps hero */
 .cleanups-hero-section {
   min-height: auto;
   border-radius: 0;
-  background: transparent;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  isolation: auto !important;
+}
+
+.cleanups-hero-section::before,
+.cleanups-hero-section::after {
+  display: none !important;
+  content: none !important;
+  opacity: 0 !important;
+  background: none !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+html[dir="rtl"] .cleanups-hero-section::before,
+html[dir="rtl"] .cleanups-hero-section::after {
+  display: none !important;
+  content: none !important;
+  opacity: 0 !important;
+  background: none !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
 }
 
 .cleanups-hero-section .cleanups-hero-inner {
@@ -13165,6 +13176,19 @@ html[dir="rtl"] .cleanups-signup-copy h2 {
   min-height: clamp(400px, 50vw, 560px);
   max-height: 560px;
   isolation: isolate;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  filter: none !important;
+}
+
+.cleanups-hero-section .cleanups-hero-inner::before,
+.cleanups-hero-section .cleanups-hero-inner::after {
+  display: none !important;
+  content: none !important;
+  opacity: 0 !important;
+  background: none !important;
+  filter: none !important;
 }
 
 .cleanups-hero-section .cleanups-hero-image {
@@ -13175,14 +13199,18 @@ html[dir="rtl"] .cleanups-signup-copy h2 {
   height: 100%;
   object-fit: cover;
   display: block;
+  filter: none !important;
+  opacity: 1 !important;
+  mix-blend-mode: normal !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+  background: none !important;
 }
 
-.cleanups-hero-section::after {
-  background: none;
-}
-
-html[dir="rtl"] .cleanups-hero-section::after {
-  background: none;
+.cleanups-hero-section .cleanups-hero-content {
+  filter: none !important;
+  backdrop-filter: none !important;
+  mix-blend-mode: normal !important;
 }
 
 .cleanups-hero-section .cleanups-hero-content {
@@ -13366,15 +13394,11 @@ html[dir="rtl"] .cleanups-event-card-content[dir="rtl"] {
 }
 
 .cleanups-signup-banner::after {
-  background:
-    linear-gradient(0deg, rgba(6, 31, 51, 0.82), rgba(6, 31, 51, 0.2) 58%, rgba(6, 31, 51, 0.06)),
-    linear-gradient(90deg, rgba(6, 31, 51, 0.42), transparent 58%);
+  background: none;
 }
 
 html[dir="rtl"] .cleanups-signup-banner::after {
-  background:
-    linear-gradient(0deg, rgba(6, 31, 51, 0.82), rgba(6, 31, 51, 0.2) 58%, rgba(6, 31, 51, 0.06)),
-    linear-gradient(270deg, rgba(6, 31, 51, 0.42), transparent 58%);
+  background: none;
 }
 
 .cleanups-signup-banner > img {
@@ -13400,6 +13424,7 @@ html[dir="rtl"] .cleanups-signup-banner::after {
 .cleanups-signup-copy h2 {
   max-width: 10ch;
   font-size: clamp(2.4rem, 5.6vw, 6.4rem);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
 }
 
 .cleanup-yellow-button {
@@ -15425,7 +15450,6 @@ html[dir="rtl"] .cleaning-system-card-overlay {
 .wide-promo-banner::after,
 .split-category-panel::after,
 .about-image-banner::after,
-.how-hero::after,
 .cleanups-hero::after,
 .cleanups-cta::after {
   opacity: 0.78;
