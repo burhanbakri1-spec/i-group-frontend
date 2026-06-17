@@ -30,7 +30,9 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return [
-      { source: '/public/uploads/:path*', destination: `${BACKEND_MEDIA_ORIGIN}/public/uploads/:path*` },
+      // Hostinger mode: backend stores uploads under public_html/uploads/
+      // and serves them at /uploads/ via Apache (not via NestJS).
+      { source: '/uploads/:path*', destination: `${BACKEND_MEDIA_ORIGIN}/uploads/:path*` },
     ];
   },
 };
