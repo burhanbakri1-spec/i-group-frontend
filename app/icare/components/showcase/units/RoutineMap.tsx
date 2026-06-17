@@ -11,6 +11,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
+import { TextPlaceholder } from '../shared/TextPlaceholder';
+import { ImagePlaceholder } from '../shared/ImagePlaceholder';
 import { registerUnit } from '../../../lib/showcase/registry';
 import type { NormalizedShowcaseUnit, RoutineMapPayload } from '../../../types/showcase-units';
 import { EASE_STANDARD, DUR, VIEWPORT } from '../../../lib/showcase/motion';
@@ -194,11 +196,15 @@ const RoutineMap: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion }) 
                 {...imageFadeMotion}
                 className="absolute inset-0"
               >
-                <ImageWithFallback
-                  src={activeStep.lifestyleImage.url}
-                  alt={activeStep.lifestyleImage.alt ?? activeStep.productName}
-                  className="w-full h-full object-cover"
-                />
+                {activeStep.lifestyleImage.url === '' ? (
+                  <ImagePlaceholder aspect="portrait" rounded="md" />
+                ) : (
+                  <ImageWithFallback
+                    src={activeStep.lifestyleImage.url}
+                    alt={activeStep.lifestyleImage.alt ?? activeStep.productName}
+                    className="w-full h-full object-cover"
+                  />
+                )}
               </motion.div>
             </AnimatePresence>
           </div>
@@ -259,11 +265,15 @@ const RoutineMap: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion }) 
                         {...imageFadeMotion}
                         className="absolute inset-0"
                       >
-                        <ImageWithFallback
-                          src={activeStep.lifestyleImage.url}
-                          alt={activeStep.lifestyleImage.alt ?? activeStep.productName}
-                          className="w-full h-full object-cover"
-                        />
+                        {activeStep.lifestyleImage.url === '' ? (
+                          <ImagePlaceholder aspect="portrait" rounded="md" />
+                        ) : (
+                          <ImageWithFallback
+                            src={activeStep.lifestyleImage.url}
+                            alt={activeStep.lifestyleImage.alt ?? activeStep.productName}
+                            className="w-full h-full object-cover"
+                          />
+                        )}
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -277,13 +287,15 @@ const RoutineMap: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion }) 
                 {...labelMotion}
               >
                 <h3 className="font-display font-medium text-[var(--rb-near-black)] text-lg md:text-xl leading-tight mb-1">
-                  {activeStep.productName}
+                  {activeStep.productName === '' ? <TextPlaceholder variant="label-line" width="half" /> : activeStep.productName}
                 </h3>
-                {activeStep.productSubtitle && (
+                {activeStep.productSubtitle === '' ? (
+                  <TextPlaceholder variant="label-line" width="three-quarter" />
+                ) : activeStep.productSubtitle ? (
                   <BodyText className="text-[var(--rb-muted-text)] text-sm">
                     {activeStep.productSubtitle}
                   </BodyText>
-                )}
+                ) : null}
                 {activeStep.dayNight && (
                   <p className="mt-2 text-[10px] font-medium uppercase tracking-widest text-[var(--rb-muted-text)]">
                     {activeStep.dayNight === 'both' ? 'AM + PM' : activeStep.dayNight === 'day' ? 'AM' : 'PM'}

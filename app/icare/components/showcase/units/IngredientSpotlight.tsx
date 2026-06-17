@@ -12,6 +12,8 @@ import { motion } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
+import { TextPlaceholder } from '../shared/TextPlaceholder';
+import { ImagePlaceholder } from '../shared/ImagePlaceholder';
 import { registerUnit } from '../../../lib/showcase/registry';
 import type { NormalizedShowcaseUnit, IngredientSpotlightPayload } from '../../../types/showcase-units';
 import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
@@ -35,26 +37,39 @@ const IngredientSpotlight: React.FC<Props> = ({ unit, lang = 'en', shouldReduceM
     >
       <div dir={isRtl ? 'rtl' : 'ltr'}>
         {/* Header */}
-        {heading && (
-          <motion.div
-            className="mb-10 md:mb-14 max-w-xl"
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: VIEWPORT.default }}
-            transition={{
-              duration: shouldReduceMotion ? 0 : DUR.normal / 1000,
-              ease: EASE_STANDARD,
-            }}
-          >
-            {heading.eyebrow && <Eyebrow>{heading.eyebrow}</Eyebrow>}
-            {heading.title && <SectionTitle size="lg">{heading.title}</SectionTitle>}
-            {heading.subtitle && (
-              <BodyText className="mt-2 text-[var(--rb-muted-text)]">{heading.subtitle}</BodyText>
+        {heading === undefined ? (
+              <motion.div
+                className="mb-10 md:mb-14 max-w-xl"
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: VIEWPORT.default }}
+                transition={{
+                  duration: shouldReduceMotion ? 0 : DUR.normal / 1000,
+                  ease: EASE_STANDARD,
+                }}
+              >
+                <TextPlaceholder variant="single-line" width="half" />
+              </motion.div>
+            ) : (
+              <motion.div
+                className="mb-10 md:mb-14 max-w-xl"
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: VIEWPORT.default }}
+                transition={{
+                  duration: shouldReduceMotion ? 0 : DUR.normal / 1000,
+                  ease: EASE_STANDARD,
+                }}
+              >
+                {heading.eyebrow && <Eyebrow>{heading.eyebrow}</Eyebrow>}
+                {heading.title && <SectionTitle size="lg">{heading.title}</SectionTitle>}
+                {heading.subtitle && (
+                  <BodyText className="mt-2 text-[var(--rb-muted-text)]">{heading.subtitle}</BodyText>
+                )}
+              </motion.div>
             )}
-          </motion.div>
-        )}
 
-        {/* Two-column layout: hero image left, ingredients right */}
+            {/* Two-column layout: hero image left, ingredients right */}
         <div className={clsx('grid gap-8 md:gap-10', 'grid-cols-1 md:grid-cols-2')}>
           {/* Hero image — full height on desktop */}
           <motion.div
@@ -67,13 +82,17 @@ const IngredientSpotlight: React.FC<Props> = ({ unit, lang = 'en', shouldReduceM
               ease: EASE_STANDARD,
             }}
           >
-            <ImageWithFallback
-              src={heroImage.url}
-              alt={heroImage.alt}
-              className="object-cover w-full h-full"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              priority
-            />
+            {heroImage.url === '' ? (
+              <ImagePlaceholder aspect="portrait" rounded="lg" />
+            ) : (
+              <ImageWithFallback
+                src={heroImage.url}
+                alt={heroImage.alt}
+                className="object-cover w-full h-full"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                priority
+              />
+            )}
           </motion.div>
 
           {/* Ingredient column — sticky on desktop */}
@@ -94,7 +113,9 @@ const IngredientSpotlight: React.FC<Props> = ({ unit, lang = 'en', shouldReduceM
                   }}
                 >
                   {/* Optional ingredient image */}
-                  {ingredient.image && (
+                  {ingredient.image == null ? (
+                    <ImagePlaceholder aspect="square" rounded="md" />
+                  ) : (
                     <div className={clsx('relative overflow-hidden rounded-md bg-[var(--rb-bg-warm-gray)]', 'aspect-[4/3] w-full')}>
                       <ImageWithFallback
                         src={ingredient.image.url}
@@ -108,10 +129,10 @@ const IngredientSpotlight: React.FC<Props> = ({ unit, lang = 'en', shouldReduceM
                   {/* Ingredient name + description */}
                   <div>
                     <h3 className="font-display font-medium text-lg leading-tight text-[var(--rb-near-black)]">
-                      {ingredient.name}
+                      {ingredient.name === '' ? <TextPlaceholder variant="label-line" width="half" /> : ingredient.name}
                     </h3>
                     <BodyText className="mt-1.5 text-[var(--rb-primary-text)]">
-                      {ingredient.description}
+                      {ingredient.description === '' ? <TextPlaceholder variant="label-line" width="full" /> : ingredient.description}
                     </BodyText>
                   </div>
                 </motion.div>

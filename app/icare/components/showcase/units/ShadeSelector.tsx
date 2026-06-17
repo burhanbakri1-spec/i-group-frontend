@@ -14,6 +14,8 @@ import { UnitShell, SectionTitle, BodyText } from '../shared/UnitShell';
 import { registerUnit } from '../../../lib/showcase/registry';
 import type { NormalizedShowcaseUnit, ShadeSelectorPayload } from '../../../types/showcase-units';
 import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
+import { TextPlaceholder } from '../shared/TextPlaceholder';
+import { ImagePlaceholder } from '../shared/ImagePlaceholder';
 
 // ---------------------------------------------------------------------------
 // Props
@@ -61,6 +63,9 @@ const ShadeSelector: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion 
     setSelectedShadeId(id);
   };
 
+  const groupKeys = (Object.keys(GROUP_LABELS) as GroupKey[]);
+  const totalShades = groupKeys.reduce((sum, key) => sum + grouped[key].length, 0);
+
   return (
     <UnitShell
       theme={theme ?? 'light'}
@@ -69,7 +74,7 @@ const ShadeSelector: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion 
     >
       <div dir={isRtl ? 'rtl' : 'ltr'}>
         {/* ── Optional heading ─────────────────────────────────────────── */}
-        {heading && (
+        {heading || heading === '' ? (
           <motion.div
             className="mb-10 md:mb-14"
             initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
@@ -80,12 +85,15 @@ const ShadeSelector: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion 
               ease: EASE_STANDARD,
             }}
           >
-            <SectionTitle size="lg">{heading}</SectionTitle>
+            {heading ? <SectionTitle size="lg">{heading}</SectionTitle> : <TextPlaceholder variant="single-line" width="half" />}
           </motion.div>
-        )}
+        ) : null}
 
         {/* ── Shade groups ─────────────────────────────────────────────── */}
-        {(Object.keys(GROUP_LABELS) as GroupKey[]).map((groupKey) => {
+        {totalShades === 0 && (
+          <p className="text-sm text-[var(--rb-muted-text)]">Shades will appear here</p>
+        )}
+        {groupKeys.map((groupKey) => {
           const groupShades = grouped[groupKey];
           if (groupShades.length === 0) return null;
 
@@ -111,7 +119,9 @@ const ShadeSelector: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion 
                   const isSelected = selectedShadeId === shade.id;
 
                   // Swatch content: hex fill or image thumbnail
-                  const swatchContent = shade.hex ? (
+                  const swatchContent = shade.hex === null && shade.image === undefined ? (
+                    <ImagePlaceholder aspect="circle" />
+                  ) : shade.hex !== null ? (
                     <span
                       className="block w-full h-full rounded-full"
                       style={{ backgroundColor: shade.hex }}
@@ -216,11 +226,15 @@ const ShadeSelector: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion 
                       </p>
 
                       {/* Description (desktop / wider screens) */}
-                      {shade.description && (
+                      {shade.description === '' ? (
+                        <p className="text-[11px] text-[var(--rb-muted-text)] text-center max-w-[120px] hidden md:block leading-snug">
+                          <TextPlaceholder variant="label-line" width="full" />
+                        </p>
+                      ) : shade.description ? (
                         <p className="text-[11px] text-[var(--rb-muted-text)] text-center max-w-[120px] hidden md:block leading-snug">
                           {shade.description}
                         </p>
-                      )}
+                      ) : null}
                     </motion.button>
                   );
                 })}

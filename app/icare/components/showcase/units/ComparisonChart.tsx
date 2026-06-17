@@ -14,6 +14,8 @@ import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell'
 import { registerUnit } from '../../../lib/showcase/registry';
 import type { NormalizedShowcaseUnit, ComparisonChartPayload } from '../../../types/showcase-units';
 import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
+import { TextPlaceholder } from '../shared/TextPlaceholder';
+import { ImagePlaceholder } from '../shared/ImagePlaceholder';
 
 interface ProductField {
   label: string;
@@ -34,7 +36,9 @@ const FIELDS: { label: string; key: 'whatItIs' | 'bestFor' | 'whereItFits' | 'ke
 
 const ProductCard: React.FC<ProductProps> = ({ product }) => (
   <div className="flex h-full flex-col rounded-[12px] border border-[var(--rb-border)] bg-[var(--rb-bg-surface)]">
-    {product.image && (
+    {product.image === undefined ? (
+      <ImagePlaceholder aspect="square" rounded="lg" />
+    ) : product.image ? (
       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-[12px] bg-[var(--rb-bg-warm-gray)]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -43,7 +47,7 @@ const ProductCard: React.FC<ProductProps> = ({ product }) => (
           className="h-full w-full object-cover"
         />
       </div>
-    )}
+    ) : null}
     <div className="flex flex-1 flex-col p-5 md:p-6">
       <div className="mb-4">
         <p className="text-[11px] font-semibold uppercase tracking-widest text-[var(--rb-muted-text)]">
@@ -52,12 +56,16 @@ const ProductCard: React.FC<ProductProps> = ({ product }) => (
         <h3 className="mt-1 font-display text-lg font-medium text-[var(--rb-near-black)] md:text-xl">
           {product.name}
         </h3>
-        {product.tagline && (
+        {product.tagline === '' ? (
+          <TextPlaceholder variant="label-line" width="full" />
+        ) : product.tagline ? (
           <p className="mt-1 text-sm text-[var(--rb-primary-text)]">{product.tagline}</p>
-        )}
-        {product.price && (
+        ) : null}
+        {product.price === '' ? (
+          <TextPlaceholder variant="label-line" width="third" />
+        ) : product.price ? (
           <p className="mt-2 text-sm font-semibold text-[var(--rb-near-black)]">{product.price}</p>
-        )}
+        ) : null}
       </div>
       <div className="mt-auto space-y-3">
         {FIELDS.map(({ label, key }) => (
@@ -164,14 +172,18 @@ const ComparisonChart: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotio
   return (
     <UnitShell theme={theme ?? 'light'} id={unit.id} innerClassName="py-12 md:py-16 lg:py-20">
       <div dir={isRtl ? 'rtl' : 'ltr'}>
-        {(heading) && (
+        {heading || heading === '' ? (
           <motion.div
             className={clsx('mb-10 md:mb-14', isRtl ? 'text-right' : 'text-left')}
             {...containerAnimation}
           >
-            <SectionTitle size="lg">{heading}</SectionTitle>
+            {heading ? (
+              <SectionTitle size="lg">{heading}</SectionTitle>
+            ) : (
+              <TextPlaceholder variant="single-line" width="half" />
+            )}
           </motion.div>
-        )}
+        ) : null}
 
         {/* Desktop: side-by-side */}
         <div className={clsx('hidden md:grid md:grid-cols-2', products.length === 3 && 'md:grid-cols-3')}>

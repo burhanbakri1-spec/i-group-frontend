@@ -6,4 +6,9 @@ export default defineConfig({
     globals: true,
     include: ['tests/**/*.spec.ts', 'tests/**/*.spec.tsx'],
   },
+  esbuild: {
+    jsx: 'transform',
+    jsxFactory: 'React.createElement',
+    jsxFragment: 'React.Fragment',
+  },
 });

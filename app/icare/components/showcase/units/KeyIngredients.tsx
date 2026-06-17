@@ -10,6 +10,8 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell';
+import { TextPlaceholder } from '../shared/TextPlaceholder';
+import { ImagePlaceholder } from '../shared/ImagePlaceholder';
 import { registerUnit } from '../../../lib/showcase/registry';
 import type { NormalizedShowcaseUnit, KeyIngredientsPayload } from '../../../types/showcase-units';
 import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
@@ -71,7 +73,9 @@ const KeyIngredients: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion
                   delay: shouldReduceMotion ? 0 : i * STAGGER_STEP,
                 }}
               >
-                {ingredient.image && (
+                {ingredient.image == null ? (
+                  <ImagePlaceholder aspect="square" rounded="md" />
+                ) : (
                   <div className="w-full max-w-xs overflow-hidden rounded-[8px] bg-[var(--rb-bg-surface)]">
                     <img
                       src={ingredient.image.url}
@@ -83,10 +87,10 @@ const KeyIngredients: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion
                 )}
                 <div>
                   <h3 className="font-display text-lg font-medium tracking-tight text-[var(--rb-near-black)]">
-                    {ingredient.name}
+                    {ingredient.name === '' ? <TextPlaceholder variant="label-line" width="half" /> : ingredient.name}
                   </h3>
                   <BodyText className="text-sm md:text-base">
-                    {ingredient.description}
+                    {ingredient.description === '' ? <TextPlaceholder variant="label-line" width="full" /> : ingredient.description}
                   </BodyText>
                 </div>
               </motion.div>
@@ -106,7 +110,13 @@ const KeyIngredients: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion
                 delay: shouldReduceMotion ? 0 : Math.min(heroIngredients.length, 3) * STAGGER_STEP,
               }}
             >
-              {alsoMadeWith.length > 0 && (
+              {alsoMadeWith.length === 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  <TextPlaceholder variant="label-line" width="quarter" className="inline-block" />
+                  <TextPlaceholder variant="label-line" width="quarter" className="inline-block" />
+                  <TextPlaceholder variant="label-line" width="quarter" className="inline-block" />
+                </div>
+              ) : (
                 <div className="flex flex-wrap gap-2">
                   {alsoMadeWith.map((ingredient, i) => (
                     <span

@@ -15,6 +15,8 @@ import { ImageWithFallback } from '../../figma/ImageWithFallback';
 import { registerUnit } from '../../../lib/showcase/registry';
 import type { NormalizedShowcaseUnit, LifestyleCarouselPayload } from '../../../types/showcase-units';
 import { EASE_STANDARD, DUR, crossfade, VIEWPORT } from '../../../lib/showcase/motion';
+import { TextPlaceholder } from '../shared/TextPlaceholder';
+import { ImagePlaceholder } from '../shared/ImagePlaceholder';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -131,7 +133,7 @@ const LifestyleCarousel: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMot
     >
       <div dir={isRtl ? 'rtl' : 'ltr'} className="flex flex-col">
         {/* Header */}
-        {heading && (
+        {heading || heading === '' ? (
           <motion.div
             className="mb-6 md:mb-10 max-w-2xl"
             initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
@@ -142,9 +144,9 @@ const LifestyleCarousel: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMot
               ease: EASE_STANDARD,
             }}
           >
-            <SectionTitle size="lg">{heading}</SectionTitle>
+            {heading ? <SectionTitle size="lg">{heading}</SectionTitle> : <TextPlaceholder variant="single-line" width="half" />}
           </motion.div>
-        )}
+        ) : null}
 
         {/* Carousel strip — CSS scroll-snap strip */}
         <div
@@ -178,20 +180,30 @@ const LifestyleCarousel: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMot
               style={{ scrollSnapAlign: isRtl ? 'end' : 'start' }}
             >
               <div className="relative aspect-[3/4] md:aspect-[16/9] overflow-hidden rounded-lg bg-[var(--rb-bg-warm-gray)]">
-                <ImageWithFallback
-                  src={item.image.url}
-                  alt={item.image.alt || `${heading || 'Lifestyle image'} ${i + 1}`}
-                  className="object-cover w-full h-full select-none pointer-events-none"
-                  sizes="(max-width: 768px) 100vw, 80vw"
-                />
+                {item.image.url === '' ? (
+                  <ImagePlaceholder aspect="portrait" rounded="lg" />
+                ) : (
+                  <ImageWithFallback
+                    src={item.image.url}
+                    alt={item.image.alt || `${heading || 'Lifestyle image'} ${i + 1}`}
+                    className="object-cover w-full h-full select-none pointer-events-none"
+                    sizes="(max-width: 768px) 100vw, 80vw"
+                  />
+                )}
                 {/* Caption overlay */}
-                {item.caption && (
+                {item.caption === '' ? (
+                  <div className="absolute inset-x-0 bottom-0 p-4 md:p-5 bg-gradient-to-t from-black/50 via-black/20 to-transparent">
+                    <p className="text-white/90 text-sm md:text-base font-medium leading-snug max-w-lg">
+                      <TextPlaceholder variant="label-line" width="three-quarter" />
+                    </p>
+                  </div>
+                ) : item.caption ? (
                   <div className="absolute inset-x-0 bottom-0 p-4 md:p-5 bg-gradient-to-t from-black/50 via-black/20 to-transparent">
                     <p className="text-white/90 text-sm md:text-base font-medium leading-snug max-w-lg">
                       {item.caption}
                     </p>
                   </div>
-                )}
+                ) : null}
               </div>
             </div>
           ))}

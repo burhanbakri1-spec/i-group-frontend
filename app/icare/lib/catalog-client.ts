@@ -321,7 +321,7 @@ export const fetchProductShowcase = async (slug: string): Promise<import('../typ
           alt: z.string(),
           width: z.number().int().positive().optional(),
           height: z.number().int().positive().optional(),
-        })).min(2),
+        })).min(1),
         badges: z.array(z.string()).optional(),
         sizes: z.array(z.object({
           id: z.string(),
@@ -377,7 +377,7 @@ export const fetchProductShowcase = async (slug: string): Promise<import('../typ
           title: z.string(),
           subtitle: z.string().optional(),
           description: z.string().optional(),
-        }),
+        }).optional(),
         heroIngredients: z.array(z.object({
           name: z.string(),
           description: z.string(),
@@ -847,38 +847,62 @@ export const fetchProductShowcase = async (slug: string): Promise<import('../typ
     for (const unit of units as BackendShowcaseUnit[]) {
       const typeResult = unitTypeScheme.safeParse(unit.type);
       if (!typeResult.success) {
-        console.warn('[fetchProductShowcase] Skipping unit with unknown type:', unit.type);
+        console.warn('[fetchProductShowcase] Skipping unit', {
+          slug,
+          unitId: unit.id,
+          type: unit.type,
+          reason: 'unknown_type',
+        });
         continue;
       }
 
       const confirmedType = typeResult.data;
       const payloadSchema = payloadSchemaFor[confirmedType];
       if (!payloadSchema) {
-        console.warn('[fetchProductShowcase] No schema for type:', confirmedType);
+        console.warn('[fetchProductShowcase] Skipping unit', {
+          slug,
+          unitId: unit.id,
+          type: confirmedType,
+          reason: 'no_schema',
+        });
         continue;
       }
 
-      // Try the payload as-is first. If it fails and the unit has a
-      // top-level image, attempt one hydration pass from that image and
-      // re-validate. This is the bridge between the admin's "image
-      // field on the form" UX and the FE's per-type zod schemas.
       let payloadToValidate: unknown = unit.payload;
-      let payloadResult = payloadSchema.safeParse(payloadToValidate);
-      if (!payloadResult.success && typeof unit.image === 'string' && unit.image.trim() !== '') {
-        const hydrated = hydratePayloadWithUnitImage(
-          confirmedType,
-          unit.payload,
-          unit.image.trim(),
-          unit.title,
-        );
-        if (hydrated) {
-          payloadToValidate = hydrated;
-          payloadResult = payloadSchema.safeParse(payloadToValidate);
+      let payloadResult: ReturnType<typeof payloadSchema['safeParse']>;
+      try {
+        payloadResult = payloadSchema.safeParse(payloadToValidate);
+        if (!payloadResult.success && typeof unit.image === 'string' && unit.image.trim() !== '') {
+          const hydrated = hydratePayloadWithUnitImage(
+            confirmedType,
+            unit.payload,
+            unit.image.trim(),
+            unit.title,
+          );
+          if (hydrated) {
+            payloadToValidate = hydrated;
+            payloadResult = payloadSchema.safeParse(payloadToValidate);
+          }
         }
+      } catch (parseError) {
+        console.warn('[fetchProductShowcase] Skipping unit', {
+          slug,
+          unitId: unit.id,
+          type: confirmedType,
+          reason: 'zod_parse_exception',
+          error: parseError instanceof Error ? parseError.message : String(parseError),
+        });
+        continue;
       }
 
       if (!payloadResult.success) {
-        console.warn('[fetchProductShowcase] Skipping unit with invalid payload, type:', confirmedType, 'errors:', payloadResult.error.issues?.map(i => i.message).join(', '));
+        console.warn('[fetchProductShowcase] Skipping unit', {
+          slug,
+          unitId: unit.id,
+          type: confirmedType,
+          reason: 'zod_invalid_payload',
+          errors: payloadResult.error.issues?.map(i => `${i.path.join('.')}: ${i.message}`).join('; '),
+        });
         continue;
       }
 
@@ -893,7 +917,7 @@ export const fetchProductShowcase = async (slug: string): Promise<import('../typ
       } as import('../types/showcase-units').ShowcaseUnit);
     }
 
-    return validatedUnits;
+    return validatedUnits.length > 0 ? validatedUnits : null;
   } catch (error) {
     if (!(error instanceof IcareApiError && error.status === 0)) {
       console.error('Error fetching product showcase:', error);

@@ -15,6 +15,8 @@ import { registerUnit } from '../../../lib/showcase/registry';
 import type { NormalizedShowcaseUnit, KitContentsPayload } from '../../../types/showcase-units';
 import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
+import { TextPlaceholder } from '../shared/TextPlaceholder';
+import { ImagePlaceholder } from '../shared/ImagePlaceholder';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -77,16 +79,24 @@ const ProductCard: React.FC<ProductCardProps> = ({
   >
     {/* Product image */}
     <div className="aspect-square rounded-[12px] overflow-hidden bg-white mb-3">
-      <ImageWithFallback src={product.image.url} alt={product.image.alt} className="h-full w-full object-contain p-2" />
+      {product.image.url === '' ? (
+        <ImagePlaceholder aspect="square" rounded="lg" />
+      ) : (
+        <ImageWithFallback src={product.image.url} alt={product.image.alt} className="h-full w-full object-contain p-2" />
+      )}
     </div>
 
     {/* Name */}
-    <h3 className="text-sm font-bold text-[var(--rb-near-black)] leading-snug">{product.name}</h3>
+    <h3 className="text-sm font-bold text-[var(--rb-near-black)] leading-snug">
+      {product.name === '' ? <TextPlaceholder variant="label-line" width="three-quarter" /> : product.name}
+    </h3>
 
     {/* Subtitle */}
-    {product.subtitle && (
+    {product.subtitle === '' ? (
+      <TextPlaceholder variant="label-line" width="full" />
+    ) : product.subtitle ? (
       <p className="text-xs text-[var(--rb-muted-text)] mt-0.5">{product.subtitle}</p>
-    )}
+    ) : null}
 
     {/* Rating + review count */}
     {product.rating !== undefined && (
@@ -102,9 +112,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
     {/* Price + optional buy label */}
     <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
-      {product.price && (
+      {product.price === '' ? (
+        <TextPlaceholder variant="label-line" width="third" />
+      ) : product.price ? (
         <span className="text-sm font-black text-[var(--rb-near-black)]">{product.price}</span>
-      )}
+      ) : null}
       {product.buyLabel && (
         <span className="text-[10px] font-black uppercase tracking-[0.12em] text-[var(--rb-muted-text)] underline underline-offset-2">
           {product.buyLabel}
@@ -150,7 +162,8 @@ const KitContents: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion })
             }}
           >
             {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-            {heading && <SectionTitle size="lg">{heading.title}</SectionTitle>}
+            {heading === undefined && <TextPlaceholder variant="single-line" width="half" />}
+            {heading?.title && <SectionTitle size="lg">{heading.title}</SectionTitle>}
             {heading?.subtitle && (
               <p className="mt-2 text-[var(--rb-text-base)] text-[var(--rb-primary-text)]">
                 {heading.subtitle}
@@ -218,11 +231,15 @@ const KitContents: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion })
                 }}
                 className="rounded-[12px] aspect-square bg-white overflow-hidden"
               >
-                <ImageWithFallback
-                  src={activeProduct.image.url}
-                  alt={activeProduct.image.alt}
-                  className="h-full w-full object-contain p-6 lg:p-8"
-                />
+                {activeProduct.image.url === '' ? (
+                  <ImagePlaceholder aspect="square" rounded="lg" />
+                ) : (
+                  <ImageWithFallback
+                    src={activeProduct.image.url}
+                    alt={activeProduct.image.alt}
+                    className="h-full w-full object-contain p-6 lg:p-8"
+                  />
+                )}
               </motion.div>
             </AnimatePresence>
           </div>

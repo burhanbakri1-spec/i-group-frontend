@@ -18,6 +18,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
+import { TextPlaceholder } from '../shared/TextPlaceholder';
+import { ImagePlaceholder } from '../shared/ImagePlaceholder';
 import { registerUnit } from '../../../lib/showcase/registry';
 import type { NormalizedShowcaseUnit, ApplicationStepsPayload } from '../../../types/showcase-units';
 import { EASE_STANDARD, DUR, VIEWPORT } from '../../../lib/showcase/motion';
@@ -245,14 +247,22 @@ const ApplicationSteps: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMoti
                   key={activeStep.id}
                   {...fadeMotion}
                 >
-                  {activeStep.title && (
+                  {activeStep.title === '' ? (
+                    <TextPlaceholder variant="single-line" width="half" className="mb-3" />
+                  ) : activeStep.title ? (
                     <h3 className="font-display font-medium text-[var(--rb-near-black)] text-xl md:text-2xl leading-snug mb-3">
                       {activeStep.title}
                     </h3>
-                  )}
-                  {activeStep.description && (
+                  ) : null}
+                  {activeStep.description === '' ? (
+                    <div className="flex flex-col gap-2 max-w-md">
+                      <TextPlaceholder variant="multi-line" width="full" />
+                      <TextPlaceholder variant="multi-line" width="full" />
+                      <TextPlaceholder variant="multi-line" width="full" />
+                    </div>
+                  ) : activeStep.description ? (
                     <BodyText className="max-w-md">{activeStep.description}</BodyText>
-                  )}
+                  ) : null}
                   {activeStep.duration && (
                     <p className="mt-3 text-[var(--rb-text-2xs)] font-medium uppercase tracking-widest text-[var(--rb-muted-text)]">
                       {activeStep.duration}
@@ -262,49 +272,55 @@ const ApplicationSteps: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMoti
               </AnimatePresence>
 
               {/* Mobile image below text at h-[340px] */}
-              {activeStep.image && (
-                <div className="mt-8 md:hidden rounded-[8px] overflow-hidden h-[340px] w-full bg-[var(--rb-bg-surface)]">
-                  <AnimatePresence mode="wait" initial={false}>
-                    <motion.div
-                      key={activeStep.id}
-                      {...(shouldReduceMotion
-                        ? {}
-                        : {
-                            initial: { opacity: 0 },
-                            animate: { opacity: 1 },
-                            exit: { opacity: 0 },
-                            transition: {
-                              duration: DUR.normal / 1000,
-                              ease: EASE_STANDARD,
-                            },
-                          })}
-                      className="w-full h-full"
-                    >
+              <div className="mt-8 md:hidden rounded-[8px] overflow-hidden h-[340px] w-full bg-[var(--rb-bg-surface)]">
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.div
+                    key={activeStep.id}
+                    {...(shouldReduceMotion
+                      ? {}
+                      : {
+                          initial: { opacity: 0 },
+                          animate: { opacity: 1 },
+                          exit: { opacity: 0 },
+                          transition: {
+                            duration: DUR.normal / 1000,
+                            ease: EASE_STANDARD,
+                          },
+                        })}
+                    className="w-full h-full"
+                  >
+                    {activeStep.image == null ? (
+                      <ImagePlaceholder aspect="square" rounded="md" />
+                    ) : (
                       <ImageWithFallback
                         src={activeStep.image.url}
                         alt={activeStep.image.alt ?? activeStep.title}
                         className="w-full h-full object-cover"
                       />
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
-              )}
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
             </div>
 
             {/* Right col: large image (desktop only) */}
             <div className="hidden md:block relative rounded-[12px] overflow-hidden aspect-[3/4] bg-[var(--rb-bg-surface)]">
               <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                  key={activeStep.id}
-                  {...imageFadeMotion}
-                  className="absolute inset-0"
-                >
+              <motion.div
+                key={activeStep.id}
+                {...imageFadeMotion}
+                className="absolute inset-0"
+              >
+                {activeStep.image == null ? (
+                  <ImagePlaceholder aspect="square" rounded="md" />
+                ) : (
                   <ImageWithFallback
-                    src={activeStep.image?.url}
-                    alt={activeStep.image?.alt ?? activeStep.title}
+                    src={activeStep.image.url}
+                    alt={activeStep.image.alt ?? activeStep.title}
                     className="w-full h-full object-cover"
                   />
-                </motion.div>
+                )}
+              </motion.div>
               </AnimatePresence>
             </div>
           </div>

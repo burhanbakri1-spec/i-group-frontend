@@ -13,6 +13,8 @@ import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell'
 import { registerUnit } from '../../../lib/showcase/registry';
 import type { NormalizedShowcaseUnit, BenefitsGridPayload } from '../../../types/showcase-units';
 import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
+import { TextPlaceholder } from '../shared/TextPlaceholder';
+import { ImagePlaceholder } from '../shared/ImagePlaceholder';
 
 interface Props {
   unit: NormalizedShowcaseUnit<BenefitsGridPayload>;
@@ -60,7 +62,11 @@ const BenefitsGrid: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion }
             }}
           >
             {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-            {heading && <SectionTitle size="lg">{heading}</SectionTitle>}
+            {heading ? (
+              <SectionTitle size="lg">{heading}</SectionTitle>
+            ) : heading === '' ? (
+              <TextPlaceholder variant="single-line" width="half" />
+            ) : null}
           </motion.div>
         )}
 
@@ -84,12 +90,20 @@ const BenefitsGrid: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion }
             >
               {/* Checkmark */}
               <div className="w-10 h-10 mx-auto mb-3 flex items-center justify-center text-[var(--rb-pure-black)]">
-                <CheckIcon className="w-5 h-5" />
+                {item.icon === undefined ? (
+                  <ImagePlaceholder aspect="square" rounded="full" className="w-8 h-8" />
+                ) : (
+                  <CheckIcon className="w-5 h-5" />
+                )}
               </div>
 
               {/* Benefit text */}
               <BodyText className="text-[var(--rb-primary-text)]">
-                {item.text}
+                {item.text === '' ? (
+                  <TextPlaceholder variant="label-line" width="three-quarter" />
+                ) : (
+                  item.text
+                )}
               </BodyText>
             </motion.div>
           ))}

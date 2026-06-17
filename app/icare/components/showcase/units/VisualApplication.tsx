@@ -11,6 +11,8 @@ import { motion } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, Eyebrow, SectionTitle } from '../shared/UnitShell';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
+import { TextPlaceholder } from '../shared/TextPlaceholder';
+import { ImagePlaceholder } from '../shared/ImagePlaceholder';
 import { registerUnit } from '../../../lib/showcase/registry';
 import type { NormalizedShowcaseUnit, VisualApplicationPayload } from '../../../types/showcase-units';
 import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
@@ -64,18 +66,28 @@ const StepCard: React.FC<StepCardProps> = ({ step, index, shouldReduceMotion }) 
 
       {/* Title */}
       <h3 className="font-display font-medium text-[var(--rb-near-black)] text-lg md:text-xl leading-snug mb-2">
-        {step.title}
+        {step.title === '' ? <TextPlaceholder variant="single-line" width="half" /> : step.title}
       </h3>
 
       {/* Description */}
-      {step.description && (
+      {step.description === '' ? (
+        <div className="flex flex-col gap-2 flex-1">
+          <TextPlaceholder variant="multi-line" width="full" />
+          <TextPlaceholder variant="multi-line" width="full" />
+          <TextPlaceholder variant="multi-line" width="full" />
+        </div>
+      ) : step.description ? (
         <p className="text-[var(--rb-primary-text)] text-[var(--rb-text-base)] leading-relaxed flex-1">
           {step.description}
         </p>
-      )}
+      ) : null}
 
       {/* Mobile image — only shown on small screens */}
-      {step.image && (
+      {step.image == null ? (
+        <div className="mt-5 block md:hidden rounded-[8px] overflow-hidden h-[340px] w-full bg-[var(--rb-bg-surface)]">
+          <ImagePlaceholder aspect="square" rounded="md" />
+        </div>
+      ) : (
         <div className="mt-5 block md:hidden rounded-[8px] overflow-hidden h-[340px] w-full bg-[var(--rb-bg-surface)]">
           <ImageWithFallback
             src={step.image.url}

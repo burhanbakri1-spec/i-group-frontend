@@ -13,6 +13,7 @@ import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell'
 import { registerUnit } from '../../../lib/showcase/registry';
 import type { NormalizedShowcaseUnit, SustainabilityPayload } from '../../../types/showcase-units';
 import { EASE_STANDARD, DUR, VIEWPORT } from '../../../lib/showcase/motion';
+import { TextPlaceholder } from '../shared/TextPlaceholder';
 
 interface Props {
   unit: NormalizedShowcaseUnit<SustainabilityPayload>;
@@ -33,7 +34,7 @@ const Sustainability: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion
     >
       <div dir={isRtl ? 'rtl' : 'ltr'}>
         {/* Header */}
-        {(title || intro) && (
+        {(title || intro || intro === '') && (
           <motion.div
             className="mb-10 md:mb-14 max-w-xl"
             initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
@@ -45,9 +46,13 @@ const Sustainability: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion
             }}
           >
             {title && <SectionTitle size="lg">{title}</SectionTitle>}
-            {intro && (
+            {intro ? (
               <BodyText className="mt-3 text-[var(--rb-text-base)]">{intro}</BodyText>
-            )}
+            ) : intro === '' ? (
+              <BodyText className="mt-3 text-[var(--rb-text-base)]">
+                <TextPlaceholder variant="multi-line" width="full" />
+              </BodyText>
+            ) : null}
           </motion.div>
         )}
 
@@ -76,7 +81,7 @@ const Sustainability: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion
                   {spec.component}
                 </span>
                 <span className="text-sm text-[var(--rb-muted-text)]">
-                  {spec.detail}
+                  {spec.detail === '' ? <TextPlaceholder variant="label-line" width="three-quarter" /> : spec.detail}
                 </span>
               </motion.div>
             ))}
@@ -141,7 +146,7 @@ const Sustainability: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion
         )}
 
         {/* Closing note */}
-        {closingNote && (
+        {closingNote || closingNote === '' ? (
           <motion.div
             initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -152,10 +157,10 @@ const Sustainability: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion
             }}
           >
             <BodyText className="text-[var(--rb-muted-text)] italic">
-              {closingNote}
+              {closingNote ? closingNote : <TextPlaceholder variant="single-line" width="half" />}
             </BodyText>
           </motion.div>
-        )}
+        ) : null}
       </div>
     </UnitShell>
   );

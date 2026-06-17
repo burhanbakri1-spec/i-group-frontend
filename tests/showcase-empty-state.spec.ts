@@ -8,7 +8,9 @@
  * Run: cd i-group && npx vitest run tests/showcase-empty-state.spec.ts
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
+import { render } from '@testing-library/react';
+import React from 'react';
 import { isDemoMode } from '../app/icare/lib/showcase/demo-mode';
 
 // ─── isDemoMode tests ─────────────────────────────────────────────────────────
@@ -32,6 +34,45 @@ describe('isDemoMode', () => {
 
   it('returns false when no demo param', () => {
     expect(isDemoMode(new URLSearchParams(''))).toBe(false);
+  });
+});
+
+// ─── ShowcaseBlock empty-state regression tests ─────────────────────────────
+
+describe('ShowcaseBlock empty-state regression', () => {
+  it('returns null when units is null', async () => {
+    const { ShowcaseBlock } = await import('../app/icare/components/showcase/ShowcaseBlock');
+    const { container } = render(
+      React.createElement(ShowcaseBlock, { slug: 'test-slug', units: null, lang: 'en' }),
+    );
+    expect(container.firstChild).toBeNull();
+  });
+
+  it('returns null when units is []', async () => {
+    const { ShowcaseBlock } = await import('../app/icare/components/showcase/ShowcaseBlock');
+    const { container } = render(
+      React.createElement(ShowcaseBlock, { slug: 'test-slug', units: [], lang: 'en' }),
+    );
+    expect(container.firstChild).toBeNull();
+  });
+
+  it('returns null when all units are isActive=false', async () => {
+    const { ShowcaseBlock } = await import('../app/icare/components/showcase/ShowcaseBlock');
+    const inactiveUnit = {
+      id: '1',
+      type: 'hero_gallery' as const,
+      sortOrder: 0,
+      isActive: false,
+      direction: 'ltr' as const,
+      theme: 'light' as const,
+      payload: {
+        images: [{ url: 'https://placehold.co/1x1', alt: 'inactive' }],
+      } as unknown as import('../app/icare/types/showcase-units').HeroGalleryPayload,
+    } as unknown as import('../app/icare/types/showcase-units').ShowcaseUnit;
+    const { container } = render(
+      React.createElement(ShowcaseBlock, { slug: 'test-slug', units: [inactiveUnit], lang: 'en' }),
+    );
+    expect(container.firstChild).toBeNull();
   });
 });
 

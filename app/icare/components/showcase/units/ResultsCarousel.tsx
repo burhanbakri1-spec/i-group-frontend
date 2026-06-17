@@ -13,6 +13,8 @@ import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell'
 import { registerUnit } from '../../../lib/showcase/registry';
 import type { NormalizedShowcaseUnit, ResultsCarouselPayload } from '../../../types/showcase-units';
 import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
+import { TextPlaceholder } from '../shared/TextPlaceholder';
+import { ImagePlaceholder } from '../shared/ImagePlaceholder';
 
 interface Props {
   unit: NormalizedShowcaseUnit<ResultsCarouselPayload>;
@@ -48,7 +50,7 @@ const ResultsCarousel: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotio
     >
       <div dir={isRtl ? 'rtl' : 'ltr'}>
         {/* Header */}
-        {(heading || subtitle) && (
+        {(heading || subtitle || heading === '') && (
           <motion.div
             className="mb-8 md:mb-10 max-w-2xl"
             initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
@@ -59,7 +61,11 @@ const ResultsCarousel: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotio
               ease: EASE_STANDARD,
             }}
           >
-            {heading && <SectionTitle size="lg">{heading}</SectionTitle>}
+            {heading === '' ? (
+              <TextPlaceholder variant="single-line" width="half" />
+            ) : heading ? (
+              <SectionTitle size="lg">{heading}</SectionTitle>
+            ) : null}
             {subtitle && (
               <BodyText className="mt-3 text-lg">{subtitle}</BodyText>
             )}
@@ -105,12 +111,16 @@ const ResultsCarousel: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotio
               >
                 {/* Card image */}
                 <div className="relative w-full aspect-square overflow-hidden bg-[var(--rb-bg-light)]">
-                  <img
-                    src={card.image.url}
-                    alt={card.image.alt}
-                    className="w-full h-full object-contain"
-                    loading="lazy"
-                  />
+                  {card.image.url === '' ? (
+                    <ImagePlaceholder aspect="portrait" rounded="lg" />
+                  ) : (
+                    <img
+                      src={card.image.url}
+                      alt={card.image.alt}
+                      className="w-full h-full object-contain"
+                      loading="lazy"
+                    />
+                  )}
                 </div>
 
                 {/* Card body */}
@@ -125,7 +135,11 @@ const ResultsCarousel: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotio
                   {/* Metric */}
                   <div className="flex flex-col gap-0.5">
                     <span className="text-4xl md:text-5xl font-display font-bold leading-none tracking-tight text-[var(--rb-near-black)]">
-                      {card.metricValue}
+                      {card.metricValue === '' ? (
+                        <TextPlaceholder variant="single-line" width="third" />
+                      ) : (
+                        card.metricValue
+                      )}
                     </span>
                     <span className="text-sm text-[var(--rb-primary-text)] leading-snug">
                       {card.metricLabel}
@@ -133,19 +147,23 @@ const ResultsCarousel: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotio
                   </div>
 
                   {/* Creator attribution */}
-                  {card.creator && (
-                    <div className="mt-1 flex items-center gap-2">
-                      <ProfileIcon className="text-[var(--rb-muted-text)]" />
-                      <span className="text-xs text-[var(--rb-muted-text)]">
-                        {card.creator.handle}
-                        {card.creator.skinType && (
-                          <span className="ml-1">
-                            · {card.creator.skinType}
-                          </span>
-                        )}
-                      </span>
-                    </div>
-                  )}
+                  <div className="mt-1 flex items-center gap-2">
+                    <ProfileIcon className="text-[var(--rb-muted-text)]" />
+                    <span className="text-xs text-[var(--rb-muted-text)]">
+                      {card.creator === undefined ? (
+                        <TextPlaceholder variant="label-line" width="half" />
+                      ) : card.creator.handle === '' ? (
+                        <TextPlaceholder variant="label-line" width="half" />
+                      ) : (
+                        card.creator.handle
+                      )}
+                      {card.creator?.skinType && (
+                        <span className="ml-1">
+                          · {card.creator.skinType}
+                        </span>
+                      )}
+                    </span>
+                  </div>
                 </div>
               </motion.div>
             ))}

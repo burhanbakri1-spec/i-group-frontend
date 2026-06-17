@@ -15,6 +15,8 @@ import { UnitShell, Eyebrow, SectionTitle } from '../shared/UnitShell';
 import { registerUnit } from '../../../lib/showcase/registry';
 import type { NormalizedShowcaseUnit, ValuePropsGridPayload } from '../../../types/showcase-units';
 import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
+import { TextPlaceholder } from '../shared/TextPlaceholder';
+import { ImagePlaceholder } from '../shared/ImagePlaceholder';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -32,7 +34,11 @@ interface PropIconProps {
 }
 
 const PropIcon: React.FC<PropIconProps> = ({ icon, className }) => {
-  if (!icon?.url) return null;
+  if (!icon?.url) {
+    return icon && icon.url === '' ? (
+      <ImagePlaceholder aspect="square" rounded="full" className={clsx('w-12 h-12 mb-4', className)} />
+    ) : null;
+  }
   return (
     <img
       src={icon.url}
@@ -49,22 +55,25 @@ interface TripleLabelProps {
   label: string;
 }
 
-const TripleLabel: React.FC<TripleLabelProps> = ({ label }) => (
-  <span className="mt-auto pt-4 flex flex-col items-start gap-0.5">
-    {/* Small — micro caps label */}
-    <span className="text-[var(--rb-text-2xs)] font-medium uppercase tracking-widest text-[var(--rb-muted-text)] leading-none">
-      {label}
+const TripleLabel: React.FC<TripleLabelProps> = ({ label }) => {
+  const isEmpty = label === '';
+  return (
+    <span className="mt-auto pt-4 flex flex-col items-start gap-0.5">
+      {/* Small — micro caps label */}
+      <span className="text-[var(--rb-text-2xs)] font-medium uppercase tracking-widest text-[var(--rb-muted-text)] leading-none">
+        {isEmpty ? <TextPlaceholder variant="single-line" width="half" /> : label}
+      </span>
+      {/* Medium — display text */}
+      <span className="text-base md:text-lg font-display font-medium leading-snug text-[var(--rb-primary-text)]">
+        {isEmpty ? <TextPlaceholder variant="single-line" width="half" /> : label}
+      </span>
+      {/* Large — prominent display weight */}
+      <span className="text-xl md:text-2xl lg:text-3xl font-display font-medium tracking-tight leading-tight text-[var(--rb-primary-text)]">
+        {isEmpty ? <TextPlaceholder variant="single-line" width="half" /> : label}
+      </span>
     </span>
-    {/* Medium — display text */}
-    <span className="text-base md:text-lg font-display font-medium leading-snug text-[var(--rb-primary-text)]">
-      {label}
-    </span>
-    {/* Large — prominent display weight */}
-    <span className="text-xl md:text-2xl lg:text-3xl font-display font-medium tracking-tight leading-tight text-[var(--rb-primary-text)]">
-      {label}
-    </span>
-  </span>
-);
+  );
+};
 
 // ─── Main component ────────────────────────────────────────────────────────────
 

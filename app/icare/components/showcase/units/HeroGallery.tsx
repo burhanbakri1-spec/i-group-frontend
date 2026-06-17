@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell } from '../shared/UnitShell';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
+import { ImagePlaceholder } from '../shared/ImagePlaceholder';
 import { registerUnit } from '../../../lib/showcase/registry';
 import type { NormalizedShowcaseUnit, HeroGalleryPayload } from '../../../types/showcase-units';
 import { EASE_STANDARD, DUR, heroSwap, STAGGER_STEP } from '../../../lib/showcase/motion';
@@ -147,6 +148,17 @@ const HeroGallery: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion })
                     className="w-full h-full object-cover"
                   />
                 </motion.div>
+              ) : images.length === 1 ? (
+                <div className="absolute inset-0 grid grid-cols-2">
+                  <ImageWithFallback
+                    src={images[0].url}
+                    alt={images[0].alt}
+                    className="object-cover w-full h-full"
+                    sizes="(max-width: 768px) 50vw, 30vw"
+                    priority
+                  />
+                  <ImagePlaceholder aspect="portrait" rounded="none" />
+                </div>
               ) : (
                 <motion.div
                   key={activeIndex}

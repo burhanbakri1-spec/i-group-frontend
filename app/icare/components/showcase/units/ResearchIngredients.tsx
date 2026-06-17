@@ -15,6 +15,8 @@ import { ImageWithFallback } from '../../figma/ImageWithFallback';
 import { registerUnit } from '../../../lib/showcase/registry';
 import type { NormalizedShowcaseUnit, ResearchIngredientsPayload } from '../../../types/showcase-units';
 import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT, tabFade } from '../../../lib/showcase/motion';
+import { TextPlaceholder } from '../shared/TextPlaceholder';
+import { ImagePlaceholder } from '../shared/ImagePlaceholder';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -32,7 +34,11 @@ interface IngredientIconProps {
 }
 
 const IngredientIcon: React.FC<IngredientIconProps> = ({ icon, className }) => {
-  if (!icon?.url) return null;
+  if (!icon?.url) {
+    return icon && icon.url === undefined ? (
+      <ImagePlaceholder aspect="square" rounded="full" className={clsx('w-10 h-10 mb-3', className)} />
+    ) : null;
+  }
   return (
     <img
       src={icon.url}
@@ -141,13 +147,17 @@ const ResearchIngredients: React.FC<Props> = ({ unit, lang = 'en', shouldReduceM
               'aspect-[4/5] md:aspect-auto md:h-full',
             )}
           >
-            <ImageWithFallback
-              src={heroImage.url}
-              alt={heroImage.alt}
-              className="object-cover w-full h-full"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              priority
-            />
+            {heroImage.url === '' ? (
+              <ImagePlaceholder aspect="video" rounded="lg" />
+            ) : (
+              <ImageWithFallback
+                src={heroImage.url}
+                alt={heroImage.alt}
+                className="object-cover w-full h-full"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                priority
+              />
+            )}
           </div>
 
           {/* Tabbed ingredient panel */}
@@ -214,13 +224,22 @@ const ResearchIngredients: React.FC<Props> = ({ unit, lang = 'en', shouldReduceM
 
                 {/* Description */}
                 <BodyText className="mt-4 text-[var(--rb-primary-text)]">
-                  {activeIngredient.description}
+                  {activeIngredient.description === '' ? (
+                    <TextPlaceholder variant="multi-line" width="full" />
+                  ) : (
+                    activeIngredient.description
+                  )}
                 </BodyText>
 
                 {/* Also-made-with pills */}
-                {activeIngredient.alsoMadeWith && activeIngredient.alsoMadeWith.length > 0 && (
+                {activeIngredient.alsoMadeWith && activeIngredient.alsoMadeWith.length > 0 ? (
                   <AlsoMadeWithPills items={activeIngredient.alsoMadeWith} />
-                )}
+                ) : activeIngredient.alsoMadeWith?.length === 0 ? (
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    <TextPlaceholder variant="label-line" width="quarter" className="inline-block" />
+                    <TextPlaceholder variant="label-line" width="quarter" className="inline-block" />
+                  </div>
+                ) : null}
               </motion.div>
             </AnimatePresence>
           </div>

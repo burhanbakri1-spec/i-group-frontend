@@ -12,6 +12,7 @@ import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell'
 import { registerUnit } from '../../../lib/showcase/registry';
 import type { NormalizedShowcaseUnit, ReviewsPayload } from '../../../types/showcase-units';
 import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
+import { TextPlaceholder } from '../shared/TextPlaceholder';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -155,7 +156,9 @@ const ReviewCard: React.FC<{
     >
       <div className={clsx('flex items-start justify-between gap-3', isRtl && 'flex-row-reverse')}>
         <div className={clsx(isRtl && 'text-right')}>
-          <p className="font-semibold text-[var(--rb-near-black)]">{review.author}</p>
+          <p className="font-semibold text-[var(--rb-near-black)]">
+            {review.author === '' ? <TextPlaceholder variant="label-line" width="half" /> : review.author}
+          </p>
           {review.skinType && (
             <p className="text-xs text-[var(--rb-muted-text)] mt-0.5">{review.skinType}</p>
           )}
@@ -271,9 +274,18 @@ const Reviews: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion }) => 
                   totalReviews={totalReviews}
                   isRtl={isRtl}
                 />
-              ) : null}
+              ) : (
+                <div className={clsx('flex items-center gap-3', isRtl && 'flex-row-reverse')}>
+                  {overallRating === undefined && (
+                    <TextPlaceholder variant="single-line" width="quarter" />
+                  )}
+                  {totalReviews === undefined && (
+                    <TextPlaceholder variant="label-line" width="third" />
+                  )}
+                </div>
+              )}
 
-              {starDistribution.length > 0 && (
+              {starDistribution.length > 0 && overallRating !== undefined && (
                 <StarDistribution distribution={starDistribution} isRtl={isRtl} />
               )}
 

@@ -71,7 +71,7 @@ export type BaseUnit = z.infer<typeof BaseUnitSchema>;
 
 // M1 HeroGallery
 export const HeroGalleryPayloadSchema = z.object({
-  images: z.array(MediaAssetSchema).min(2),
+  images: z.array(MediaAssetSchema).min(1),
   badges: z.array(z.string()).optional(),
   sizes: z.array(z.object({
     id: z.string(),

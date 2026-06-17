@@ -14,6 +14,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { clsx } from 'clsx';
 import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
+import { TextPlaceholder } from '../shared/TextPlaceholder';
+import { ImagePlaceholder } from '../shared/ImagePlaceholder';
 import { registerUnit } from '../../../lib/showcase/registry';
 import type { NormalizedShowcaseUnit, ResultsStudyPayload } from '../../../types/showcase-units';
 import { EASE_STANDARD, DUR, VIEWPORT, tabFade } from '../../../lib/showcase/motion';
@@ -33,6 +35,13 @@ type BeforeAfter = ResultsStudyPayload['tabs'][number]['beforeAfter'];
 type Tab = ResultsStudyPayload['tabs'][number];
 
 // ─── Sub-components ────────────────────────────────────────────────────────────
+
+const MetricCardPlaceholder: React.FC = () => (
+  <div className="flex flex-col gap-1 p-4 md:p-5 rounded-[8px] bg-[var(--rb-bg-surface)]">
+    <TextPlaceholder variant="single-line" width="third" />
+    <TextPlaceholder variant="label-line" width="half" />
+  </div>
+);
 
 interface MetricCardProps {
   metric: Metric;
@@ -96,7 +105,9 @@ const BeforeAfterImage: React.FC<BeforeAfterImageProps> = ({
   isRtl,
   shouldReduceMotion,
 }) => {
-  if (!beforeAfter?.before && !beforeAfter?.after) return null;
+  const hasBefore = beforeAfter?.before != null;
+  const hasAfter = beforeAfter?.after != null;
+  if (!hasBefore && !hasAfter) return null;
 
   const imageMotion = shouldReduceMotion
     ? {}
@@ -113,39 +124,43 @@ const BeforeAfterImage: React.FC<BeforeAfterImageProps> = ({
   return (
     <div className="flex flex-col gap-3">
       <div className="grid grid-cols-2 gap-3">
-        {beforeAfter.before && (
+        {hasBefore ? (
           <div className="rounded-[8px] overflow-hidden aspect-[3/4] bg-[var(--rb-bg-surface)]">
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
-                key={`before-${beforeAfter.before.url}`}
+                key={`before-${beforeAfter!.before!.url}`}
                 className="w-full h-full"
                 {...imageMotion}
               >
                 <ImageWithFallback
-                  src={beforeAfter.before.url}
-                  alt={beforeAfter.before.alt ?? 'Before'}
+                  src={beforeAfter!.before!.url}
+                  alt={beforeAfter!.before!.alt ?? 'Before'}
                   className="w-full h-full object-cover"
                 />
               </motion.div>
             </AnimatePresence>
           </div>
+        ) : (
+          <ImagePlaceholder aspect="portrait" rounded="md" />
         )}
-        {beforeAfter.after && (
+        {hasAfter ? (
           <div className="rounded-[8px] overflow-hidden aspect-[3/4] bg-[var(--rb-bg-surface)]">
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
-                key={`after-${beforeAfter.after.url}`}
+                key={`after-${beforeAfter!.after!.url}`}
                 className="w-full h-full"
                 {...imageMotion}
               >
                 <ImageWithFallback
-                  src={beforeAfter.after.url}
-                  alt={beforeAfter.after.alt ?? 'After'}
+                  src={beforeAfter!.after!.url}
+                  alt={beforeAfter!.after!.alt ?? 'After'}
                   className="w-full h-full object-cover"
                 />
               </motion.div>
             </AnimatePresence>
           </div>
+        ) : (
+          <ImagePlaceholder aspect="portrait" rounded="md" />
         )}
       </div>
       {caption && (
@@ -164,7 +179,7 @@ interface TimelineHeroProps {
 }
 
 const TimelineHero: React.FC<TimelineHeroProps> = ({ heroImages, isRtl, shouldReduceMotion }) => {
-  if (!heroImages || heroImages.length < 2) return null;
+  const hasHeroImages = heroImages != null && heroImages.length > 0;
 
   const imageMotion = shouldReduceMotion
     ? {}
@@ -180,29 +195,33 @@ const TimelineHero: React.FC<TimelineHeroProps> = ({ heroImages, isRtl, shouldRe
 
   return (
     <div className="grid grid-cols-2 gap-3 md:gap-4 mb-8">
-      {heroImages.map((image, i) => (
-        <div
-          key={i}
-          className={clsx(
-            'rounded-[12px] overflow-hidden aspect-square md:aspect-[4/3]',
-            'bg-[var(--rb-bg-surface)]',
-          )}
-        >
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={image.url}
-              className="w-full h-full"
-              {...imageMotion}
-            >
-              <ImageWithFallback
-                src={image.url}
-                alt={image.alt ?? ''}
-                className="w-full h-full object-cover"
-              />
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      ))}
+      {hasHeroImages ? (
+        heroImages!.map((image, i) => (
+          <div
+            key={i}
+            className={clsx(
+              'rounded-[12px] overflow-hidden aspect-square md:aspect-[4/3]',
+              'bg-[var(--rb-bg-surface)]',
+            )}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={image.url}
+                className="w-full h-full"
+                {...imageMotion}
+              >
+                <ImageWithFallback
+                  src={image.url}
+                  alt={image.alt ?? ''}
+                  className="w-full h-full object-cover"
+                />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        ))
+      ) : (
+        <ImagePlaceholder aspect="video" rounded="lg" className="col-span-2" />
+      )}
     </div>
   );
 };
@@ -283,7 +302,7 @@ const TabContent: React.FC<TabContentProps> = ({ tab, isRtl, shouldReduceMotion 
       )}
 
       {/* Bullets */}
-      {tab.bullets.length > 0 && (
+      {tab.bullets.length > 0 ? (
         <ul className="flex flex-col gap-2.5">
           {tab.bullets.map((bullet, i) => (
             <li
@@ -295,10 +314,21 @@ const TabContent: React.FC<TabContentProps> = ({ tab, isRtl, shouldReduceMotion 
             </li>
           ))}
         </ul>
+      ) : (
+        <ul className="flex flex-col gap-2.5">
+          <li className="flex items-start gap-2.5 text-[var(--rb-primary-text)]">
+            <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[var(--rb-primary-text)] flex-shrink-0" />
+            <TextPlaceholder variant="label-line" width="full" />
+          </li>
+          <li className="flex items-start gap-2.5 text-[var(--rb-primary-text)]">
+            <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[var(--rb-primary-text)] flex-shrink-0" />
+            <TextPlaceholder variant="label-line" width="full" />
+          </li>
+        </ul>
       )}
 
       {/* Metrics grid */}
-      {tab.metrics.length > 0 && (
+      {tab.metrics.length > 0 ? (
         <div
           className={clsx(
             'grid gap-3 md:gap-4',
@@ -316,6 +346,10 @@ const TabContent: React.FC<TabContentProps> = ({ tab, isRtl, shouldReduceMotion 
             />
           ))}
         </div>
+      ) : (
+        <div className="grid gap-3 md:gap-4 grid-cols-1">
+          <MetricCardPlaceholder />
+        </div>
       )}
 
       {/* Before/after image */}
@@ -329,16 +363,16 @@ const TabContent: React.FC<TabContentProps> = ({ tab, isRtl, shouldReduceMotion 
       )}
 
       {/* Per-tab source / disclaimer */}
-      {(tab.source || tab.disclaimer) && (
-        <div className="flex flex-col gap-1 pt-3 border-t border-[var(--rb-border-light)]">
-          {tab.source && (
-            <p className="text-xs text-[var(--rb-muted-text)]">Source: {tab.source}</p>
-          )}
-          {tab.disclaimer && (
-            <p className="text-xs text-[var(--rb-muted-text)] italic">{tab.disclaimer}</p>
-          )}
-        </div>
-      )}
+      <div className="flex flex-col gap-1 pt-3 border-t border-[var(--rb-border-light)]">
+        {tab.source ? (
+          <p className="text-xs text-[var(--rb-muted-text)]">Source: {tab.source}</p>
+        ) : (
+          <TextPlaceholder variant="label-line" width="third" />
+        )}
+        {tab.disclaimer && (
+          <p className="text-xs text-[var(--rb-muted-text)] italic">{tab.disclaimer}</p>
+        )}
+      </div>
     </motion.div>
   );
 };
