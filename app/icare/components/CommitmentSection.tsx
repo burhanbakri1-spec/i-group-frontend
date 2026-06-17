@@ -8,10 +8,60 @@ import { useSiteContent } from '../hooks/useSiteContent';
 import { useContent } from '../hooks/useContent';
 import { ScrollReveal } from './ui/ScrollReveal';
 
-const COMMITMENT_ITEMS = [
-  { id: 'mission' as const, titleKey: 'commitmentMission' as const, detailKey: 'commitmentMissionDetail' as const, ctaKey: 'commitmissionCta' as const },
-  { id: 'philanthropy' as const, titleKey: 'commitmentPhilanthropy' as const, detailKey: 'commitmentPhilanthropyDetail' as const, ctaKey: 'commitmentPhilanthropyCta' as const },
-  { id: 'sustainability' as const, titleKey: 'commitmentSustainability' as const, detailKey: 'commitmentSustainabilityDetail' as const, ctaKey: 'commitmentSustainabilityCta' as const },
+type CommitmentItemId = 'mission' | 'philanthropy' | 'sustainability';
+
+// Constrain translation keys to the specific entries this component reads from
+// translations[lang]. `t.commitmentMission` etc. are all top-level string props.
+type CommitmentTranslationsKey =
+  | 'commitmentMission'
+  | 'commitmentMissionDetail'
+  | 'commitmissionCta'
+  | 'commitmentPhilanthropy'
+  | 'commitmentPhilanthropyDetail'
+  | 'commitmentPhilanthropyCta'
+  | 'commitmentSustainability'
+  | 'commitmentSustainabilityDetail'
+  | 'commitmentSustainabilityCta';
+
+interface CommitmentItemDef {
+  id: CommitmentItemId;
+  titleKey: CommitmentTranslationsKey;
+  detailKey: CommitmentTranslationsKey;
+  ctaKey: CommitmentTranslationsKey;
+  // CMS keys for the content provider layer.
+  cpTitleKey: `home.commitment.${CommitmentItemId}.title`;
+  cpDetailKey: `home.commitment.${CommitmentItemId}.detail`;
+  cpCtaKey: `home.commitment.${CommitmentItemId}.cta`;
+}
+
+const COMMITMENT_ITEMS: CommitmentItemDef[] = [
+  {
+    id: 'mission',
+    titleKey: 'commitmentMission',
+    detailKey: 'commitmentMissionDetail',
+    ctaKey: 'commitmissionCta',
+    cpTitleKey: 'home.commitment.mission.title',
+    cpDetailKey: 'home.commitment.mission.detail',
+    cpCtaKey: 'home.commitment.mission.cta',
+  },
+  {
+    id: 'philanthropy',
+    titleKey: 'commitmentPhilanthropy',
+    detailKey: 'commitmentPhilanthropyDetail',
+    ctaKey: 'commitmentPhilanthropyCta',
+    cpTitleKey: 'home.commitment.philanthropy.title',
+    cpDetailKey: 'home.commitment.philanthropy.detail',
+    cpCtaKey: 'home.commitment.philanthropy.cta',
+  },
+  {
+    id: 'sustainability',
+    titleKey: 'commitmentSustainability',
+    detailKey: 'commitmentSustainabilityDetail',
+    ctaKey: 'commitmentSustainabilityCta',
+    cpTitleKey: 'home.commitment.sustainability.title',
+    cpDetailKey: 'home.commitment.sustainability.detail',
+    cpCtaKey: 'home.commitment.sustainability.cta',
+  },
 ];
 
 interface CommitmentSectionProps {
@@ -20,7 +70,7 @@ interface CommitmentSectionProps {
 }
 
 type CommitmentItem = {
-  id: 'mission' | 'philanthropy' | 'sustainability';
+  id: CommitmentItemId;
   title: string;
   detail: string;
   cta: string;
@@ -29,22 +79,51 @@ type CommitmentItem = {
 export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNavigate }) => {
   const shouldReduceMotion = useReducedMotion();
   const { commitmentImage } = useSiteContent(lang);
-  // ContentProvider key — BE provides the Unsplash URL as defaultValue
+  // ContentProvider — BE provides the Unsplash URL as defaultValue
   // (registered in e-commerce-backend/src/modules/hero/hero.service.ts).
   const { val: commitmentImageCp } = useContent('home.commitment.image', {
     lang,
     fallback: '',
   });
+  // ContentProvider — 9 keys: title + detail + cta per item.
+  const { val: missionTitleCp } = useContent('home.commitment.mission.title', { lang, fallback: '' });
+  const { val: missionDetailCp } = useContent('home.commitment.mission.detail', { lang, fallback: '' });
+  const { val: missionCtaCp } = useContent('home.commitment.mission.cta', { lang, fallback: '' });
+  const { val: philanthropyTitleCp } = useContent('home.commitment.philanthropy.title', { lang, fallback: '' });
+  const { val: philanthropyDetailCp } = useContent('home.commitment.philanthropy.detail', { lang, fallback: '' });
+  const { val: philanthropyCtaCp } = useContent('home.commitment.philanthropy.cta', { lang, fallback: '' });
+  const { val: sustainabilityTitleCp } = useContent('home.commitment.sustainability.title', { lang, fallback: '' });
+  const { val: sustainabilityDetailCp } = useContent('home.commitment.sustainability.detail', { lang, fallback: '' });
+  const { val: sustainabilityCtaCp } = useContent('home.commitment.sustainability.cta', { lang, fallback: '' });
+
+  const cpByItem: Record<CommitmentItemId, { title: string; detail: string; cta: string }> = {
+    mission: { title: missionTitleCp, detail: missionDetailCp, cta: missionCtaCp },
+    philanthropy: {
+      title: philanthropyTitleCp,
+      detail: philanthropyDetailCp,
+      cta: philanthropyCtaCp,
+    },
+    sustainability: {
+      title: sustainabilityTitleCp,
+      detail: sustainabilityDetailCp,
+      cta: sustainabilityCtaCp,
+    },
+  };
+
   const t = translations[lang];
   const scrollInInitialX = lang === 'ar' ? 10 : -10;
-  const [activeId, setActiveId] = useState<CommitmentItem['id']>('mission');
+  const [activeId, setActiveId] = useState<CommitmentItemId>('mission');
 
-  const commitmentItems: CommitmentItem[] = COMMITMENT_ITEMS.map((item) => ({
-    id: item.id,
-    title: t[item.titleKey],
-    detail: t[item.detailKey],
-    cta: t[item.ctaKey],
-  }));
+  // Priority chain per item: CMS > settings > translations.ts EN fallback.
+  const commitmentItems: CommitmentItem[] = COMMITMENT_ITEMS.map((item) => {
+    const cp = cpByItem[item.id];
+    return {
+      id: item.id,
+      title: cp.title || t[item.titleKey],
+      detail: cp.detail || t[item.detailKey],
+      cta: cp.cta || t[item.ctaKey],
+    };
+  });
 
   const activeItem = commitmentItems.find((item) => item.id === activeId) ?? commitmentItems[0];
 

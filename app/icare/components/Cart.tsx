@@ -4,6 +4,7 @@ import { X, Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 import { Language, translations } from '../translations';
 import { useShop } from '../context/ShopContext';
 import { useSiteContent } from '../hooks/useSiteContent';
+import { useContent } from '../hooks/useContent';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface CartProps {
@@ -22,6 +23,9 @@ const DRAWER_TRANSITION = { duration: 0.18, ease: 'easeOut' as const };
 export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate }) => {
   const { cartItems, removeFromCart, updateQuantity, cartTotal, cartCount, isAuthenticated } = useShop();
   const { freeShippingThreshold, cartShippingUnlockedText, cartShippingDisclaimer } = useSiteContent(lang);
+  // ContentProvider overrides.
+  const { val: cartShippingUnlockedCp } = useContent('cart.shipping.unlocked.text', { lang, fallback: '' });
+  const { val: cartShippingDisclaimerCp } = useContent('cart.shipping.disclaimer', { lang, fallback: '' });
   const t = translations[lang];
   const shouldReduceMotion = useReducedMotion();
   const hasUnlockedShipping = Number.isFinite(freeShippingThreshold) && cartTotal >= freeShippingThreshold;
@@ -100,7 +104,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                         />
                       </div>
                       <p className="text-[13px] text-[#67645E] font-medium tracking-tight">
-                        {cartShippingUnlockedText}
+                        {cartShippingUnlockedCp || cartShippingUnlockedText}
                       </p>
                     </div>
                   )}
@@ -193,7 +197,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                 </button>
                 
                 <p className="text-xs text-[#84827E] text-center">
-                  {cartShippingDisclaimer}
+                  {cartShippingDisclaimerCp || cartShippingDisclaimer}
                 </p>
               </div>
             )}

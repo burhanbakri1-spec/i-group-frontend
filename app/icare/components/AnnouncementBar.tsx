@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { icareApi } from '../lib/api-client';
 import { useSiteContent } from '../hooks/useSiteContent';
+import { useContent } from '../hooks/useContent';
 import { useIcareShell } from './IcareShell';
 import { Language, translations } from '../translations';
 
@@ -44,7 +45,12 @@ export const AnnouncementBar: React.FC = () => {
   const t = translations[lang];
   const shouldReduceMotion = useReducedMotion();
   const { announcementText } = useSiteContent(lang);
-  const fallbackSlides = useMemo(() => splitAnnouncementText(announcementText), [announcementText]);
+  // ContentProvider override — BE serves EN/AR via {lang}.
+  const { val: announcementTextCp } = useContent('marketing.announcement.text', { lang, fallback: '' });
+  const fallbackSlides = useMemo(
+    () => splitAnnouncementText(announcementTextCp || announcementText),
+    [announcementTextCp, announcementText],
+  );
   const [remoteSlides, setRemoteSlides] = useState<string[]>([]);
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);

@@ -4,6 +4,7 @@ import { X, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language, translations } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
+import { useContent } from '../hooks/useContent';
 import { Product } from '../types';
 import { icareApi } from '../lib/api-client';
 import { mapBackendProductToProduct, mapBrandNames, mapCategoryNames, unwrapListData } from '../lib/mappers';
@@ -32,6 +33,14 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
     searchBrandsHeading,
     searchCollectionsUnavailable,
   } = useSiteContent(lang);
+  // ContentProvider overrides — 7 search keys.
+  const { val: searchDrawerTitleCp } = useContent('search.drawer.title', { lang, fallback: '' });
+  const { val: searchPlaceholderCp } = useContent('search.placeholder', { lang, fallback: '' });
+  const { val: searchNoResultsCp } = useContent('search.no.results', { lang, fallback: '' });
+  const { val: searchCollectionsHeadingCp } = useContent('search.collections.heading', { lang, fallback: '' });
+  const { val: searchProductsHeadingCp } = useContent('search.products.heading', { lang, fallback: '' });
+  const { val: searchBrandsHeadingCp } = useContent('search.brands.heading', { lang, fallback: '' });
+  const { val: searchCollectionsUnavailableCp } = useContent('search.collections.unavailable', { lang, fallback: '' });
   const t = translations[lang];
   const [searchQuery, setSearchQuery] = useState('');
   const [remoteCollections, setRemoteCollections] = useState<string[]>([]);
@@ -135,7 +144,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
           >
             {/* Header */}
             <div className="relative p-6 flex items-center justify-center border-b border-black/5">
-              <h2 className="text-[15px] font-black text-[#67645E] tracking-normal lowercase">{searchDrawerTitle}</h2>
+              <h2 className="text-[15px] font-black text-[#67645E] tracking-normal lowercase">{searchDrawerTitleCp || searchDrawerTitle}</h2>
               <button 
                 onClick={onClose} 
                 className={`absolute right-6 p-1 text-[#67645E] hover:text-black transition-colors min-h-[44px] ${CONTROL_FOCUS_CLASS}`}
@@ -154,7 +163,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                     type="text" 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder={searchPlaceholder}
+                    placeholder={searchPlaceholderCp || searchPlaceholder}
                     className="w-full px-5 py-4 min-h-[44px] text-[16px] text-[#67645E] placeholder:text-[#84827E] bg-transparent outline-none border-none font-medium"
                     autoFocus
                   />
@@ -178,7 +187,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                       {/* Matching Collections */}
                       {filteredResults.collections.length > 0 && (
                         <div>
-                          <h3 className="text-[12px] font-black text-[#84827E] mb-4 uppercase tracking-[0.1em]">{searchCollectionsHeading}</h3>
+                          <h3 className="text-[12px] font-black text-[#84827E] mb-4 uppercase tracking-[0.1em]">{searchCollectionsHeadingCp || searchCollectionsHeading}</h3>
                           <div className="space-y-3">
                             {filteredResults.collections.map((item) => (
                               <button key={`collection-${item}`} className={`flex items-center justify-between w-full group text-left rounded-[8px] ${CONTROL_FOCUS_CLASS}`}>
@@ -193,7 +202,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                       {/* Matching Products */}
                       {filteredResults.products.length > 0 && (
                         <div>
-                          <h3 className="text-[12px] font-black text-[#84827E] mb-6 uppercase tracking-[0.1em]">{searchProductsHeading}</h3>
+                          <h3 className="text-[12px] font-black text-[#84827E] mb-6 uppercase tracking-[0.1em]">{searchProductsHeadingCp || searchProductsHeading}</h3>
                           <div className="space-y-6">
                             {filteredResults.products.map((product) => (
                               <button key={product.id} onClick={() => handleProductSelect(product)} className={`flex items-center gap-5 group cursor-pointer text-left w-full rounded-[8px] ${CONTROL_FOCUS_CLASS}`}>
@@ -217,7 +226,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                       {/* Matching Brands */}
                       {filteredResults.brands.length > 0 && (
                         <div>
-                          <h3 className="text-[12px] font-black text-[#84827E] mb-4 uppercase tracking-[0.1em]">{searchBrandsHeading}</h3>
+                          <h3 className="text-[12px] font-black text-[#84827E] mb-4 uppercase tracking-[0.1em]">{searchBrandsHeadingCp || searchBrandsHeading}</h3>
                           <div className="flex flex-wrap gap-2">
                             {filteredResults.brands.map((brand) => (
                               <span key={`brand-${brand}`} className="px-4 py-2 bg-white/60 border border-[#DDDDDD] rounded-full text-[13px] font-medium text-[#67645E] lowercase">
@@ -230,7 +239,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                     </>
                   ) : (
                     <div className="text-center py-20">
-                      <p className="text-[16px] text-[#67645E] font-medium italic">{searchNoResults} &quot;{searchQuery}&quot;</p>
+                      <p className="text-[16px] text-[#67645E] font-medium italic">{searchNoResultsCp || searchNoResults} &quot;{searchQuery}&quot;</p>
                     </div>
                   )}
                 </div>
@@ -245,7 +254,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                         ))}
                       </div>
                     ) : (
-                      <p className="text-[13px] text-[#67645E] font-medium italic">{searchCollectionsUnavailable}</p>
+                      <p className="text-[13px] text-[#67645E] font-medium italic">{searchCollectionsUnavailableCp || searchCollectionsUnavailable}</p>
                     )}
                   </div>
 

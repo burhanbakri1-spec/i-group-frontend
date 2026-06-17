@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
+import { useContent } from '../hooks/useContent';
 import { ScrollReveal } from './ui/ScrollReveal';
 
 interface PromoSectionProps {
@@ -12,11 +13,25 @@ interface PromoSectionProps {
 
 export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) => {
   const shouldReduceMotion = useReducedMotion();
-  const { promoBadge, promoHeadline, promoDescription, promoCtaLabel, promoImage } = useSiteContent(lang);
+  // Legacy aliases — settings-table tier; ContentProvider overrides when present.
+  const {
+    promoBadge,
+    promoHeadline,
+    promoDescription,
+    promoCtaLabel,
+    promoImage,
+  } = useSiteContent(lang);
+  // ContentProvider — BE serves both EN + AR via {lang} param.
+  // Replaces the hardcoded Arabic literals that previously lived in JSX.
+  const { val: promoBadgeCp } = useContent('home.promo.badge', { lang, fallback: '' });
+  const { val: promoHeadlineCp } = useContent('home.promo.headline', { lang, fallback: '' });
+  const { val: promoDescriptionCp } = useContent('home.promo.description', { lang, fallback: '' });
+  const { val: promoCtaCp } = useContent('home.promo.cta', { lang, fallback: '' });
+  const { val: promoImageCp } = useContent('home.promo.image', { lang, fallback: '' });
   return (
     <section className="icare-index-section icare-split-banner rounded-[var(--icare-section-radius)] p-[var(--icare-section-inset)]">
       <div className="contents">
-        
+
         {/* Left Side: Content Section */}
         <div className="icare-split-banner__copy">
           <motion.div
@@ -29,7 +44,7 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) 
             <span
               className="mb-6 block text-[12.8px] font-bold uppercase leading-[1.5] tracking-[0.02em] text-[#67645E] md:text-[12.8px]"
             >
-              {lang === 'en' ? promoBadge : 'وصول جديد'}
+              {promoBadgeCp || promoBadge}
             </span>
 
             {/* Main Title - Lowercase, Swiss 400, ImageWithContent-h2 size */}
@@ -45,11 +60,9 @@ viewport={{ once: false }}
                 ease: [0.22, 1, 0.36, 1]
               }}
               >
-                {lang === 'en' ? (
-                  <>{promoHeadline}</>
-                ) : (
-                  <>احمرار <br /> صغير بارد</>
-                )}
+                {/* CMS may include HTML breaks; dangerouslySetInnerHTML keeps the
+                    rendered markup intact. Falls back to plain text from settings. */}
+                <span dangerouslySetInnerHTML={{ __html: promoHeadlineCp || promoHeadline || '' }} />
               </motion.h2>
             </div>
 
@@ -61,10 +74,7 @@ viewport={{ once: false }}
               viewport={{ once: false }}
               transition={{ delay: 0.12, duration: 0.35 }}
             >
-              {lang === 'en'
-                ? promoDescription
-                : 'دفئي خديك مع Pocket Blush. لمسة من اللون الكريمي طويل الأمد الذي يحاكي الاحمرار الذي تحصلين عليه بعد الدخول من البرد.'
-              }
+              {promoDescriptionCp || promoDescription}
             </motion.p>
 
             {/* Button - system pill 15.73px / 400 / 0.314px / uppercase */}
@@ -77,7 +87,7 @@ viewport={{ once: false }}
 viewport={{ once: false }}
               transition={{ delay: 0.18, duration: 0.35 }}
               >
-                <span>{lang === 'en' ? promoCtaLabel : 'بوكيت بلاش'}</span>
+                <span>{promoCtaCp || promoCtaLabel}</span>
               </motion.button>
             </div>
           </motion.div>
@@ -93,13 +103,13 @@ viewport={{ once: false }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             className="w-full h-full"
           >
-            <ImageWithFallback 
-              src={promoImage} 
-              alt="icare Pocket Blush" 
+            <ImageWithFallback
+              src={promoImageCp || promoImage}
+              alt="icare Pocket Blush"
               className="w-full h-full object-contain"
             />
           </motion.div>
-          
+
           {/* Subtle Overlay for Premium feel */}
           <div className="absolute inset-0 bg-black/5 mix-blend-multiply pointer-events-none" />
         </motion.div>

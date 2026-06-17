@@ -4,6 +4,7 @@ import { Search, Navigation, ExternalLink } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { translations, Language } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
+import { useContent } from '../hooks/useContent';
 import { icareApi, IcareApiError } from '../lib/api-client';
 import { BackendStore, PaginatedData } from '../types';
 import { StoreLocatorSkeleton } from './ui/skeletons';
@@ -86,6 +87,9 @@ const fetchActiveStores = async () => normalizeStores(await icareApi.stores.list
 
 export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
   const { storeLocatorTagline, storeLocatorNoResults } = useSiteContent(lang);
+  // ContentProvider overrides — 3 marketing keys.
+  const { val: storeLocatorTaglineCp } = useContent('marketing.store.locator.tagline', { lang, fallback: '' });
+  const { val: storeLocatorNoResultsCp } = useContent('marketing.store.locator.no.results', { lang, fallback: '' });
   const [searchQuery, setSearchQuery] = useState('');
   const [stores, setStores] = useState<Store[]>([]);
   const [fetchState, setFetchState] = useState<'loading' | 'success' | 'error' | 'empty'>('loading');
@@ -126,7 +130,7 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
 
   const filteredStores = stores.filter((store) => matchesStoreSearch(store, searchQuery));
   const t = translations[lang];
-  const noResultsText = storeLocatorNoResults?.trim() || t.pages.storeLocator.noResults;
+  const noResultsText = storeLocatorNoResultsCp || storeLocatorNoResults?.trim() || t.pages.storeLocator.noResults;
 
   const handleStoreClick = useCallback((storeId: string) => {
     setSelectedStoreId(storeId);
@@ -146,7 +150,7 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
             <header>
               <h1 className="text-[24px] lg:text-[42px] font-brand lowercase italic leading-none mb-1 lg:mb-2">{t.pages.storeLocator.title}</h1>
               <p className="text-[9px] lg:text-[11px] font-bold uppercase tracking-widest text-black/40">
-                {storeLocatorTagline || t.pages.storeLocator.tagline}
+                {storeLocatorTaglineCp || storeLocatorTagline || t.pages.storeLocator.tagline}
               </p>
             </header>
 

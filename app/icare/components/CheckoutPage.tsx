@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import { ArrowLeft, ChevronRight, Lock } from 'lucide-react';
 import { Language } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
+import { useContent } from '../hooks/useContent';
 import { useCheckout } from '../hooks/useCheckout';
 import { CheckoutProgressBar } from './checkout/CheckoutProgressBar';
 import { CheckoutShippingForm } from './checkout/CheckoutShippingForm';
@@ -28,6 +29,26 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
   const siteContent = useSiteContent(lang);
   const shouldReduceMotion = useReducedMotion();
 
+  // ContentProvider overrides — 18 checkout keys.
+  const { val: checkoutBackToShopCp } = useContent('checkout.back.to.shop', { lang, fallback: '' });
+  const { val: checkoutHeadingCp } = useContent('checkout.heading', { lang, fallback: '' });
+  const { val: checkoutShippingHeadingCp } = useContent('checkout.shipping.heading', { lang, fallback: '' });
+  const { val: checkoutPaymentHeadingCp } = useContent('checkout.payment.heading', { lang, fallback: '' });
+  const { val: checkoutReviewHeadingCp } = useContent('checkout.review.heading', { lang, fallback: '' });
+  const { val: checkoutCardLabelCp } = useContent('checkout.card.label', { lang, fallback: '' });
+  const { val: checkoutPaypalLabelCp } = useContent('checkout.paypal.label', { lang, fallback: '' });
+  const { val: checkoutCodLabelCp } = useContent('checkout.cod.label', { lang, fallback: '' });
+  const { val: checkoutTermsTextCp } = useContent('checkout.terms.text', { lang, fallback: '' });
+  const { val: checkoutConfirmedHeadingCp } = useContent('checkout.confirmed.heading', { lang, fallback: '' });
+  const { val: checkoutConfirmedMessageCp } = useContent('checkout.confirmed.message', { lang, fallback: '' });
+  const { val: checkoutPlaceOrderCp } = useContent('checkout.place.order', { lang, fallback: '' });
+  const { val: checkoutSubmittingTextCp } = useContent('checkout.submitting.text', { lang, fallback: '' });
+  const { val: checkoutNavBackCp } = useContent('checkout.nav.back', { lang, fallback: '' });
+  const { val: checkoutNavContinueCp } = useContent('checkout.nav.continue', { lang, fallback: '' });
+
+  // Memoize priority-chain helpers (closure-trap on siteContent to avoid recomputing per render).
+  const v = (cpVal: string, legacy: string) => cpVal || legacy;
+
   // ── Unauthenticated gate ──
   if (!checkout.isAuthenticated) {
     const { ct } = checkout;
@@ -40,10 +61,10 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
               className={`inline-flex items-center gap-2 text-xs md:text-sm text-[#67645E] hover:text-black mb-4 transition-colors ${CONTROL_FOCUS_CLASS}`}
             >
               <ArrowLeft size={16} />
-              {siteContent.checkoutBackToShop}
+              {v(checkoutBackToShopCp, siteContent.checkoutBackToShop)}
             </button>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-4">
-              {siteContent.checkoutHeading}
+              {v(checkoutHeadingCp, siteContent.checkoutHeading)}
             </h1>
           </div>
           <motion.div
@@ -78,10 +99,10 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
               className={`inline-flex items-center gap-2 text-xs md:text-sm text-[#67645E] hover:text-black mb-4 transition-colors ${CONTROL_FOCUS_CLASS}`}
             >
               <ArrowLeft size={16} />
-              {siteContent.checkoutBackToShop}
+              {v(checkoutBackToShopCp, siteContent.checkoutBackToShop)}
             </button>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight mb-4">
-              {siteContent.checkoutHeading}
+              {v(checkoutHeadingCp, siteContent.checkoutHeading)}
             </h1>
           </div>
 
@@ -89,9 +110,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
           <CheckoutProgressBar
             currentStep={checkout.step}
             lang={lang}
-            checkoutShippingHeading={siteContent.checkoutShippingHeading}
-            checkoutPaymentHeading={siteContent.checkoutPaymentHeading}
-            checkoutReviewHeading={siteContent.checkoutReviewHeading}
+            checkoutShippingHeading={v(checkoutShippingHeadingCp, siteContent.checkoutShippingHeading)}
+            checkoutPaymentHeading={v(checkoutPaymentHeadingCp, siteContent.checkoutPaymentHeading)}
+            checkoutReviewHeading={v(checkoutReviewHeadingCp, siteContent.checkoutReviewHeading)}
           />
 
           <div className="grid lg:grid-cols-3 gap-8">
@@ -112,7 +133,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                     savedAddresses={checkout.savedAddresses}
                     selectedAddress={checkout.selectedAddress}
                     onSelectSavedAddress={checkout.selectSavedAddress}
-                    checkoutShippingHeading={siteContent.checkoutShippingHeading}
+                    checkoutShippingHeading={v(checkoutShippingHeadingCp, siteContent.checkoutShippingHeading)}
                     cartItems={checkout.cartItems}
                   />
                 )}
@@ -123,10 +144,10 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                     lang={lang}
                     paymentMethod={checkout.paymentMethod}
                     onSetPaymentMethod={checkout.setPaymentMethod}
-                    checkoutPaymentHeading={siteContent.checkoutPaymentHeading}
-                    checkoutCardLabel={siteContent.checkoutCardLabel}
-                    checkoutPaypalLabel={siteContent.checkoutPaypalLabel}
-                    checkoutCodLabel={siteContent.checkoutCodLabel}
+                    checkoutPaymentHeading={v(checkoutPaymentHeadingCp, siteContent.checkoutPaymentHeading)}
+                    checkoutCardLabel={v(checkoutCardLabelCp, siteContent.checkoutCardLabel)}
+                    checkoutPaypalLabel={v(checkoutPaypalLabelCp, siteContent.checkoutPaypalLabel)}
+                    checkoutCodLabel={v(checkoutCodLabelCp, siteContent.checkoutCodLabel)}
                   />
                 )}
 
@@ -137,8 +158,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                       lang={lang}
                       order={checkout.order}
                       paymentStatus={checkout.paymentStatus}
-                      checkoutConfirmedHeading={siteContent.checkoutConfirmedHeading}
-                      checkoutConfirmedMessage={siteContent.checkoutConfirmedMessage}
+                      checkoutConfirmedHeading={v(checkoutConfirmedHeadingCp, siteContent.checkoutConfirmedHeading)}
+                      checkoutConfirmedMessage={v(checkoutConfirmedMessageCp, siteContent.checkoutConfirmedMessage)}
                       onNavigate={onNavigate}
                       onSwitchToCod={() => {
                         checkout.setPaymentMethod('cod');
@@ -151,10 +172,10 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                       checkoutError={checkout.checkoutError}
                       isSubmitting={checkout.isSubmitting}
                       onPlaceOrder={checkout.placeOrder}
-                      checkoutReviewHeading={siteContent.checkoutReviewHeading}
-                      checkoutTermsText={siteContent.checkoutTermsText}
-                      checkoutPlaceOrder={siteContent.checkoutPlaceOrder}
-                      checkoutSubmittingText={siteContent.checkoutSubmittingText}
+                      checkoutReviewHeading={v(checkoutReviewHeadingCp, siteContent.checkoutReviewHeading)}
+                      checkoutTermsText={v(checkoutTermsTextCp, siteContent.checkoutTermsText)}
+                      checkoutPlaceOrder={v(checkoutPlaceOrderCp, siteContent.checkoutPlaceOrder)}
+                      checkoutSubmittingText={v(checkoutSubmittingTextCp, siteContent.checkoutSubmittingText)}
                     />
                   ))}
 
@@ -166,14 +187,14 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                         onClick={checkout.previousStep}
                         className={`flex-1 px-6 py-3 border border-[#67645E] rounded-full hover:bg-[#F1F0ED] transition-colors ${CONTROL_FOCUS_CLASS}`}
                       >
-                        {siteContent.checkoutNavBack}
+                        {v(checkoutNavBackCp, siteContent.checkoutNavBack)}
                       </button>
                     )}
                     <button
                       onClick={checkout.nextStep}
                       className={`flex-1 px-6 py-3 bg-[#67645E] text-white rounded-full hover:bg-[#5A5853] transition-colors flex items-center justify-center gap-2 ${CONTROL_FOCUS_CLASS}`}
                     >
-                      {siteContent.checkoutNavContinue}
+                      {v(checkoutNavContinueCp, siteContent.checkoutNavContinue)}
                       <ChevronRight size={18} />
                     </button>
                   </div>
