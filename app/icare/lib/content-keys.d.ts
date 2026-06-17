@@ -1,0 +1,34 @@
+export interface ContentKeys {
+  'home.hero.headline': { type: 'text'; locales: ['en', 'ar'] };
+  'home.hero.image': { type: 'image' };
+  'about.hero.headline': { type: 'text' };
+  'about.hero.cta': { type: 'text' };
+  'about.hero.image': { type: 'image' };
+  'about.intentional.image': { type: 'image' };
+  'about.foundation.image': { type: 'image' };
+  'about.values.image': { type: 'image' };
+  'about.team.member1.name': { type: 'text' };
+  'about.team.member1.title': { type: 'text' };
+  'about.team.member1.image': { type: 'image' };
+  'about.team.member2.name': { type: 'text' };
+  'about.team.member2.title': { type: 'text' };
+  'about.team.member2.image': { type: 'image' };
+  'about.team.member3.name': { type: 'text' };
+  'about.team.member3.title': { type: 'text' };
+  'about.team.member3.image': { type: 'image' };
+  'about.founder.signature.image': { type: 'image' };
+  'contact.email': { type: 'text' };
+  'contact.hero.heading': { type: 'text' };
+  'contact.hero.image': { type: 'image' };
+  'contact.info.title': { type: 'text' };
+  'contact.support.info': { type: 'text' };
+  'contact.email.label': { type: 'text' };
+  'contact.wholesale.email': { type: 'text' };
+  'contact.wholesale.label': { type: 'text' };
+  'contact.faq.title': { type: 'text' };
+  'contact.faq.text': { type: 'text' };
+  'contact.faq.cta': { type: 'text' };
+  'contact.support.hours': { type: 'text' };
+  'shipping.rates': { type: 'text' };
+  'shipping.free.threshold': { type: 'text' };
+}
