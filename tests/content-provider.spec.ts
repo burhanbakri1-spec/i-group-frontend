@@ -87,6 +87,39 @@ describe('content-client: fetchContent', () => {
     expect(url).toMatch(/\/api\/v1\/content\//);
     expect(url).toContain('about.hero.headline');
   });
+
+  it('strips lang query param for image keys (single key)', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ val: 'https://cdn.example.com/hero.jpg', fallbackUsed: false }),
+    });
+    await fetchContent('home.faq.image', { lang: 'en' });
+    const url = mockFetch.mock.calls[0][0] as string;
+    expect(url).toBe('https://backend.igroup.website/api/v1/content/home.faq.image');
+    expect(url).not.toContain('lang=');
+    expect(url).not.toContain('?');
+  });
+
+  it('ignores lang option for image keys even when explicitly passed', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ val: 'https://cdn.example.com/x.jpg', fallbackUsed: false }),
+    });
+    await fetchContent('home.hero.image', { lang: 'ar' });
+    const url = mockFetch.mock.calls[0][0] as string;
+    expect(url).not.toContain('lang=');
+    expect(url).not.toContain('ar');
+  });
+
+  it('keeps lang query param for text keys (single key)', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ val: 'x', fallbackUsed: false }),
+    });
+    await fetchContent('home.hero.headline');
+    const url = mockFetch.mock.calls[0][0] as string;
+    expect(url).toContain('lang=en');
+  });
 });
 
 describe('content-client: fetchContentBatch', () => {
@@ -141,6 +174,34 @@ describe('content-client: fetchContentBatch', () => {
     await fetchContentBatch(['home.hero.headline'], { lang: 'ar' });
     const url = mockFetch.mock.calls[0][0] as string;
     expect(url).toContain('lang=ar');
+  });
+
+  it('strips lang from URL when all keys are images', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        'home.hero.image': { val: 'I' },
+        'home.faq.image': { val: 'J' },
+      }),
+    });
+    await fetchContentBatch(['home.hero.image', 'home.faq.image'], { lang: 'en' });
+    const url = mockFetch.mock.calls[0][0] as string;
+    expect(url).not.toContain('lang=');
+    expect(url).toContain('keys=home.hero.image,home.faq.image');
+    // The `?` is part of the batch endpoint structure (separates `keys=`).
+    // No `&` should follow because no other query param is appended.
+    expect(url).not.toContain('&');
+  });
+
+  it('keeps lang in URL for mixed image + text batches', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({}),
+    });
+    await fetchContentBatch(['home.hero.headline', 'home.hero.image'], { lang: 'ar' });
+    const url = mockFetch.mock.calls[0][0] as string;
+    expect(url).toContain('lang=ar');
+    expect(url).toContain('keys=home.hero.headline,home.hero.image');
   });
 });
 

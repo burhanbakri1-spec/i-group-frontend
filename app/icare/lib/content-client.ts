@@ -12,16 +12,28 @@ const API_BASE =
     ? (process.env.NEXT_PUBLIC_BACKEND_URL ?? 'https://backend.igroup.website')
     : 'https://backend.igroup.website';
 
+// Image keys are stored as a single URL string (not bilingual JSON), so the
+// `lang` query param has no effect on them. Stripping it client-side keeps the
+// URL clean and matches the registered key's storage shape. The `.image`
+// suffix is the registered key-naming convention and aligns with the
+// discriminated `ContentKeys` type, where every image key is typed as
+// `{ type: 'image' }`. See content-keys.d.ts.
+const IMAGE_KEY_SUFFIX = '.image';
+
+const isImageKey = (key: string): boolean => key.endsWith(IMAGE_KEY_SUFFIX);
+
 export async function fetchContent<K extends keyof ContentKeys>(
   key: K,
   opts: FetchContentOptions = {},
 ): Promise<string> {
-  const lang = opts.lang ?? 'en';
+  const baseUrl = `${API_BASE}/api/v1/content/${encodeURIComponent(key)}`;
+  // Image keys don't carry language variants — drop the lang param to keep
+  // the URL explicit about what the BE is expected to return.
+  const url = isImageKey(key)
+    ? baseUrl
+    : `${baseUrl}?lang=${opts.lang ?? 'en'}`;
   try {
-    const res = await fetch(
-      `${API_BASE}/api/v1/content/${encodeURIComponent(key)}?lang=${lang}`,
-      { next: { revalidate: 300 } },
-    );
+    const res = await fetch(url, { next: { revalidate: 300 } });
     if (!res.ok) {
       if (process.env.NODE_ENV === 'development') {
         // eslint-disable-next-line no-console
@@ -44,13 +56,15 @@ export async function fetchContentBatch<K extends keyof ContentKeys>(
   keys: K[],
   opts: { lang?: ContentLocale } = {},
 ): Promise<Record<K, string>> {
-  const lang = opts.lang ?? 'en';
   if (keys.length === 0) return {} as Record<K, string>;
+  const baseUrl = `${API_BASE}/api/v1/content?keys=${keys.join(',')}`;
+  // If every key in the batch is an image, no lang param is needed.
+  // Mixed batches still need lang for the text keys.
+  const url = keys.every(isImageKey)
+    ? baseUrl
+    : `${baseUrl}&lang=${opts.lang ?? 'en'}`;
   try {
-    const res = await fetch(
-      `${API_BASE}/api/v1/content?keys=${keys.join(',')}&lang=${lang}`,
-      { next: { revalidate: 300 } },
-    );
+    const res = await fetch(url, { next: { revalidate: 300 } });
     if (!res.ok) return {} as Record<K, string>;
     return (await res.json()) as Record<K, string>;
   } catch {
