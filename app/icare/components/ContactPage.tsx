@@ -2,6 +2,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Language, translations } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
+import { useContent } from '../hooks/useContent';
 import { PageHero } from './PageHero';
 import { ScrollReveal } from './ui/ScrollReveal';
 
@@ -25,11 +26,14 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
     contactFaqText,
     contactFaqCta,
   } = useSiteContent(lang);
+  // ContentProvider key — BE provides Unsplash default via
+  // PagesService.onModuleInit() (registered in e-commerce-backend).
+  const { val: contactHeroImageCp } = useContent('contact.hero.image', { lang, fallback: '' });
 
   return (
     <div className="min-h-screen bg-[#F1F0ED] pb-32">
       <PageHero
-        image={contactHeroImage}
+        image={contactHeroImageCp || contactHeroImage}
         fallbackImage="https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=2000"
         alt="Contact iCare"
         title={contactHeroHeading || t.pages.contact.heroHeading}
