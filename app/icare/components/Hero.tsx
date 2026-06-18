@@ -1,7 +1,7 @@
 import React from 'react';
 import { Language, translations } from '../translations';
-import { useSiteContent } from '../hooks/useSiteContent';
 import { useContent } from '../hooks/useContent';
+import { useVerifiedImage } from '../hooks/useVerifiedImage';
 import { PageHero } from './PageHero';
 
 interface HeroProps {
@@ -11,15 +11,15 @@ interface HeroProps {
 
 export const Hero: React.FC<HeroProps> = ({ onNavigate, lang }) => {
   const t = translations[lang];
-  const { heroHeadline, heroImage } = useSiteContent(lang);
-  // ContentProvider key — BE provides Unsplash default via
-  // HeroService.onModuleInit() (registered in e-commerce-backend).
+  // BE ContentProvider keys — single source of truth. HeroService.onModuleInit
+  // (in e-commerce-backend/src/modules/hero) registers `home.hero.image` with
+  // a defaultValue so a fresh DB still serves a valid URL. Spec 005's
+  // useSiteContent shim is intentionally NOT used here: its hardcoded literal
+  // fallback masked BE failures (a 500 from `/api/v1/content/:key` would
+  // silently render the old Unsplash photo, which made "the hero image isn't
+  // updating" impossible to debug from the FE).
   const { val: homeHeroImageCp } = useContent('home.hero.image', { lang, fallback: '' });
   const { val: homeHeroHeadlineCp } = useContent('home.hero.headline', { lang, fallback: '' });
-  // Responsive + narrative variants registered by ContentDefaultsService.
-  // The mobile/tablet crops let PageHero serve a tighter aspect ratio
-  // on smaller viewports; the text variants enrich the section below
-  // the headline without forcing the FE to hardcode any copy.
   const { val: homeHeroImageMobileCp } = useContent('home.hero.image.mobile', {
     lang,
     fallback: '',
@@ -36,18 +36,32 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, lang }) => {
     lang,
     fallback: '',
   });
-  // Unified fallback chain: CMS > settings table > translations.ts EN.
-  // Bug fix: previously AR branch rendered EN fallbackTitle unconditionally,
-  // bypassing both CMS and settings. Now AR resolves through the same chain
-  // (CMS serves AR via {lang: 'ar'}, settings row falls back, EN last resort).
-  const headline = homeHeroHeadlineCp || heroHeadline || t.pages.hero.fallbackTitle;
+
+  // Pre-load each candidate URL with a hidden <Image> probe. The visible
+  // <img> only receives the URL after the probe's onload fires — that
+  // way the rendered hero image is guaranteed to be a URL the browser
+  // actually decoded (no 404 flicker, no half-loaded frames).
+  const desktop = useVerifiedImage(homeHeroImageCp);
+  const mobile = useVerifiedImage(homeHeroImageMobileCp);
+  const tablet = useVerifiedImage(homeHeroImageTabletCp);
+
+  // Headline: BE content registry > translations.ts fallback (i18n).
+  const headline = homeHeroHeadlineCp || t.pages.hero.fallbackTitle;
   const ctaLabel = homeHeroCtaCp || t.shopNow;
+
+  // The hero image comes from the BE ONLY. The ultimate fallback
+  // (network down + BE unreachable) is PageHero's `fallbackImage` prop.
+  // Verified URLs come from the probe — non-verified candidates are
+  // dropped so we never hand the <img> a broken URL.
+  const desktopSrc = desktop.verified ? desktop.url : null;
+  const mobileSrc = mobile.verified ? mobile.url : null;
+  const tabletSrc = tablet.verified ? tablet.url : null;
 
   return (
     <PageHero
-      image={homeHeroImageCp || heroImage}
-      mobileImage={homeHeroImageMobileCp || undefined}
-      tabletImage={homeHeroImageTabletCp || undefined}
+      image={desktopSrc ?? undefined}
+      mobileImage={mobileSrc ?? undefined}
+      tabletImage={tabletSrc ?? undefined}
       fallbackImage="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=2000"
       alt={t.pages.hero.imageAlt}
       title={headline}
