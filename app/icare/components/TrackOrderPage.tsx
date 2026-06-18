@@ -76,14 +76,15 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
 
   const doTrack = useCallback(async () => {
     const trimmedOrder = orderNumber.trim();
-    if (!trimmedOrder) return;
+    const trimmedEmail = email.trim();
+    if (!trimmedOrder || !trimmedEmail) return;
 
     setLoadState('loading');
     setErrorMessage('');
     setResult(null);
 
     try {
-      const data = await icareApi.orders.track(trimmedOrder);
+      const data = await icareApi.orders.track(trimmedOrder, trimmedEmail);
 
       setResult(data);
       setLoadState('found');

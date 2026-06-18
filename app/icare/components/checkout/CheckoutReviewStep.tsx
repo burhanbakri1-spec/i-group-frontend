@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { type RefObject } from 'react';
 import { Lock } from 'lucide-react';
 import { Language, checkoutTranslations } from '../../translations';
 import { CreatedOrder } from '../../types';
@@ -13,6 +13,17 @@ interface CheckoutReviewStepProps {
   lang: Language;
   checkoutError: string | null;
   isSubmitting: boolean;
+  /**
+   * T010 / C-05 — when true, the React 19 transition is still
+   * pending (request in flight). Drives `aria-busy`.
+   */
+  isPending?: boolean;
+  /**
+   * T010 / C-05 — synchronous re-entrancy sentinel. While
+   * `.current === true`, the button is a hard no-op even if a
+   * second click fires before React commits `disabled=true`.
+   */
+  submitGuardRef?: RefObject<boolean>;
   onPlaceOrder: () => Promise<void>;
   checkoutReviewHeading: string;
   checkoutTermsText: string;
@@ -24,6 +35,8 @@ export const CheckoutReviewStep: React.FC<CheckoutReviewStepProps> = ({
   lang,
   checkoutError,
   isSubmitting,
+  isPending = false,
+  submitGuardRef,
   onPlaceOrder,
   checkoutReviewHeading,
   checkoutTermsText,
@@ -31,6 +44,12 @@ export const CheckoutReviewStep: React.FC<CheckoutReviewStepProps> = ({
   checkoutSubmittingText,
 }) => {
   const ct = checkoutTranslations[lang];
+
+  // T010 / C-05 — `disabled` reflects BOTH the React 19 transition
+  // pending state AND the synchronous submit guard. The guard is the
+  // safety net for clicks that fire inside the same commit window.
+  const guardLocked = submitGuardRef?.current === true;
+  const disabled = isSubmitting || isPending || guardLocked;
 
   return (
     <div className="space-y-6">
@@ -43,12 +62,15 @@ export const CheckoutReviewStep: React.FC<CheckoutReviewStepProps> = ({
           <p className="text-sm text-red-600 mb-4">{checkoutError}</p>
         )}
         <button
+          type="button"
           onClick={onPlaceOrder}
-          disabled={isSubmitting}
+          disabled={disabled}
+          aria-busy={isPending || isSubmitting}
+          aria-disabled={disabled}
           className={`w-full px-6 py-4 bg-[#67645E] text-white rounded-full hover:bg-[#5A5853] transition-colors flex items-center justify-center gap-2 text-lg font-medium disabled:opacity-50 ${CONTROL_FOCUS_CLASS}`}
         >
           <Lock size={20} />
-          {isSubmitting ? checkoutSubmittingText : checkoutPlaceOrder}
+          {isSubmitting || isPending ? checkoutSubmittingText : checkoutPlaceOrder}
         </button>
       </div>
     </div>

@@ -305,11 +305,16 @@ export const icareApi = {
 
   orders: {
     summary: (token: string) => request<OrderSummary>('/api/v1/orders/summary', { token }),
-    create: (order: CreateOrderInput, token?: string) =>
+    create: (
+      order: CreateOrderInput,
+      token?: string,
+      extraHeaders?: Record<string, string>,
+    ) =>
       request<CreatedOrder>('/api/v1/orders', {
         method: 'POST',
         token,
         body: JSON.stringify(order),
+        headers: extraHeaders,
       }),
     list: (token: string, query?: Record<string, QueryValue>) =>
       request<PaginatedData<OrderListItem> | OrderListItem[]>('/api/v1/orders', { token, query }),
@@ -325,10 +330,16 @@ export const icareApi = {
         { method: 'POST', token },
       ),
     /**
-     * Track an order by order number — no authentication required.
-     * Returns status, tracking number, carrier, and status timeline.
+     * Track an order by orderNumber + email — no authentication required.
+     * The endpoint 404s on either an unknown order OR an email
+     * mismatch (both responses are identical so the endpoint cannot
+     * be enumerated).
+     *
+     * T024 / C-15 — email is now REQUIRED in the request body. The
+     * previous shape (orderNumber-only) leaked tracking info to
+     * anyone with a guessable order number.
      */
-    track: (orderNumber: string) =>
+    track: (orderNumber: string, email: string) =>
       request<{
         orderNumber: string;
         status: string;
@@ -339,7 +350,10 @@ export const icareApi = {
         shippedAt?: string | null;
         deliveredAt?: string | null;
         statusHistory?: Array<{ status: string; comment?: string | null; createdAt: string }>;
-      }>(`/api/v1/orders/${orderNumber}/track`, { method: 'POST' }),
+      }>(`/api/v1/orders/${orderNumber}/track`, {
+        method: 'POST',
+        body: JSON.stringify({ email }),
+      }),
   },
 
   addresses: {

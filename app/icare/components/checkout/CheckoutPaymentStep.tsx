@@ -17,6 +17,11 @@ interface CheckoutPaymentStepProps {
   checkoutCardLabel: string;
   checkoutPaypalLabel: string;
   checkoutCodLabel: string;
+  /**
+   * T028 / C-19 — toggle card/PayPal buttons. Default `false` keeps
+   * the legacy "Coming Soon" disabled state for safe rollout.
+   */
+  onlinePaymentsEnabled?: boolean;
 }
 
 export const CheckoutPaymentStep: React.FC<CheckoutPaymentStepProps> = ({
@@ -27,6 +32,7 @@ export const CheckoutPaymentStep: React.FC<CheckoutPaymentStepProps> = ({
   checkoutCardLabel,
   checkoutPaypalLabel,
   checkoutCodLabel,
+  onlinePaymentsEnabled = false,
 }) => {
   const ct = checkoutTranslations[lang];
   const shouldReduceMotion = useReducedMotion();
@@ -38,10 +44,15 @@ export const CheckoutPaymentStep: React.FC<CheckoutPaymentStepProps> = ({
     <div className="space-y-6">
       <h2 className="text-2xl font-light mb-6">{checkoutPaymentHeading}</h2>
 
-      {/* Payment Methods — COD is the only active method */}
+      {/* Payment Methods
+          T028 / C-19 — when `onlinePaymentsEnabled` is true the card /
+          PayPal buttons become real `button`s the customer can click.
+          The `useCheckout.placeOrder` flow already handles the redirect
+          via `order.paymentUrl` (set by the BE Paymob integration). */}
       <div className="space-y-3">
         {/* COD — fully functional */}
         <button
+          type="button"
           onClick={() => onSetPaymentMethod('cod')}
           className={`w-full p-4 border-2 rounded-[12px] flex items-center justify-between transition-colors duration-200 ${CONTROL_FOCUS_CLASS} ${
             paymentMethod === 'cod'
@@ -56,39 +67,81 @@ export const CheckoutPaymentStep: React.FC<CheckoutPaymentStepProps> = ({
           {paymentMethod === 'cod' && <Check size={20} />}
         </button>
 
-        {/* Card — disabled, Coming Soon */}
-        <div
-          className={`w-full p-4 border-2 rounded-[12px] flex items-center justify-between border-[#DDDDDD] ${disabledClass}`}
-        >
-          <div className="flex items-center gap-3">
-            <CreditCard size={24} />
-            <span>{checkoutCardLabel}</span>
-            <span className="ml-1 rounded-full bg-[#F0F0F0] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#84827E]">
-              {ct.comingSoonBadge}
-            </span>
+        {/* Card — disabled until T028 trigger fires, otherwise live */}
+        {onlinePaymentsEnabled ? (
+          <button
+            type="button"
+            onClick={() => onSetPaymentMethod('card')}
+            className={`w-full p-4 border-2 rounded-[12px] flex items-center justify-between transition-colors duration-200 ${CONTROL_FOCUS_CLASS} ${
+              paymentMethod === 'card'
+                ? 'border-[#67645E] bg-[#F1F0ED]'
+                : 'border-[#DDDDDD] hover:border-[#67645E]'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <CreditCard size={24} />
+              <span>{checkoutCardLabel}</span>
+            </div>
+            {paymentMethod === 'card' && <Check size={20} />}
+          </button>
+        ) : (
+          <div
+            className={`w-full p-4 border-2 rounded-[12px] flex items-center justify-between border-[#DDDDDD] ${disabledClass}`}
+            aria-disabled="true"
+          >
+            <div className="flex items-center gap-3">
+              <CreditCard size={24} />
+              <span>{checkoutCardLabel}</span>
+              <span className="ml-1 rounded-full bg-[#F0F0F0] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#84827E]">
+                {ct.comingSoonBadge}
+              </span>
+            </div>
+            <Clock size={16} className="text-[#DDDDDD]" />
           </div>
-          <Clock size={16} className="text-[#DDDDDD]" />
-        </div>
-        <p className="text-[11px] text-[#AAAAAA] leading-none pl-4 -mt-1">
-          {ct.availableSoon}
-        </p>
+        )}
+        {!onlinePaymentsEnabled && (
+          <p className="text-[11px] text-[#AAAAAA] leading-none pl-4 -mt-1">
+            {ct.availableSoon}
+          </p>
+        )}
 
-        {/* PayPal — disabled, Coming Soon */}
-        <div
-          className={`w-full p-4 border-2 rounded-[12px] flex items-center justify-between border-[#DDDDDD] ${disabledClass}`}
-        >
-          <div className="flex items-center gap-3">
-            <Wallet size={24} />
-            <span>{checkoutPaypalLabel}</span>
-            <span className="ml-1 rounded-full bg-[#F0F0F0] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#84827E]">
-              {ct.comingSoonBadge}
-            </span>
+        {/* PayPal — disabled until T028 trigger fires, otherwise live */}
+        {onlinePaymentsEnabled ? (
+          <button
+            type="button"
+            onClick={() => onSetPaymentMethod('paypal')}
+            className={`w-full p-4 border-2 rounded-[12px] flex items-center justify-between transition-colors duration-200 ${CONTROL_FOCUS_CLASS} ${
+              paymentMethod === 'paypal'
+                ? 'border-[#67645E] bg-[#F1F0ED]'
+                : 'border-[#DDDDDD] hover:border-[#67645E]'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <Wallet size={24} />
+              <span>{checkoutPaypalLabel}</span>
+            </div>
+            {paymentMethod === 'paypal' && <Check size={20} />}
+          </button>
+        ) : (
+          <div
+            className={`w-full p-4 border-2 rounded-[12px] flex items-center justify-between border-[#DDDDDD] ${disabledClass}`}
+            aria-disabled="true"
+          >
+            <div className="flex items-center gap-3">
+              <Wallet size={24} />
+              <span>{checkoutPaypalLabel}</span>
+              <span className="ml-1 rounded-full bg-[#F0F0F0] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#84827E]">
+                {ct.comingSoonBadge}
+              </span>
+            </div>
+            <Clock size={16} className="text-[#DDDDDD]" />
           </div>
-          <Clock size={16} className="text-[#DDDDDD]" />
-        </div>
-        <p className="text-[11px] text-[#AAAAAA] leading-none pl-4 -mt-1">
-          {ct.availableSoon}
-        </p>
+        )}
+        {!onlinePaymentsEnabled && (
+          <p className="text-[11px] text-[#AAAAAA] leading-none pl-4 -mt-1">
+            {ct.availableSoon}
+          </p>
+        )}
       </div>
 
       {paymentMethod === 'cod' && (

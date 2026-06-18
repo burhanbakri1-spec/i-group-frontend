@@ -1,6 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from 'react';
 import { useRouter } from 'next/navigation';
 import { useShop } from '../context/ShopContext';
 import { useSiteContent } from './useSiteContent';
@@ -132,6 +139,16 @@ export interface CheckoutState {
   order: CreatedOrder | null;
   orderSummary: OrderSummary | null;
   isSubmitting: boolean;
+  /**
+   * T010 / C-05 — React 19 `useTransition` pending flag. Drives the
+   * Place Order button's `aria-busy` attribute.
+   */
+  isPending: boolean;
+  /**
+   * T010 / C-05 — synchronous re-entrancy sentinel (mutable ref).
+   * Exposed so the button can apply `disabled` BEFORE React commits.
+   */
+  submitGuardRef: React.RefObject<boolean>;
   checkoutError: string | null;
   summaryLoading: boolean;
   /** Single payment status enum — replaces verifyingPayment + paymentVerified booleans */
@@ -217,6 +234,14 @@ export function useCheckout(lang: Language): UseCheckoutReturn {
   const [order, setOrder] = useState<CreatedOrder | null>(null);
   const [orderSummary, setOrderSummary] = useState<OrderSummary | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // T010 / C-05 — `useRef` sentinel survives across renders without
+  // re-triggering them. Used as the hard guard against double-submit
+  // during the same React commit window.
+  const submitGuardRef = useRef(false);
+  // `useTransition` marks the order submission as a low-priority
+  // transition; `isPending` drives the button's `aria-busy` and
+  // `disabled` state.
+  const [isPending, startTransition] = useTransition();
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<CheckoutState['paymentStatus']>('idle');
@@ -298,7 +323,34 @@ export function useCheckout(lang: Language): UseCheckoutReturn {
     let cancelled = false;
 
     try {
-      const lastOrderNumber = window.sessionStorage.getItem('lastOrderNumber');
+      // T025 / C-16 — lastOrderNumber TTL. The stored value is a JSON
+      // envelope `{ orderNumber, expiresAt }`; entries older than
+      // 24h are cleared on mount so a stale entry from a different
+      // user / browser context cannot leak into a fresh session.
+      const raw = window.sessionStorage.getItem('lastOrderNumber');
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw) as {
+            orderNumber?: string;
+            expiresAt?: number;
+          };
+          if (
+            typeof parsed.expiresAt === 'number' &&
+            Date.now() > parsed.expiresAt
+          ) {
+            window.sessionStorage.removeItem('lastOrderNumber');
+            return;
+          }
+          // Fall through with the parsed shape below.
+          var lastOrderNumber: string | null = parsed.orderNumber ?? null;
+        } catch {
+          // Legacy format (plain string) — clear and start fresh.
+          window.sessionStorage.removeItem('lastOrderNumber');
+          var lastOrderNumber: string | null = null;
+        }
+      } else {
+        var lastOrderNumber: string | null = null;
+      }
       if (lastOrderNumber && isAuthenticated) {
         const token = accessToken ?? undefined;
         if (token) {
@@ -535,22 +587,61 @@ export function useCheckout(lang: Language): UseCheckoutReturn {
       return;
     }
 
+    // T010 / C-05 / FR-005 — double-submit prevention.
+    //
+    // Two layers of defense so a rapid second click cannot create a
+    // duplicate order:
+    //   1. `useRef` sentinel — survives across renders without
+    //      triggering re-render. A 2nd click within the same React
+    //      commit window is a hard no-op (return early).
+    //   2. `useTransition` — marks the request as low-priority and
+    //      exposes `isPending` for the button's `aria-busy` /
+    //      `disabled` state.
+    //
+    // We also mint a per-click UUIDv4 and send it as the
+    // `Idempotency-Key` header (per FR-006 contract). The backend
+    // honours it to dedupe even if both layers above are bypassed.
+    if (submitGuardRef.current) return;
+    submitGuardRef.current = true;
     setIsSubmitting(true);
     setCheckoutError(null);
-    try {
-      const orderInput = buildOrderInput();
+    const idempotencyKey = crypto.randomUUID();
 
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('[Checkout] Order payload:', JSON.stringify(orderInput, null, 2));
-      }
+    startTransition(async () => {
+      try {
+        const orderInput = buildOrderInput();
 
-      const createdOrder = await icareApi.orders.create(orderInput, accessToken ?? undefined);
-      setOrder(createdOrder);
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('[Checkout] Order payload:', JSON.stringify(orderInput, null, 2));
+        }
+
+        // T020 / C-12 — retry on transient 5xx / 429 / network
+        // failures with exponential backoff (1s, 2s, 4s). The
+        // Idempotency-Key header means retries are safe — the BE
+        // either responds with the same order (already created) or
+        // creates it fresh. 4xx errors (400/409/422) are NOT
+        // retried because they signal a client-side bug that won't
+        // resolve by trying again.
+        const createdOrder = await placeOrderWithRetry(
+          orderInput,
+          idempotencyKey,
+          accessToken,
+        );
+        setOrder(createdOrder);
       setOrderComplete(true);
 
-      // Persist order number for confirmation page restoration
+      // Persist order number for confirmation page restoration.
+      // T025 / C-16 — store a JSON envelope with `expiresAt` so the
+      // 24h TTL is enforceable on subsequent mounts.
       try {
-        window.sessionStorage.setItem('lastOrderNumber', createdOrder.orderNumber);
+        const ttlMs = 24 * 60 * 60 * 1000;
+        window.sessionStorage.setItem(
+          'lastOrderNumber',
+          JSON.stringify({
+            orderNumber: createdOrder.orderNumber,
+            expiresAt: Date.now() + ttlMs,
+          }),
+        );
       } catch {
         // sessionStorage may be unavailable — non-fatal
       }
@@ -621,7 +712,9 @@ export function useCheckout(lang: Language): UseCheckoutReturn {
       setCheckoutError(errorMessage);
     } finally {
       setIsSubmitting(false);
+      submitGuardRef.current = false;
     }
+    });
   }, [
     isAuthenticated,
     validateCheckout,
@@ -659,6 +752,12 @@ export function useCheckout(lang: Language): UseCheckoutReturn {
     ct,
     cartItems,
     isAuthenticated,
+    // T010 / C-05 — exposed for the Place Order button. `isPending` is
+    // the React 19 transition pending flag; `submitGuardRef` is the
+    // synchronous re-entrancy sentinel (a click that fires before
+    // React commits `disabled=true` is still a no-op).
+    isPending,
+    submitGuardRef,
     // Actions
     goToStep,
     nextStep,
@@ -672,4 +771,63 @@ export function useCheckout(lang: Language): UseCheckoutReturn {
     removeCoupon,
     dismissCheckoutError,
   };
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// T020 / C-12 — Retry helper for transient order-create failures.
+//
+// Retries on:
+//   - IcareApiError with status >= 500 (server-side transient)
+//   - IcareApiError with status === 429 (rate-limited)
+//   - TypeError (network failure)
+//
+// Does NOT retry on 4xx (client-side bug — retrying won't help).
+// Uses exponential backoff (1s, 2s, 4s) capped at 3 attempts.
+//
+// Safe to retry because the Idempotency-Key header is sent on every
+// attempt — the BE either returns the same order (already created) or
+// creates it fresh; never duplicates.
+// ────────────────────────────────────────────────────────────────────────────
+
+function isRetryable(err: unknown): boolean {
+  if (err && typeof err === 'object' && 'status' in err) {
+    const status = (err as { status?: number }).status;
+    if (typeof status === 'number') {
+      return status >= 500 || status === 429;
+    }
+  }
+  // Network / fetch failures come through as TypeError in the
+  // browser. The api-client normalizes some of these into
+  // IcareApiError(status=0); we keep the TypeError fallback for any
+  // that escape.
+  return err instanceof TypeError;
+}
+
+async function placeOrderWithRetry(
+  orderInput: CreateOrderInput,
+  idempotencyKey: string,
+  accessToken: string | null,
+): Promise<CreatedOrder> {
+  const maxAttempts = 3;
+  let lastErr: unknown;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      return await icareApi.orders.create(orderInput, accessToken ?? undefined, {
+        'Idempotency-Key': idempotencyKey,
+      });
+    } catch (err) {
+      lastErr = err;
+      if (attempt === maxAttempts - 1 || !isRetryable(err)) {
+        throw err;
+      }
+      const delayMs = Math.min(1000 * 2 ** attempt, 4000);
+      if (typeof console !== 'undefined') {
+        console.warn(
+          `[Checkout] Retry ${attempt + 1}/${maxAttempts - 1} after ${delayMs}ms — ${(err as Error)?.message ?? err}`,
+        );
+      }
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+  throw lastErr;
 }
