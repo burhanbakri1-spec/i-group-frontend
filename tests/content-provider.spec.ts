@@ -13,19 +13,34 @@ beforeEach(() => {
 });
 
 describe('content-client: fetchContent', () => {
-  it('returns the resolved value for a registered text key', async () => {
+  it('returns the resolved value for a registered text key (unwraps envelope)', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ val: 'Hello world', fallbackUsed: false }),
+      json: async () => ({
+        success: true,
+        data: { val: 'Hello world', fallbackUsed: false },
+      }),
     });
     const result = await fetchContent('home.hero.headline', { lang: 'en' });
     expect(result).toBe('Hello world');
   });
 
+  it('accepts the bare (un-wrapped) shape for backwards compat', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ val: 'legacy', fallbackUsed: false }),
+    });
+    const result = await fetchContent('home.hero.headline', { lang: 'en' });
+    expect(result).toBe('legacy');
+  });
+
   it('returns the resolved value for an image key (URL string)', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ val: 'https://cdn.example.com/hero.jpg', fallbackUsed: false }),
+      json: async () => ({
+        success: true,
+        data: { val: 'https://cdn.example.com/hero.jpg', fallbackUsed: false },
+      }),
     });
     const result = await fetchContent('home.hero.image', { lang: 'en' });
     expect(result).toBe('https://cdn.example.com/hero.jpg');
@@ -58,7 +73,10 @@ describe('content-client: fetchContent', () => {
   it('passes lang=ar query param when lang is Arabic', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ val: 'مرحبا', fallbackUsed: false }),
+      json: async () => ({
+        success: true,
+        data: { val: 'مرحبا', fallbackUsed: false },
+      }),
     });
     await fetchContent('home.hero.headline', { lang: 'ar' });
     const calledUrl = mockFetch.mock.calls[0][0] as string;
@@ -70,7 +88,7 @@ describe('content-client: fetchContent', () => {
   it('defaults lang to en when not provided', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ val: 'x', fallbackUsed: false }),
+      json: async () => ({ success: true, data: { val: 'x', fallbackUsed: false } }),
     });
     await fetchContent('home.hero.headline');
     expect(mockFetch.mock.calls[0][0]).toContain('lang=en');
@@ -79,7 +97,7 @@ describe('content-client: fetchContent', () => {
   it('encodes keys with dots in URL', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ val: 'x', fallbackUsed: false }),
+      json: async () => ({ success: true, data: { val: 'x', fallbackUsed: false } }),
     });
     await fetchContent('about.hero.headline');
     const url = mockFetch.mock.calls[0][0] as string;
@@ -91,7 +109,10 @@ describe('content-client: fetchContent', () => {
   it('strips lang query param for image keys (single key)', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ val: 'https://cdn.example.com/hero.jpg', fallbackUsed: false }),
+      json: async () => ({
+        success: true,
+        data: { val: 'https://cdn.example.com/hero.jpg', fallbackUsed: false },
+      }),
     });
     await fetchContent('home.faq.image', { lang: 'en' });
     const url = mockFetch.mock.calls[0][0] as string;
@@ -103,7 +124,10 @@ describe('content-client: fetchContent', () => {
   it('ignores lang option for image keys even when explicitly passed', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ val: 'https://cdn.example.com/x.jpg', fallbackUsed: false }),
+      json: async () => ({
+        success: true,
+        data: { val: 'https://cdn.example.com/x.jpg', fallbackUsed: false },
+      }),
     });
     await fetchContent('home.hero.image', { lang: 'ar' });
     const url = mockFetch.mock.calls[0][0] as string;
@@ -114,7 +138,7 @@ describe('content-client: fetchContent', () => {
   it('keeps lang query param for text keys (single key)', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ val: 'x', fallbackUsed: false }),
+      json: async () => ({ success: true, data: { val: 'x', fallbackUsed: false } }),
     });
     await fetchContent('home.hero.headline');
     const url = mockFetch.mock.calls[0][0] as string;
@@ -123,18 +147,37 @@ describe('content-client: fetchContent', () => {
 });
 
 describe('content-client: fetchContentBatch', () => {
-  it('returns a map of values for a list of registered keys', async () => {
+  it('returns a map of values for a list of registered keys (unwraps envelope)', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
-        'home.hero.headline': { val: 'H' },
-        'home.hero.image': { val: 'I' },
+        success: true,
+        data: {
+          'home.hero.headline': { val: 'H' },
+          'home.hero.image': { val: 'I' },
+        },
+      }),
+    });
+    const result = await fetchContentBatch(['home.hero.headline', 'home.hero.image']);
+    // Projected to plain string map (`.val` extracted per key).
+    expect(result).toEqual({
+      'home.hero.headline': 'H',
+      'home.hero.image': 'I',
+    });
+  });
+
+  it('returns empty values for keys absent from the BE response', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        success: true,
+        data: { 'home.hero.headline': { val: 'H' } },
       }),
     });
     const result = await fetchContentBatch(['home.hero.headline', 'home.hero.image']);
     expect(result).toEqual({
-      'home.hero.headline': { val: 'H' },
-      'home.hero.image': { val: 'I' },
+      'home.hero.headline': 'H',
+      'home.hero.image': '',
     });
   });
 
@@ -159,7 +202,7 @@ describe('content-client: fetchContentBatch', () => {
   it('joins keys with comma in the URL', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({}),
+      json: async () => ({ success: true, data: {} }),
     });
     await fetchContentBatch(['home.hero.headline', 'home.hero.image']);
     const url = mockFetch.mock.calls[0][0] as string;
@@ -169,7 +212,7 @@ describe('content-client: fetchContentBatch', () => {
   it('passes lang parameter to the URL', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({}),
+      json: async () => ({ success: true, data: {} }),
     });
     await fetchContentBatch(['home.hero.headline'], { lang: 'ar' });
     const url = mockFetch.mock.calls[0][0] as string;
@@ -180,8 +223,11 @@ describe('content-client: fetchContentBatch', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
-        'home.hero.image': { val: 'I' },
-        'home.faq.image': { val: 'J' },
+        success: true,
+        data: {
+          'home.hero.image': { val: 'I' },
+          'home.faq.image': { val: 'J' },
+        },
       }),
     });
     await fetchContentBatch(['home.hero.image', 'home.faq.image'], { lang: 'en' });
@@ -196,7 +242,7 @@ describe('content-client: fetchContentBatch', () => {
   it('keeps lang in URL for mixed image + text batches', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({}),
+      json: async () => ({ success: true, data: {} }),
     });
     await fetchContentBatch(['home.hero.headline', 'home.hero.image'], { lang: 'ar' });
     const url = mockFetch.mock.calls[0][0] as string;
@@ -226,7 +272,7 @@ describe('content-client: useContent hook', () => {
   it('returns the resolved value once fetch completes', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ val: 'resolved', fallbackUsed: false }),
+      json: async () => ({ success: true, data: { val: 'resolved', fallbackUsed: false } }),
     });
     const value = await fetchContent('home.hero.headline');
     expect(value).toBe('resolved');
@@ -254,7 +300,7 @@ describe('content-client: SSR/edge compatibility', () => {
     (globalThis as any).fetch = mockFetch;
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ val: 'ssr-value', fallbackUsed: false }),
+      json: async () => ({ success: true, data: { val: 'ssr-value', fallbackUsed: false } }),
     });
 
     // In an SSR context, `window` is undefined. The content-client

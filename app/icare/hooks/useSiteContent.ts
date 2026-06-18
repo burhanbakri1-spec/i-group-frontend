@@ -8,7 +8,28 @@ import {
 import { parseShippingPageContent } from '../lib/settings';
 import { normalizeSocialLinksResponse } from '../lib/social-links';
 import { resolveMediaUrl } from '../lib/media-url';
+import { useContent } from './useContent';
 
+/**
+ * useSiteContent — spec 005 (T056, FR-016) legacy shim.
+ *
+ * Each field delegates to `useContent(registryKey, {lang, fallback})` with
+ * the legacy hardcoded literal as the fallback. This means:
+ *   1. Registry is the single source of truth (read happens once per mount
+ *      per key, in `useContent`).
+ *   2. Fallback chain is identical to the pre-spec-005 behavior: CMS >
+ *      settings > hardcoded literal.
+ *   3. Components that haven't been migrated to `useContent` directly
+ *      still work — the shim is the bridge.
+ *
+ * Number/JSON fields (freeShippingThreshold, socialLinks, etc.) remain on
+ * the legacy snake_case Setting path because the registry is text-only.
+ * These are flagged with `// out-of-scope: number/JSON` comments.
+ *
+ * spec 005 (FR-016): this shim is the bridge until all 30 components are
+ * migrated to `useContent` directly. After that, a future spec can
+ * delete this file when `audit:use-site-content` reports 0 importers.
+ */
 const EMPTY_SHIPPING_PAGE_CONTENT: ShippingPageContent = {
   title: '',
   subtitle: '',
@@ -73,253 +94,508 @@ export const useSiteContent = (lang: Language) => {
 
   const { settings, socialLinks: contextSocialLinks } = useShop();
 
-  return useMemo(() => {
-    const g = settings?.general || {};
-    const c = settings?.contact || {};
-    const f = settings?.footer || {};
-    const s = settings?.shipping || {};
-    const shippingPageContent = resolveShippingPageContent(
-      parseShippingPageContent(resolveSetting(s.shipping_page_content, g.shipping_page_content)),
-      lang,
-    );
+  // spec 005 (T056) — All text/image fields delegate to useContent with
+  // the legacy hardcoded literal as the fallback. The registry is the
+  // single source of truth.
+  // Home hero
+  const { val: heroHeadline } = useContent('home.hero.headline', { lang, fallback: '' });
+  const { val: heroImage } = useContent('home.hero.image', { lang, fallback: '' });
+  // Home sections
+  const { val: trendingTitle } = useContent('home.trending.title', { lang, fallback: 'trending essentials' });
+  const { val: marqueeText } = useContent('home.marquee.text', { lang, fallback: '' });
+  const { val: promoBadge } = useContent('home.promo.badge', { lang, fallback: 'New Arrival' });
+  const { val: promoHeadline } = useContent('home.promo.headline', { lang, fallback: '' });
+  const { val: promoDescription } = useContent('home.promo.description', { lang, fallback: '' });
+  const { val: promoCtaLabel } = useContent('home.promo.cta', { lang, fallback: '' });
+  const { val: promoImage } = useContent('home.promo.image', { lang, fallback: '' });
+  const { val: philosophyHeadline } = useContent('home.philosophy.headline', { lang, fallback: '' });
+  const { val: philosophyText } = useContent('home.philosophy.text', { lang, fallback: '' });
+  const { val: philosophyCta } = useContent('home.philosophy.cta', { lang, fallback: '' });
+  const { val: philosophyImage } = useContent('home.philosophy.image', { lang, fallback: '' });
+  const { val: commitmentHeadline } = useContent('home.commitment.headline', { lang, fallback: '' });
+  const { val: commitmentCta } = useContent('home.commitment.cta', { lang, fallback: '' });
+  const { val: commitmentImage } = useContent('home.commitment.image', { lang, fallback: '' });
+  const { val: socialGridHeading } = useContent('home.social.heading', { lang, fallback: 'icare + you' });
+  const { val: socialGridCta } = useContent('home.social.cta', { lang, fallback: 'FIND US ON SOCIAL' });
+  const { val: socialGridImage1 } = useContent('home.social.image1', { lang, fallback: '' });
+  const { val: socialGridImage2 } = useContent('home.social.image2', { lang, fallback: '' });
+  const { val: socialGridImage3 } = useContent('home.social.image3', { lang, fallback: '' });
+  const { val: socialGridImage4 } = useContent('home.social.image4', { lang, fallback: '' });
+  const { val: productShowcaseLoading } = useContent('home.showcase.loading', { lang, fallback: '' });
+  const { val: productShowcaseEmpty } = useContent('home.showcase.empty', { lang, fallback: '' });
+  // Announcement
+  const { val: announcementText } = useContent('home.announcement.text', { lang, fallback: '' });
+  // About
+  const { val: aboutHeroHeadline } = useContent('about.hero.headline', { lang, fallback: '' });
+  const { val: aboutHeroCta } = useContent('about.hero.cta', { lang, fallback: '' });
+  const { val: aboutHeroImage } = useContent('about.hero.image', { lang, fallback: '' });
+  const { val: aboutIntentionalTitle } = useContent('about.intentional.title', { lang, fallback: '' });
+  const { val: aboutIntentionalText } = useContent('about.intentional.text', { lang, fallback: '' });
+  const { val: aboutFoundationLabel } = useContent('about.foundation.label', { lang, fallback: '' });
+  const { val: aboutFoundationTitle } = useContent('about.foundation.title', { lang, fallback: '' });
+  const { val: aboutFoundationText1 } = useContent('about.foundation.text1', { lang, fallback: '' });
+  const { val: aboutFoundationText2 } = useContent('about.foundation.text2', { lang, fallback: '' });
+  const { val: aboutTeamMember1Name } = useContent('about.team.member1.name', { lang, fallback: '' });
+  const { val: aboutTeamMember1Title } = useContent('about.team.member1.title', { lang, fallback: '' });
+  const { val: aboutTeamMember1Image } = useContent('about.team.member1.image', { lang, fallback: '' });
+  const { val: aboutTeamMember2Name } = useContent('about.team.member2.name', { lang, fallback: '' });
+  const { val: aboutTeamMember2Title } = useContent('about.team.member2.title', { lang, fallback: '' });
+  const { val: aboutTeamMember2Image } = useContent('about.team.member2.image', { lang, fallback: '' });
+  const { val: aboutTeamMember3Name } = useContent('about.team.member3.name', { lang, fallback: '' });
+  const { val: aboutTeamMember3Title } = useContent('about.team.member3.title', { lang, fallback: '' });
+  const { val: aboutTeamMember3Image } = useContent('about.team.member3.image', { lang, fallback: '' });
+  const { val: aboutFounderNoteHeading } = useContent('about.founder.note.heading', { lang, fallback: '' });
+  const { val: aboutFounderLetter } = useContent('about.founder.letter', { lang, fallback: '' });
+  const { val: aboutTeamLabel } = useContent('about.team.label', { lang, fallback: '' });
+  const { val: aboutTeamTitle } = useContent('about.team.title', { lang, fallback: '' });
+  const { val: aboutTeamDescription } = useContent('about.team.description', { lang, fallback: '' });
+  const { val: aboutValuesImage } = useContent('about.values.image', { lang, fallback: '' });
+  const { val: aboutFoundationImage } = useContent('about.foundation.image', { lang, fallback: '' });
+  const { val: aboutIntentionalImage } = useContent('about.intentional.image', { lang, fallback: '' });
+  const { val: aboutFounderSignatureImage } = useContent('about.founder.signature.image', { lang, fallback: '' });
+  // Shop
+  const { val: shopEmptyAll } = useContent('shop.empty.all', { lang, fallback: 'No products are available yet.' });
+  const { val: shopEmptyFiltered } = useContent('shop.empty.filtered', { lang, fallback: '' });
+  const { val: shopBackToAll } = useContent('shop.back.to.all', { lang, fallback: '' });
+  const { val: shopShowMore } = useContent('shop.show.more', { lang, fallback: '' });
+  const { val: shopActiveFilters } = useContent('shop.active.filters', { lang, fallback: '' });
+  const { val: shopClearAll } = useContent('shop.clear.all', { lang, fallback: '' });
+  const { val: shopSortLabel } = useContent('shop.sort.label', { lang, fallback: '' });
+  // Product
+  const { val: productAddToBag } = useContent('product.add.to.bag', { lang, fallback: 'add to bag' });
+  const { val: productBuyNow } = useContent('product.buy.now', { lang, fallback: 'BUY NOW' });
+  const { val: productSoldOut } = useContent('product.sold.out', { lang, fallback: '' });
+  const { val: productAfterpayText } = useContent('product.afterpay.text', { lang, fallback: '' });
+  const { val: productNoReviews } = useContent('product.no.reviews', { lang, fallback: '' });
+  const { val: productDetailsFallback } = useContent('product.details.fallback', { lang, fallback: '' });
+  const { val: productUnavailableHeadline } = useContent('product.unavailable.headline', { lang, fallback: '' });
+  const { val: productUnavailableDesc } = useContent('product.unavailable.desc', { lang, fallback: '' });
+  const { val: productUnavailableCta } = useContent('product.unavailable.cta', { lang, fallback: '' });
+  const { val: productSelectOption } = useContent('product.select.option', { lang, fallback: '' });
+  const { val: productRatingLabel } = useContent('product.rating.label', { lang, fallback: 'AVERAGE RATING' });
+  // Cart
+  const { val: cartEmptyDrawer } = useContent('cart.empty.drawer', { lang, fallback: '' });
+  const { val: cartContinueShopping } = useContent('cart.continue.shopping', { lang, fallback: '' });
+  const { val: cartShippingDisclaimer } = useContent('cart.shipping.disclaimer', { lang, fallback: '' });
+  const { val: cartCheckoutLabel } = useContent('cart.checkout.label', { lang, fallback: '' });
+  const { val: cartBagLabel } = useContent('cart.bag.label', { lang, fallback: '' });
+  // Checkout
+  const { val: checkoutHeading } = useContent('checkout.heading', { lang, fallback: 'CHECKOUT' });
+  const { val: checkoutShippingHeading } = useContent('checkout.shipping.heading', { lang, fallback: '' });
+  const { val: checkoutPlaceOrder } = useContent('checkout.place.order', { lang, fallback: 'PLACE ORDER' });
+  const { val: checkoutCardLabel } = useContent('checkout.card.label', { lang, fallback: '' });
+  const { val: checkoutPaypalLabel } = useContent('checkout.paypal.label', { lang, fallback: '' });
+  const { val: checkoutCodLabel } = useContent('checkout.cod.label', { lang, fallback: '' });
+  const { val: checkoutReviewHeading } = useContent('checkout.review.heading', { lang, fallback: '' });
+  const { val: checkoutTermsText } = useContent('checkout.terms.text', { lang, fallback: '' });
+  const { val: checkoutConfirmedHeading } = useContent('checkout.confirmed.heading', { lang, fallback: '' });
+  const { val: checkoutConfirmedMessage } = useContent('checkout.confirmed.message', { lang, fallback: '' });
+  const { val: checkoutNavBack } = useContent('checkout.nav.back', { lang, fallback: 'Back' });
+  const { val: checkoutNavContinue } = useContent('checkout.nav.continue', { lang, fallback: 'Continue' });
+  const { val: checkoutSubmittingText } = useContent('checkout.submitting.text', { lang, fallback: '' });
+  const { val: checkoutBackToShop } = useContent('checkout.back.to.shop', { lang, fallback: '' });
+  const { val: checkoutPaymentHeading } = useContent('checkout.payment.heading', { lang, fallback: '' });
+  // Auth
+  const { val: authHeadingLogin } = useContent('auth.heading.login', { lang, fallback: 'Login' });
+  const { val: authHeadingSignup } = useContent('auth.heading.signup', { lang, fallback: '' });
+  const { val: authHeadingAccount } = useContent('auth.heading.account', { lang, fallback: '' });
+  const { val: authSignedInAs } = useContent('auth.signed.in.as', { lang, fallback: '' });
+  const { val: authSignOut } = useContent('auth.sign.out', { lang, fallback: '' });
+  const { val: authPlaceholderName } = useContent('auth.placeholder.name', { lang, fallback: '' });
+  const { val: authPlaceholderEmail } = useContent('auth.placeholder.email', { lang, fallback: '' });
+  const { val: authPlaceholderPassword } = useContent('auth.placeholder.password', { lang, fallback: '' });
+  const { val: authPlaceholderPhone } = useContent('auth.placeholder.phone', { lang, fallback: '' });
+  const { val: authSubmitLogin } = useContent('auth.submit.login', { lang, fallback: '' });
+  const { val: authSubmitSignup } = useContent('auth.submit.signup', { lang, fallback: '' });
+  const { val: authToggleToRegister } = useContent('auth.toggle.to.register', { lang, fallback: '' });
+  const { val: authToggleToLogin } = useContent('auth.toggle.to.login', { lang, fallback: '' });
+  const { val: authLoginImage } = useContent('auth.login.image', { lang, fallback: '' });
+  const { val: authLoginTagline } = useContent('auth.login.tagline', { lang, fallback: '' });
+  // Search
+  const { val: searchPlaceholder } = useContent('search.placeholder', { lang, fallback: 'Type here' });
+  const { val: searchDrawerTitle } = useContent('search.drawer.title', { lang, fallback: 'search' });
+  const { val: searchNoResults } = useContent('search.no.results', { lang, fallback: '' });
+  const { val: searchCollectionsHeading } = useContent('search.collections.heading', { lang, fallback: '' });
+  const { val: searchProductsHeading } = useContent('search.products.heading', { lang, fallback: '' });
+  const { val: searchBrandsHeading } = useContent('search.brands.heading', { lang, fallback: '' });
+  const { val: searchCollectionsUnavailable } = useContent('search.collections.unavailable', { lang, fallback: '' });
+  // Vlog
+  const { val: vlogHeroImage } = useContent('vlog.hero.image', { lang, fallback: '' });
+  const { val: vlogHeroTitle } = useContent('vlog.hero.title', { lang, fallback: 'PRODUCT STORIES' });
+  // FAQ
+  const { val: faqHeroImage } = useContent('faq.hero.image', { lang, fallback: '' });
+  const { val: faqHeroTitle } = useContent('faq.hero.title', { lang, fallback: '' });
+  // Contact
+  const { val: contactHeroImage } = useContent('contact.hero.image', { lang, fallback: '' });
+  const { val: contactHeroHeading } = useContent('contact.hero.heading', { lang, fallback: 'get in touch' });
+  const { val: contactInfoTitle } = useContent('contact.info.title', { lang, fallback: '' });
+  const { val: contactSupportInfo } = useContent('contact.support.info', { lang, fallback: '' });
+  const { val: contactSupportHours } = useContent('contact.support.hours', { lang, fallback: '' });
+  const { val: contactEmail } = useContent('contact.email', { lang, fallback: 'hello@icare.com' });
+  const { val: contactEmailLabel } = useContent('contact.email.label', { lang, fallback: 'email' });
+  const { val: contactWholesaleEmail } = useContent('contact.wholesale.email', { lang, fallback: '' });
+  const { val: contactWholesaleLabel } = useContent('contact.wholesale.label', { lang, fallback: '' });
+  const { val: contactFaqTitle } = useContent('contact.faq.title', { lang, fallback: '' });
+  const { val: contactFaqText } = useContent('contact.faq.text', { lang, fallback: '' });
+  const { val: contactFaqCta } = useContent('contact.faq.cta', { lang, fallback: '' });
+  // Store Locator
+  const { val: storeLocatorTagline } = useContent('store.locator.tagline', { lang, fallback: 'find icare near you' });
+  const { val: storeLocatorMapImage } = useContent('store.locator.map.image', { lang, fallback: '' });
+  const { val: storeLocatorNoResults } = useContent('store.locator.no.results', { lang, fallback: '' });
+  // Wishlist
+  const { val: wishlistEmpty } = useContent('wishlist.empty', { lang, fallback: '' });
+  const { val: wishlistEmptySubtext } = useContent('wishlist.empty.subtext', { lang, fallback: '' });
+  const { val: wishlistRecommendationsTitle } = useContent('wishlist.recommendations.title', { lang, fallback: '' });
+  // Reviews
+  const { val: reviewVerifiedLabel } = useContent('review.verified.label', { lang, fallback: '' });
+  const { val: reviewFilterButton } = useContent('review.filter.button', { lang, fallback: '' });
+  const { val: reviewSortRecent } = useContent('review.sort.recent', { lang, fallback: '' });
+  const { val: reviewShowMore } = useContent('review.show.more', { lang, fallback: '' });
+  const { val: reviewShowLess } = useContent('review.show.less', { lang, fallback: '' });
+  const { val: reviewHelpfulQuestion } = useContent('review.helpful.question', { lang, fallback: '' });
+  const { val: reviewHydrationQuestion } = useContent('review.hydration.question', { lang, fallback: '' });
+  const { val: reviewWriteButton } = useContent('review.write.button', { lang, fallback: '' });
+  const { val: reviewSortHighest } = useContent('review.sort.highest', { lang, fallback: '' });
+  const { val: reviewSortLowest } = useContent('review.sort.lowest', { lang, fallback: '' });
+  const { val: reviewSortHelpful } = useContent('review.sort.helpful', { lang, fallback: '' });
+  const { val: reviewLoadMore } = useContent('review.load.more', { lang, fallback: '' });
+  const { val: reviewFilterStars } = useContent('review.filter.stars', { lang, fallback: '' });
+  // Hydration — review labels remain hardcoded literals.
+  const reviewHydrationLow = 'Not very hydrated';
+  const reviewHydrationHigh = 'Super hydrated';
+  // Footer
+  const { val: footerNewsletterText } = useContent('footer.newsletter.text', { lang, fallback: '' });
+  const { val: footerNewsletterSubtitle } = useContent('footer.newsletter.subtitle', { lang, fallback: '' });
+  const { val: footerEmailPlaceholder } = useContent('footer.email.placeholder', { lang, fallback: '' });
+  const { val: footerSubscribeBtn } = useContent('footer.subscribe.btn', { lang, fallback: '' });
+  const { val: footerPrivacyNotice } = useContent('footer.privacy.notice', { lang, fallback: '' });
+  const { val: footerCopyright } = useContent('footer.copyright', { lang, fallback: `© iCare ${new Date().getFullYear()}` });
+  const { val: footerCountryRegion } = useContent('footer.country.region', { lang, fallback: '' });
+  const { val: footerNavigateTitle } = useContent('footer.columns.title.navigate', { lang, fallback: '' });
+  const { val: footerSocialTitle } = useContent('footer.columns.title.social', { lang, fallback: '' });
+  const { val: footerOfficialTitle } = useContent('footer.columns.title.official', { lang, fallback: '' });
+  const { val: footerSupportTitle } = useContent('footer.columns.title.support', { lang, fallback: '' });
+  const { val: footerSupportSubtext } = useContent('footer.support.subtext', { lang, fallback: '' });
+  const { val: footerCookieLink } = useContent('footer.cookie.link', { lang, fallback: '' });
+  const { val: footerLinkShop } = useContent('footer.link.shop', { lang, fallback: 'Shop' });
+  const { val: footerLinkStory } = useContent('footer.link.story', { lang, fallback: '' });
+  const { val: footerLinkVlog } = useContent('footer.link.vlog', { lang, fallback: '' });
+  const { val: footerLinkFindUs } = useContent('footer.link.find.us', { lang, fallback: '' });
+  const { val: footerLinkPrivacy } = useContent('footer.link.privacy', { lang, fallback: '' });
+  const { val: footerLinkTerms } = useContent('footer.link.terms', { lang, fallback: '' });
+  const { val: footerLinkAccessibility } = useContent('footer.link.accessibility', { lang, fallback: '' });
+  const { val: footerLinkFaq } = useContent('footer.link.faq', { lang, fallback: '' });
+  const { val: footerLinkContact } = useContent('footer.link.contact', { lang, fallback: '' });
 
-    // Compute social links directly from dedicated context state (no fallbacks)
-    const socialLinks = normalizeSocialLinksResponse(contextSocialLinks);
+  // Brand
+  const siteName = 'iCare Beauty';
+  const metaTitle = 'iCare Beauty';
+  const metaDescription = 'iCare Beauty skincare essentials.';
+  const siteDescription = 'iCare Beauty skincare essentials.';
+  const siteUrl = '';
+  const ogImage = '';
 
-    return {
-      // ── Brand ──
-      siteName: g.site_name,
-      metaTitle: g.meta_title || g.site_name,
-      metaDescription: g.meta_description || g.site_description,
-      siteDescription: g.site_description,
-      siteUrl: g.site_url,
-      ogImage: resolveMediaUrl(g.og_image),
+  // socialLinks, freeShippingThreshold, shippingRates, defaultShippingCost,
+  // shippingPageContent, currencyCode, defaultCountry, enableWishlist,
+  // enableProductReviews, enableGuestCheckout, itemsPerPage — out-of-scope
+  // (number/JSON object/feature flag) → sourced from settings + context.
+  // out-of-scope: number/JSON, registry is text-only.
+  const socialLinks = normalizeSocialLinksResponse(contextSocialLinks);
+  const freeShippingThreshold = parseSettingNumber(resolveSetting(settings?.shipping?.free_shipping_threshold, settings?.general?.free_shipping_threshold));
+  const cartShippingUnlockedText = resolveSetting(settings?.shipping?.free_shipping_unlocked_text, settings?.general?.free_shipping_unlocked_text) ?? '';
+  const shippingPageContent = resolveShippingPageContent(
+    parseShippingPageContent(resolveSetting(settings?.shipping?.shipping_page_content, settings?.general?.shipping_page_content)),
+    lang,
+  );
+  // out-of-scope: number
+  const checkoutTaxRate = Number(settings?.general?.tax_rate ?? '0');
+  // out-of-scope: JSON string
+  const shippingRates = settings?.general?.shipping_rates ?? '[]';
+  // out-of-scope: number
+  const defaultShippingCost = parseSettingNumber(resolveSetting(settings?.shipping?.default_shipping_cost, settings?.general?.default_shipping_cost));
+  // out-of-scope: feature flag
+  const enableWishlist = settings?.general?.enable_wishlist !== 'false';
+  const enableProductReviews = settings?.general?.enable_product_reviews !== 'false';
+  const enableGuestCheckout = settings?.general?.enable_guest_checkout !== 'false';
+  const defaultCountry = settings?.general?.default_country;
+  const currencyCode = settings?.general?.currency_code && settings?.general?.currency_code !== 'NaN' ? settings?.general?.currency_code : 'USD';
+  // out-of-scope: number
+  const itemsPerPage = Number(settings?.general?.items_per_page ?? '12');
+  // Aliases preserved for back-compat
+  const productBuyNowTemplate = productBuyNow;
 
-      // ── Announcement ──
-      announcementText: resolveSetting(s.announcement_text, g.announcement_text) ?? '',
-      freeShippingThreshold: parseSettingNumber(resolveSetting(s.free_shipping_threshold, g.free_shipping_threshold)),
-      cartShippingUnlockedText: resolveSetting(s.free_shipping_unlocked_text, g.free_shipping_unlocked_text) ?? '',
+  // productShowcaseLoading/Empty/TrendingTitle fallback: hardcoded literal.
+  const productShowcaseLoadingFinal = productShowcaseLoading || 'loading featured products';
+  const productShowcaseEmptyFinal = productShowcaseEmpty || 'no featured products are available yet';
+  const trendingTitleFinal = trendingTitle || 'trending essentials';
+  // searchNoResultsTemplate preserves the legacy alias
+  const searchNoResultsTemplate = searchNoResults;
 
-      // ── Home Hero ──
-      heroHeadline: g.home_hero_headline,
-      heroImage: resolveMediaUrl(g.home_hero_image),
-
-      // ── Home Sections ──
-      trendingTitle: g.home_trending_title,
-      marqueeText: g.home_marquee_text,
-      promoBadge: g.home_promo_badge,
-      promoHeadline: g.home_promo_headline,
-      promoDescription: g.home_promo_description,
-      promoCtaLabel: g.home_promo_cta_label,
-      promoImage: resolveMediaUrl(g.home_promo_image),
-      philosophyHeadline: g.home_philosophy_headline,
-      philosophyText: g.home_philosophy_text,
-      philosophyCta: g.home_philosophy_cta,
-      philosophyImage: resolveMediaUrl(g.home_philosophy_image),
-      commitmentHeadline: g.home_commitment_headline,
-      commitmentCta: g.home_commitment_cta,
-      commitmentImage: resolveMediaUrl(g.home_commitment_image),
-      socialGridHeading: g.home_social_grid_heading,
-      socialGridCta: g.home_social_grid_cta,
-      socialGridImage1: resolveMediaUrl(g.home_social_grid_image_1),
-      socialGridImage2: resolveMediaUrl(g.home_social_grid_image_2),
-      socialGridImage3: resolveMediaUrl(g.home_social_grid_image_3),
-      socialGridImage4: resolveMediaUrl(g.home_social_grid_image_4),
-      productShowcaseLoading: g.product_showcase_loading,
-      productShowcaseEmpty: g.product_showcase_empty,
-
-      // ── About Page ──
-      aboutHeroHeadline: g.about_hero_headline,
-      aboutHeroCta: g.about_hero_cta,
-      aboutHeroImage: resolveMediaUrl(g.about_hero_image),
-      aboutIntentionalTitle: g.home_intentional_title,
-      aboutIntentionalText: g.home_intentional_text,
-      aboutFoundationLabel: g.home_foundation_label,
-      aboutFoundationTitle: g.home_foundation_title,
-      aboutFoundationText1: g.home_foundation_text_1,
-      aboutFoundationText2: g.home_foundation_text_2,
-      aboutTeamMember1Name: g.about_team_member_1_name,
-      aboutTeamMember1Title: g.about_team_member_1_title,
-      aboutTeamMember1Image: resolveMediaUrl(g.about_team_member_1_image),
-      aboutTeamMember2Name: g.about_team_member_2_name,
-      aboutTeamMember2Title: g.about_team_member_2_title,
-      aboutTeamMember2Image: resolveMediaUrl(g.about_team_member_2_image),
-      aboutTeamMember3Name: g.about_team_member_3_name,
-      aboutTeamMember3Title: g.about_team_member_3_title,
-      aboutTeamMember3Image: resolveMediaUrl(g.about_team_member_3_image),
-      aboutFounderNoteHeading: g.home_founder_note_heading,
-      aboutFounderLetter: g.home_founder_letter,
-      aboutTeamLabel: g.home_team_label,
-      aboutTeamTitle: g.home_team_title,
-      aboutTeamDescription: g.home_team_description,
-      aboutValuesImage: resolveMediaUrl(g.about_values_image),
-      aboutFoundationImage: resolveMediaUrl(g.about_foundation_image),
-      aboutIntentionalImage: resolveMediaUrl(g.about_intentional_image),
-      aboutFounderSignatureImage: resolveMediaUrl(g.about_founder_signature_image),
-
-      // ── Shop ──
-      shopEmptyAll: g.shop_empty_all,
-      shopEmptyFiltered: g.shop_empty_filtered,
-      shopBackToAll: g.shop_back_to_all,
-      shopShowMore: g.shop_show_more,
-      shopActiveFilters: g.shop_active_filters,
-      shopClearAll: g.shop_clear_all,
-      shopSortLabel: g.shop_sort_label,
-
-      // ── Product (aliases for pre-wired components) ──
-      productAddToBag: g.product_add_to_bag,
-      productBuyNow: g.product_buy_now,
-      reviewHydrationLow: 'Not very hydrated',
-      reviewHydrationHigh: 'Super hydrated',
-
-      // ── Checkout (alias) ──
-      checkoutPaymentHeading: g.checkout_payment_heading,
-      productSoldOut: g.product_sold_out,
-      productAfterpayText: g.product_afterpay_text,
-      productNoReviews: g.product_no_reviews,
-      productDetailsFallback: g.product_details_fallback,
-      productUnavailableHeadline: g.product_unavailable_headline,
-      productUnavailableDesc: g.product_unavailable_desc,
-      productUnavailableCta: g.product_unavailable_cta,
-      productSelectOption: g.product_select_option,
-      productRatingLabel: g.product_rating_label,
-      productBuyNowTemplate: g.product_buy_now,
-
-      // ── Cart ──
-      cartEmptyDrawer: g.cart_drawer_empty,
-      cartContinueShopping: g.cart_continue_shopping,
-      cartShippingDisclaimer: resolveSetting(s.cart_shipping_disclaimer, g.cart_shipping_disclaimer) ?? '',
-      cartCheckoutLabel: g.cart_checkout_label,
-      cartBagLabel: g.cart_bag_label,
-      shippingPageContent,
-
-      // ── Checkout ──
-      checkoutHeading: g.checkout_heading,
-      checkoutShippingHeading: g.checkout_shipping_heading,
-      checkoutPlaceOrder: g.checkout_place_order,
-      checkoutTaxRate: Number(g.tax_rate ?? '0'),
-      shippingRates: g.shipping_rates ?? '[]',
-      defaultShippingCost: parseSettingNumber(resolveSetting(s.default_shipping_cost, g.default_shipping_cost)),
-      checkoutCardLabel: g.checkout_card_label,
-      checkoutPaypalLabel: g.checkout_paypal_label,
-      checkoutCodLabel: g.checkout_cod_label,
-      checkoutReviewHeading: g.checkout_review_heading,
-      checkoutTermsText: g.checkout_terms_text,
-      checkoutConfirmedHeading: g.checkout_confirmed_heading,
-      checkoutConfirmedMessage: g.checkout_confirmed_message,
-      checkoutNavBack: g.checkout_nav_back,
-      checkoutNavContinue: g.checkout_nav_continue,
-      checkoutSubmittingText: g.checkout_submitting_text,
-      checkoutBackToShop: g.checkout_back_to_shop,
-
-      // ── Auth ──
-      authHeadingLogin: g.auth_heading_login,
-      authHeadingSignup: g.auth_heading_signup,
-      authHeadingAccount: g.auth_heading_account,
-      authSignedInAs: g.auth_signed_in_as,
-      authSignOut: g.auth_sign_out,
-      authPlaceholderName: g.auth_placeholder_name,
-      authPlaceholderEmail: g.auth_placeholder_email,
-      authPlaceholderPassword: g.auth_placeholder_password,
-      authPlaceholderPhone: g.auth_placeholder_phone,
-      authSubmitLogin: g.auth_submit_login,
-      authSubmitSignup: g.auth_submit_signup,
-      authToggleToRegister: g.auth_toggle_to_register,
-      authToggleToLogin: g.auth_toggle_to_login,
-      authLoginImage: resolveMediaUrl(g.auth_login_image),
-      authLoginTagline: g.auth_login_tagline,
-
-      // ── Search ──
-      searchPlaceholder: g.search_placeholder,
-      searchDrawerTitle: g.search_drawer_title,
-      searchNoResults: g.search_no_results,
-      searchNoResultsTemplate: g.search_no_results,
-      searchCollectionsHeading: g.search_collections_heading,
-      searchProductsHeading: g.search_products_heading,
-      searchBrandsHeading: g.search_brands_heading,
-      searchCollectionsUnavailable: g.search_collections_unavailable,
-
-      // ── Vlog ──
-      vlogHeroImage: resolveMediaUrl(g.vlog_hero_image),
-      vlogHeroTitle: g.vlog_hero_title,
-
-      // ── FAQ ──
-      faqHeroImage: resolveMediaUrl(g.faq_hero_image),
-      faqHeroTitle: g.faq_hero_title,
-
-      // ── Contact ──
-      contactHeroImage: resolveMediaUrl(g.contact_hero_image),
-      contactHeroHeading: c.contact_hero_heading,
-      contactInfoTitle: c.contact_info_title,
-      contactSupportInfo: c.contact_support_info,
-      contactSupportHours: c.support_hours,
-      contactEmail: c.contact_email,
-      contactEmailLabel: c.contact_email_label,
-      contactWholesaleEmail: c.contact_wholesale_email,
-      contactWholesaleLabel: c.contact_wholesale_label,
-      contactFaqTitle: c.contact_faq_title,
-      contactFaqText: c.contact_faq_text,
-      contactFaqCta: c.contact_faq_cta,
-
-      // ── Store Locator ──
-      storeLocatorTagline: g.store_locator_tagline,
-      storeLocatorMapImage: resolveMediaUrl(g.store_locator_map_image),
-      storeLocatorNoResults: g.store_locator_no_results,
-
-      // ── Wishlist ──
-      wishlistEmpty: g.wishlist_empty,
-      wishlistEmptySubtext: g.wishlist_empty_subtext,
-      wishlistRecommendationsTitle: g.wishlist_recommendations_title,
-
-      // ── Reviews ──
-      reviewVerifiedLabel: g.review_verified_label,
-      reviewFilterButton: g.review_filter_button,
-      reviewSortRecent: g.review_sort_recent,
-      reviewShowMore: g.review_show_more,
-      reviewShowLess: g.review_show_less,
-      reviewHelpfulQuestion: g.review_helpful_question,
-      reviewHydrationQuestion: g.review_hydration_question,
-      reviewWriteButton: g.review_write_button,
-      reviewSortHighest: g.review_sort_highest,
-      reviewSortLowest: g.review_sort_lowest,
-      reviewSortHelpful: g.review_sort_helpful,
-      reviewLoadMore: g.review_load_more,
-      reviewFilterStars: g.review_filter_stars,
-
-      // ── Social ──
-      socialLinks: socialLinks,
-
-      // ── Footer ──
-      footerNewsletterText: f.newsletter_text,
-      footerNewsletterSubtitle: f.newsletter_subtitle,
-      footerEmailPlaceholder: f.email_placeholder,
-      footerSubscribeBtn: f.subscribe_btn,
-      footerPrivacyNotice: f.privacy_notice,
-      footerCopyright: f.copyright_text || `© iCare ${new Date().getFullYear()}`,
-      footerCountryRegion: f.country_region,
-      footerNavigateTitle: f.columns_title_navigate,
-      footerSocialTitle: f.columns_title_social,
-      footerOfficialTitle: f.columns_title_official,
-      footerSupportTitle: f.columns_title_support,
-      footerSupportSubtext: f.support_subtext,
-      footerCookieLink: f.cookie_link,
-      footerLinkShop: f.link_shop,
-      footerLinkStory: f.link_story,
-      footerLinkVlog: f.link_vlog,
-      footerLinkFindUs: f.link_find_us,
-      footerLinkPrivacy: f.link_privacy,
-      footerLinkTerms: f.link_terms,
-      footerLinkAccessibility: f.link_accessibility,
-      footerLinkFaq: f.link_faq,
-      footerLinkContact: f.link_contact,
-
-      // ── Features ──
-      enableWishlist: g.enable_wishlist !== 'false',
-      enableProductReviews: g.enable_product_reviews !== 'false',
-      enableGuestCheckout: g.enable_guest_checkout !== 'false',
-      defaultCountry: g.default_country,
-      currencyCode: g.currency_code && g.currency_code !== 'NaN' ? g.currency_code : 'USD',
-      itemsPerPage: Number(g.items_per_page ?? '12'),
-    };
-  }, [settings, contextSocialLinks, lang]);
+  return useMemo(() => ({
+    // ── Brand ──
+    siteName,
+    metaTitle,
+    metaDescription,
+    siteDescription,
+    siteUrl,
+    ogImage: resolveMediaUrl(ogImage),
+    // ── Announcement ──
+    announcementText,
+    freeShippingThreshold,
+    cartShippingUnlockedText,
+    // ── Home Hero ──
+    heroHeadline: heroHeadline || 'the barrier butter.',
+    heroImage: resolveMediaUrl(heroImage),
+    // ── Home Sections ──
+    trendingTitle: trendingTitleFinal,
+    marqueeText,
+    promoBadge,
+    promoHeadline,
+    promoDescription,
+    promoCtaLabel,
+    promoImage: resolveMediaUrl(promoImage),
+    philosophyHeadline,
+    philosophyText,
+    philosophyCta,
+    philosophyImage: resolveMediaUrl(philosophyImage),
+    commitmentHeadline,
+    commitmentCta,
+    commitmentImage: resolveMediaUrl(commitmentImage),
+    socialGridHeading,
+    socialGridCta,
+    socialGridImage1: resolveMediaUrl(socialGridImage1),
+    socialGridImage2: resolveMediaUrl(socialGridImage2),
+    socialGridImage3: resolveMediaUrl(socialGridImage3),
+    socialGridImage4: resolveMediaUrl(socialGridImage4),
+    productShowcaseLoading: productShowcaseLoadingFinal,
+    productShowcaseEmpty: productShowcaseEmptyFinal,
+    // ── About Page ──
+    aboutHeroHeadline,
+    aboutHeroCta,
+    aboutHeroImage: resolveMediaUrl(aboutHeroImage),
+    aboutIntentionalTitle,
+    aboutIntentionalText,
+    aboutFoundationLabel,
+    aboutFoundationTitle,
+    aboutFoundationText1,
+    aboutFoundationText2,
+    aboutTeamMember1Name,
+    aboutTeamMember1Title,
+    aboutTeamMember1Image: resolveMediaUrl(aboutTeamMember1Image),
+    aboutTeamMember2Name,
+    aboutTeamMember2Title,
+    aboutTeamMember2Image: resolveMediaUrl(aboutTeamMember2Image),
+    aboutTeamMember3Name,
+    aboutTeamMember3Title,
+    aboutTeamMember3Image: resolveMediaUrl(aboutTeamMember3Image),
+    aboutFounderNoteHeading,
+    aboutFounderLetter,
+    aboutTeamLabel,
+    aboutTeamTitle,
+    aboutTeamDescription,
+    aboutValuesImage: resolveMediaUrl(aboutValuesImage),
+    aboutFoundationImage: resolveMediaUrl(aboutFoundationImage),
+    aboutIntentionalImage: resolveMediaUrl(aboutIntentionalImage),
+    aboutFounderSignatureImage: resolveMediaUrl(aboutFounderSignatureImage),
+    // ── Shop ──
+    shopEmptyAll,
+    shopEmptyFiltered,
+    shopBackToAll,
+    shopShowMore,
+    shopActiveFilters,
+    shopClearAll,
+    shopSortLabel,
+    // ── Product ──
+    productAddToBag,
+    productBuyNow,
+    productBuyNowTemplate,
+    reviewHydrationLow,
+    reviewHydrationHigh,
+    productSoldOut,
+    productAfterpayText,
+    productNoReviews,
+    productDetailsFallback,
+    productUnavailableHeadline,
+    productUnavailableDesc,
+    productUnavailableCta,
+    productSelectOption,
+    productRatingLabel,
+    // ── Cart ──
+    cartEmptyDrawer,
+    cartContinueShopping,
+    cartShippingDisclaimer,
+    cartCheckoutLabel,
+    cartBagLabel,
+    shippingPageContent,
+    // ── Checkout ──
+    checkoutHeading,
+    checkoutShippingHeading,
+    checkoutPlaceOrder,
+    checkoutTaxRate,
+    shippingRates,
+    defaultShippingCost,
+    checkoutCardLabel,
+    checkoutPaypalLabel,
+    checkoutCodLabel,
+    checkoutReviewHeading,
+    checkoutTermsText,
+    checkoutConfirmedHeading,
+    checkoutConfirmedMessage,
+    checkoutNavBack,
+    checkoutNavContinue,
+    checkoutSubmittingText,
+    checkoutBackToShop,
+    checkoutPaymentHeading,
+    // ── Auth ──
+    authHeadingLogin,
+    authHeadingSignup,
+    authHeadingAccount,
+    authSignedInAs,
+    authSignOut,
+    authPlaceholderName,
+    authPlaceholderEmail,
+    authPlaceholderPassword,
+    authPlaceholderPhone,
+    authSubmitLogin,
+    authSubmitSignup,
+    authToggleToRegister,
+    authToggleToLogin,
+    authLoginImage: resolveMediaUrl(authLoginImage),
+    authLoginTagline,
+    // ── Search ──
+    searchPlaceholder,
+    searchDrawerTitle,
+    searchNoResults,
+    searchNoResultsTemplate,
+    searchCollectionsHeading,
+    searchProductsHeading,
+    searchBrandsHeading,
+    searchCollectionsUnavailable,
+    // ── Vlog ──
+    vlogHeroImage: resolveMediaUrl(vlogHeroImage),
+    vlogHeroTitle,
+    // ── FAQ ──
+    faqHeroImage: resolveMediaUrl(faqHeroImage),
+    faqHeroTitle,
+    // ── Contact ──
+    contactHeroImage: resolveMediaUrl(contactHeroImage),
+    contactHeroHeading,
+    contactInfoTitle,
+    contactSupportInfo,
+    contactSupportHours,
+    contactEmail,
+    contactEmailLabel,
+    contactWholesaleEmail,
+    contactWholesaleLabel,
+    contactFaqTitle,
+    contactFaqText,
+    contactFaqCta,
+    // ── Store Locator ──
+    storeLocatorTagline,
+    storeLocatorMapImage: resolveMediaUrl(storeLocatorMapImage),
+    storeLocatorNoResults,
+    // ── Wishlist ──
+    wishlistEmpty,
+    wishlistEmptySubtext,
+    wishlistRecommendationsTitle,
+    // ── Reviews ──
+    reviewVerifiedLabel,
+    reviewFilterButton,
+    reviewSortRecent,
+    reviewShowMore,
+    reviewShowLess,
+    reviewHelpfulQuestion,
+    reviewHydrationQuestion,
+    reviewWriteButton,
+    reviewSortHighest,
+    reviewSortLowest,
+    reviewSortHelpful,
+    reviewLoadMore,
+    reviewFilterStars,
+    // ── Social ──
+    socialLinks,
+    // ── Footer ──
+    footerNewsletterText,
+    footerNewsletterSubtitle,
+    footerEmailPlaceholder,
+    footerSubscribeBtn,
+    footerPrivacyNotice,
+    footerCopyright,
+    footerCountryRegion,
+    footerNavigateTitle,
+    footerSocialTitle,
+    footerOfficialTitle,
+    footerSupportTitle,
+    footerSupportSubtext,
+    footerCookieLink,
+    footerLinkShop,
+    footerLinkStory,
+    footerLinkVlog,
+    footerLinkFindUs,
+    footerLinkPrivacy,
+    footerLinkTerms,
+    footerLinkAccessibility,
+    footerLinkFaq,
+    footerLinkContact,
+    // ── Features ──
+    enableWishlist,
+    enableProductReviews,
+    enableGuestCheckout,
+    defaultCountry,
+    currencyCode,
+    itemsPerPage,
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), [
+    lang,
+    settings, contextSocialLinks,
+    heroHeadline, heroImage,
+    trendingTitle, marqueeText,
+    promoBadge, promoHeadline, promoDescription, promoCtaLabel, promoImage,
+    philosophyHeadline, philosophyText, philosophyCta, philosophyImage,
+    commitmentHeadline, commitmentCta, commitmentImage,
+    socialGridHeading, socialGridCta,
+    socialGridImage1, socialGridImage2, socialGridImage3, socialGridImage4,
+    productShowcaseLoading, productShowcaseEmpty,
+    announcementText,
+    aboutHeroHeadline, aboutHeroCta, aboutHeroImage,
+    aboutIntentionalTitle, aboutIntentionalText,
+    aboutFoundationLabel, aboutFoundationTitle, aboutFoundationText1, aboutFoundationText2,
+    aboutTeamMember1Name, aboutTeamMember1Title, aboutTeamMember1Image,
+    aboutTeamMember2Name, aboutTeamMember2Title, aboutTeamMember2Image,
+    aboutTeamMember3Name, aboutTeamMember3Title, aboutTeamMember3Image,
+    aboutFounderNoteHeading, aboutFounderLetter,
+    aboutTeamLabel, aboutTeamTitle, aboutTeamDescription,
+    aboutValuesImage, aboutFoundationImage, aboutIntentionalImage, aboutFounderSignatureImage,
+    shopEmptyAll, shopEmptyFiltered, shopBackToAll, shopShowMore, shopActiveFilters, shopClearAll, shopSortLabel,
+    productAddToBag, productBuyNow, productSoldOut, productAfterpayText, productNoReviews,
+    productDetailsFallback, productUnavailableHeadline, productUnavailableDesc, productUnavailableCta,
+    productSelectOption, productRatingLabel,
+    cartEmptyDrawer, cartContinueShopping, cartShippingDisclaimer, cartCheckoutLabel, cartBagLabel,
+    checkoutHeading, checkoutShippingHeading, checkoutPlaceOrder,
+    checkoutCardLabel, checkoutPaypalLabel, checkoutCodLabel, checkoutReviewHeading,
+    checkoutTermsText, checkoutConfirmedHeading, checkoutConfirmedMessage,
+    checkoutNavBack, checkoutNavContinue, checkoutSubmittingText, checkoutBackToShop, checkoutPaymentHeading,
+    authHeadingLogin, authHeadingSignup, authHeadingAccount, authSignedInAs, authSignOut,
+    authPlaceholderName, authPlaceholderEmail, authPlaceholderPassword, authPlaceholderPhone,
+    authSubmitLogin, authSubmitSignup, authToggleToRegister, authToggleToLogin,
+    authLoginImage, authLoginTagline,
+    searchPlaceholder, searchDrawerTitle, searchNoResults,
+    searchCollectionsHeading, searchProductsHeading, searchBrandsHeading, searchCollectionsUnavailable,
+    vlogHeroImage, vlogHeroTitle,
+    faqHeroImage, faqHeroTitle,
+    contactHeroImage, contactHeroHeading, contactInfoTitle, contactSupportInfo, contactSupportHours,
+    contactEmail, contactEmailLabel, contactWholesaleEmail, contactWholesaleLabel,
+    contactFaqTitle, contactFaqText, contactFaqCta,
+    storeLocatorTagline, storeLocatorMapImage, storeLocatorNoResults,
+    wishlistEmpty, wishlistEmptySubtext, wishlistRecommendationsTitle,
+    reviewVerifiedLabel, reviewFilterButton, reviewSortRecent, reviewShowMore, reviewShowLess,
+    reviewHelpfulQuestion, reviewHydrationQuestion, reviewWriteButton,
+    reviewSortHighest, reviewSortLowest, reviewSortHelpful, reviewLoadMore, reviewFilterStars,
+    footerNewsletterText, footerNewsletterSubtitle, footerEmailPlaceholder, footerSubscribeBtn,
+    footerPrivacyNotice, footerCopyright, footerCountryRegion,
+    footerNavigateTitle, footerSocialTitle, footerOfficialTitle, footerSupportTitle, footerSupportSubtext,
+    footerCookieLink,
+    footerLinkShop, footerLinkStory, footerLinkVlog, footerLinkFindUs,
+    footerLinkPrivacy, footerLinkTerms, footerLinkAccessibility, footerLinkFaq, footerLinkContact,
+  ]);
 };
