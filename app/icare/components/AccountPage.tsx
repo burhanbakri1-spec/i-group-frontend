@@ -37,10 +37,12 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
     authToggleToLogin,
   } = useSiteContent(lang);
   const loginImageFallback = "https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=1200&auto=format&fit=crop";
-  // ContentProvider key — BE provides Unsplash default via
-  // PagesService.onModuleInit() (registered in e-commerce-backend).
-  const { val: accountLoginImageCp } = useContent('account.login.image', { lang, fallback: '' });
-  const loginImage = accountLoginImageCp || authLoginImage || loginImageFallback;
+  // `auth.login.image` is already fetched by the useSiteContent shim above
+  // (and now auto-resolved for image keys per CRIT-01). No second fetch
+  // needed here — that was a HIGH-02 double-fetch. The chain is:
+  //   BE ContentProvider (admin override) → BE defaultValue (Unsplash)
+  //   → component-level fallback when BE is unreachable.
+  const loginImage = authLoginImage || loginImageFallback;
   // ContentProvider overrides for all auth text keys.
   const { val: authLoginTaglineCp } = useContent('auth.login.tagline', { lang, fallback: '' });
   const { val: authHeadingLoginCp } = useContent('auth.heading.login', { lang, fallback: '' });

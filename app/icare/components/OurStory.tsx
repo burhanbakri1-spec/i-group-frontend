@@ -14,8 +14,10 @@ const DEFAULT_OUR_STORY_IMAGE = 'https://images.unsplash.com/photo-1596755094514
 export const OurStory: React.FC<OurStoryProps> = ({ lang }) => {
   const t = translations[lang];
   // ContentProvider key — BE provides Unsplash default via
-  // PagesService.onModuleInit() (registered in e-commerce-backend).
-  const { val: ourStoryImageCp } = useContent('home.our-story.image', { lang, fallback: '' });
+  // ContentDefaultsService.registerHomepage() in e-commerce-backend.
+  // Key is `home.ourstory.image` (no separator) to satisfy the registry's
+  // KEY_RE = /^[a-z][a-z0-9_.]+$/ — hyphens are rejected at runtime.
+  const { val: ourStoryImageCp } = useContent('home.ourstory.image', { lang, fallback: '' });
 
   return (
     <div className="pt-24 min-h-screen bg-[#F2F0EA]">

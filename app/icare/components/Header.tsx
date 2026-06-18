@@ -5,6 +5,8 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { translations, Language } from '../translations';
 import { useShop } from '../context/ShopContext';
 import { usePathname } from 'next/navigation';
+import { useContent } from '../hooks/useContent';
+import { resolveMediaUrl } from '../lib/media-url';
 import { BackendCategory, Product } from '../types';
 import { fetchCatalogProducts, fetchCategoryRoots } from '../lib/catalog-client';
 import { hasIcareStandardHero } from '../lib/hero-routes';
@@ -33,6 +35,14 @@ const PREVIEW_SLIDE_DISTANCE = 60;
 export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavigate, onProductSelect, onOpenMenu, isDrawerOpen, lang, onToggleLang }) => {
   const t = translations[lang];
   const { cartCount } = useShop();
+  // Brand logo — fetched from BE content registry (`marketing.site.logo.image`,
+  // registered in e-commerce-backend/src/content/content-defaults.service.ts).
+  // Replaces the previous `/icare-logo.png` static asset that 404'd at runtime
+  // (no public/icare-logo.png existed). ImageWithFallback keeps the existing
+  // verified-image rendering path intact.
+  const LOGO_FALLBACK = 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=400';
+  const { val: logoCp } = useContent('marketing.site.logo.image', { lang, fallback: '' });
+  const logoSrc = resolveMediaUrl(logoCp) || LOGO_FALLBACK;
   const [isShopHovered, setIsShopHovered] = useState(false);
   const [activePreviewIndex, setActivePreviewIndex] = useState(0);
   const [previewDirection, setPreviewDirection] = useState<'left' | 'right'>('right');
@@ -415,9 +425,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
             transition={calmTween}
               aria-label={t.goToHome}
           >
-            <img
-              src="/icare-logo.png"
-                alt={t.aboutAltBrand}
+            <ImageWithFallback
+              src={logoSrc}
+              alt={t.aboutAltBrand}
               className={`h-full w-auto object-contain transition-all duration-300 ${logoToneClass}`}
             />
           </motion.button>

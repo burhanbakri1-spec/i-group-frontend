@@ -11,9 +11,15 @@ interface PageHeroProps {
   tabletImage?: string;
   fallbackImage: string;
   alt: string;
+  // Optional announcement chip rendered above the headline (e.g.
+  // "NEW: Barrier Butter tinted edition"). Sourced from
+  // `home.hero.announcement` so marketing can edit it without a redeploy.
+  announcement?: string;
   title: React.ReactNode;
   subtitle?: React.ReactNode;
   ctaLabel?: React.ReactNode;
+  // Optional scroll prompt (e.g. "scroll") rendered below the CTA.
+  scrollHint?: string;
   onCtaClick?: () => void;
   priority?: boolean;
 }
@@ -26,9 +32,11 @@ export const PageHero: React.FC<PageHeroProps> = ({
   tabletImage,
   fallbackImage,
   alt,
+  announcement,
   title,
   subtitle,
   ctaLabel,
+  scrollHint,
   onCtaClick,
   priority = false,
 }) => {
@@ -76,6 +84,11 @@ export const PageHero: React.FC<PageHeroProps> = ({
           animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.8, ease: HERO_EASE }}
         >
+          {announcement ? (
+            <span className="rounded-full bg-white/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.45)] backdrop-blur-sm">
+              {announcement}
+            </span>
+          ) : null}
           <div className="grid max-w-[70rem] gap-3">
             <h1 className="m-0 max-w-[22rem] text-[clamp(1.875rem,7.2vw,2.25rem)] font-medium leading-[1.12] tracking-[-0.02em] md:max-w-[70rem] md:text-[calc(1.8rem_+_.2vw)] md:leading-[1.2]">
               {title}
@@ -95,6 +108,11 @@ export const PageHero: React.FC<PageHeroProps> = ({
             >
               {ctaLabel}
             </button>
+          ) : null}
+          {scrollHint ? (
+            <span className="mt-2 text-[10px] font-bold uppercase tracking-[0.24em] text-white/70">
+              {scrollHint}
+            </span>
           ) : null}
         </motion.div>
       </motion.div>

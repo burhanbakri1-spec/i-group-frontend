@@ -88,9 +88,10 @@ const resolveShippingPageContent = (
 };
 
 export const useSiteContent = (lang: Language) => {
-  if (process.env.NODE_ENV !== 'production' && !lang) {
-    console.warn('useSiteContent called without lang');
-  }
+  // The previous dev warning (`!lang`) was unreachable because `lang`
+  // is typed `Language = 'en' | 'ar'` — both values are truthy strings.
+  // Removed in CRIT-cleanup. If a future caller wants to detect a missing
+  // arg, change the signature to `lang?: Language` first.
 
   const { settings, socialLinks: contextSocialLinks } = useShop();
 
@@ -121,10 +122,10 @@ export const useSiteContent = (lang: Language) => {
   const { val: socialGridImage2 } = useContent('home.social.image2', { lang, fallback: '' });
   const { val: socialGridImage3 } = useContent('home.social.image3', { lang, fallback: '' });
   const { val: socialGridImage4 } = useContent('home.social.image4', { lang, fallback: '' });
-  const { val: productShowcaseLoading } = useContent('home.showcase.loading', { lang, fallback: '' });
   const { val: productShowcaseEmpty } = useContent('home.showcase.empty', { lang, fallback: '' });
-  // Announcement
-  const { val: announcementText } = useContent('home.announcement.text', { lang, fallback: '' });
+  // Announcement — read the canonical marketing.announcement.text key.
+  // (home.announcement.text was a duplicate registration removed in CRIT-03.)
+  const { val: announcementText } = useContent('marketing.announcement.text', { lang, fallback: '' });
   // About
   const { val: aboutHeroHeadline } = useContent('about.hero.headline', { lang, fallback: '' });
   const { val: aboutHeroCta } = useContent('about.hero.cta', { lang, fallback: '' });
@@ -238,10 +239,10 @@ export const useSiteContent = (lang: Language) => {
   const { val: contactFaqTitle } = useContent('contact.faq.title', { lang, fallback: '' });
   const { val: contactFaqText } = useContent('contact.faq.text', { lang, fallback: '' });
   const { val: contactFaqCta } = useContent('contact.faq.cta', { lang, fallback: '' });
-  // Store Locator
-  const { val: storeLocatorTagline } = useContent('store.locator.tagline', { lang, fallback: 'find icare near you' });
-  const { val: storeLocatorMapImage } = useContent('store.locator.map.image', { lang, fallback: '' });
-  const { val: storeLocatorNoResults } = useContent('store.locator.no.results', { lang, fallback: '' });
+  // Store Locator — canonical marketing.store.locator.* keys
+  // (store.locator.* aliases were removed in CRIT-03).
+  const { val: storeLocatorTagline } = useContent('marketing.store.locator.tagline', { lang, fallback: 'find icare near you' });
+  const { val: storeLocatorNoResults } = useContent('marketing.store.locator.no.results', { lang, fallback: '' });
   // Wishlist
   const { val: wishlistEmpty } = useContent('wishlist.empty', { lang, fallback: '' });
   const { val: wishlistEmptySubtext } = useContent('wishlist.empty.subtext', { lang, fallback: '' });
@@ -324,8 +325,8 @@ export const useSiteContent = (lang: Language) => {
   // Aliases preserved for back-compat
   const productBuyNowTemplate = productBuyNow;
 
-  // productShowcaseLoading/Empty/TrendingTitle fallback: hardcoded literal.
-  const productShowcaseLoadingFinal = productShowcaseLoading || 'loading featured products';
+  // productShowcaseEmpty/TrendingTitle fallback: hardcoded literal.
+  // (productShowcaseLoading was removed — ProductShowcase uses SkeletonPulse.)
   const productShowcaseEmptyFinal = productShowcaseEmpty || 'no featured products are available yet';
   const trendingTitleFinal = trendingTitle || 'trending essentials';
   // searchNoResultsTemplate preserves the legacy alias
@@ -367,7 +368,6 @@ export const useSiteContent = (lang: Language) => {
     socialGridImage2: resolveMediaUrl(socialGridImage2),
     socialGridImage3: resolveMediaUrl(socialGridImage3),
     socialGridImage4: resolveMediaUrl(socialGridImage4),
-    productShowcaseLoading: productShowcaseLoadingFinal,
     productShowcaseEmpty: productShowcaseEmptyFinal,
     // ── About Page ──
     aboutHeroHeadline,
@@ -492,7 +492,8 @@ export const useSiteContent = (lang: Language) => {
     contactFaqCta,
     // ── Store Locator ──
     storeLocatorTagline,
-    storeLocatorMapImage: resolveMediaUrl(storeLocatorMapImage),
+    // storeLocatorMapImage removed (CRIT-06) — StoreLocatorMap renders
+    // Leaflet OSM tiles, not a static image fallback.
     storeLocatorNoResults,
     // ── Wishlist ──
     wishlistEmpty,
@@ -555,7 +556,7 @@ export const useSiteContent = (lang: Language) => {
     commitmentHeadline, commitmentCta, commitmentImage,
     socialGridHeading, socialGridCta,
     socialGridImage1, socialGridImage2, socialGridImage3, socialGridImage4,
-    productShowcaseLoading, productShowcaseEmpty,
+    productShowcaseEmpty,
     announcementText,
     aboutHeroHeadline, aboutHeroCta, aboutHeroImage,
     aboutIntentionalTitle, aboutIntentionalText,
@@ -586,7 +587,7 @@ export const useSiteContent = (lang: Language) => {
     contactHeroImage, contactHeroHeading, contactInfoTitle, contactSupportInfo, contactSupportHours,
     contactEmail, contactEmailLabel, contactWholesaleEmail, contactWholesaleLabel,
     contactFaqTitle, contactFaqText, contactFaqCta,
-    storeLocatorTagline, storeLocatorMapImage, storeLocatorNoResults,
+    storeLocatorTagline, storeLocatorNoResults,
     wishlistEmpty, wishlistEmptySubtext, wishlistRecommendationsTitle,
     reviewVerifiedLabel, reviewFilterButton, reviewSortRecent, reviewShowMore, reviewShowLess,
     reviewHelpfulQuestion, reviewHydrationQuestion, reviewWriteButton,

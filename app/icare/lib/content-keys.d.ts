@@ -30,9 +30,7 @@ export interface ContentKeys {
   'about.team.member3.name': { type: 'text'; locales: ['en', 'ar'] };
   'about.team.member3.title': { type: 'text'; locales: ['en', 'ar'] };
   'about.team.title': { type: 'text'; locales: ['en', 'ar'] };
-  'about.values.content': { type: 'text'; locales: ['en', 'ar'] };
   'about.values.image': { type: 'text'; locales: ['en', 'ar'] };
-  'about.values.title': { type: 'text'; locales: ['en', 'ar'] };
 
   // auth
   'auth.heading.account': { type: 'text'; locales: ['en', 'ar'] };
@@ -56,7 +54,6 @@ export interface ContentKeys {
   'cart.checkout.label': { type: 'text'; locales: ['en', 'ar'] };
   'cart.continue.shopping': { type: 'text'; locales: ['en', 'ar'] };
   'cart.empty.drawer': { type: 'text'; locales: ['en', 'ar'] };
-  'cart.free.shipping.threshold': { type: 'text'; locales: ['en', 'ar'] };
   'cart.shipping.disclaimer': { type: 'text'; locales: ['en', 'ar'] };
   'cart.shipping.unlocked.text': { type: 'text'; locales: ['en', 'ar'] };
 
@@ -74,9 +71,7 @@ export interface ContentKeys {
   'checkout.place.order': { type: 'text'; locales: ['en', 'ar'] };
   'checkout.review.heading': { type: 'text'; locales: ['en', 'ar'] };
   'checkout.shipping.heading': { type: 'text'; locales: ['en', 'ar'] };
-  'checkout.shipping.rates': { type: 'text'; locales: ['en', 'ar'] };
   'checkout.submitting.text': { type: 'text'; locales: ['en', 'ar'] };
-  'checkout.tax.rate': { type: 'text'; locales: ['en', 'ar'] };
   'checkout.terms.text': { type: 'text'; locales: ['en', 'ar'] };
 
   // contact
@@ -94,7 +89,6 @@ export interface ContentKeys {
   'contact.wholesale.label': { type: 'text'; locales: ['en', 'ar'] };
 
   // faq
-  'faq.hero.image': { type: 'image' };
   'faq.hero.title': { type: 'text'; locales: ['en', 'ar'] };
 
   // footer
@@ -123,7 +117,6 @@ export interface ContentKeys {
   'footer.support.subtext': { type: 'text'; locales: ['en', 'ar'] };
 
   // home
-  'home.announcement.text': { type: 'text'; locales: ['en', 'ar'] };
   'home.commitment.cta': { type: 'text'; locales: ['en', 'ar'] };
   'home.commitment.headline': { type: 'text'; locales: ['en', 'ar'] };
   'home.commitment.image': { type: 'image' };
@@ -145,8 +138,8 @@ export interface ContentKeys {
   'home.hero.image.tablet': { type: 'image' };
   'home.hero.scroll.hint': { type: 'text'; locales: ['en', 'ar'] };
   'home.hero.subtitle': { type: 'text'; locales: ['en', 'ar'] };
-  'home.hero.video': { type: 'image' };
   'home.marquee.text': { type: 'text'; locales: ['en', 'ar'] };
+  'home.ourstory.image': { type: 'image' };
   'home.philosophy.cta': { type: 'text'; locales: ['en', 'ar'] };
   'home.philosophy.headline': { type: 'text'; locales: ['en', 'ar'] };
   'home.philosophy.image': { type: 'image' };
@@ -156,20 +149,21 @@ export interface ContentKeys {
   'home.promo.description': { type: 'text'; locales: ['en', 'ar'] };
   'home.promo.headline': { type: 'text'; locales: ['en', 'ar'] };
   'home.promo.image': { type: 'image' };
+  'home.shop.image': { type: 'image' };
   'home.showcase.empty': { type: 'text'; locales: ['en', 'ar'] };
-  'home.showcase.loading': { type: 'text'; locales: ['en', 'ar'] };
   'home.social.cta': { type: 'text'; locales: ['en', 'ar'] };
   'home.social.heading': { type: 'text'; locales: ['en', 'ar'] };
   'home.social.image1': { type: 'image' };
   'home.social.image2': { type: 'image' };
   'home.social.image3': { type: 'image' };
   'home.social.image4': { type: 'image' };
+  'home.story.image': { type: 'image' };
   'home.trending.title': { type: 'text'; locales: ['en', 'ar'] };
 
   // marketing
   'marketing.announcement.text': { type: 'text'; locales: ['en', 'ar'] };
+  'marketing.site.logo.image': { type: 'image' };
   'marketing.site.name': { type: 'text'; locales: ['en', 'ar'] };
-  'marketing.store.locator.map.image': { type: 'image' };
   'marketing.store.locator.no.results': { type: 'text'; locales: ['en', 'ar'] };
   'marketing.store.locator.tagline': { type: 'text'; locales: ['en', 'ar'] };
 
@@ -218,11 +212,6 @@ export interface ContentKeys {
   'shop.empty.filtered': { type: 'text'; locales: ['en', 'ar'] };
   'shop.show.more': { type: 'text'; locales: ['en', 'ar'] };
   'shop.sort.label': { type: 'text'; locales: ['en', 'ar'] };
-
-  // store
-  'store.locator.map.image': { type: 'image' };
-  'store.locator.no.results': { type: 'text'; locales: ['en', 'ar'] };
-  'store.locator.tagline': { type: 'text'; locales: ['en', 'ar'] };
 
   // vlog
   'vlog.hero.image': { type: 'image' };

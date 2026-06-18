@@ -11,4 +11,4 @@ export const NOT_MIGRATED = {
 } as const;
 
 /** Components whose remaining useSiteContent fields are all in the acknowledged list. */
-export const MIGRATED = ["AboutPage","AccountPage","Cart","CartDrawer","ContactPage","Footer","Hero","IcareProductRoutePage","PhilosophySection","ProductPage","ProductShowcase","PromoSection","SearchDrawer","ShopPage","SocialGrid","StoreLocator","VlogPage","WishlistPage","WriteReviewDialog"] as const;
+export const MIGRATED = ["AboutPage","AccountPage","Cart","CartDrawer","ContactPage","Footer","IcareProductRoutePage","MobileMenu","PhilosophySection","ProductPage","PromoSection","SearchDrawer","ShopPage","SocialGrid","StoreLocator","VlogPage","WishlistPage","WriteReviewDialog"] as const;

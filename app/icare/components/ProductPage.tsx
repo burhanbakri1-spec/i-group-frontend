@@ -496,8 +496,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                             style={!color.image ? { backgroundColor: color.hexCode } : undefined}
                           >
                             {color.image ? (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img
+                              <ImageWithFallback
                                 src={color.image}
                                 alt={color.name}
                                 className="h-full w-full object-cover"

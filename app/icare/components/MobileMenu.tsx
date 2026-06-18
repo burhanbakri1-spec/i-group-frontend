@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
-import { X, ShoppingBag, Globe } from 'lucide-react';
+import { X, ShoppingBag, Globe, Search } from 'lucide-react';
 import { translations, Language } from '../translations';
 import { useShop } from '../context/ShopContext';
 import { ImageWithFallback } from './figma/ImageWithFallback';
+import { useContent } from '../hooks/useContent';
+import { resolveMediaUrl } from '../lib/media-url';
 import { fetchCatalogProducts } from '../lib/catalog-client';
 import { Product } from '../types';
 import { useSiteContent } from '../hooks/useSiteContent';
@@ -31,7 +33,15 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
   const [activeCategory, setActiveCategory] = useState(SHOP_ALL_SENTINEL);
   const [remoteProducts, setRemoteProducts] = useState<Product[]>([]);
   const { cartCount } = useShop();
-  const { socialLinks: rawSocialLinks } = useSiteContent(lang);
+  const { socialLinks: rawSocialLinks, footerCopyright } = useSiteContent(lang);
+  // Brand logo + copyright — both sourced from BE content registry.
+  // Replaces `/icare-logo.png` (no static asset existed) and the hardcoded
+  // `© ICARE 2026` literal that would silently rot as years advance.
+  const LOGO_FALLBACK = 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=400';
+  const { val: logoCp } = useContent('marketing.site.logo.image', { lang, fallback: '' });
+  const logoSrc = resolveMediaUrl(logoCp) || LOGO_FALLBACK;
+  const { val: copyrightCp } = useContent('footer.copyright', { lang, fallback: '' });
+  const copyrightDisplay = copyrightCp || footerCopyright;
   const shouldReduceMotion = useReducedMotion();
   const calmTween = shouldReduceMotion ? { duration: 0 } : { duration: 0.22, ease: 'easeOut' as const };
 
@@ -83,7 +93,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
               <X size={24} className="text-[var(--rb-primary-text)]" />
             </button>
             <div className="absolute left-1/2 -translate-x-1/2 h-10">
-              <img src="/icare-logo.png" alt="icare" className="h-full w-auto object-contain" />
+              <ImageWithFallback src={logoSrc} alt={t.aboutAltBrand ?? 'icare'} className="h-full w-auto object-contain" />
             </div>
             <div className="flex items-center gap-1">
               <button 
@@ -219,7 +229,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
             )}
 
             <p className="text-[9px] text-[var(--rb-gray-84827E)] font-bold tracking-widest uppercase">
-              © ICARE 2026
+              {copyrightDisplay}
             </p>
           </div>
         </motion.div>

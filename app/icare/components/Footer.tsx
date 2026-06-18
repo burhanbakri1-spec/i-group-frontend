@@ -43,7 +43,8 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
 
   // ContentProvider overrides — 24 footer keys + site name.
   // Brand display falls back to literal 'icare' (no dedicated CMS key).
-  const brandDisplay = 'icare';
+  const { val: siteNameCp } = useContent('marketing.site.name', { lang, fallback: '' });
+  const brandDisplay = siteNameCp || 'icare';
   const { val: copyrightCp } = useContent('footer.copyright', { lang, fallback: '' });
   const { val: newsletterTextCp } = useContent('footer.newsletter.text', { lang, fallback: '' });
   const { val: newsletterSubtitleCp } = useContent('footer.newsletter.subtitle', { lang, fallback: '' });

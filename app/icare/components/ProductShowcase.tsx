@@ -7,6 +7,7 @@ import { Product } from '../types';
 import { fetchProductShortcut } from '../lib/catalog-client';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { useContent } from '../hooks/useContent';
+import { resolveMediaUrl } from '../lib/media-url';
 import { SkeletonPulse } from './ui/skeletons';
 import { ScrollReveal } from './ui/ScrollReveal';
 
@@ -20,9 +21,15 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
   void products;
   const t = translations[lang];
   const shouldReduceMotion = useReducedMotion();
-  const { productShowcaseLoading, productShowcaseEmpty } = useSiteContent(lang);
+  const { productShowcaseEmpty } = useSiteContent(lang);
   // ContentProvider override — BE serves EN/AR via {lang}.
   const { val: showcaseEmptyCp } = useContent('home.showcase.empty', { lang, fallback: '' });
+  // Brand logo — sourced from BE content registry instead of the broken
+  // `/icare-logo.png` static asset. Uses the same ImageWithFallback
+  // renderer as Header/MobileMenu so visual consistency is automatic.
+  const LOGO_FALLBACK = 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=400';
+  const { val: logoCp } = useContent('marketing.site.logo.image', { lang, fallback: '' });
+  const logoSrc = resolveMediaUrl(logoCp) || LOGO_FALLBACK;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [remoteProducts, setRemoteProducts] = useState<Product[] | null>(null);
 
@@ -189,7 +196,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
 
                 <div className="space-y-0.5 md:space-y-2">
                   <div className="flex items-center gap-2">
-                    <ImageWithFallback src="/icare-logo.png" alt={t.pages.showcase.imageAlt} className="h-3 md:h-5 w-auto object-contain hidden sm:block" />
+                    <ImageWithFallback src={logoSrc} alt={t.pages.showcase.imageAlt} className="h-3 md:h-5 w-auto object-contain hidden sm:block" />
                     <h3 className="text-[14px] sm:text-[20px] md:text-[28px] font-bold tracking-normal text-[#67645E] lowercase leading-[1.1]">
                       {current.title ?? current.name}
                     </h3>

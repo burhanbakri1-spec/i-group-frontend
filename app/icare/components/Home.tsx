@@ -7,6 +7,7 @@ import { SocialGrid } from './SocialGrid';
 import { PhilosophySection } from './PhilosophySection';
 import { Language } from '../translations';
 import { Hero } from './Hero';
+import Marquee from './Marquee';
 import { Product } from '../types';
 
 interface HomeProps {
@@ -19,6 +20,8 @@ export const Home: React.FC<HomeProps> = ({ onNavigate, lang, onProductSelect })
   return (
     <div>
       <Hero onNavigate={onNavigate} lang={lang} />
+
+      <Marquee lang={lang} />
 
       <LandingProductShowcase lang={lang} onProductSelect={onProductSelect} />
 

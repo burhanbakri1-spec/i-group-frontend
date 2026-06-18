@@ -1,10 +1,17 @@
 import React from 'react';
 import { motion } from 'motion/react';
+import { useContent } from '../hooks/useContent';
+import { Language } from '../translations';
 
-// TODO(content-provider-spec-003): Migrate to fetch `home.marquee.text` via useContent
-// once Home.tsx starts passing the resolved value as the `text` prop.
-// Currently Home.tsx does not render this component, so no consumer-side wiring exists.
-const Marquee = ({ text }: { text: string }) => {
+// Wired in i-group/app/icare by Home.tsx — fetches `home.marquee.text`
+// from the BE content registry (registered in
+// e-commerce-backend/src/content/content-defaults.service.ts) and
+// renders a horizontally-scrolling marquee strip. If the BE serves an
+// empty string we render nothing — keeps the layout clean instead of
+// showing a marquee of empty space.
+const Marquee: React.FC<{ lang: Language }> = ({ lang }) => {
+  const { val: marqueeText } = useContent('home.marquee.text', { lang, fallback: '' });
+  if (!marqueeText.trim()) return null;
   return (
     <div className="bg-[#F1F0ED] py-2 overflow-hidden border-y border-[#DDDDDD]">
       <motion.div
@@ -18,7 +25,7 @@ const Marquee = ({ text }: { text: string }) => {
       >
         {[...Array(10)].map((_, i) => (
           <span key={i} className="text-[10px] tracking-[0.2em] font-medium uppercase px-8 text-[#67645E]">
-            {text}
+            {marqueeText}
           </span>
         ))}
       </motion.div>

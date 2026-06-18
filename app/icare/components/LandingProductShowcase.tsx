@@ -42,9 +42,10 @@ const LandingProductShowcaseSkeleton = ({ lang }: { lang: Language }) => {
 };
 
 export const LandingProductShowcase: React.FC<LandingProductShowcaseProps> = ({ lang, onProductSelect }) => {
+  // Single fetch path: useSiteContent's shim already wraps useContent for
+  // `home.trending.title` with a fallback chain (legacy literal 'trending
+  // essentials'). The direct useContent call was a double-fetch (HIGH-02).
   const { trendingTitle } = useSiteContent(lang);
-  // ContentProvider override (BE serves EN/AR via {lang}).
-  const { val: trendingTitleCp } = useContent('home.trending.title', { lang, fallback: '' });
   const t = translations[lang];
   const [products, setProducts] = useState<Product[] | null>(null);
 
@@ -88,7 +89,9 @@ export const LandingProductShowcase: React.FC<LandingProductShowcaseProps> = ({ 
       <ScrollReveal direction="bottom" viewportMargin="-60px">
         <div className="icare-landing-products__header">
           <h2 className="icare-landing-products__title">
-            {trendingTitleCp || trendingTitle || t.pages.landingShowcase.trendingEssentials}
+            {lang === 'ar'
+              ? t.pages.landingShowcase.trendingEssentials || trendingTitle
+              : trendingTitle || t.pages.landingShowcase.trendingEssentials}
           </h2>
         </div>
       </ScrollReveal>

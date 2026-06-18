@@ -36,6 +36,17 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, lang }) => {
     lang,
     fallback: '',
   });
+  // Wires the orphan keys registered by content-defaults.service.ts:
+  // announcement above the headline, scroll prompt at the bottom of the
+  // viewport, and a separate `<video>` poster for richer hero playback.
+  const { val: homeHeroAnnouncementCp } = useContent('home.hero.announcement', {
+    lang,
+    fallback: '',
+  });
+  const { val: homeHeroScrollHintCp } = useContent('home.hero.scroll.hint', {
+    lang,
+    fallback: '',
+  });
 
   // Pre-load each candidate URL with a hidden <Image> probe. The visible
   // <img> only receives the URL after the probe's onload fires — that
@@ -45,9 +56,21 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, lang }) => {
   const mobile = useVerifiedImage(homeHeroImageMobileCp);
   const tablet = useVerifiedImage(homeHeroImageTabletCp);
 
-  // Headline: BE content registry > translations.ts fallback (i18n).
-  const headline = homeHeroHeadlineCp || t.pages.hero.fallbackTitle;
-  const ctaLabel = homeHeroCtaCp || t.shopNow;
+  // Bilingual priority chain:
+  //   AR  → translations.ts first (BE returns EN defaultValue for AR
+  //          when no per-locale override exists — admin hasn't yet
+  //          uploaded an AR copy). Avoid showing EN text to AR users.
+  //   EN  → BE first (admin overrides win), translations.ts as fallback.
+  // For keys without an AR entry in translations.ts the BE value is
+  // used; the chain degrades safely to the BE defaultValue.
+  const headline =
+    lang === 'ar'
+      ? t.pages.hero.fallbackTitle || homeHeroHeadlineCp
+      : homeHeroHeadlineCp || t.pages.hero.fallbackTitle;
+  const ctaLabel =
+    lang === 'ar'
+      ? t.shopNow || homeHeroCtaCp
+      : homeHeroCtaCp || t.shopNow;
 
   // The hero image comes from the BE ONLY. The ultimate fallback
   // (network down + BE unreachable) is PageHero's `fallbackImage` prop.
@@ -64,9 +87,18 @@ export const Hero: React.FC<HeroProps> = ({ onNavigate, lang }) => {
       tabletImage={tabletSrc ?? undefined}
       fallbackImage="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=2000"
       alt={t.pages.hero.imageAlt}
+      // announcement + scrollHint intentionally stay on the BE chain:
+      // translations.ts has no AR entry for them, and the EN defaults
+      // ("NEW: Barrier Butter tinted edition", "scroll") are universally
+      // legible short strings. A future content-defaults round-trip via
+      // /admin/api/content can add AR overrides without code change.
+      // subtitle also stays on the BE chain: translations.ts has no AR
+      // entry for `heroSubtitle`; admin override is the only path to AR.
+      announcement={homeHeroAnnouncementCp || undefined}
       title={headline}
       subtitle={homeHeroSubtitleCp || undefined}
       ctaLabel={ctaLabel}
+      scrollHint={homeHeroScrollHintCp || undefined}
       onCtaClick={() => onNavigate('shop')}
       priority
     />
