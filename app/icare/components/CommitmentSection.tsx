@@ -5,7 +5,6 @@ import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language, translations } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
-import { useContent } from '../hooks/useContent';
 import { ScrollReveal } from './ui/ScrollReveal';
 
 const COMMITMENT_ITEMS = [
@@ -19,6 +18,8 @@ interface CommitmentSectionProps {
   onNavigate: (page: string) => void;
 }
 
+const DEFAULT_COMMITMENT_IMAGE = 'https://images.unsplash.com/photo-1603189777895-1dcbe39ec57e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200';
+
 type CommitmentItem = {
   id: 'mission' | 'philanthropy' | 'sustainability';
   title: string;
@@ -26,15 +27,11 @@ type CommitmentItem = {
   cta: string;
 };
 
+
+
 export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNavigate }) => {
   const shouldReduceMotion = useReducedMotion();
   const { commitmentImage } = useSiteContent(lang);
-  // ContentProvider key — BE provides the Unsplash URL as defaultValue
-  // (registered in e-commerce-backend/src/modules/hero/hero.service.ts).
-  const { val: commitmentImageCp } = useContent('home.commitment.image', {
-    lang,
-    fallback: '',
-  });
   const t = translations[lang];
   const scrollInInitialX = lang === 'ar' ? 10 : -10;
   const [activeId, setActiveId] = useState<CommitmentItem['id']>('mission');
@@ -47,6 +44,8 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNa
   }));
 
   const activeItem = commitmentItems.find((item) => item.id === activeId) ?? commitmentItems[0];
+
+  const pillBase = 'relative isolate overflow-hidden rounded-full px-8 py-2.5 text-[15.73px] font-bold uppercase leading-[1.5] tracking-[0.02em] text-[#67645E] shadow-[inset_0_0_0_1px_#67645E] transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] before:absolute before:inset-0 before:-z-10 before:origin-bottom before:rounded-full before:bg-[#67645E] before:transition-transform before:duration-500 before:ease-[cubic-bezier(0.76,0,0.24,1)] hover:-translate-y-px hover:text-white hover:before:scale-y-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F1F0ED]';
 
   return (
     <section dir={lang === 'ar' ? 'rtl' : 'ltr'} className="icare-index-section icare-mission-section">
@@ -105,7 +104,7 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNa
       <ScrollReveal direction="right" viewportMargin="-80px">
         <div className="icare-mission-image relative">
           <ImageWithFallback
-            src={commitmentImageCp || commitmentImage}
+            src={commitmentImage || DEFAULT_COMMITMENT_IMAGE}
             alt=""
             className="h-full w-full object-cover"
           />

@@ -4,7 +4,6 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { ChevronDown } from 'lucide-react';
 import { Language, translations } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
-import { useContent } from '../hooks/useContent';
 import { PageHero } from './PageHero';
 import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
 
@@ -57,7 +56,6 @@ const DEFAULT_VALUES_IMAGE = 'https://images.unsplash.com/photo-1642080668102-dc
 const DEFAULT_TEAM_1_IMAGE = 'https://images.unsplash.com/photo-1702261347927-11207f77e751?q=80&w=800';
 const DEFAULT_TEAM_2_IMAGE = 'https://images.unsplash.com/photo-1763692108454-6cfa2b0af5c1?q=80&w=800';
 const DEFAULT_TEAM_3_IMAGE = 'https://images.unsplash.com/photo-1631214565164-dd0b7fba0295?q=80&w=800';
-const DEFAULT_FOUNDER_IMAGE = 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=800';
 
 
 export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
@@ -73,17 +71,6 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
     aboutTeamMember3Name, aboutTeamMember3Title, aboutTeamMember3Image,
     aboutValuesImage, aboutFounderNoteHeading, aboutFounderLetter,
   } = useSiteContent(lang);
-  // ContentProvider layer: BE provides Unsplash defaults via
-  // PagesService.onModuleInit() (registered in e-commerce-backend).
-  // Final fallback is the hardcoded Unsplash URL.
-  const { val: aboutHeroImageCp } = useContent('about.hero.image', { lang, fallback: '' });
-  const { val: aboutIntentionalImageCp } = useContent('about.intentional.image', { lang, fallback: '' });
-  const { val: aboutFoundationImageCp } = useContent('about.foundation.image', { lang, fallback: '' });
-  const { val: aboutValuesImageCp } = useContent('about.values.image', { lang, fallback: '' });
-  const { val: aboutTeam1ImageCp } = useContent('about.team.member1.image', { lang, fallback: '' });
-  const { val: aboutTeam2ImageCp } = useContent('about.team.member2.image', { lang, fallback: '' });
-  const { val: aboutTeam3ImageCp } = useContent('about.team.member3.image', { lang, fallback: '' });
-  const { val: aboutFounderSignatureImageCp } = useContent('about.founder.signature.image', { lang, fallback: '' });
 
   // TODO: Move valuesData to CMS (useSiteContent) for centralized content management.
   // Now driven from translations[lang] for bilingual support.
@@ -105,8 +92,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
   return (
     <div className="bg-white">
       {/* 1. HERO */}
-<PageHero
-        image={aboutHeroImageCp || aboutHeroImage}
+      <PageHero
+        image={aboutHeroImage}
         fallbackImage={DEFAULT_HERO_IMAGE}
          alt={t.aboutAltBrand}
         title={aboutHeroHeadline}
@@ -120,8 +107,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 items-center">
           <ScrollReveal direction="left" viewportMargin="-80px">
             <div className="overflow-hidden aspect-[4/5] lg:aspect-auto lg:h-[80vh] z-0">
-<ImageWithFallback 
-                 src={aboutIntentionalImageCp || aboutIntentionalImage || DEFAULT_INTENTIONAL_IMAGE} 
+               <ImageWithFallback 
+                 src={aboutIntentionalImage || DEFAULT_INTENTIONAL_IMAGE} 
                  alt={t.aboutAltTexture} 
                 className="w-full h-full object-cover"
               />
@@ -164,8 +151,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
             </ScrollReveal>
             <ScrollReveal direction="right" viewportMargin="-80px">
               <div className="relative aspect-[3/4] rounded-[16px] md:rounded-[24px] overflow-hidden lg:h-[80vh] order-1 lg:order-2">
-<ImageWithFallback 
-                   src={aboutFoundationImageCp || aboutFoundationImage || DEFAULT_FOUNDATION_IMAGE} 
+                 <ImageWithFallback 
+                   src={aboutFoundationImage || DEFAULT_FOUNDATION_IMAGE} 
                    alt={t.aboutAltTexture} 
                   className="w-full h-full object-cover scale-110"
                 />
@@ -181,11 +168,11 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 items-stretch">
             <ScrollReveal direction="left" viewportMargin="-80px">
               <div className="rounded-[16px] overflow-hidden aspect-[4/5] lg:aspect-auto lg:h-[80vh]">
-<ImageWithFallback 
-                   src={aboutValuesImageCp || aboutValuesImage || DEFAULT_VALUES_IMAGE} 
+                 <ImageWithFallback 
+                   src={aboutValuesImage || DEFAULT_VALUES_IMAGE} 
                    alt={t.aboutAltValues} 
-                   className="w-full h-full object-cover grayscale"
-                 />
+                  className="w-full h-full object-cover grayscale"
+                />
               </div>
             </ScrollReveal>
             <ScrollReveal direction="right" viewportMargin="-80px">
@@ -230,7 +217,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
               <div className="min-w-[75vw] md:min-w-0 snap-center group space-y-6">
                 <div className="aspect-[3/4] rounded-[16px] overflow-hidden bg-[#F2F1ED]">
                   <ImageWithFallback 
-                    src={aboutTeam1ImageCp || aboutTeamMember1Image || DEFAULT_TEAM_1_IMAGE} 
+                    src={aboutTeamMember1Image || DEFAULT_TEAM_1_IMAGE} 
                     alt={t.aboutAltTeam} 
                     className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                   />
@@ -247,7 +234,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
               <div className="min-w-[75vw] md:min-w-0 snap-center group space-y-6">
                 <div className="aspect-[3/4] rounded-[16px] overflow-hidden bg-[#F2F1ED]">
                   <ImageWithFallback 
-                    src={aboutTeam2ImageCp || aboutTeamMember2Image || DEFAULT_TEAM_2_IMAGE} 
+                    src={aboutTeamMember2Image || DEFAULT_TEAM_2_IMAGE} 
                     alt={t.aboutAltTeam} 
                     className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                   />
@@ -264,7 +251,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
               <div className="min-w-[75vw] md:min-w-0 snap-center group space-y-6">
                 <div className="aspect-[3/4] rounded-[16px] overflow-hidden bg-[#F2F1ED]">
                   <ImageWithFallback 
-                    src={aboutTeam3ImageCp || aboutTeamMember3Image || DEFAULT_TEAM_3_IMAGE} 
+                    src={aboutTeamMember3Image || DEFAULT_TEAM_3_IMAGE} 
                     alt={t.aboutAltTeam} 
                     className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                   />

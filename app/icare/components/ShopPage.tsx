@@ -5,7 +5,6 @@ import { ChevronDown, Grid2X2, LayoutGrid } from 'lucide-react';
 import { fetchCatalogProducts, fetchCategoryRoots } from '../lib/catalog-client';
 import { Language, translations } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
-import { useContent } from '../hooks/useContent';
 import { Product, BackendCategory } from '../types';
 import { ProductGridSkeleton } from './ui/skeletons';
 import { PageHero } from './PageHero';
@@ -27,10 +26,6 @@ const getProductTimestamp = (product: Product) => {
 export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => {
   const { shopEmptyAll, shopEmptyFiltered, shopBackToAll, shopShowMore, shopSortLabel } = useSiteContent(lang);
   const t = translations[lang];
-  // ContentProvider key — BE provides Unsplash default via
-  // PagesService.onModuleInit() (registered in e-commerce-backend).
-  const { val: shopImageCp } = useContent('home.shop.image', { lang, fallback: '' });
-  const SHOP_HERO_FALLBACK = 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1920';
   const [catalogProducts, setCatalogProducts] = useState<Product[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [rootCategories, setRootCategories] = useState<BackendCategory[]>([]);
@@ -138,8 +133,8 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
   return (
     <div className="min-h-screen overflow-x-hidden bg-white">
       <PageHero
-        image={shopImageCp}
-        fallbackImage={SHOP_HERO_FALLBACK}
+        image="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1920"
+        fallbackImage="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1920"
         alt="Shop iCare"
         title={t.pages.shop.title}
         subtitle={t.pages.shop.subtitle}

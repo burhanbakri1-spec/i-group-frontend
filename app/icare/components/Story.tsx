@@ -2,21 +2,14 @@ import React from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
 import { Language, translations } from '../translations';
-import { useContent } from '../hooks/useContent';
 
 interface StoryProps {
   onNavigate: (page: string) => void;
   lang: Language;
 }
 
-const DEFAULT_STORY_IMAGE = 'https://images.unsplash.com/photo-1501876725168-00c445821c9e?q=80&w=1000';
-
 export const Story: React.FC<StoryProps> = ({ onNavigate, lang }) => {
   const t = translations[lang];
-  // ContentProvider key — BE provides Unsplash default via
-  // PagesService.onModuleInit() (registered in e-commerce-backend).
-  const { val: storyImageCp } = useContent('home.story.image', { lang, fallback: '' });
-
   return (
     <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-20">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
@@ -25,7 +18,7 @@ export const Story: React.FC<StoryProps> = ({ onNavigate, lang }) => {
         <ScrollReveal direction="left" viewportMargin="-80px">
           <div className="rounded-[32px] overflow-hidden aspect-[4/5]">
             <ImageWithFallback 
-              src={storyImageCp || DEFAULT_STORY_IMAGE}
+              src="https://images.unsplash.com/photo-1501876725168-00c445821c9e?q=80&w=1000"
               alt={t.storyAltOurStory}
               className="w-full h-full object-cover"
             />

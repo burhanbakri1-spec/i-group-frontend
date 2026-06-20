@@ -3,20 +3,13 @@ import { motion } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
 import { Language, translations } from '../translations';
-import { useContent } from '../hooks/useContent';
 
 interface OurStoryProps {
   lang: Language;
 }
 
-const DEFAULT_OUR_STORY_IMAGE = 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=800';
-
 export const OurStory: React.FC<OurStoryProps> = ({ lang }) => {
   const t = translations[lang];
-  // ContentProvider key — BE provides Unsplash default via
-  // PagesService.onModuleInit() (registered in e-commerce-backend).
-  const { val: ourStoryImageCp } = useContent('home.our-story.image', { lang, fallback: '' });
-
   return (
     <div className="pt-24 min-h-screen bg-[#F2F0EA]">
       {/* Hero Section */}
@@ -37,7 +30,7 @@ export const OurStory: React.FC<OurStoryProps> = ({ lang }) => {
              className="aspect-[4/5] rounded-[32px] overflow-hidden shadow-xl"
           >
             <ImageWithFallback 
-              src={ourStoryImageCp || DEFAULT_OUR_STORY_IMAGE}
+              src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=800" 
               alt={t.aboutAltTexture}
               className="w-full h-full object-cover"
             />

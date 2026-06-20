@@ -1,10 +1,6 @@
 export interface ContentKeys {
-  // Homepage hero
   'home.hero.headline': { type: 'text'; locales: ['en', 'ar'] };
   'home.hero.image': { type: 'image' };
-  'home.commitment.image': { type: 'image' };
-
-  // About page
   'about.hero.headline': { type: 'text' };
   'about.hero.cta': { type: 'text' };
   'about.hero.image': { type: 'image' };
@@ -21,8 +17,6 @@ export interface ContentKeys {
   'about.team.member3.title': { type: 'text' };
   'about.team.member3.image': { type: 'image' };
   'about.founder.signature.image': { type: 'image' };
-
-  // Contact page
   'contact.email': { type: 'text' };
   'contact.hero.heading': { type: 'text' };
   'contact.hero.image': { type: 'image' };
@@ -35,16 +29,6 @@ export interface ContentKeys {
   'contact.faq.text': { type: 'text' };
   'contact.faq.cta': { type: 'text' };
   'contact.support.hours': { type: 'text' };
-
-  // Shipping
   'shipping.rates': { type: 'text' };
   'shipping.free.threshold': { type: 'text' };
-
-  // Page hero images (added in spec 003 wiring)
-  'home.faq.image': { type: 'image' };
-  'home.shop.image': { type: 'image' };
-  'vlog.hero.image': { type: 'image' };
-  'home.our-story.image': { type: 'image' };
-  'home.story.image': { type: 'image' };
-  'account.login.image': { type: 'image' };
 }

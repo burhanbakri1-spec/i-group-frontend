@@ -4,7 +4,6 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language, translations } from '../translations';
 import { useShop } from '../context/ShopContext';
 import { useSiteContent } from '../hooks/useSiteContent';
-import { useContent } from '../hooks/useContent';
 import { icareApi, IcareApiError } from '../lib/api-client';
 import type { OrderListItem, CreatedOrder } from '../types';
 
@@ -36,11 +35,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
     authToggleToRegister,
     authToggleToLogin,
   } = useSiteContent(lang);
-  const loginImageFallback = "https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=1200&auto=format&fit=crop";
-  // ContentProvider key — BE provides Unsplash default via
-  // PagesService.onModuleInit() (registered in e-commerce-backend).
-  const { val: accountLoginImageCp } = useContent('account.login.image', { lang, fallback: '' });
-  const loginImage = accountLoginImageCp || authLoginImage || loginImageFallback;
+  const loginImage = authLoginImage || "https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=1200&auto=format&fit=crop";
   const t = translations[lang];
   const { user, isAuthenticated, accessToken, login, register, logout, authError } = useShop();
   const [mode, setMode] = useState<'login' | 'register'>('login');

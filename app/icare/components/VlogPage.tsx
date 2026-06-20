@@ -6,7 +6,6 @@ import { Play } from 'lucide-react';
 import { fetchProductMediaVlogs } from '../lib/catalog-client';
 import { VlogContentItem } from '../types';
 import { useSiteContent } from '../hooks/useSiteContent';
-import { useContent } from '../hooks/useContent';
 import { VlogGridSkeleton } from './ui/skeletons';
 import { PageHero } from './PageHero';
 
@@ -100,9 +99,6 @@ const VideoFallbackIcon = () => (
 
 export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
   const { vlogHeroTitle, vlogHeroImage } = useSiteContent(lang);
-  // ContentProvider key — BE provides Unsplash default via
-  // PagesService.onModuleInit() (registered in e-commerce-backend).
-  const { val: vlogHeroImageCp } = useContent('vlog.hero.image', { lang, fallback: '' });
   const t = translations[lang];
   const [remoteVlogs, setRemoteVlogs] = useState<VlogContentItem[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -129,7 +125,7 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
   const vlogs = remoteVlogs ?? [];
   const isLoading = loading || remoteVlogs === null;
   const heroTitle = vlogHeroTitle?.trim() || t.pages.vlog.heroTitle;
-  const heroImage = normalizeVlogHeroImageUrl(vlogHeroImageCp || vlogHeroImage);
+  const heroImage = normalizeVlogHeroImageUrl(vlogHeroImage);
 
   return (
     <div className="min-h-screen bg-white pb-32">

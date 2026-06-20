@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Language, translations } from '../translations';
 import { Plus, Minus } from 'lucide-react';
-import { useContent } from '../hooks/useContent';
 import { PageHero } from './PageHero';
 import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
 
@@ -51,10 +50,6 @@ export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
   const [openId, setOpenId] = useState<string | null>(null);
   const t = translations[lang];
   const faqGroups = t.pages.faq.categories;
-  // ContentProvider key — BE provides Unsplash default via
-  // PagesService.onModuleInit() (registered in e-commerce-backend).
-  const { val: faqImageCp } = useContent('home.faq.image', { lang, fallback: '' });
-  const FAQ_HERO_FALLBACK = 'https://images.unsplash.com/photo-1768483018807-bd0b9ab86539?q=80&w=2000';
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -69,8 +64,8 @@ export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
   return (
     <div className="min-h-screen bg-[#F1F0ED] pb-32 px-4 sm:px-6 lg:px-8">
       <PageHero
-        image={faqImageCp}
-        fallbackImage={FAQ_HERO_FALLBACK}
+        image="https://images.unsplash.com/photo-1768483018807-bd0b9ab86539?q=80&w=2000"
+        fallbackImage="https://images.unsplash.com/photo-1768483018807-bd0b9ab86539?q=80&w=2000"
         alt="FAQ iCare"
         title={t.pages.faq.heroTitle}
         subtitle={t.pages.faq.heroSubtitle}
