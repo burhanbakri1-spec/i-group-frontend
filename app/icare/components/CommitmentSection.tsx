@@ -3,15 +3,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { Language, translations } from '../translations';
+import { Language } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { ScrollReveal } from './ui/ScrollReveal';
-
-const COMMITMENT_ITEMS = [
-  { id: 'mission' as const, titleKey: 'commitmentMission' as const, detailKey: 'commitmentMissionDetail' as const, ctaKey: 'commitmissionCta' as const },
-  { id: 'philanthropy' as const, titleKey: 'commitmentPhilanthropy' as const, detailKey: 'commitmentPhilanthropyDetail' as const, ctaKey: 'commitmentPhilanthropyCta' as const },
-  { id: 'sustainability' as const, titleKey: 'commitmentSustainability' as const, detailKey: 'commitmentSustainabilityDetail' as const, ctaKey: 'commitmentSustainabilityCta' as const },
-];
 
 interface CommitmentSectionProps {
   lang: Language;
@@ -27,21 +21,55 @@ type CommitmentItem = {
   cta: string;
 };
 
-
+const COMMITMENT_ITEMS: Record<Language, CommitmentItem[]> = {
+  en: [
+    {
+      id: 'mission',
+      title: 'mission',
+      detail: 'We formulate with intention, not trends. Every ingredient is chosen for efficacy, safety, and skin compatibility.',
+      cta: 'our values',
+    },
+    {
+      id: 'philanthropy',
+      title: 'philanthropy',
+      detail: 'We partner with organizations that support women, mental health awareness, and environmental conservation.',
+      cta: 'our impact',
+    },
+    {
+      id: 'sustainability',
+      title: 'sustainability',
+      detail: 'From recyclable packaging to lower-waste shipping, we are working to reduce our footprint at every step.',
+      cta: 'our footprint',
+    },
+  ],
+  ar: [
+    {
+      id: 'mission',
+      title: 'المهمة',
+      detail: 'نصنع تركيباتنا بقصد ووعي، لا لمواكبة الموضة. كل مكون يختار لفعاليته وأمانه وتوافقه مع البشرة.',
+      cta: 'قيمنا',
+    },
+    {
+      id: 'philanthropy',
+      title: 'العمل الخيري',
+      detail: 'نتعاون مع منظمات تدعم تمكين المرأة والتوعية بالصحة النفسية والحفاظ على البيئة.',
+      cta: 'أثرنا',
+    },
+    {
+      id: 'sustainability',
+      title: 'الاستدامة',
+      detail: 'من التغليف القابل لإعادة التدوير إلى تقليل الهدر في الشحن، نعمل على تقليل بصمتنا في كل خطوة.',
+      cta: 'بصمتنا',
+    },
+  ],
+};
 
 export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNavigate }) => {
   const shouldReduceMotion = useReducedMotion();
   const { commitmentImage } = useSiteContent(lang);
-  const t = translations[lang];
+  const commitmentItems = COMMITMENT_ITEMS[lang];
   const scrollInInitialX = lang === 'ar' ? 10 : -10;
   const [activeId, setActiveId] = useState<CommitmentItem['id']>('mission');
-
-  const commitmentItems: CommitmentItem[] = COMMITMENT_ITEMS.map((item) => ({
-    id: item.id,
-    title: t[item.titleKey],
-    detail: t[item.detailKey],
-    cta: t[item.ctaKey],
-  }));
 
   const activeItem = commitmentItems.find((item) => item.id === activeId) ?? commitmentItems[0];
 

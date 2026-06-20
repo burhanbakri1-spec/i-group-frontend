@@ -30,37 +30,70 @@ interface TrackingResult {
 
 type LoadState = 'idle' | 'loading' | 'found' | 'not_found' | 'error';
 
-const STATUS_ICONS: Record<string, React.ReactNode> = {
-  pending: <Clock size={16} />,
-  reviewed: <CheckCircle size={16} />,
-  confirmed: <CheckCircle size={16} />,
-  processing: <Package size={16} />,
-  shipped: <Truck size={16} />,
-  out_for_delivery: <Truck size={16} />,
-  delivered: <CheckCircle size={16} />,
-  cancelled: <XCircle size={16} />,
-};
-
-const STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-amber-100 text-amber-800',
-  reviewed: 'bg-blue-100 text-blue-800',
-  confirmed: 'bg-blue-100 text-blue-800',
-  processing: 'bg-purple-100 text-purple-800',
-  shipped: 'bg-indigo-100 text-indigo-800',
-  out_for_delivery: 'bg-purple-100 text-purple-800',
-  delivered: 'bg-green-500 text-white',
-  cancelled: 'bg-red-100 text-red-800',
+const STATUS_MAP: Record<string, {
+  labelEn: string;
+  labelAr: string;
+  icon: React.ReactNode;
+  color: string;
+}> = {
+  pending: {
+    labelEn: 'Pending',
+    labelAr: 'قيد الانتظار',
+    icon: <Clock size={16} />,
+    color: 'bg-amber-100 text-amber-800',
+  },
+  reviewed: {
+    labelEn: 'Reviewed',
+    labelAr: 'تمت المراجعة',
+    icon: <CheckCircle size={16} />,
+    color: 'bg-blue-100 text-blue-800',
+  },
+  confirmed: {
+    labelEn: 'Confirmed',
+    labelAr: 'تم التأكيد',
+    icon: <CheckCircle size={16} />,
+    color: 'bg-blue-100 text-blue-800',
+  },
+  processing: {
+    labelEn: 'Processing',
+    labelAr: 'قيد المعالجة',
+    icon: <Package size={16} />,
+    color: 'bg-purple-100 text-purple-800',
+  },
+  shipped: {
+    labelEn: 'Shipped',
+    labelAr: 'تم الشحن',
+    icon: <Truck size={16} />,
+    color: 'bg-indigo-100 text-indigo-800',
+  },
+  out_for_delivery: {
+    labelEn: 'Out for Delivery',
+    labelAr: 'قيد التوصيل',
+    icon: <Truck size={16} />,
+    color: 'bg-purple-100 text-purple-800',
+  },
+  delivered: {
+    labelEn: 'Delivered',
+    labelAr: 'تم التوصيل',
+    icon: <CheckCircle size={16} />,
+    color: 'bg-green-500 text-white',
+  },
+  cancelled: {
+    labelEn: 'Cancelled',
+    labelAr: 'ملغي',
+    icon: <XCircle size={16} />,
+    color: 'bg-red-100 text-red-800',
+  },
 };
 
 function getStatusInfo(status: string, lang: Language) {
-  const t = translations[lang];
-  const accountStatus = t.accountPage as Record<string, string | undefined>;
-  const label = accountStatus[status] ?? status;
-  return {
-    label,
-    icon: STATUS_ICONS[status] ?? <Clock size={16} />,
-    color: STATUS_COLORS[status] ?? 'bg-gray-100 text-gray-800',
+  const entry = STATUS_MAP[status] ?? {
+    labelEn: status,
+    labelAr: status,
+    icon: <Clock size={16} />,
+    color: 'bg-gray-100 text-gray-800',
   };
+  return { label: lang === 'ar' ? entry.labelAr : entry.labelEn, icon: entry.icon, color: entry.color };
 }
 
 export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrderNumber }) => {
