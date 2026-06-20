@@ -3,8 +3,8 @@
 import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'motion/react';
-import { Search, Loader2, Truck, Package, Clock, CheckCircle, XCircle, AlertCircle, MapPin } from 'lucide-react';
-import { icareApi } from '../lib/api-client';
+import { Search, Loader2, Truck, Package, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { icareApi, IcareApiError } from '../lib/api-client';
 import { Language, translations } from '../translations';
 
 const CONTROL_FOCUS_CLASS =
@@ -17,15 +17,12 @@ interface TrackOrderPageProps {
 }
 
 interface TrackingResult {
-  orderNumber: string;
   status: string;
-  shippingName?: string;
-  shippingCity?: string;
   trackingNumber?: string | null;
   carrier?: string | null;
   shippedAt?: string | null;
   deliveredAt?: string | null;
-  statusHistory?: Array<{ status: string; comment?: string | null; createdAt: string }>;
+  lastStatusUpdate?: string | null;
 }
 
 type LoadState = 'idle' | 'loading' | 'found' | 'not_found' | 'error';
@@ -89,9 +86,11 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
       setResult(data);
       setLoadState('found');
     } catch (error: unknown) {
+      const status = (error as IcareApiError)?.status;
       const msg = error instanceof Error ? error.message : String(error);
-      // Detect 404 vs other errors
-      if (msg.includes('not found') || msg.includes('404') || (error as any)?.status === 404) {
+      // 404 = unknown order OR email mismatch (backend deliberately identical).
+      // Status-based check is primary; string-match is fallback for non-IcareApiError shapes.
+      if (status === 404 || msg.includes('not found') || msg.includes('404')) {
         setLoadState('not_found');
       } else {
         setLoadState('error');
@@ -111,10 +110,6 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
     e.preventDefault();
     doTrack();
   };
-
-  const statusTimeline = result?.statusHistory && result.statusHistory.length > 0
-    ? [...result.statusHistory].reverse()
-    : [];
 
   return (
     <div className="min-h-screen bg-[#F1F0ED] py-12">
@@ -224,7 +219,7 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
               {/* Status badge */}
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-medium">
-                  {t.pages.trackOrder.orderPrefix} {result.orderNumber}
+                  {t.pages.trackOrder.orderPrefix} {orderNumber.trim()}
                 </h2>
                 {(() => {
                   const info = getStatusInfo(result.status, lang);
@@ -259,58 +254,20 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
                 </div>
               )}
 
-              {/* Shipping destination */}
-              {result.shippingCity && (
+              {/* Last status update — backend exposes only the latest timestamp, not full history. */}
+              {result.lastStatusUpdate && (
                 <div className="flex items-center gap-2 text-sm text-[#84827E] mb-6">
-                  <MapPin size={14} />
-                  <span>{result.shippingCity}</span>
-                </div>
-              )}
-
-              {/* Status timeline */}
-              {statusTimeline.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-medium text-[#67645E] mb-4">
-                    {t.pages.trackOrder.statusHistory}
-                  </h3>
-                  <div className="space-y-0">
-                    {statusTimeline.map((entry, idx) => {
-                      const info = getStatusInfo(entry.status, lang);
-                      const isLast = idx === statusTimeline.length - 1;
-                      return (
-                        <div key={idx} className="flex gap-4">
-                          {/* Timeline line */}
-                          <div className="flex flex-col items-center">
-                            <div className={`w-3 h-3 rounded-full ${info.color.split(' ')[0]}`} />
-                            {!isLast && <div className="w-0.5 flex-1 bg-[#EEE] my-0.5" />}
-                          </div>
-                          {/* Content */}
-                          <div className={`pb-5 ${isLast ? '' : ''}`}>
-                            <p className="text-sm">
-                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs ${info.color}`}>
-                                {info.icon}
-                                {info.label}
-                              </span>
-                            </p>
-                            {entry.comment && (
-                              <p className="text-xs text-[#84827E] mt-1">{entry.comment}</p>
-                            )}
-                            <p className="text-xs text-[#AAA] mt-1">
-                              {new Date(entry.createdAt).toLocaleString(lang === 'ar' ? 'ar' : 'en', {
-                                dateStyle: 'medium',
-                                timeStyle: 'short',
-                              })}
-                            </p>
-                          </div>
-                        </div>
-                      );
+                  <Clock size={14} />
+                  <span>
+                    {t.pages.trackOrder.statusHistory}: {new Date(result.lastStatusUpdate).toLocaleString(lang === 'ar' ? 'ar' : 'en', {
+                      dateStyle: 'medium',
+                      timeStyle: 'short',
                     })}
-                  </div>
+                  </span>
                 </div>
               )}
 
-              {/* No history */}
-              {statusTimeline.length === 0 && (
+              {!result.lastStatusUpdate && (
                 <p className="text-center text-sm text-[#AAA] py-6">
                   {t.pages.trackOrder.noHistory}
                 </p>

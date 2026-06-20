@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Language, translations } from '../translations';
 import { Plus, Minus } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
+import { fetchFaqGroups } from '../lib/catalog-client';
+import { FAQCategoryGroup } from '../types';
 import { PageHero } from './PageHero';
-import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
+import { ScrollReveal } from './ui/ScrollReveal';
+import { FAQSkeleton } from './ui/skeletons';
 
 interface FAQPageProps {
   lang: Language;
@@ -12,7 +15,7 @@ interface FAQPageProps {
 
 const FAQAccordionBase = ({ question, answer, isOpen, onClick }: { question: string, answer: string, isOpen: boolean, onClick: () => void }) => (
   <div className="border-b border-black/5 last:border-0">
-    <button 
+    <button
       onClick={onClick}
       className="w-full py-5 flex items-center justify-between text-left group transition-all"
     >
@@ -50,11 +53,40 @@ const FAQAccordion = React.memo(FAQAccordionBase);
 export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
   const [openId, setOpenId] = useState<string | null>(null);
   const t = translations[lang];
-  const faqGroups = t.pages.faq.categories;
-  // ContentProvider key — BE provides Unsplash default via
-  // PagesService.onModuleInit() (registered in e-commerce-backend).
+  const fallbackGroups: FAQCategoryGroup[] = t.pages.faq.categories;
+  const [groups, setGroups] = useState<FAQCategoryGroup[] | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // ContentProvider keys — BE provides defaults via
+  // LegacyContentService.registerFaq() (registered in e-commerce-backend).
   const { val: faqImageCp } = useContent('home.faq.image', { lang, fallback: '' });
+  const { val: faqTitleCp } = useContent('faq.hero.title', { lang, fallback: t.pages.faq.heroTitle });
+  const { val: faqSubtitleCp } = useContent('faq.hero.subtitle', { lang, fallback: t.pages.faq.heroSubtitle });
   const FAQ_HERO_FALLBACK = 'https://images.unsplash.com/photo-1768483018807-bd0b9ab86539?q=80&w=2000';
+
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    fetchFaqGroups()
+      .then((fetched) => {
+        if (!mounted) return;
+        // API returns null on outage / unconfigured → keep translations
+        // so the page never renders empty.
+        setGroups(fetched && fetched.length > 0 ? fetched : fallbackGroups);
+        setLoading(false);
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setGroups(fallbackGroups);
+        setLoading(false);
+      });
+    return () => {
+      mounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
+
+  const faqGroups = groups ?? fallbackGroups;
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -72,13 +104,13 @@ export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
         image={faqImageCp}
         fallbackImage={FAQ_HERO_FALLBACK}
         alt="FAQ iCare"
-        title={t.pages.faq.heroTitle}
-        subtitle={t.pages.faq.heroSubtitle}
+        title={faqTitleCp || t.pages.faq.heroTitle}
+        subtitle={faqSubtitleCp || t.pages.faq.heroSubtitle}
         priority
       />
 
       <div className="max-w-[1400px] mx-auto grid grid-cols-12 gap-4 mt-12 px-2 md:px-8 lg:px-12">
-        
+
         {/* Sidebar */}
         <aside className="col-span-4 md:col-span-3">
           <ScrollReveal direction="left" viewportMargin="-60px">
@@ -92,7 +124,7 @@ export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
                     className="text-[9px] md:text-[11px] font-[800] text-[#5C5A56]/60 hover:text-black transition-colors text-left uppercase tracking-widest leading-tight"
                   >
                     {cat.name}
-                    </button>
+                  </button>
                 ))}
               </nav>
             </div>
@@ -101,6 +133,9 @@ export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
 
         {/* Content Area */}
         <main className="col-span-8 md:col-span-9 bg-[#F2F1ED] p-5 md:p-12 rounded-[20px]">
+          {loading ? (
+            <FAQSkeleton count={6} />
+          ) : (
           <div className="space-y-16">
             {faqGroups.map((cat) => (
             <ScrollReveal key={cat.id} direction="bottom" viewportMargin="-40px">
@@ -110,7 +145,7 @@ export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
                 </h2>
                 <div className="border-t border-black/10">
                   {cat.items.map((item, idx) => (
-                    <FAQAccordion 
+                    <FAQAccordion
                       key={`${cat.id}-${idx}`}
                       question={item.q}
                       answer={item.a}
@@ -123,6 +158,7 @@ export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
             </ScrollReveal>
             ))}
           </div>
+          )}
         </main>
 
       </div>

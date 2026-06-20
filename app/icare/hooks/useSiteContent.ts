@@ -232,6 +232,11 @@ export const useSiteContent = (lang: Language) => {
   const { val: contactInfoTitle } = useContent('contact.info.title', { lang, fallback: '' });
   const { val: contactSupportInfo } = useContent('contact.support.info', { lang, fallback: '' });
   const { val: contactSupportHours } = useContent('contact.support.hours', { lang, fallback: '' });
+  // footer.support.hours is a separate registry key from contact.support.hours
+  // (both registered with the same default). Admin edits to the footer key
+  // must reflect on the footer without touching the contact page, so we
+  // read it independently and fall back to the contact-page value when unset.
+  const { val: footerSupportHours } = useContent('footer.support.hours', { lang, fallback: contactSupportHours || '' });
   const { val: contactEmail } = useContent('contact.email', { lang, fallback: 'hello@icare.com' });
   const { val: contactEmailLabel } = useContent('contact.email.label', { lang, fallback: 'email' });
   const { val: contactWholesaleEmail } = useContent('contact.wholesale.email', { lang, fallback: '' });
@@ -289,7 +294,8 @@ export const useSiteContent = (lang: Language) => {
   const { val: footerLinkContact } = useContent('footer.link.contact', { lang, fallback: '' });
 
   // Brand
-  const siteName = 'iCare Beauty';
+  const { val: siteNameCp } = useContent('marketing.site.name', { lang, fallback: 'iCare Beauty' });
+  const siteName = siteNameCp || 'iCare Beauty';
   const metaTitle = 'iCare Beauty';
   const metaDescription = 'iCare Beauty skincare essentials.';
   const siteDescription = 'iCare Beauty skincare essentials.';
@@ -483,6 +489,7 @@ export const useSiteContent = (lang: Language) => {
     contactInfoTitle,
     contactSupportInfo,
     contactSupportHours,
+    footerSupportHours,
     contactEmail,
     contactEmailLabel,
     contactWholesaleEmail,
@@ -584,7 +591,7 @@ export const useSiteContent = (lang: Language) => {
     searchCollectionsHeading, searchProductsHeading, searchBrandsHeading, searchCollectionsUnavailable,
     vlogHeroImage, vlogHeroTitle,
     faqHeroImage, faqHeroTitle,
-    contactHeroImage, contactHeroHeading, contactInfoTitle, contactSupportInfo, contactSupportHours,
+    contactHeroImage, contactHeroHeading, contactInfoTitle, contactSupportInfo, contactSupportHours, footerSupportHours,
     contactEmail, contactEmailLabel, contactWholesaleEmail, contactWholesaleLabel,
     contactFaqTitle, contactFaqText, contactFaqCta,
     storeLocatorTagline, storeLocatorNoResults,

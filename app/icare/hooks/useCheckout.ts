@@ -642,6 +642,16 @@ export function useCheckout(lang: Language): UseCheckoutReturn {
             expiresAt: Date.now() + ttlMs,
           }),
         );
+        // Persist full order snapshot so the confirmation page can render
+        // without re-fetching — critical for guest orders (backend has no
+        // guest-read endpoint). Cleared on read by the confirmation page.
+        window.sessionStorage.setItem(
+          'lastCreatedOrder',
+          JSON.stringify({
+            order: createdOrder,
+            expiresAt: Date.now() + ttlMs,
+          }),
+        );
       } catch {
         // sessionStorage may be unavailable — non-fatal
       }
@@ -653,7 +663,7 @@ export function useCheckout(lang: Language): UseCheckoutReturn {
       trackEvent('purchase_completed', {
         orderNumber: createdOrder.orderNumber,
         total: createdOrder.total,
-        itemCount: createdOrder.items?.length ?? cartItems.length,
+        itemCount: createdOrder.items?.reduce((sum, i) => sum + (i.quantity || 0), 0) ?? cartItems.reduce((sum, i) => sum + i.quantity, 0),
       });
 
       // Gate: only COD is currently selectable; card/paypal are frontend-disabled.

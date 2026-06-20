@@ -37,7 +37,7 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
     footerLinkAccessibility,
     footerLinkFaq,
     footerLinkContact,
-    contactSupportHours,
+    footerSupportHours,
     socialLinks: rawSocialLinks,
   } = useSiteContent(lang);
 
@@ -205,7 +205,7 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
             <h4 className="text-[12px] font-bold uppercase tracking-widest text-[#67645E]">{v(columnSupportCp, footerSupportTitle)}</h4>
             <div className="space-y-6">
               <div className="space-y-1">
-                <p className="text-[13px] text-[#67645E]">{contactSupportHours}</p>
+                <p className="text-[13px] text-[#67645E]">{footerSupportHours}</p>
                 <p className="text-[13px] text-[#67645E]">{v(supportSubtextCp, footerSupportSubtext)}</p>
               </div>
               <ul className="space-y-3">

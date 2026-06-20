@@ -652,8 +652,13 @@ export interface OrderListItem {
   status: string;
   paymentStatus?: string;
   total: number;
+  /** Derived on the client — backend does NOT return itemCount; computed from items[].quantity. */
   itemCount: number;
+  /** ISO currency code — backend may omit; consumers fall back to 'USD'. */
+  currency?: string;
   createdAt?: string;
+  /** Full item list — present in findByUserId serialization; used to derive itemCount. */
+  items?: OrderDetailItem[];
 }
 
 export interface CreatedOrder {
@@ -675,6 +680,8 @@ export interface CreatedOrder {
   shippingState?: string;
   shippingPostalCode?: string;
   shippingCountry?: string;
+  /** ISO currency code — backend may omit; consumers fall back to 'USD'. */
+  currency?: string;
   statusHistory?: Array<{ status: string; comment?: string | null; createdAt: string }>;
   items?: OrderDetailItem[];
   guestEmail?: string | null;

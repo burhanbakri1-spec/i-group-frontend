@@ -83,8 +83,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
     setOrdersLoading(true);
     setOrdersError(null);
     try {
-      const result = await icareApi.orders.list(accessToken!);
-      const list = Array.isArray(result) ? result : result.data ?? [];
+      const list = await icareApi.orders.list(accessToken!);
       setOrders(list);
     } catch (err) {
       setOrdersError(err instanceof IcareApiError ? err.message : t.accountPage.unableToLoad);
@@ -288,7 +287,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                                  {statusLabel(order.status, lang)}
                               </span>
                               <span className="text-[11px] font-bold text-[#5C5A56] whitespace-nowrap">
-                                 USD {order.total.toFixed(0)}
+                                 {order.currency || 'USD'} {order.total.toFixed(0)}
                               </span>
                               <span className="text-[10px] text-[#5C5A56]/70 whitespace-nowrap">
                                 {order.itemCount} {order.itemCount === 1 ? t.accountPage.item : t.accountPage.items}
@@ -344,27 +343,27 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                                       <div className="border-t border-black/5 pt-2 space-y-1">
                                         <div className="flex justify-between text-[11px] text-[#5C5A56]/75">
                                           <span>{t.accountPage.subtotal}</span>
-                                          <span>USD {orderDetail.subtotal.toFixed(0)}</span>
+                                          <span>{orderDetail.currency || order.currency || 'USD'} {orderDetail.subtotal.toFixed(0)}</span>
                                         </div>
                                         <div className="flex justify-between text-[11px] text-[#5C5A56]/75">
                                           <span>{t.accountPage.shipping}</span>
-                                          <span>USD {orderDetail.shippingCost.toFixed(0)}</span>
+                                          <span>{orderDetail.currency || order.currency || 'USD'} {orderDetail.shippingCost.toFixed(0)}</span>
                                         </div>
                                         {orderDetail.tax > 0 && (
                                           <div className="flex justify-between text-[11px] text-[#5C5A56]/75">
                                             <span>{t.accountPage.tax}</span>
-                                            <span>USD {orderDetail.tax.toFixed(0)}</span>
+                                            <span>{orderDetail.currency || order.currency || 'USD'} {orderDetail.tax.toFixed(0)}</span>
                                           </div>
                                         )}
                                         {orderDetail.discount > 0 && (
                                           <div className="flex justify-between text-[11px] text-[#5C5A56]/75">
                                             <span>{t.accountPage.discount}</span>
-                                            <span>-USD {orderDetail.discount.toFixed(0)}</span>
+                                            <span>-{orderDetail.currency || order.currency || 'USD'} {orderDetail.discount.toFixed(0)}</span>
                                           </div>
                                         )}
                                         <div className="flex justify-between text-[12px] font-bold text-[#5C5A56] pt-1 border-t border-black/5">
                                           <span>{t.accountPage.total}</span>
-                                          <span>USD {orderDetail.total.toFixed(0)}</span>
+                                          <span>{orderDetail.currency || order.currency || 'USD'} {orderDetail.total.toFixed(0)}</span>
                                         </div>
                                       </div>
 
@@ -406,6 +405,21 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                                             try {
                                               await icareApi.orders.cancel(order.orderNumber, accessToken!);
                                               setCancelStatus((prev) => ({ ...prev, [order.orderNumber]: 'cancelled' }));
+                                              // Optimistic local update — flip the row status without a refetch.
+                                              setOrders((prev) =>
+                                                prev.map((o) =>
+                                                  o.orderNumber === order.orderNumber
+                                                    ? { ...o, status: 'cancelled', paymentStatus: 'cancelled' }
+                                                    : o,
+                                                ),
+                                              );
+                                              if (orderDetail && orderDetail.orderNumber === order.orderNumber) {
+                                                setOrderDetail((prev) =>
+                                                  prev && prev.orderNumber === order.orderNumber
+                                                    ? { ...prev, status: 'cancelled', paymentStatus: 'cancelled' }
+                                                    : prev,
+                                                );
+                                              }
                                             } catch (err) {
                                               setCancelStatus((prev) => ({ ...prev, [order.orderNumber]: 'idle' }));
                                               setOrdersError(err instanceof IcareApiError ? err.message : t.accountPage.cancelFailed);

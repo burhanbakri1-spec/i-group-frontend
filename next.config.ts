@@ -26,6 +26,13 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'via.placeholder.com' },
       { protocol: 'https', hostname: 'backend.igroup.website' },
+      // OSM raster tiles for the store-locator map. Wildcards match the
+      // `a.tile`, `b.tile`, `c.tile` subdomains used for load balancing.
+      // The map currently uses plain `<img>` (react-leaflet TileLayer)
+      // and so does NOT actually hit the next/image optimizer today,
+      // but the wildcard is added defensively in case any future
+      // consumer routes tile URLs through next/image.
+      { protocol: 'https', hostname: '*.tile.openstreetmap.org' },
     ],
   },
   async rewrites() {
@@ -33,6 +40,11 @@ const nextConfig: NextConfig = {
       // Hostinger mode: backend stores uploads under public_html/uploads/
       // and serves them at /uploads/ via Apache (not via NestJS).
       { source: '/uploads/:path*', destination: `${BACKEND_MEDIA_ORIGIN}/uploads/:path*` },
+      // NestJS @fastify/static serves admin uploads at /public/uploads/.
+      // Mirrors the /uploads/ rule for the canonical admin upload prefix
+      // so FE consumers that emit /public/uploads/x.png (resolveMediaUrl)
+      // resolve server-side without hitting the Next.js origin 404.
+      { source: '/public/uploads/:path*', destination: `${BACKEND_MEDIA_ORIGIN}/public/uploads/:path*` },
     ];
   },
 };

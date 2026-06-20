@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Check, Loader2, AlertCircle, ArrowLeft, Truck, Package } from 'lucide-react';
 import { icareApi } from '../../../lib/api-client';
+import { useShop } from '../../../context/ShopContext';
 import { CreatedOrder } from '../../../types';
 import { Language, checkoutTranslations, translations } from '../../../translations';
 
@@ -19,6 +20,7 @@ interface OrderConfirmationContentProps {
 type LoadState = 'loading' | 'found' | 'not_found' | 'error';
 
 export const OrderConfirmationContent: React.FC<OrderConfirmationContentProps> = ({ orderNumber }) => {
+  const { accessToken } = useShop();
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [order, setOrder] = useState<CreatedOrder | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -39,13 +41,42 @@ export const OrderConfirmationContent: React.FC<OrderConfirmationContentProps> =
 
     async function loadOrder() {
       setLoadState('loading');
-      try {
-        // Try with stored access token first
-        const token = typeof window !== 'undefined'
-          ? window.localStorage.getItem('icare_access_token') ?? undefined
-          : undefined;
 
-        const data = await icareApi.orders.detail(token ?? '', orderNumber);
+      // 1. Guest-order fast path: the checkout flow persists the just-created
+      //    order snapshot to sessionStorage. For guest orders the backend has
+      //    no guest-read endpoint, so this snapshot is the ONLY source on the
+      //    happy path (page reached via redirect right after creation).
+      if (typeof window !== 'undefined') {
+        try {
+          const raw = window.sessionStorage.getItem('lastCreatedOrder');
+          if (raw) {
+            const parsed = JSON.parse(raw) as { order?: CreatedOrder; expiresAt?: number };
+            if (typeof parsed.expiresAt === 'number' && Date.now() > parsed.expiresAt) {
+              window.sessionStorage.removeItem('lastCreatedOrder');
+            } else if (parsed.order?.orderNumber === orderNumber) {
+              if (!cancelled) {
+                setOrder(parsed.order);
+                setLoadState('found');
+              }
+              // Consume — subsequent reloads fall through to fetch (auth) or not_found (guest).
+              window.sessionStorage.removeItem('lastCreatedOrder');
+              return;
+            }
+          }
+        } catch {
+          // sessionStorage unavailable / corrupt — fall through
+        }
+      }
+
+      // 2. Authenticated fetch — uses ShopContext accessToken (refresh-capable),
+      //    replacing the raw localStorage read that broke on expired tokens.
+      if (!accessToken) {
+        if (!cancelled) setLoadState('not_found');
+        return;
+      }
+
+      try {
+        const data = await icareApi.orders.detail(accessToken, orderNumber);
         if (!cancelled) {
           setOrder(data);
           setLoadState('found');
@@ -65,7 +96,7 @@ export const OrderConfirmationContent: React.FC<OrderConfirmationContentProps> =
 
     loadOrder();
     return () => { cancelled = true; };
-  }, [orderNumber]);
+  }, [orderNumber, accessToken]);
 
   if (loadState === 'loading') {
     return (

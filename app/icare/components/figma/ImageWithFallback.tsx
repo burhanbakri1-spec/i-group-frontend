@@ -24,7 +24,14 @@ interface ImageWithFallbackProps {
  */
 const isNativeImageSource = (src: string) => {
   if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('//')) return true;
-  if (src.startsWith('/public/uploads/') || src.startsWith('/api/icare/uploads/') || src.startsWith('/uploads/')) return true;
+  if (
+    src.startsWith('/public/uploads/') ||
+    src.startsWith('/api/icare/uploads/') ||
+    src.startsWith('/api/icare/public/uploads/') ||
+    src.startsWith('/uploads/')
+  ) {
+    return true;
+  }
   return false;
 };
 

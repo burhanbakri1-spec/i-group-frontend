@@ -8,21 +8,17 @@ import {
   mapBackendReviewToProductReview,
   unwrapListData,
 } from './mappers';
+import { resolveMediaUrl } from './media-url';
 
-const IMAGE_BASE_URL = (process.env.NEXT_PUBLIC_IMAGE_BASE_URL || '').replace(/\/$/, '');
-const IMAGE_PROXY_BASE_URL = '/api/icare';
 const VIDEO_FILE_PATTERN = /\.(mp4|webm|ogv|ogg|mov|m4v)(?:$|[?#])/i;
 const CATALOG_PRODUCT_LIMIT = 100;
 const CATALOG_SHORTCUT_PRODUCT_LIMIT = 60;
 
 type BackendProductWithVisibility = BackendProduct & { isActive?: boolean };
 
-const normalizeShowcaseImageUrl = (image?: string | null) => {
-  if (!image?.trim()) return '';
-  if (image.startsWith('http')) return image;
-  if (image.startsWith('/')) return `${IMAGE_BASE_URL || IMAGE_PROXY_BASE_URL}${image}`;
-  return image;
-};
+// Delegated to `media-url.ts` (single source of truth for image URL
+// resolution). Kept as a local alias so existing call sites unchanged.
+const normalizeShowcaseImageUrl = (image?: string | null) => resolveMediaUrl(image);
 
 const isDirectVideoUrl = (url: string) => VIDEO_FILE_PATTERN.test(url);
 

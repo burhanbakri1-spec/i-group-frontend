@@ -49,6 +49,7 @@ export function useVerifiedImage(src: string | null | undefined): UseVerifiedIma
     };
     probe.onerror = () => {
       if (!cancelled) setFailed(true);
+      if (process.env.NODE_ENV !== 'production') console.warn('[useVerifiedImage] probe failed for:', src);
     };
     probe.src = src;
     return () => {

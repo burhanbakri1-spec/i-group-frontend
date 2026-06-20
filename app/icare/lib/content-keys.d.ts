@@ -4,33 +4,33 @@
 // Run `npm run sync:content-types` to regenerate after adding keys.
 export interface ContentKeys {
   // about
-  'about.foundation.image': { type: 'text'; locales: ['en', 'ar'] };
+  'about.foundation.image': { type: 'image' };
   'about.foundation.label': { type: 'text'; locales: ['en', 'ar'] };
   'about.foundation.text1': { type: 'text'; locales: ['en', 'ar'] };
   'about.foundation.text2': { type: 'text'; locales: ['en', 'ar'] };
   'about.foundation.title': { type: 'text'; locales: ['en', 'ar'] };
   'about.founder.letter': { type: 'text'; locales: ['en', 'ar'] };
   'about.founder.note.heading': { type: 'text'; locales: ['en', 'ar'] };
-  'about.founder.signature.image': { type: 'text'; locales: ['en', 'ar'] };
+  'about.founder.signature.image': { type: 'image' };
   'about.hero.cta': { type: 'text'; locales: ['en', 'ar'] };
   'about.hero.headline': { type: 'text'; locales: ['en', 'ar'] };
-  'about.hero.image': { type: 'text'; locales: ['en', 'ar'] };
-  'about.intentional.image': { type: 'text'; locales: ['en', 'ar'] };
+  'about.hero.image': { type: 'image' };
+  'about.intentional.image': { type: 'image' };
   'about.intentional.text': { type: 'text'; locales: ['en', 'ar'] };
   'about.intentional.title': { type: 'text'; locales: ['en', 'ar'] };
   'about.team.description': { type: 'text'; locales: ['en', 'ar'] };
   'about.team.label': { type: 'text'; locales: ['en', 'ar'] };
-  'about.team.member1.image': { type: 'text'; locales: ['en', 'ar'] };
+  'about.team.member1.image': { type: 'image' };
   'about.team.member1.name': { type: 'text'; locales: ['en', 'ar'] };
   'about.team.member1.title': { type: 'text'; locales: ['en', 'ar'] };
-  'about.team.member2.image': { type: 'text'; locales: ['en', 'ar'] };
+  'about.team.member2.image': { type: 'image' };
   'about.team.member2.name': { type: 'text'; locales: ['en', 'ar'] };
   'about.team.member2.title': { type: 'text'; locales: ['en', 'ar'] };
-  'about.team.member3.image': { type: 'text'; locales: ['en', 'ar'] };
+  'about.team.member3.image': { type: 'image' };
   'about.team.member3.name': { type: 'text'; locales: ['en', 'ar'] };
   'about.team.member3.title': { type: 'text'; locales: ['en', 'ar'] };
   'about.team.title': { type: 'text'; locales: ['en', 'ar'] };
-  'about.values.image': { type: 'text'; locales: ['en', 'ar'] };
+  'about.values.image': { type: 'image' };
 
   // auth
   'auth.heading.account': { type: 'text'; locales: ['en', 'ar'] };
@@ -90,6 +90,7 @@ export interface ContentKeys {
 
   // faq
   'faq.hero.title': { type: 'text'; locales: ['en', 'ar'] };
+  'faq.hero.subtitle': { type: 'text'; locales: ['en', 'ar'] };
 
   // footer
   'footer.columns.title.navigate': { type: 'text'; locales: ['en', 'ar'] };

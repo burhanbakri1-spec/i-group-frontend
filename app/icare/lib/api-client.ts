@@ -316,8 +316,17 @@ export const icareApi = {
         body: JSON.stringify(order),
         headers: extraHeaders,
       }),
-    list: (token: string, query?: Record<string, QueryValue>) =>
-      request<PaginatedData<OrderListItem> | OrderListItem[]>('/api/v1/orders', { token, query }),
+    list: async (token: string, query?: Record<string, QueryValue>) => {
+      const result = await request<PaginatedData<OrderListItem> | OrderListItem[]>(
+        '/api/v1/orders',
+        { token, query },
+      );
+      const list = Array.isArray(result) ? result : (result.data ?? []);
+      return list.map((order) => ({
+        ...order,
+        itemCount: order.items?.reduce((sum, i) => sum + (i.quantity || 0), 0) ?? 0,
+      }));
+    },
     detail: (token: string, orderNumber: string) => request<CreatedOrder>(`/api/v1/orders/${orderNumber}`, { token }),
     /**
      * Cancel a cancellable order (status = 'pending' or 'processing').
@@ -341,15 +350,12 @@ export const icareApi = {
      */
     track: (orderNumber: string, email: string) =>
       request<{
-        orderNumber: string;
         status: string;
-        shippingName?: string;
-        shippingCity?: string;
         trackingNumber?: string | null;
         carrier?: string | null;
         shippedAt?: string | null;
         deliveredAt?: string | null;
-        statusHistory?: Array<{ status: string; comment?: string | null; createdAt: string }>;
+        lastStatusUpdate?: string | null;
       }>(`/api/v1/orders/${orderNumber}/track`, {
         method: 'POST',
         body: JSON.stringify({ email }),
