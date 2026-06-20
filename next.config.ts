@@ -21,6 +21,12 @@ const BACKEND_MEDIA_ORIGIN = (
 ).replace(/\/$/, '');
 
 const nextConfig: NextConfig = {
+  // Default 60s kills any prerender whose backend fetch stalls past a minute.
+  // Server fetches in app/icare now abort fast (settings 2s, content 5s) and
+  // fall back to hardcoded defaults, so routes complete in seconds — this
+  // ceiling is just a backstop for transient backend slowness, not a license
+  // to hang.
+  staticPageGenerationTimeout: 120,
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'images.unsplash.com' },

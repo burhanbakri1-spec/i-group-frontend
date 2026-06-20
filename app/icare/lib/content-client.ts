@@ -32,6 +32,18 @@ const IMAGE_KEY_SUFFIX = '.image';
 
 const isImageKey = (key: string): boolean => key.endsWith(IMAGE_KEY_SUFFIX);
 
+// Abort ceiling covering headers AND body. A backend that returns headers
+// fast but stalls on the body would otherwise leave `await res.json()` /
+// `res.text()` blocked past the 60s prerender kill and fail the build.
+// 5s is generous for a single text value and far under the prerender limit.
+const CONTENT_FETCH_TIMEOUT_MS = 5000;
+
+const withTimeout = () => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), CONTENT_FETCH_TIMEOUT_MS);
+  return { signal: controller.signal, clear: () => clearTimeout(timer) };
+};
+
 // 404 single-retry — covers the case where the BE has just been
 // redeployed and the registry is mid-warm-up. After one retry we
 // surface the fallback so the page renders instead of hanging.
@@ -124,29 +136,36 @@ function unwrapEnvelope(json: unknown): unknown {
 }
 
 async function fetchContentOnce(url: string): Promise<FetchOutcome> {
-  let res: Response | undefined;
+  const { signal, clear } = withTimeout();
   try {
-    res = await fetch(url, { next: { revalidate: 300 } });
-  } catch (err) {
-    if (process.env.NODE_ENV === 'development') {
-      // eslint-disable-next-line no-console
-      console.warn(`[content] network error:`, err);
+    let res: Response | undefined;
+    try {
+      res = await fetch(url, { next: { revalidate: 300 }, signal });
+    } catch (err) {
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.warn(`[content] network error:`, err);
+      }
+      return { ok: false, status: 0, val: '', isActive: false, fallbackUsed: true };
     }
-    return { ok: false, status: 0, val: '', isActive: false, fallbackUsed: true };
-  }
-  if (!res || !res.ok) return { ok: false, status: res?.status ?? 0, val: '', isActive: false, fallbackUsed: true };
-  try {
-    const payload = unwrapEnvelope(await res.json()) as { val?: string; isActive?: boolean; fallbackUsed?: boolean };
-    return {
-      ok: true,
-      status: res.status,
-      val: payload?.val ?? '',
-      isActive: payload?.isActive !== false,
-      fallbackUsed: Boolean(payload?.fallbackUsed),
-    };
-  } catch {
-    // Non-JSON body — treat as missing rather than crashing the render.
-    return { ok: false, status: res.status, val: '', isActive: false, fallbackUsed: true };
+    if (!res || !res.ok) {
+      return { ok: false, status: res?.status ?? 0, val: '', isActive: false, fallbackUsed: true };
+    }
+    try {
+      const payload = unwrapEnvelope(await res.json()) as { val?: string; isActive?: boolean; fallbackUsed?: boolean };
+      return {
+        ok: true,
+        status: res.status,
+        val: payload?.val ?? '',
+        isActive: payload?.isActive !== false,
+        fallbackUsed: Boolean(payload?.fallbackUsed),
+      };
+    } catch {
+      // Non-JSON body — treat as missing rather than crashing the render.
+      return { ok: false, status: res.status, val: '', isActive: false, fallbackUsed: true };
+    }
+  } finally {
+    clear();
   }
 }
 
@@ -161,8 +180,9 @@ export async function fetchContentBatch<K extends keyof ContentKeys>(
     keys.every((k) => isImageKey(k as string))
       ? baseUrl
       : `${baseUrl}&lang=${lang}`;
+  const { signal, clear } = withTimeout();
   try {
-    const res = await fetch(url, { next: { revalidate: 300 } });
+    const res = await fetch(url, { next: { revalidate: 300 }, signal });
     if (!res.ok) return {} as Record<K, string>;
     // BE returns `{ success: true, data: { key: { val, type, fallbackUsed } } }`.
     // Unwrap, then project each entry to its `.val` so callers receive a
@@ -182,5 +202,7 @@ export async function fetchContentBatch<K extends keyof ContentKeys>(
       console.warn(`[content] batch fetch failed:`, err);
     }
     return {} as Record<K, string>;
+  } finally {
+    clear();
   }
 }
