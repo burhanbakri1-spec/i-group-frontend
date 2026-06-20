@@ -90,7 +90,7 @@ const ACKNOWLEDGED = new Set([
   'footerNewsletterText', 'footerNewsletterSubtitle', 'footerEmailPlaceholder',
   'footerSubscribeBtn', 'footerPrivacyNotice', 'footerCopyright', 'footerCountryRegion',
   'footerNavigateTitle', 'footerSocialTitle', 'footerOfficialTitle', 'footerSupportTitle',
-  'footerSupportSubtext', 'footerCookieLink',
+  'footerSupportSubtext', 'footerSupportHours', 'footerCookieLink',
   'footerLinkShop', 'footerLinkStory', 'footerLinkVlog', 'footerLinkFindUs',
   'footerLinkPrivacy', 'footerLinkTerms', 'footerLinkAccessibility',
   'footerLinkFaq', 'footerLinkContact',
