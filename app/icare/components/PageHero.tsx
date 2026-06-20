@@ -4,11 +4,6 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface PageHeroProps {
   image?: string | null;
-  // Optional responsive crops. When supplied, the hero uses a <picture>
-  // element with srcset/media queries so mobile/tablet users get a
-  // tighter aspect-ratio crop instead of the desktop background.
-  mobileImage?: string;
-  tabletImage?: string;
   fallbackImage: string;
   alt: string;
   title: React.ReactNode;
@@ -22,8 +17,6 @@ const HERO_EASE = [0.76, 0, 0.24, 1] as const;
 
 export const PageHero: React.FC<PageHeroProps> = ({
   image,
-  mobileImage,
-  tabletImage,
   fallbackImage,
   alt,
   title,
@@ -34,7 +27,6 @@ export const PageHero: React.FC<PageHeroProps> = ({
 }) => {
   const shouldReduceMotion = useReducedMotion();
   const imageSrc = image?.trim() || fallbackImage;
-  const hasResponsive = Boolean(mobileImage && tabletImage);
 
   return (
     <section data-icare-hero className="icare-page-hero">
@@ -45,28 +37,12 @@ export const PageHero: React.FC<PageHeroProps> = ({
         transition={{ duration: 0.65, ease: HERO_EASE }}
       >
         <div className="icare-page-hero__media">
-          {hasResponsive ? (
-            <picture>
-              <source media="(max-width: 768px)" srcSet={mobileImage} />
-              <source
-                media="(min-width: 769px) and (max-width: 1280px)"
-                srcSet={tabletImage}
-              />
-              <ImageWithFallback
-                src={imageSrc}
-                alt={alt}
-                priority={priority}
-                className="h-full w-full overflow-hidden rounded-[inherit] object-cover object-center"
-              />
-            </picture>
-          ) : (
-            <ImageWithFallback
-              src={imageSrc}
-              alt={alt}
-              priority={priority}
-              className="h-full w-full overflow-hidden rounded-[inherit] object-cover object-center"
-            />
-          )}
+          <ImageWithFallback
+            src={imageSrc}
+            alt={alt}
+            priority={priority}
+            className="h-full w-full overflow-hidden rounded-[inherit] object-cover object-center"
+          />
         </div>
         <div className="icare-page-hero__overlay" />
 

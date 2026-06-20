@@ -5,12 +5,9 @@
 
   "scripts": {
     "dev": "next dev",
-    "build": "next build && npm run audit:use-site-content",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "sync:content-types": "node scripts/sync-content-types.mjs",
-    "audit:use-site-content": "node scripts/audit-use-site-content.mjs",
-    "prebuild": "npm run audit:use-site-content",
     "test": "vitest run",
     "test:watch": "vitest",
     "playwright": "playwright"

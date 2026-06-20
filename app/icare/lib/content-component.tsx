@@ -2,12 +2,11 @@
 
 import Image from 'next/image';
 import { useContent, UseContentOptions } from '../hooks/useContent';
-import type { ContentKeys } from './content-keys';
 
 type ContentElement = 'h1' | 'h2' | 'h3' | 'p' | 'span' | 'div';
 
 interface ContentProps extends UseContentOptions {
-  src: keyof ContentKeys;
+  src: string;
   as?: ContentElement;
   alt?: string;
   className?: string;
