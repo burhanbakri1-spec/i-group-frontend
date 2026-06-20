@@ -5,6 +5,7 @@ import { getWebsiteMediaImage } from "../data/websiteMedia.js";
 const fallbackImages = {
   hero: "/products/limescale-remover-hover.jpg",
   concentrate: "/products/limescale-remover-main.jpg",
+  steps: "/products/limescale-remover-main.jpg",
   refill: "/images/products/fabric-cleaner.svg",
   cta: "/homepage-categories/car-care.jpg",
   essentials: "/homepage-categories/home-care.jpg",
@@ -326,7 +327,7 @@ function HowItWorksPage({ language = "en", onNavigate, onViewProduct, products =
             </div>
           </div>
           <div className="how-process-media">
-            <img className="how-process-image" src={image("concentrate")} alt="" aria-hidden="true" loading="lazy" onError={(event) => { event.currentTarget.src = placeholderImage; }} />
+            <img className="how-process-image" src={image("steps")} alt="" aria-hidden="true" loading="lazy" onError={(event) => { event.currentTarget.src = placeholderImage; }} />
           </div>
         </section>
         <section className="how-section how-process-block">
