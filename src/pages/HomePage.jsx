@@ -622,7 +622,10 @@ function HomePage({
       products.find((product) => product.categoryId === "car-care")?.image ||
       products[0]?.image,
   );
-  const mediaCategoryCards = homepageCategoryCards.map((card) => ({
+  const resolvedHomepageCategoryCards = homepageCategoryCards.length
+    ? homepageCategoryCards
+    : defaultHomepageCategoryCards;
+  const mediaCategoryCards = resolvedHomepageCategoryCards.map((card) => ({
     ...card,
     image: getWebsiteMediaImage(websiteMedia, `homepage_category_${card.key}`, card.image),
   }));
