@@ -83,15 +83,10 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
   const { val: aboutTeam1ImageCp } = useContent('about.team.member1.image', { lang, fallback: '' });
   const { val: aboutTeam2ImageCp } = useContent('about.team.member2.image', { lang, fallback: '' });
   const { val: aboutTeam3ImageCp } = useContent('about.team.member3.image', { lang, fallback: '' });
-  const { val: aboutHeroHeadlineCp } = useContent('about.hero.headline', { lang, fallback: '' });
-  const { val: aboutHeroCtaCp } = useContent('about.hero.cta', { lang, fallback: '' });
-  const { val: aboutTeam1NameCp } = useContent('about.team.member1.name', { lang, fallback: '' });
-  const { val: aboutTeam1TitleCp } = useContent('about.team.member1.title', { lang, fallback: '' });
-  const { val: aboutTeam2NameCp } = useContent('about.team.member2.name', { lang, fallback: '' });
-  const { val: aboutTeam2TitleCp } = useContent('about.team.member2.title', { lang, fallback: '' });
-  const { val: aboutTeam3NameCp } = useContent('about.team.member3.name', { lang, fallback: '' });
-  const { val: aboutTeam3TitleCp } = useContent('about.team.member3.title', { lang, fallback: '' });
-  // Values accordion — sourced from translations.ts (no dedicated ContentProvider keys).
+  const { val: aboutFounderSignatureImageCp } = useContent('about.founder.signature.image', { lang, fallback: '' });
+
+  // TODO: Move valuesData to CMS (useSiteContent) for centralized content management.
+  // Now driven from translations[lang] for bilingual support.
   const valuesData = [
     {
       title: t.aboutValuesTitle,
@@ -114,8 +109,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
         image={aboutHeroImageCp || aboutHeroImage}
         fallbackImage={DEFAULT_HERO_IMAGE}
          alt={t.aboutAltBrand}
-        title={aboutHeroHeadlineCp || aboutHeroHeadline}
-        ctaLabel={aboutHeroCtaCp || aboutHeroCta}
+        title={aboutHeroHeadline}
+        ctaLabel={aboutHeroCta}
         onCtaClick={() => onNavigate?.('shop')}
         priority
       />
@@ -241,8 +236,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
                   />
                 </div>
                 <div className="space-y-1 px-4 text-center">
-                  <h4 className="text-[20px] font-black tracking-tight text-[#67645E] lowercase">{aboutTeam1NameCp || aboutTeamMember1Name}</h4>
-                  <p className="text-[12px] font-bold uppercase tracking-widest text-[#999]">{aboutTeam1TitleCp || aboutTeamMember1Title}</p>
+                  <h4 className="text-[20px] font-black tracking-tight text-[#67645E] lowercase">{aboutTeamMember1Name}</h4>
+                  <p className="text-[12px] font-bold uppercase tracking-widest text-[#999]">{aboutTeamMember1Title}</p>
                 </div>
               </div>
             </ScrollReveal>
@@ -258,8 +253,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
                   />
                 </div>
                 <div className="space-y-1 px-4 text-center">
-                  <h4 className="text-[20px] font-black tracking-tight text-[#67645E] lowercase">{aboutTeam2NameCp || aboutTeamMember2Name}</h4>
-                  <p className="text-[12px] font-bold uppercase tracking-widest text-[#999]">{aboutTeam2TitleCp || aboutTeamMember2Title}</p>
+                  <h4 className="text-[20px] font-black tracking-tight text-[#67645E] lowercase">{aboutTeamMember2Name}</h4>
+                  <p className="text-[12px] font-bold uppercase tracking-widest text-[#999]">{aboutTeamMember2Title}</p>
                 </div>
               </div>
             </ScrollReveal>
@@ -275,8 +270,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
                   />
                 </div>
                 <div className="space-y-1 px-4 text-center">
-                  <h4 className="text-[20px] font-black tracking-tight text-[#67645E] lowercase">{aboutTeam3NameCp || aboutTeamMember3Name}</h4>
-                  <p className="text-[12px] font-bold uppercase tracking-widest text-[#999]">{aboutTeam3TitleCp || aboutTeamMember3Title}</p>
+                  <h4 className="text-[20px] font-black tracking-tight text-[#67645E] lowercase">{aboutTeamMember3Name}</h4>
+                  <p className="text-[12px] font-bold uppercase tracking-widest text-[#999]">{aboutTeamMember3Title}</p>
                 </div>
               </div>
             </ScrollReveal>

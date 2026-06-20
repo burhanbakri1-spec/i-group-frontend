@@ -4,7 +4,6 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { SwipeRail } from './ui/SwipeRail';
 import { translations, Language } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
-import { useContent } from '../hooks/useContent';
 
 interface SocialGridProps {
   lang: Language;
@@ -13,29 +12,14 @@ interface SocialGridProps {
 
 export const SocialGrid: React.FC<SocialGridProps> = ({ lang, onNavigate }) => {
   const shouldReduceMotion = useReducedMotion();
-  // Legacy aliases — kept as fallback tier while ContentProvider rollout finishes.
-  const {
-    socialGridHeading,
-    socialGridCta,
-    socialGridImage1,
-    socialGridImage2,
-    socialGridImage3,
-    socialGridImage4,
-  } = useSiteContent(lang);
-  // ContentProvider layer — BE serves AR via {lang: 'ar'}.
-  const { val: socialHeadingCp } = useContent('home.social.heading', { lang, fallback: '' });
-  const { val: socialCtaCp } = useContent('home.social.cta', { lang, fallback: '' });
-  const { val: socialImage1Cp } = useContent('home.social.image1', { lang, fallback: '' });
-  const { val: socialImage2Cp } = useContent('home.social.image2', { lang, fallback: '' });
-  const { val: socialImage3Cp } = useContent('home.social.image3', { lang, fallback: '' });
-  const { val: socialImage4Cp } = useContent('home.social.image4', { lang, fallback: '' });
+  const { socialGridHeading, socialGridCta, socialGridImage1, socialGridImage2, socialGridImage3, socialGridImage4 } = useSiteContent(lang);
   const t = translations[lang];
 
   const lifestyleImages = [
-    { id: 1, src: socialImage1Cp || socialGridImage1, alt: 'icare lifestyle 1' },
-    { id: 2, src: socialImage2Cp || socialGridImage2, alt: 'icare lifestyle 2' },
-    { id: 3, src: socialImage3Cp || socialGridImage3, alt: 'icare lifestyle 3' },
-    { id: 4, src: socialImage4Cp || socialGridImage4, alt: 'icare lifestyle 4' },
+    { id: 1, src: socialGridImage1, alt: 'icare lifestyle 1' },
+    { id: 2, src: socialGridImage2, alt: 'icare lifestyle 2' },
+    { id: 3, src: socialGridImage3, alt: 'icare lifestyle 3' },
+    { id: 4, src: socialGridImage4, alt: 'icare lifestyle 4' },
   ];
 
   return (
@@ -48,7 +32,7 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang, onNavigate }) => {
           viewport={{ once: true }}
           transition={{ duration: 0.32 }}
         >
-          {socialHeadingCp || socialGridHeading}
+          {socialGridHeading}
         </motion.h2>
         <motion.button
           onClick={() => onNavigate('vlog')}
@@ -66,7 +50,7 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang, onNavigate }) => {
             whileHover={{ x: 0 }}
             transition={{ duration: 0.24 }}
           />
-          <span className="relative z-10">{socialCtaCp || socialGridCta}</span>
+          <span className="relative z-10">{lang === 'en' ? socialGridCta : 'تابعنا على السوشيال'}</span>
         </motion.button>
       </div>
 
@@ -102,7 +86,7 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang, onNavigate }) => {
         onClick={() => onNavigate('vlog')}
         className="mt-8 w-full rounded-full border border-[#67645E]/20 py-4 text-[12.8px] font-bold uppercase leading-[1.5] tracking-[0.02em] text-[#67645E] hover:bg-[#67645E]/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDECEB] md:hidden"
       >
-        {socialCtaCp || socialGridCta}
+        {lang === 'en' ? socialGridCta : 'تابعنا على السوشيال'}
       </button>
     </section>
   );

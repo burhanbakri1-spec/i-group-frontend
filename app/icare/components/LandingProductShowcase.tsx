@@ -5,7 +5,6 @@ import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
 import { SkeletonPulse } from './ui/skeletons';
 import { fetchCatalogProducts, fetchProductShortcut } from '../lib/catalog-client';
 import { useSiteContent } from '../hooks/useSiteContent';
-import { useContent } from '../hooks/useContent';
 import { Language, translations } from '../translations';
 import { Product } from '../types';
 
@@ -43,8 +42,6 @@ const LandingProductShowcaseSkeleton = ({ lang }: { lang: Language }) => {
 
 export const LandingProductShowcase: React.FC<LandingProductShowcaseProps> = ({ lang, onProductSelect }) => {
   const { trendingTitle } = useSiteContent(lang);
-  // ContentProvider override (BE serves EN/AR via {lang}).
-  const { val: trendingTitleCp } = useContent('home.trending.title', { lang, fallback: '' });
   const t = translations[lang];
   const [products, setProducts] = useState<Product[] | null>(null);
 
@@ -88,7 +85,7 @@ export const LandingProductShowcase: React.FC<LandingProductShowcaseProps> = ({ 
       <ScrollReveal direction="bottom" viewportMargin="-60px">
         <div className="icare-landing-products__header">
           <h2 className="icare-landing-products__title">
-            {trendingTitleCp || trendingTitle || t.pages.landingShowcase.trendingEssentials}
+            {trendingTitle || t.pages.landingShowcase.trendingEssentials}
           </h2>
         </div>
       </ScrollReveal>

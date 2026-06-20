@@ -41,21 +41,6 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
   // PagesService.onModuleInit() (registered in e-commerce-backend).
   const { val: accountLoginImageCp } = useContent('account.login.image', { lang, fallback: '' });
   const loginImage = accountLoginImageCp || authLoginImage || loginImageFallback;
-  // ContentProvider overrides for all auth text keys.
-  const { val: authLoginTaglineCp } = useContent('auth.login.tagline', { lang, fallback: '' });
-  const { val: authHeadingLoginCp } = useContent('auth.heading.login', { lang, fallback: '' });
-  const { val: authHeadingSignupCp } = useContent('auth.heading.signup', { lang, fallback: '' });
-  const { val: authHeadingAccountCp } = useContent('auth.heading.account', { lang, fallback: '' });
-  const { val: authSignedInAsCp } = useContent('auth.signed.in.as', { lang, fallback: '' });
-  const { val: authSignOutCp } = useContent('auth.sign.out', { lang, fallback: '' });
-  const { val: authPlaceholderNameCp } = useContent('auth.placeholder.name', { lang, fallback: '' });
-  const { val: authPlaceholderEmailCp } = useContent('auth.placeholder.email', { lang, fallback: '' });
-  const { val: authPlaceholderPasswordCp } = useContent('auth.placeholder.password', { lang, fallback: '' });
-  const { val: authPlaceholderPhoneCp } = useContent('auth.placeholder.phone', { lang, fallback: '' });
-  const { val: authSubmitLoginCp } = useContent('auth.submit.login', { lang, fallback: '' });
-  const { val: authSubmitSignupCp } = useContent('auth.submit.signup', { lang, fallback: '' });
-  const { val: authToggleToRegisterCp } = useContent('auth.toggle.to.register', { lang, fallback: '' });
-  const { val: authToggleToLoginCp } = useContent('auth.toggle.to.login', { lang, fallback: '' });
   const t = translations[lang];
   const { user, isAuthenticated, accessToken, login, register, logout, authError } = useShop();
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -193,7 +178,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
         {/* Overlay Text - Matching the image exactly */}
         <div className="absolute inset-0 flex items-center justify-center p-8 md:p-12 bg-black/10">
           <h2 className="text-white text-[28px] md:text-[36px] lg:text-[42px] font-medium leading-tight text-center md:text-left md:max-w-xl tracking-tight drop-shadow-lg">
-            {authLoginTaglineCp || authLoginTagline}
+            {authLoginTagline}
           </h2>
         </div>
       </div>
@@ -207,13 +192,13 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
           className="w-full max-w-[400px] flex flex-col items-center"
         >
           <h1 className="text-[36px] md:text-[48px] font-bold text-[#5C5A56] mb-12 lowercase">
-            {isAuthenticated ? (authHeadingAccountCp || authHeadingAccount) : mode === 'login' ? (authHeadingLoginCp || authHeadingLogin) : (authHeadingSignupCp || authHeadingSignup)}
+            {isAuthenticated ? authHeadingAccount : mode === 'login' ? authHeadingLogin : authHeadingSignup}
           </h1>
 
           {isAuthenticated ? (
             <div className="w-full space-y-5 text-center">
               <div className="bg-white rounded-[16px] p-6 text-[#5C5A56]">
-                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#5C5A56]/70 mb-2">{authSignedInAsCp || authSignedInAs}</p>
+                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#5C5A56]/70 mb-2">{authSignedInAs}</p>
                 <p className="text-[20px] font-bold">{user?.name}</p>
                 <p className="text-[13px] text-[#5C5A56]/80">{user?.email}</p>
               </div>
@@ -443,7 +428,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                 onClick={() => logout()}
                 className={`border border-[#5C5A56] text-[#5C5A56] px-14 py-3 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors duration-200 active:scale-[0.98] motion-reduce:active:scale-100 ${CONTROL_FOCUS_CLASS}`}
               >
-                {authSignOutCp || authSignOut}
+                {authSignOut}
               </button>
             </div>
           ) : (
@@ -454,7 +439,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                     type="text"
                     value={name}
                     onChange={(event) => setName(event.target.value)}
-                    placeholder={authPlaceholderNameCp || authPlaceholderName}
+                    placeholder={authPlaceholderName}
                     className={ACCOUNT_INPUT_CLASS}
                   />
                 </div>
@@ -464,7 +449,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                   type="email"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
-                  placeholder={authPlaceholderEmailCp || authPlaceholderEmail}
+                  placeholder={authPlaceholderEmail}
                   className={ACCOUNT_INPUT_CLASS}
                 />
               </div>
@@ -474,7 +459,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                   type="password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  placeholder={authPlaceholderPasswordCp || authPlaceholderPassword}
+                  placeholder={authPlaceholderPassword}
                   className={ACCOUNT_INPUT_CLASS}
                 />
               </div>
@@ -485,7 +470,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                     type="tel"
                     value={phone}
                     onChange={(event) => setPhone(event.target.value)}
-                    placeholder={authPlaceholderPhoneCp || authPlaceholderPhone}
+                    placeholder={authPlaceholderPhone}
                     className={ACCOUNT_INPUT_CLASS}
                   />
                 </div>
@@ -499,14 +484,14 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                     <div className="w-4 h-4 border-2 border-[#5C5A56] border-t-transparent rounded-full animate-spin" />
                     {t.accountPage.pleaseWait}
                   </>
-                ) : mode === 'login' ? (authSubmitLoginCp || authSubmitLogin) : (authSubmitSignupCp || authSubmitSignup)}
+                ) : mode === 'login' ? authSubmitLogin : authSubmitSignup}
               </button>
             </form>
           )}
 
           {!isAuthenticated && <div className="mt-8 flex flex-col items-center gap-3">
             <div className="text-[12px] text-[#67645E] font-medium">
-              {mode === 'login' ? (authToggleToRegisterCp || authToggleToRegister) : (authToggleToLoginCp || authToggleToLogin)}{' '}
+              {mode === 'login' ? authToggleToRegister : authToggleToLogin}{' '}
               <button onClick={() => setMode(mode === 'login' ? 'register' : 'login')} className={`underline underline-offset-4 hover:text-black transition-colors ${CONTROL_FOCUS_CLASS}`}>
                 {mode === 'login' ? t.accountPage.signUp : t.accountPage.signIn}
               </button>

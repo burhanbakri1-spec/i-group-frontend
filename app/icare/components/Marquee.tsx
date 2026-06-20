@@ -1,9 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
 
-// TODO(content-provider-spec-003): Migrate to fetch `home.marquee.text` via useContent
-// once Home.tsx starts passing the resolved value as the `text` prop.
-// Currently Home.tsx does not render this component, so no consumer-side wiring exists.
 const Marquee = ({ text }: { text: string }) => {
   return (
     <div className="bg-[#F1F0ED] py-2 overflow-hidden border-y border-[#DDDDDD]">

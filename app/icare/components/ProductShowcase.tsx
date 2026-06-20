@@ -6,7 +6,6 @@ import { Language, translations } from '../translations';
 import { Product } from '../types';
 import { fetchProductShortcut } from '../lib/catalog-client';
 import { useSiteContent } from '../hooks/useSiteContent';
-import { useContent } from '../hooks/useContent';
 import { SkeletonPulse } from './ui/skeletons';
 import { ScrollReveal } from './ui/ScrollReveal';
 
@@ -21,8 +20,6 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
   const t = translations[lang];
   const shouldReduceMotion = useReducedMotion();
   const { productShowcaseLoading, productShowcaseEmpty } = useSiteContent(lang);
-  // ContentProvider override — BE serves EN/AR via {lang}.
-  const { val: showcaseEmptyCp } = useContent('home.showcase.empty', { lang, fallback: '' });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [remoteProducts, setRemoteProducts] = useState<Product[] | null>(null);
 
@@ -58,7 +55,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
     return (
       <section className="icare-index-section icare-morning-section">
         <div className="rounded-[8px] bg-white p-12 text-center text-[12px] font-bold uppercase tracking-[0.2em] text-[#84827E]">
-          {showcaseEmptyCp || productShowcaseEmpty}
+          {productShowcaseEmpty}
         </div>
       </section>
     );
