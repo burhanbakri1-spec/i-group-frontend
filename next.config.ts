@@ -71,6 +71,34 @@ const nextConfig: NextConfig = {
       { source: '/public/uploads/:path*', destination: `${BACKEND_MEDIA_ORIGIN}/public/uploads/:path*` },
     ];
   },
+  // UX safeguard: iGroup landing is at `/`, iCare storefront is at `/icare/*`.
+  // Users (and pasted links) frequently drop the `/icare` prefix. Forward
+  // bare storefront paths to their canonical `/icare/*` location with a 308
+  // (permanent) so the browser bar reflects the final URL.
+  async redirects() {
+    const storefrontPaths = [
+      'shop',
+      'cart',
+      'checkout',
+      'account',
+      'wishlist',
+      'story',
+      'contact',
+      'faq',
+      'vlog',
+      'find-us',
+      'shipping',
+      'privacy',
+      'terms',
+      'track-order',
+      'accessibility',
+    ];
+    return storefrontPaths.map((path) => ({
+      source: `/${path}`,
+      destination: `/icare/${path}`,
+      permanent: true,
+    }));
+  },
 };
 
 export default nextConfig;

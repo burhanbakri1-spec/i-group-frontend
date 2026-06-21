@@ -23,9 +23,10 @@ interface HeaderProps {
 const FOCUS_VISIBLE_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67645E]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--rb-bg-warm-gray)]';
 const MUTED_TEXT_CLASS = 'text-[var(--rb-primary-text)] hover:text-[var(--rb-near-black)]';
 const SHOP_MEGA_MENU_ID = 'icare-shop-mega-menu';
-const HEADER_HIDE_SCROLL_THRESHOLD = 32;
+const HEADER_HIDE_SCROLL_THRESHOLD = 220;
+const HEADER_SHOW_SCROLL_THRESHOLD = 32;
 const HEADER_SCROLL_DELTA = 4;
-const HEADER_HIDE_DELAY_MS = 80;
+const HEADER_HIDE_DELAY_MS = 200;
 const HEADER_MOTION_EASE = [0.76, 0, 0.24, 1] as const;
 const PREVIEW_LIMIT = 8;
 const PREVIEW_SLIDE_DISTANCE = 60;
@@ -251,7 +252,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
         return;
       }
 
-      if (currentScrollY <= HEADER_HIDE_SCROLL_THRESHOLD) {
+      // Two-zone scroll model: always show near the top, always hide after
+      // sustained scroll-down past a generous threshold, no-op in between.
+      // Eliminates the hide/show flicker on small scroll deltas.
+      if (currentScrollY <= HEADER_SHOW_SCROLL_THRESHOLD) {
         cancelHeaderHideTimer();
         setIsVisible(true);
         setIsScrollingUp(false);
@@ -259,7 +263,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
           clearTimeout(scrollIdleTimerRef.current);
           scrollIdleTimerRef.current = null;
         }
-      } else if (delta > HEADER_SCROLL_DELTA) {
+      } else if (currentScrollY > HEADER_HIDE_SCROLL_THRESHOLD && delta > HEADER_SCROLL_DELTA) {
         setIsScrollingUp(false);
         scheduleHeaderHide();
       } else if (delta < -HEADER_SCROLL_DELTA) {
@@ -292,10 +296,12 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
   }, [pathname]);
 
   const isStandardHero = hasIcareStandardHero(pathname);
-  // home-only, one-shot transparency: armed-off for the rest of the session after the first scroll past the hero
+  // All standard hero routes share a dark hero at the top, so the header
+  // pill stays transparent and the logo inverts to white over it. Once the
+  // user scrolls past the hero, the pill switches to its solid light style
+  // and the logo reverts to its native dark version.
   const isConnected =
     isStandardHero
-    && pathname === '/icare'
     && !isScrolled
     && !isShopHovered
     && !hasScrolledPastHero;

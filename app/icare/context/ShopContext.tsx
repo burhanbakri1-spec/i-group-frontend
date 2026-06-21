@@ -4,6 +4,8 @@ import { IcareApiError, icareApi } from '../lib/api-client';
 import { mapBackendCartToCartItems } from '../lib/mappers';
 import { normalizeSettingsGroups } from '../lib/settings';
 import { cachedFetch, cacheMiddleware } from '../lib/cache-middleware';
+import { fetchContentBatch, mergeWithFallback, ALL_CONTENT_KEYS, type ContentBatchResponse } from '../lib/content-client';
+import type { FallbackContentKey } from '../lib/fallback-content';
 
 const GUEST_CART_STORAGE_KEY = 'icare_guest_cart';
 const WISHLIST_STORAGE_KEY = 'icare_wishlist';
@@ -71,6 +73,7 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [authError, setAuthError] = useState<string | null>(null);
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [socialLinks, setSocialLinks] = useState<unknown>({});
+  const [content, setContent] = useState<Record<FallbackContentKey, string>>(() => mergeWithFallback({}));
 
   const accessToken = session?.accessToken ?? null;
   const user = session?.user ?? null;
@@ -167,6 +170,36 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
     };
     loadSocialLinks();
+  }, []);
+
+  // Load content registry batch (cached: reference). BE serves shipped
+  // defaultValues when admin hasn't overridden a key, so even a fresh
+  // backend never returns missing keys for registered entries.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    let cancelled = false;
+    const controller = new AbortController();
+    const loadContent = async () => {
+      try {
+        const batch: ContentBatchResponse = await cachedFetch(
+          '/api/v1/content',
+          () => fetchContentBatch(ALL_CONTENT_KEYS as readonly string[], 'en', controller.signal),
+          { tier: 'reference' },
+        );
+        if (!cancelled) {
+          setContent(mergeWithFallback(batch, 'en'));
+        }
+      } catch (error) {
+        if (cancelled) return;
+        warnInDevelopment('Failed to load iCare content registry.', error);
+        // Keep the fallback-only content already in state.
+      }
+    };
+    loadContent();
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
   }, []);
 
   const addGuestCartItem = (product: Product, quantity: number) => {
@@ -318,6 +351,7 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         refreshCart,
         settings,
         socialLinks,
+        content,
       }}
     >
       {children}

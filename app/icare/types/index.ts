@@ -190,6 +190,7 @@ export interface ShopContextType {
   refreshCart: () => Promise<void>;
   settings: AppSettings | null;
   socialLinks: unknown;
+  content: Record<string, string>;
 }
 
 export interface AppSettings {

@@ -98,6 +98,11 @@ const parseResponseBody = async <T>(response: Response): Promise<ApiEnvelope<T> 
   }
 };
 
+const isHtmlResponse = (body: string) => {
+  const trimmed = body.trimStart();
+  return trimmed.startsWith('<!DOCTYPE') || trimmed.startsWith('<html') || trimmed.startsWith('<?xml');
+};
+
 const parseEnvelope = async <T>(response: Response): Promise<T> => {
   // Read raw body once so we can pass it through unwrapped on error
   const bodyText = await response.text();
@@ -109,11 +114,16 @@ const parseEnvelope = async <T>(response: Response): Promise<T> => {
   }
 
   if (!response.ok || envelope?.success === false) {
-    // Raw backend response — no wrappers, no cooking
-    throw new IcareApiError(
-      bodyText || response.statusText || DEFAULT_API_ERROR_MESSAGE,
-      response.status,
-    );
+    // The Next.js dev/proxy layer returns full HTML error pages on
+    // crashes — dumping that body into a typed IcareApiError message
+    // spams the console. Detect HTML and substitute a clean message;
+    // the original status is preserved for downstream handling.
+    const message = bodyText
+      ? isHtmlResponse(bodyText)
+        ? `Backend unavailable (HTTP ${response.status})`
+        : bodyText
+      : response.statusText || DEFAULT_API_ERROR_MESSAGE;
+    throw new IcareApiError(message, response.status);
   }
   if (!envelope) {
     throw new IcareApiError('iCare API returned an empty response.', response.status);
