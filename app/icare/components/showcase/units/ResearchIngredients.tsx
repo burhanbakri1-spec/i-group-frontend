@@ -40,11 +40,10 @@ const IngredientIcon: React.FC<IngredientIconProps> = ({ icon, className }) => {
     ) : null;
   }
   return (
-    <img
+    <ImageWithFallback
       src={icon.url}
       alt={icon.alt}
       className={clsx('w-10 h-10 object-contain mb-3', className)}
-      loading="lazy"
     />
   );
 };

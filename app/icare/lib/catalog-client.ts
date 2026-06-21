@@ -2,6 +2,7 @@ import { BackendProduct, BackendShowcaseUnit, BackendVlog, ContentDirection, Cre
 import { z } from 'zod';
 import { icareApi, IcareApiError } from './api-client';
 import { cachedFetch, cacheMiddleware } from './cache-middleware';
+import { resolveMediaUrl } from './media-url';
 import {
   mapBackendFaqsToGroups,
   mapBackendProductToProduct,
@@ -9,20 +10,11 @@ import {
   unwrapListData,
 } from './mappers';
 
-const IMAGE_BASE_URL = (process.env.NEXT_PUBLIC_IMAGE_BASE_URL || '').replace(/\/$/, '');
-const IMAGE_PROXY_BASE_URL = '/api/icare';
 const VIDEO_FILE_PATTERN = /\.(mp4|webm|ogv|ogg|mov|m4v)(?:$|[?#])/i;
 const CATALOG_PRODUCT_LIMIT = 100;
 const CATALOG_SHORTCUT_PRODUCT_LIMIT = 60;
 
 type BackendProductWithVisibility = BackendProduct & { isActive?: boolean };
-
-const normalizeShowcaseImageUrl = (image?: string | null) => {
-  if (!image?.trim()) return '';
-  if (image.startsWith('http')) return image;
-  if (image.startsWith('/')) return `${IMAGE_BASE_URL || IMAGE_PROXY_BASE_URL}${image}`;
-  return image;
-};
 
 const isDirectVideoUrl = (url: string) => VIDEO_FILE_PATTERN.test(url);
 
@@ -277,8 +269,8 @@ export async function fetchProductMediaVlogs(limit = 12): Promise<VlogContentIte
       const vlogs = unwrapListData(result);
 
       return vlogs.map((vlog: BackendVlog) => {
-        const normalizedThumbnail = normalizeShowcaseImageUrl(vlog.thumbnailUrl);
-        const normalizedVideoUrl = normalizeShowcaseImageUrl(vlog.videoUrl);
+        const normalizedThumbnail = resolveMediaUrl(vlog.thumbnailUrl);
+        const normalizedVideoUrl = resolveMediaUrl(vlog.videoUrl);
         const hostedThumbnail = normalizedThumbnail ? '' : getHostedVideoThumbnail(normalizedVideoUrl);
         const videoPreviewUrl = !normalizedThumbnail && !hostedThumbnail && isDirectVideoUrl(normalizedVideoUrl) ? normalizedVideoUrl : null;
         const image = normalizedThumbnail || hostedThumbnail;

@@ -16,6 +16,7 @@ import type { NormalizedShowcaseUnit, ShadeSelectorPayload } from '../../../type
 import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
 import { TextPlaceholder } from '../shared/TextPlaceholder';
 import { ImagePlaceholder } from '../shared/ImagePlaceholder';
+import { ImageWithFallback } from '../../figma/ImageWithFallback';
 
 // ---------------------------------------------------------------------------
 // Props
@@ -127,7 +128,7 @@ const ShadeSelector: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion 
                       style={{ backgroundColor: shade.hex }}
                     />
                   ) : shade.image ? (
-                    <img
+                    <ImageWithFallback
                       src={shade.image.url}
                       alt={shade.image.alt || shade.name}
                       className="w-full h-full rounded-full object-cover"

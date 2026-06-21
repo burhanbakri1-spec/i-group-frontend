@@ -17,6 +17,7 @@ import type { NormalizedShowcaseUnit, ValuePropsGridPayload } from '../../../typ
 import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
 import { TextPlaceholder } from '../shared/TextPlaceholder';
 import { ImagePlaceholder } from '../shared/ImagePlaceholder';
+import { ImageWithFallback } from '../../figma/ImageWithFallback';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -40,11 +41,10 @@ const PropIcon: React.FC<PropIconProps> = ({ icon, className }) => {
     ) : null;
   }
   return (
-    <img
+    <ImageWithFallback
       src={icon.url}
       alt={icon.alt}
       className={clsx('w-10 h-10 object-contain mb-4', className)}
-      loading="lazy"
     />
   );
 };

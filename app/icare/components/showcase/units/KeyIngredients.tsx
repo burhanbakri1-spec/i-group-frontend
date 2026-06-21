@@ -12,6 +12,7 @@ import { clsx } from 'clsx';
 import { UnitShell, Eyebrow, SectionTitle, BodyText } from '../shared/UnitShell';
 import { TextPlaceholder } from '../shared/TextPlaceholder';
 import { ImagePlaceholder } from '../shared/ImagePlaceholder';
+import { ImageWithFallback } from '../../figma/ImageWithFallback';
 import { registerUnit } from '../../../lib/showcase/registry';
 import type { NormalizedShowcaseUnit, KeyIngredientsPayload } from '../../../types/showcase-units';
 import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
@@ -77,11 +78,10 @@ const KeyIngredients: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotion
                   <ImagePlaceholder aspect="square" rounded="md" />
                 ) : (
                   <div className="w-full max-w-xs overflow-hidden rounded-[8px] bg-[var(--rb-bg-surface)]">
-                    <img
+                    <ImageWithFallback
                       src={ingredient.image.url}
                       alt={ingredient.image.alt || ingredient.name}
                       className="h-auto w-full object-cover"
-                      loading="lazy"
                     />
                   </div>
                 )}

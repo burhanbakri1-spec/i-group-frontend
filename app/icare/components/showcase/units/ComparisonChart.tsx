@@ -16,6 +16,7 @@ import type { NormalizedShowcaseUnit, ComparisonChartPayload } from '../../../ty
 import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
 import { TextPlaceholder } from '../shared/TextPlaceholder';
 import { ImagePlaceholder } from '../shared/ImagePlaceholder';
+import { ImageWithFallback } from '../../figma/ImageWithFallback';
 
 interface ProductField {
   label: string;
@@ -40,8 +41,7 @@ const ProductCard: React.FC<ProductProps> = ({ product }) => (
       <ImagePlaceholder aspect="square" rounded="lg" />
     ) : product.image ? (
       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-[12px] bg-[var(--rb-bg-warm-gray)]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <ImageWithFallback
           src={product.image.url}
           alt={product.image.alt ?? product.name}
           className="h-full w-full object-cover"

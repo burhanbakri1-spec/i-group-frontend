@@ -15,6 +15,7 @@ import type { NormalizedShowcaseUnit, ResultsCarouselPayload } from '../../../ty
 import { EASE_STANDARD, DUR, STAGGER_STEP, VIEWPORT } from '../../../lib/showcase/motion';
 import { TextPlaceholder } from '../shared/TextPlaceholder';
 import { ImagePlaceholder } from '../shared/ImagePlaceholder';
+import { ImageWithFallback } from '../../figma/ImageWithFallback';
 
 interface Props {
   unit: NormalizedShowcaseUnit<ResultsCarouselPayload>;
@@ -114,11 +115,10 @@ const ResultsCarousel: React.FC<Props> = ({ unit, lang = 'en', shouldReduceMotio
                   {card.image.url === '' ? (
                     <ImagePlaceholder aspect="portrait" rounded="lg" />
                   ) : (
-                    <img
+                    <ImageWithFallback
                       src={card.image.url}
                       alt={card.image.alt}
                       className="w-full h-full object-contain"
-                      loading="lazy"
                     />
                   )}
                 </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import Image from 'next/image';
+import { resolveMediaUrl, isSafeImageUrl } from '../../lib/media-url';
 
 interface ImageWithFallbackProps {
   src?: string;
@@ -15,34 +15,34 @@ interface ImageWithFallbackProps {
 }
 
 /**
- * Native sources are rendered with a plain `<img>` (not next/image) so we
- * don't need width/height and don't go through the next/image optimizer for
- * relative paths (next/image can't resolve relative paths without a loader).
- * The canonical upload prefix `/public/uploads/` is what the admin upload
- * endpoint returns — it MUST be in this list, otherwise uploaded images
- * fall through to the next/image branch and render as "no image".
+ * ImageWithFallback — URL-shape-agnostic image renderer.
+ *
+ * Resolves `src` through the canonical resolver, which guarantees the
+ * result is either empty (rejected input), absolute (http/https), a
+ * protocol-relative URL, a data:image URL, a blob: URL, or a root-
+ * relative path that Next.js proxies via rewrites. For all of these a
+ * plain `<img>` works — we never need the next/image optimizer.
+ *
+ * - Skeleton overlay + opacity transition until the image decodes.
+ * - `loading="lazy"` by default; `eager` when `priority` is set.
+ * - `decoding="async"` keeps the main thread responsive.
+ * - `onError` logs a warning (was previously silent — operational blind spot).
+ * - Accessible "no image" placeholder when src is missing or the load fails.
+ * - `width`/`height` props are accepted for backwards compat but ignored
+ *   — plain `<img>` infers dimensions from the container.
  */
-const isNativeImageSource = (src: string) => {
-  if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('//')) return true;
-  if (src.startsWith('/public/uploads/') || src.startsWith('/api/icare/uploads/') || src.startsWith('/uploads/')) return true;
-  return false;
-};
-
 export function ImageWithFallback({
   src,
   alt,
   className,
   style,
-  sizes,
   priority = false,
-  width,
-  height,
 }: ImageWithFallbackProps) {
   const [loaded, setLoaded] = useState(false);
   const [didError, setDidError] = useState(false);
-  const hasImage = typeof src === 'string' && src.trim().length > 0;
+  const resolved = isSafeImageUrl(src) ? resolveMediaUrl(src) : '';
 
-  if (!hasImage || didError) {
+  if (!resolved || didError) {
     return (
       <div
         className={`inline-flex bg-muted text-center align-middle ${className ?? ''}`}
@@ -57,68 +57,25 @@ export function ImageWithFallback({
     );
   }
 
-  const imageSrc: string = src;
-  const visibleClass = `${className ?? ''} ${!loaded ? 'opacity-0' : 'opacity-100 skeleton-content'}`;
-
-  const skeletonOverlay = !loaded && (
-    <div
-      className="absolute inset-0 bg-muted motion-safe:animate-[skeleton-pulse_2.5s_ease-in-out_infinite] motion-reduce:opacity-50 rounded-[inherit]"
-    />
-  );
-
-  if (isNativeImageSource(imageSrc)) {
-    return (
-      <div className={`relative ${className ?? ''}`} style={style}>
-        {skeletonOverlay}
-        <img
-          src={imageSrc}
-          alt={alt ?? ''}
-          className={visibleClass}
-          style={style}
-          draggable={false}
-          onLoad={() => setLoaded(true)}
-          onError={() => setDidError(true)}
-        />
-      </div>
-    );
-  }
-
-  if (width !== undefined && height !== undefined) {
-    return (
-      <div className="relative inline-flex" style={style}>
-        {skeletonOverlay}
-        <Image
-          src={imageSrc}
-          alt={alt ?? ''}
-          width={width}
-          height={height}
-          sizes={sizes}
-          priority={priority}
-          className={visibleClass}
-          style={style}
-          draggable={false}
-          onLoad={() => setLoaded(true)}
-          onError={() => setDidError(true)}
-        />
-      </div>
-    );
-  }
-
   return (
     <div className={`relative ${className ?? ''}`} style={style}>
-      {skeletonOverlay}
-<Image
-          src={imageSrc}
-          alt={alt ?? ''}
-          fill
-          sizes={sizes ?? '100vw'}
-          priority={priority}
-          className={visibleClass}
-          style={style}
-          draggable={false}
-          onLoad={() => setLoaded(true)}
-          onError={() => setDidError(true)}
-        />
+      {!loaded && (
+        <div className="absolute inset-0 bg-muted motion-safe:animate-[skeleton-pulse_2.5s_ease-in-out_infinite] motion-reduce:opacity-50 rounded-[inherit]" />
+      )}
+      <img
+        src={resolved}
+        alt={alt ?? ''}
+        className={`${className ?? ''} ${!loaded ? 'opacity-0' : 'opacity-100 skeleton-content'}`}
+        style={style}
+        loading={priority ? 'eager' : 'lazy'}
+        decoding="async"
+        draggable={false}
+        onLoad={() => setLoaded(true)}
+        onError={() => {
+          console.warn('[ImageWithFallback] failed to load:', { originalSrc: src, resolvedUrl: resolved });
+          setDidError(true);
+        }}
+      />
     </div>
   );
 }

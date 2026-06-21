@@ -16,15 +16,12 @@ import {
   ProductReview,
   ProductVariant,
 } from '../types';
+import { resolveMediaUrl } from './media-url';
 
 type NumericInput = string | number | null | undefined;
 
 const normalizeFilterName = (value?: string | null) => value?.trim().toLowerCase() ?? '';
 
-
-// Configurable image base URL — when empty, backend media is served through the Next.js proxy.
-const IMAGE_BASE_URL = (process.env.NEXT_PUBLIC_IMAGE_BASE_URL || '').replace(/\/$/, '');
-const IMAGE_PROXY_BASE_URL = '/api/icare';
 
 export const coerceNumber = (value: NumericInput) => {
   if (typeof value === 'number') return Number.isFinite(value) ? value : null;
@@ -76,14 +73,8 @@ const getProductLabel = (product: BackendProduct) => {
   return undefined;
 };
 
-export const normalizeProductMediaUrl = (mediaUrl?: string | null) => {
-  const trimmedUrl = mediaUrl?.trim();
-  if (!trimmedUrl) return '';
-  if (/^(https?:|data:|blob:)/i.test(trimmedUrl)) return trimmedUrl;
-
-  const relativePath = trimmedUrl.startsWith('/') ? trimmedUrl : `/${trimmedUrl}`;
-  return `${IMAGE_BASE_URL || IMAGE_PROXY_BASE_URL}${relativePath}`;
-};
+export const normalizeProductMediaUrl = (mediaUrl?: string | null): string =>
+  resolveMediaUrl(mediaUrl);
 
 const normalizeProductMediaType = (mediaType?: string | null): ProductGalleryMediaType => (
   mediaType?.toUpperCase() === 'VIDEO' ? 'VIDEO' : 'IMAGE'

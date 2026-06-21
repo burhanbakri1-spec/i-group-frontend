@@ -6,6 +6,7 @@ import { Play } from 'lucide-react';
 import { fetchProductMediaVlogs } from '../lib/catalog-client';
 import { VlogContentItem } from '../types';
 import { useSiteContent } from '../hooks/useSiteContent';
+import { resolveMediaUrl } from '../lib/media-url';
 import { VlogGridSkeleton } from './ui/skeletons';
 import { PageHero } from './PageHero';
 
@@ -15,19 +16,6 @@ interface VlogPageProps {
 
 
 const VLOG_HERO_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1590439471364-192aa70c47b53?q=80&w=2000';
-const IMAGE_BASE_URL = (process.env.NEXT_PUBLIC_IMAGE_BASE_URL || '').replace(/\/$/, '');
-const IMAGE_PROXY_BASE_URL = '/api/icare';
-
-const normalizeVlogHeroImageUrl = (image?: string | null) => {
-  const trimmedImage = image?.trim();
-  if (!trimmedImage) return VLOG_HERO_FALLBACK_IMAGE;
-  if (trimmedImage.startsWith('http://') || trimmedImage.startsWith('https://')) return trimmedImage;
-  if (trimmedImage.startsWith('/api/icare/')) return trimmedImage;
-  if (trimmedImage.startsWith('/public/uploads/') || trimmedImage.startsWith('/uploads/')) {
-    return `${IMAGE_BASE_URL || IMAGE_PROXY_BASE_URL}${trimmedImage}`;
-  }
-  return trimmedImage;
-};
 
 const VlogItemBase = ({ image, subtitle, thumbnailType, title, videoPreviewUrl, videoUrl, lang }: VlogContentItem & { lang: Language }) => (
   <motion.div 
@@ -125,7 +113,7 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
   const vlogs = remoteVlogs ?? [];
   const isLoading = loading || remoteVlogs === null;
   const heroTitle = vlogHeroTitle?.trim() || t.pages.vlog.heroTitle;
-  const heroImage = normalizeVlogHeroImageUrl(vlogHeroImage);
+  const heroImage = resolveMediaUrl(vlogHeroImage) || VLOG_HERO_FALLBACK_IMAGE;
 
   return (
     <div className="min-h-screen bg-white pb-32">
