@@ -90,22 +90,27 @@ export async function cachedFetch<T>(
   const { tier = 'list', query } = options;
   const key = normalizeKey(path, query);
 
-  const pending = cacheMiddleware.getPending<T>(key);
-  if (pending) return pending;
-
   const cached = cacheMiddleware.getFresh<T>(key, tier);
+
+  // Cache hit (fresh or stale) — return immediately and refresh in the
+  // background. Callers never block on a fetch when cached data exists;
+  // the cache is a display buffer so the UI never flashes an empty state
+  // while a request is in flight.
   if (cached.data !== null) {
-    if (cached.fresh) {
-      return cached.data;
+    if (!cached.fresh) {
+      fetchFn()
+        .then((fresh) => cacheMiddleware.set(key, fresh, tier))
+        .catch(() => {
+          /* keep stale cache on refresh failure */
+        });
     }
-    cacheMiddleware.setPending(key, fetchFn()
-      .then((fresh) => {
-        cacheMiddleware.set(key, fresh, tier);
-        return fresh;
-      })
-      .catch(() => cached.data));
     return cached.data;
   }
+
+  // Cache miss — no choice but to fetch. Dedupe concurrent calls on the
+  // same key so we don't fire N parallel requests for the same resource.
+  const pending = cacheMiddleware.getPending<T>(key);
+  if (pending) return pending;
 
   const promise = fetchFn()
     .then((data) => {
@@ -113,8 +118,6 @@ export async function cachedFetch<T>(
       return data;
     })
     .catch((error) => {
-      const fallback = cacheMiddleware.get<T>(key);
-      if (fallback) return fallback.data;
       throw error;
     });
 
