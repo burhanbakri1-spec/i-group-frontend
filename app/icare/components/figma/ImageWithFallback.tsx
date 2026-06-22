@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { resolveMediaUrl, isSafeImageUrl } from '../../lib/media-url';
-import { useShop } from '../../context/ShopContext';
 
 interface ImageWithFallbackProps {
   src?: string;
@@ -62,25 +61,24 @@ export function ImageWithFallback({
 }: ImageWithFallbackProps) {
   const [loaded, setLoaded] = useState(false);
   const [didError, setDidError] = useState(false);
-  // contentVersion is the BE envelope timestamp. Appending it as a query
-  // string forces the browser to bypass its HTTP cache when the admin
-  // uploads a replacement image (same URL, different bytes).
-  const { contentVersion } = useShop();
   const resolved = isSafeImageUrl(src) ? resolveMediaUrl(src) : '';
   const fallbackResolved = fallbackSrc && isPublicAssetPath(fallbackSrc)
     ? fallbackSrc
     : resolveMediaUrl(fallbackSrc);
 
-  // Append a cache-busting query param to http(s) URLs only. Root-relative
-  // proxied paths (/api/icare/..., /uploads/...) and the Next.js
-  // /default-*.svg fallbacks don't need it (and adding ?v= would break
-  // the rewrite rules that strip the prefix).
-  const applyCacheBuster = (url: string): string => {
-    if (!contentVersion || !url) return url;
-    if (!/^https?:\/\//.test(url)) return url;
-    const sep = url.includes('?') ? '&' : '?';
-    return `${url}${sep}v=${encodeURIComponent(contentVersion)}`;
-  };
+  // React-canonical pattern: reset per-image load state when the resolved URL
+  // changes, *during render* (no effect/ref needed).
+  // See: https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  //
+  // Without this, a single transient `onError` latches `didError=true`
+  // forever and the instance is stuck on the fallback — the mechanism
+  // behind "images break after navigating home → shop → home".
+  const [prevResolved, setPrevResolved] = useState(resolved);
+  if (prevResolved !== resolved) {
+    setPrevResolved(resolved);
+    setLoaded(false);
+    setDidError(false);
+  }
 
   const shouldShowFallback = !resolved || didError;
 
@@ -99,7 +97,7 @@ export function ImageWithFallback({
     );
   }
 
-  const imageSrc = applyCacheBuster(shouldShowFallback ? fallbackResolved : resolved);
+  const imageSrc = shouldShowFallback ? fallbackResolved : resolved;
 
   return (
     <div className={`relative ${className ?? ''}`} style={style}>
@@ -107,6 +105,10 @@ export function ImageWithFallback({
         <div className="absolute inset-0 bg-muted motion-safe:animate-[skeleton-pulse_2.5s_ease-in-out_infinite] motion-reduce:opacity-50 rounded-[inherit]" />
       )}
       <img
+        // `key` on the resolved URL forces React to recreate the DOM node
+        // (and re-run the browser's load) when the URL actually changes,
+        // independent of the state reset above. Belt and suspenders.
+        key={imageSrc}
         src={imageSrc}
         alt={shouldShowFallback ? (fallbackAlt ?? alt ?? '') : (alt ?? '')}
         className={`${className ?? ''} ${!loaded ? 'opacity-0' : 'opacity-100 skeleton-content'}`}
