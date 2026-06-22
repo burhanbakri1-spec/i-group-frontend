@@ -11,6 +11,7 @@ import CheckoutPage from "./pages/CheckoutPage.jsx";
 import CleanupsPage from "./pages/CleanupsPage.jsx";
 import EmployeeDashboardPage from "./pages/EmployeeDashboardPage.jsx";
 import EBPointsPage from "./pages/EBPointsPage.jsx";
+import FollowUsPage from "./pages/FollowUsPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import HowItWorksPage from "./pages/HowItWorksPage.jsx";
 import AdminLoginPage from "./pages/AdminLoginPage.jsx";
@@ -88,6 +89,7 @@ const pagePaths = {
   cleanups: "/cleanups",
   "eb-points": "/eb-points",
   social: "/social",
+  "follow-us": "/follow-us",
   login: "/login",
   "admin-login": "/admin/login",
   register: "/register",
@@ -998,6 +1000,8 @@ function App() {
         )}
 
         {activePage === "social" && <SocialPage t={t} />}
+
+        {activePage === "follow-us" && <FollowUsPage />}
 
         {activePage === "login" && (
           <LoginPage

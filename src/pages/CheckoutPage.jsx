@@ -1,5 +1,5 @@
 import React from "react";
-import { brand } from "../data/brand.js";
+import { buildWhatsAppOrderUrl } from "../utils/whatsapp.js";
 
 const initialCheckoutForm = {
   name: "",
@@ -9,36 +9,18 @@ const initialCheckoutForm = {
   notes: "",
 };
 
-function buildWhatsAppMessage(form, cartItems, total, products, language, t) {
-  const productLines = cartItems
-    .map((item) => {
-      const product = products.find((entry) => entry.id === item.productId);
-      const productName = product?.name[language] || item.slug;
+function getMessageItems(items, products, language) {
+  return items.map((item) => {
+    const product = products.find((entry) => entry.id === item.productId);
+    const productName = product?.name?.[language] || item.productName || item.slug || item.productId;
 
-      if (language === "ar") {
-        return `- المنتج: ${productName}\n  الحجم: ${item.size}\n  الكمية: ${item.quantity}\n  الإجمالي: ${item.price * item.quantity} ${t("common.ils")}`;
-      }
-
-      return `- ${productName} (${item.size}) x${item.quantity} = ${
-        item.price * item.quantity
-      } ${t("common.ils")}`;
-    })
-    .join("\n");
-
-  return [
-    t("whatsapp.intro"),
-    "",
-    `${t("whatsapp.customer")}: ${form.name || t("whatsapp.notProvided")}`,
-    `${t("whatsapp.phone")}: ${form.phone || t("whatsapp.notProvided")}`,
-    `${t("whatsapp.city")}: ${form.city || t("whatsapp.notProvided")}`,
-    `${t("whatsapp.address")}: ${form.address || t("whatsapp.notProvided")}`,
-    `${t("whatsapp.notes")}: ${form.notes || t("whatsapp.none")}`,
-    "",
-    `${t("whatsapp.products")}:`,
-    productLines,
-    "",
-    `${t("whatsapp.total")}: ${total} ${t("common.ils")}`,
-  ].join("\n");
+    return {
+      ...item,
+      productName,
+      selectedSize: item.selectedSize || item.size,
+      lineTotal: item.lineTotal ?? Number(item.price || 0) * Number(item.quantity || 1),
+    };
+  });
 }
 
 function CheckoutPage({
@@ -86,8 +68,20 @@ function CheckoutPage({
     setIsSubmitting(true);
 
     try {
-      await onCreateOrder(form);
+      const submittedForm = { ...form };
+      const submittedItems = getMessageItems(cartItems, products, language);
+      const submittedTotal = total;
+      const order = await onCreateOrder(submittedForm);
+      const whatsappUrl = buildWhatsAppOrderUrl({
+        customer: { ...submittedForm, ...(order?.customer || {}) },
+        items: order?.items?.length ? order.items : submittedItems,
+        total: order?.total ?? submittedTotal,
+      });
+
       setOrderPlaced(true);
+      if (typeof window !== "undefined") {
+        window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+      }
     } catch (error) {
       setOrderError(error.message);
     } finally {
@@ -97,10 +91,11 @@ function CheckoutPage({
 
   const messageItems = orderPlaced && lastOrder ? lastOrder.items : cartItems;
   const messageTotal = orderPlaced && lastOrder ? lastOrder.total : total;
-  const whatsappMessage = encodeURIComponent(
-    buildWhatsAppMessage(form, messageItems, messageTotal, products, language, t)
-  );
-  const whatsappUrl = `https://wa.me/${brand.whatsappLinkNumber}?text=${whatsappMessage}`;
+  const whatsappUrl = buildWhatsAppOrderUrl({
+    customer: orderPlaced && lastOrder ? lastOrder.customer : form,
+    items: getMessageItems(messageItems, products, language),
+    total: messageTotal,
+  });
 
   if (cartItems.length === 0 && !orderPlaced) {
     return (
@@ -196,12 +191,12 @@ function CheckoutPage({
           <h2>{t("cart.orderSummary")}</h2>
           {messageItems.map((item) => {
             const product = products.find((entry) => entry.id === item.productId);
-            const productName = product?.name[language] || item.slug;
+            const productName = product?.name?.[language] || item.productName || item.slug;
 
             return (
-              <div className="summary-line" key={item.cartId}>
+              <div className="summary-line" key={item.cartId || `${item.productId}-${item.selectedSize || item.size}`}>
                 <span>
-                  {productName} · {item.size} x{item.quantity}
+                  {productName} - {item.selectedSize || item.size} x{item.quantity}
                 </span>
                 <strong>
                   {(item.lineTotal ?? item.price * item.quantity)} {t("common.ils")}
@@ -215,7 +210,7 @@ function CheckoutPage({
               {messageTotal} {t("common.ils")}
             </strong>
           </div>
-          <a className="whatsapp-action" href={whatsappUrl}>
+          <a className="whatsapp-action" href={whatsappUrl} rel="noopener noreferrer" target="_blank">
             {t("checkout.sendWhatsApp")}
           </a>
         </aside>

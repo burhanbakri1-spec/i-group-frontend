@@ -14,14 +14,14 @@ export const brand = {
   socials: [
     {
       name: "Instagram",
-      handle: "@epchemical",
-      url: "#",
+      handle: "@eb_chemical",
+      url: "https://www.instagram.com/eb_chemical",
       description: "Product tips, new arrivals, and cleaning routines.",
     },
     {
       name: "Facebook",
       handle: "EB Chemical",
-      url: "#",
+      url: "https://www.facebook.com/profile.php?id=61586630773060",
       description: "Updates, offers, and announcements.",
     },
     {

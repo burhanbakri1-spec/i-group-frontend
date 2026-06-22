@@ -2372,6 +2372,155 @@ textarea:focus {
   font-size: 27px;
 }
 
+.follow-us-page .page-heading {
+  max-width: 760px;
+}
+
+.follow-us-page .follow-social-grid {
+  align-items: stretch;
+}
+
+.follow-us-page .follow-social-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 300px;
+  align-content: space-between;
+  color: #10243d;
+  text-decoration: none;
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+
+.follow-us-page .follow-social-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: var(--follow-card-bg, #fffdf7);
+}
+
+.follow-us-page .follow-social-card::after {
+  content: "";
+  position: absolute;
+  inset: auto -28px -72px auto;
+  z-index: -1;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  background: var(--follow-card-glow, rgba(30, 171, 210, 0.18));
+}
+
+.follow-us-page .follow-social-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 22px;
+  background: var(--follow-icon-bg, #e9f8ef);
+  color: var(--follow-icon-color, var(--color-primary-dark));
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.follow-us-page .follow-social-copy {
+  display: grid;
+  gap: 10px;
+}
+
+.follow-us-page .follow-social-copy h2 {
+  color: inherit;
+}
+
+.follow-us-page .follow-social-copy strong {
+  color: var(--follow-accent, var(--color-primary));
+  font-size: 15px;
+}
+
+.follow-us-page .follow-social-copy p {
+  color: rgba(16, 36, 61, 0.72);
+  line-height: 1.55;
+}
+
+.follow-us-page .follow-social-status {
+  width: fit-content;
+  height: auto;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--follow-accent, var(--color-primary-dark));
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.follow-us-page .follow-social-card-instagram {
+  --follow-card-bg:
+    linear-gradient(135deg, rgba(255, 221, 128, 0.35), rgba(253, 89, 73, 0.18) 45%, rgba(131, 58, 180, 0.24)),
+    #fffdf7;
+  --follow-card-glow: rgba(214, 41, 118, 0.28);
+  --follow-icon-bg: linear-gradient(135deg, #feda75, #fa7e1e 35%, #d62976 68%, #962fbf);
+  --follow-icon-color: #ffffff;
+  --follow-accent: #c13584;
+}
+
+.follow-us-page .follow-social-card-facebook {
+  --follow-card-bg: linear-gradient(135deg, rgba(24, 119, 242, 0.16), rgba(255, 255, 255, 0.86)), #f7fbff;
+  --follow-card-glow: rgba(24, 119, 242, 0.25);
+  --follow-icon-bg: #1877f2;
+  --follow-icon-color: #ffffff;
+  --follow-accent: #1877f2;
+}
+
+.follow-us-page .follow-social-card-tiktok {
+  --follow-card-bg: linear-gradient(135deg, rgba(1, 1, 1, 0.92), rgba(17, 24, 39, 0.9)), #050505;
+  --follow-card-glow: linear-gradient(135deg, rgba(37, 244, 238, 0.38), rgba(254, 44, 85, 0.3));
+  --follow-icon-bg: linear-gradient(135deg, #25f4ee, #010101 48%, #fe2c55);
+  --follow-icon-color: #ffffff;
+  --follow-accent: #25f4ee;
+  color: #ffffff;
+}
+
+.follow-us-page .follow-social-card-tiktok .follow-social-copy p,
+.follow-us-page .follow-social-card-tiktok .follow-social-status {
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.follow-us-page .follow-social-card-tiktok .follow-social-status {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.follow-us-page .follow-social-card-whatsapp {
+  --follow-card-bg: linear-gradient(135deg, rgba(37, 211, 102, 0.18), rgba(255, 255, 255, 0.9)), #f6fff9;
+  --follow-card-glow: rgba(37, 211, 102, 0.25);
+  --follow-icon-bg: #25d366;
+  --follow-icon-color: #ffffff;
+  --follow-accent: #128c4a;
+}
+
+.follow-us-page .follow-social-card-email {
+  --follow-card-bg: linear-gradient(135deg, rgba(14, 49, 84, 0.13), rgba(255, 255, 255, 0.92)), #f8fbff;
+  --follow-card-glow: rgba(30, 171, 210, 0.22);
+  --follow-icon-bg: #0e3154;
+  --follow-icon-color: #ffffff;
+  --follow-accent: #0e3154;
+}
+
+.follow-us-page .follow-social-card-disabled {
+  cursor: default;
+}
+
+.follow-us-page .follow-social-card-disabled:hover {
+  transform: none;
+}
+
+@media (max-width: 560px) {
+  .follow-us-page .follow-social-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .follow-us-page .follow-social-card {
+    min-height: 250px;
+  }
+}
+
 .newsletter-band {
   position: relative;
   background: #F4F1EA;

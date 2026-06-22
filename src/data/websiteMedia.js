@@ -171,12 +171,21 @@ export const defaultWebsiteMedia = [
     isActive: true,
   },
   {
+    id: "website-media-about-rethinking-clean",
+    sectionKey: "about_rethinking_clean",
+    sectionLabel: "About page - Rethinking clean image",
+    groupKey: "about",
+    imageUrl: "/homepage-categories/home-care.jpg",
+    sortOrder: 3,
+    isActive: true,
+  },
+  {
     id: "website-media-about-card-bottle",
     sectionKey: "about_card_bottle",
     sectionLabel: "About page - every bottle card",
     groupKey: "about",
     imageUrl: "/images/products/fabric-cleaner.svg",
-    sortOrder: 3,
+    sortOrder: 4,
     isActive: true,
   },
   {
@@ -185,7 +194,7 @@ export const defaultWebsiteMedia = [
     sectionLabel: "About page - concentrates card",
     groupKey: "about",
     imageUrl: "/images/products/grease-oil-remover.svg",
-    sortOrder: 4,
+    sortOrder: 5,
     isActive: true,
   },
   {
@@ -194,7 +203,7 @@ export const defaultWebsiteMedia = [
     sectionLabel: "About page - materials card",
     groupKey: "about",
     imageUrl: "/images/products/car-shampoo-gloss.svg",
-    sortOrder: 5,
+    sortOrder: 6,
     isActive: true,
   },
   {
@@ -203,7 +212,16 @@ export const defaultWebsiteMedia = [
     sectionLabel: "About page - CTA image",
     groupKey: "about",
     imageUrl: "/images/products/limescale-remover.svg",
-    sortOrder: 6,
+    sortOrder: 7,
+    isActive: true,
+  },
+  {
+    id: "website-media-about-join",
+    sectionKey: "about_join",
+    sectionLabel: "About page - Join section image",
+    groupKey: "about",
+    imageUrl: "/homepage-categories/car-care.jpg",
+    sortOrder: 8,
     isActive: true,
   },
   {
@@ -212,7 +230,7 @@ export const defaultWebsiteMedia = [
     sectionLabel: "About page - impact image",
     groupKey: "about",
     imageUrl: "/images/products/radiator-water-green.svg",
-    sortOrder: 7,
+    sortOrder: 9,
     isActive: true,
   },
   {

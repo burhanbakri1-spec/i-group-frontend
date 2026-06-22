@@ -4,6 +4,8 @@ import { categories } from "../data/categories.js";
 import { homepageCategoryCards as defaultHomepageCategoryCards } from "../data/homeContent.js";
 import { getWebsiteMediaImage } from "../data/websiteMedia.js";
 
+const INSTAGRAM_URL = "https://www.instagram.com/eb_chemical";
+
 function getLocalized(value, language) {
   if (!value) return "";
   if (typeof value === "string") return value;
@@ -55,9 +57,9 @@ function HomeCommunityGallery({ galleryImages = [] }) {
             <a
               aria-label="EB Chemical on Instagram"
               className={`home-community-card home-community-card-${index + 1}`}
-              href="https://www.instagram.com/ebchemical"
+              href={INSTAGRAM_URL}
               key={`${image}-${index}`}
-              rel="noreferrer"
+              rel="noopener noreferrer"
               target="_blank"
             >
               <img
@@ -74,7 +76,7 @@ function HomeCommunityGallery({ galleryImages = [] }) {
                   <circle cx="12" cy="12" r="4" />
                   <circle cx="17" cy="7" r="1.4" />
                 </svg>
-                <span>@ebchemical</span>
+                <span>@eb_chemical</span>
               </span>
             </a>
           ))}
@@ -788,7 +790,7 @@ function HomePage({
           <h2>{t("home.socialTitle")}</h2>
           <p>{t("home.socialText")}</p>
         </div>
-        <button className="primary-action large" onClick={() => onNavigate("social")} type="button">
+        <button className="primary-action large" onClick={() => onNavigate("follow-us")} type="button">
           {t("home.socialCta")}
         </button>
       </section>

@@ -12,7 +12,7 @@ function SocialPage({ t }) {
 
       <div className="social-grid">
         {brand.socials.map((social) => (
-          <a className="social-card" href={social.url} key={social.name}>
+          <a className="social-card" href={social.url} key={social.name} rel="noopener noreferrer" target="_blank">
             <span>{social.name.slice(0, 2)}</span>
             <h2>{social.name}</h2>
             <strong>{social.handle}</strong>

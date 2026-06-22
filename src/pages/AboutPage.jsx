@@ -5,10 +5,12 @@ const fallbackImages = {
   hero: "/products/limescale-remover-hover.jpg",
   intro: "/products/limescale-remover-main.jpg",
   banner: "/homepage-categories/home-care.jpg",
+  rethinking_clean: "/homepage-categories/home-care.jpg",
   pillar1: "/images/products/limescale-remover.svg",
   pillar2: "/images/products/fabric-cleaner.svg",
   pillar3: "/images/products/car-interior-cleaner.svg",
   cta: "/homepage-categories/car-care.jpg",
+  join: "/homepage-categories/car-care.jpg",
   impact: "/homepage-categories/bathroom.jpg",
   stat1: "/images/products/limescale-remover.svg",
   stat2: "/images/products/fabric-cleaner.svg",
@@ -203,8 +205,8 @@ function AboutPage({ language = "en", onNavigate, websiteMedia = [] }) {
             <p className="mission-rethinking-text">{t.rethinkText}</p>
           </div>
           <picture>
-            <source srcSet={image("banner")} type="image/webp" />
-            <img className="mission-rethinking-bg" src={image("banner")} alt="" aria-hidden="true" loading="lazy" />
+            <source srcSet={image("rethinking_clean")} type="image/webp" />
+            <img className="mission-rethinking-bg" src={image("rethinking_clean")} alt="" aria-hidden="true" loading="lazy" />
           </picture>
           <div className="mission-rethinking-overlay" />
         </section>
@@ -251,8 +253,8 @@ function AboutPage({ language = "en", onNavigate, websiteMedia = [] }) {
         <div className="mission-join-inner">
           <div className="mission-join-media">
             <picture>
-              <source srcSet={image("cta")} type="image/webp" />
-              <img className="mission-join-image" src={image("cta")} alt="" aria-hidden="true" />
+              <source srcSet={image("join")} type="image/webp" />
+              <img className="mission-join-image" src={image("join")} alt="" aria-hidden="true" />
             </picture>
           </div>
           <div className="mission-join-content">

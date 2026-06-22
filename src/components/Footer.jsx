@@ -1,6 +1,9 @@
 import React from "react";
 import { brand } from "../data/brand.js";
 
+const instagramUrl = "https://www.instagram.com/eb_chemical";
+const facebookUrl = "https://www.facebook.com/profile.php?id=61586630773060";
+
 function Footer({ onNavigate, t }) {
   return (
     <footer className="site-footer">
@@ -48,6 +51,8 @@ function Footer({ onNavigate, t }) {
             <button type="button">Shipping Information</button>
             <button type="button">{t("footer.contact")}</button>
             <a href={`https://wa.me/${brand.whatsappLinkNumber}`}>WhatsApp</a>
+            <a href={instagramUrl} rel="noopener noreferrer" target="_blank">Instagram</a>
+            <a href={facebookUrl} rel="noopener noreferrer" target="_blank">Facebook</a>
             <button type="button">Terms & Conditions</button>
           </nav>
         </div>
