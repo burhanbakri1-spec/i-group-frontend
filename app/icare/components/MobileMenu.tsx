@@ -71,9 +71,9 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={shouldReduceMotion ? { opacity: 0 } : { x: '-100%' }}
+          initial={shouldReduceMotion ? { opacity: 0 } : { x: lang === 'ar' ? '100%' : '-100%' }}
           animate={shouldReduceMotion ? { opacity: 1 } : { x: 0 }}
-          exit={shouldReduceMotion ? { opacity: 0 } : { x: '-100%' }}
+          exit={shouldReduceMotion ? { opacity: 0 } : { x: lang === 'ar' ? '100%' : '-100%' }}
           transition={calmTween}
           className="fixed inset-0 z-[80] bg-[var(--rb-bg-warm-gray)] flex flex-col"
         >

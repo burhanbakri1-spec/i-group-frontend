@@ -466,7 +466,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
               <div className="md:hidden flex items-center gap-1 relative">
                 <ShoppingBag size={20} />
                 {cartCount > 0 && (
-                  <span className={`absolute -top-2 -right-2 w-5 h-5 text-[10px] font-black rounded-full flex items-center justify-center ${isConnected ? 'bg-white text-[var(--rb-primary-text)]' : 'bg-black text-white'}`}>
+                  <span className={`absolute -top-2 ${lang === 'ar' ? '-left-2' : '-right-2'} w-5 h-5 text-[10px] font-black rounded-full flex items-center justify-center ${isConnected ? 'bg-white text-[var(--rb-primary-text)]' : 'bg-black text-white'}`}>
                     {cartCount}
                   </span>
                 )}
@@ -503,7 +503,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                     >
                       {t.categories.all}
                       {clampedActivePreviewIndex === 0 && (
-                        <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="absolute -bottom-2 left-0 w-full h-[1px] bg-black" />
+                        <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="absolute -bottom-2 start-0 w-full h-[1px] bg-black" />
                       )}
                     </button>
                     {/* Root category buttons */}
@@ -520,7 +520,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                       >
                         {cat.name}
                         {clampedActivePreviewIndex === index + 1 && (
-                          <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="absolute -bottom-2 left-0 w-full h-[1px] bg-[var(--rb-near-black)]" />
+                          <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="absolute -bottom-2 start-0 w-full h-[1px] bg-[var(--rb-near-black)]" />
                         )}
                       </button>
                     )) : (

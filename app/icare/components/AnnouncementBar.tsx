@@ -1,26 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { icareApi } from '../lib/api-client';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { useIcareShell } from './IcareShell';
 import { Language, translations } from '../translations';
 
 const SENTENCE_SPLIT_PATTERN = /\s*(?:\||\n|•|؛)\s*/;
-
-const readAnnouncementValue = (announcement: Record<string, unknown>) => {
-  const candidates = [
-    announcement.message,
-    announcement.text,
-    announcement.title,
-    announcement.content,
-    announcement.body,
-    announcement.description,
-  ];
-
-  return candidates.find((value): value is string => (
-    typeof value === 'string' && value.trim().length > 0
-  ))?.trim();
-};
 
 const splitAnnouncementText = (text: string) => {
   const normalizedText = text.trim();
@@ -44,47 +28,10 @@ export const AnnouncementBar: React.FC = () => {
   const t = translations[lang];
   const shouldReduceMotion = useReducedMotion();
   const { announcementText } = useSiteContent(lang);
-  const fallbackSlides = useMemo(() => splitAnnouncementText(announcementText), [announcementText]);
-  const [remoteSlides, setRemoteSlides] = useState<string[]>([]);
+  const slides = useMemo(() => splitAnnouncementText(announcementText), [announcementText]);
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    const loadAnnouncements = async () => {
-      try {
-        const announcements = await icareApi.announcements.active();
-        if (cancelled || !Array.isArray(announcements)) return;
-
-        const nextSlides = announcements
-          .map(readAnnouncementValue)
-          .filter((value): value is string => Boolean(value));
-
-        setRemoteSlides(nextSlides);
-      } catch (error) {
-        if (process.env.NODE_ENV !== 'production') {
-          console.warn('Unable to load iCare announcements.', error);
-        }
-      }
-    };
-
-    loadAnnouncements();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const slides = useMemo(() => {
-    const seenSlides = new Set<string>();
-    return [...remoteSlides, ...fallbackSlides].filter((slide) => {
-      const normalizedSlide = slide.trim().toLowerCase();
-      if (!normalizedSlide || seenSlides.has(normalizedSlide)) return false;
-      seenSlides.add(normalizedSlide);
-      return true;
-    });
-  }, [fallbackSlides, remoteSlides]);
   const hasMultipleSlides = slides.length > 1;
   const activeSlide = slides[activeSlideIndex % Math.max(slides.length, 1)] ?? '';
 
@@ -112,9 +59,9 @@ export const AnnouncementBar: React.FC = () => {
             <motion.p
               key={`${activeSlideIndex}-${activeSlide}`}
               className="icare-announcement__slide overflow-hidden text-ellipsis whitespace-nowrap"
-              initial={shouldReduceMotion ? false : { x: 12, opacity: 0 }}
+              initial={shouldReduceMotion ? false : { x: lang === 'ar' ? -12 : 12, opacity: 0 }}
               animate={shouldReduceMotion ? undefined : { x: 0, opacity: 1 }}
-              exit={shouldReduceMotion ? undefined : { x: -12, opacity: 0 }}
+              exit={shouldReduceMotion ? undefined : { x: lang === 'ar' ? 12 : -12, opacity: 0 }}
               transition={{ duration: 0.32, ease: [0.76, 0, 0.24, 1] }}
             >
               {activeSlide}
@@ -128,7 +75,7 @@ export const AnnouncementBar: React.FC = () => {
             aria-label={isPaused ? t.resumeSlider : t.pauseSlider}
             aria-pressed={isPaused}
             onClick={() => setIsPaused((currentValue) => !currentValue)}
-            className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center justify-center p-2 text-[#67645E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67645E]/70"
+            className="absolute end-2 top-1/2 flex -translate-y-1/2 items-center justify-center p-2 text-[#67645E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67645E]/70"
           >
             {isPaused ? (
               <span

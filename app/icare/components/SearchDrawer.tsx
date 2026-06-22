@@ -125,20 +125,20 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
             className={`fixed inset-0 bg-black/35 ${DRAWER_BACKDROP_Z_CLASS}`}
           />
           
-          <motion.div 
+          <motion.div
             key="search-drawer-content"
-            initial={shouldReduceMotion ? { opacity: 0 } : { x: '100%' }}
+            initial={shouldReduceMotion ? { opacity: 0 } : { x: lang === 'ar' ? '-100%' : '100%' }}
             animate={shouldReduceMotion ? { opacity: 1 } : { x: 0 }}
-            exit={shouldReduceMotion ? { opacity: 0 } : { x: '100%' }}
+            exit={shouldReduceMotion ? { opacity: 0 } : { x: lang === 'ar' ? '-100%' : '100%' }}
             transition={DRAWER_TRANSITION}
-            className={`fixed top-0 right-0 h-full w-full max-w-[500px] bg-[#F1F0ED] ${DRAWER_PANEL_Z_CLASS} flex flex-col font-sans overflow-hidden`}
+            className={`fixed top-0 ${lang === 'ar' ? 'left-0' : 'right-0'} h-full w-full max-w-[500px] bg-[#F1F0ED] ${DRAWER_PANEL_Z_CLASS} flex flex-col font-sans overflow-hidden`}
           >
             {/* Header */}
             <div className="relative p-6 flex items-center justify-center border-b border-black/5">
               <h2 className="text-[15px] font-black text-[#67645E] tracking-normal lowercase">{searchDrawerTitle}</h2>
-              <button 
-                onClick={onClose} 
-                className={`absolute right-6 p-1 text-[#67645E] hover:text-black transition-colors min-h-[44px] ${CONTROL_FOCUS_CLASS}`}
+              <button
+                onClick={onClose}
+                className={`absolute ${lang === 'ar' ? 'left-6' : 'right-6'} p-1 text-[#67645E] hover:text-black transition-colors min-h-[44px] ${CONTROL_FOCUS_CLASS}`}
                 aria-label={t.ui.search.closeSearch}
               >
                 <X size={24} strokeWidth={1.5} />

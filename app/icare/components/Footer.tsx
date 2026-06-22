@@ -10,7 +10,7 @@ interface FooterProps {
 }
 
 const FOCUS_VISIBLE_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F1F0ED]';
-const FOOTER_LINK_CLASS = `min-h-[44px] flex items-center rounded-sm text-[14px] text-[#84827E] hover:text-[#5C5A56] transition-colors text-left ${FOCUS_VISIBLE_CLASS}`;
+const FOOTER_LINK_CLASS = `min-h-[44px] flex items-center rounded-sm text-[14px] text-[#84827E] hover:text-[#5C5A56] transition-colors text-start ${FOCUS_VISIBLE_CLASS}`;
 
 export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
   const {

@@ -55,6 +55,23 @@ const PageTransition = ({
   );
 };
 
+const ANNOUNCEMENT_VAR = '--icare-announcement-bottom';
+
+const syncAnnouncementOffset = () => {
+  const bar = document.querySelector<HTMLElement>('[data-icare-announcement]');
+  // Use document-space (not viewport-space) so the fixed header's top stays
+  // stable as the user scrolls. offsetTop + offsetHeight is immune to scrollY.
+  let nextValue = '0px';
+  if (bar) {
+    const documentBottom = bar.offsetTop + bar.offsetHeight;
+    nextValue = `${documentBottom}px`;
+  }
+  const root = document.documentElement;
+  if (root.style.getPropertyValue(ANNOUNCEMENT_VAR) !== nextValue) {
+    root.style.setProperty(ANNOUNCEMENT_VAR, nextValue);
+  }
+};
+
 export const IcareShell = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -68,6 +85,29 @@ export const IcareShell = ({ children }: { children: React.ReactNode }) => {
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     document.documentElement.lang = lang;
   }, [lang]);
+
+  // Keep the fixed header / hero top offsets in lockstep with the actual
+  // rendered announcement bar. Without this, the offset would be hard-coded
+  // in CSS and desync whenever the bar wraps, is empty, or the language toggles.
+  useEffect(() => {
+    syncAnnouncementOffset();
+
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', syncAnnouncementOffset);
+      return () => window.removeEventListener('resize', syncAnnouncementOffset);
+    }
+
+    const ro = new ResizeObserver(() => syncAnnouncementOffset());
+    const bar = document.querySelector<HTMLElement>('[data-icare-announcement]');
+    if (bar) ro.observe(bar);
+    // Also watch the document body so we catch the bar appearing/disappearing
+    // (e.g. when the last slide is removed or language changes mid-session).
+    ro.observe(document.body);
+
+    return () => {
+      ro.disconnect();
+    };
+  }, [lang, pathname]);
 
   const navigateToPath = useCallback((path: string) => {
     router.push(path);
