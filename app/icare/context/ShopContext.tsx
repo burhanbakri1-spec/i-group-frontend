@@ -4,8 +4,9 @@ import { IcareApiError, icareApi } from '../lib/api-client';
 import { mapBackendCartToCartItems } from '../lib/mappers';
 import { normalizeSettingsGroups } from '../lib/settings';
 import { cachedFetch, cacheMiddleware } from '../lib/cache-middleware';
-import { fetchContentBatch, mergeWithFallback, ALL_CONTENT_KEYS, type ContentBatchResponse } from '../lib/content-client';
+import { fetchAllContent, mergeWithFallback } from '../lib/content-client';
 import type { FallbackContentKey } from '../lib/fallback-content';
+import { FALLBACK_CONTENT } from '../lib/fallback-content';
 
 const GUEST_CART_STORAGE_KEY = 'icare_guest_cart';
 const WISHLIST_STORAGE_KEY = 'icare_wishlist';
@@ -73,7 +74,17 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [authError, setAuthError] = useState<string | null>(null);
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [socialLinks, setSocialLinks] = useState<unknown>({});
-  const [content, setContent] = useState<Record<FallbackContentKey, string>>(() => mergeWithFallback({}));
+  const [content, setContent] = useState<Record<FallbackContentKey, string>>(() => FALLBACK_CONTENT as Record<FallbackContentKey, string>);
+  // Per-locale merged content (en + ar). `content` is kept as the en slice
+  // for backward compatibility; `contentByLocale` lets useSiteContent pick
+  // the active locale at read time so AR admin translations actually render.
+  const [contentByLocale, setContentByLocale] = useState<{
+    en: Record<FallbackContentKey, string>;
+    ar: Record<FallbackContentKey, string>;
+  }>(() => ({
+    en: FALLBACK_CONTENT as Record<FallbackContentKey, string>,
+    ar: FALLBACK_CONTENT as Record<FallbackContentKey, string>,
+  }));
 
   const accessToken = session?.accessToken ?? null;
   const user = session?.user ?? null;
@@ -172,34 +183,30 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     loadSocialLinks();
   }, []);
 
-  // Load content registry batch (cached: reference). BE serves shipped
-  // defaultValues when admin hasn't overridden a key, so even a fresh
-  // backend never returns missing keys for registered entries.
+  // Load dynamic content from backend (cached: reference)
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    let cancelled = false;
     const controller = new AbortController();
     const loadContent = async () => {
       try {
-        const batch: ContentBatchResponse = await cachedFetch(
+        const allContent = await cachedFetch(
           '/api/v1/content',
-          () => fetchContentBatch(ALL_CONTENT_KEYS as readonly string[], 'en', controller.signal),
+          () => fetchAllContent(controller.signal),
           { tier: 'reference' },
         );
-        if (!cancelled) {
-          setContent(mergeWithFallback(batch, 'en'));
+        if (controller.signal.aborted) return;
+        if (allContent) {
+          const en = mergeWithFallback(allContent.en || {}) as Record<FallbackContentKey, string>;
+          const ar = mergeWithFallback(allContent.ar || {}) as Record<FallbackContentKey, string>;
+          setContent(en);
+          setContentByLocale({ en, ar });
         }
       } catch (error) {
-        if (cancelled) return;
-        warnInDevelopment('Failed to load iCare content registry.', error);
-        // Keep the fallback-only content already in state.
+        if (controller.signal.aborted) return;
+        warnInDevelopment('Failed to load iCare dynamic content.', error);
       }
     };
     loadContent();
-    return () => {
-      cancelled = true;
-      controller.abort();
-    };
+    return () => controller.abort();
   }, []);
 
   const addGuestCartItem = (product: Product, quantity: number) => {
@@ -352,6 +359,7 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         settings,
         socialLinks,
         content,
+        contentByLocale,
       }}
     >
       {children}

@@ -1,140 +1,98 @@
 /**
- * content-client.ts — Bridge to BE ContentProvider.
+ * content-client.ts — Bridge to the new dynamic content system.
  *
- * The backend exposes a CMS-style content registry via:
- *   GET /api/v1/content?keys=k1,k2,k3&lang=en
- *   → 200 { k1: {key,type,val,fallbackUsed,isActive}, k2: {...}, ... }
+ * The backend exposes a single public envelope endpoint:
+ *   GET /api/v1/content
+ *   → 200 { en: { hero_headline: '...', ... }, ar: { ... }, version: "ISO" }
  *
- * Returns at most 50 keys per call (`content.controller.ts:40`).
- * This client batches larger key sets and merges results.
+ * This client fetches the entire envelope in one round-trip, caches it
+ * (reference tier via cacheMiddleware), and provides a `mergeWithFallback`
+ * helper that overlays the backend values on top of FALLBACK_CONTENT.
  *
- * The backend always returns a value for registered keys — either the
- * admin override or the shipped defaultValue. Missing keys are silently
- * dropped from the response. Callers should treat absent keys as
- * "use fallback" and supply their own fallback from fallback-content.ts.
+ * Design goals (per user spec):
+ *   - One endpoint, one JSON envelope — efficient, easy to debug.
+ *   - Frontend does its own caching. No per-key endpoints.
+ *   - Fully pluggable: admin adds group/entry in admin panel, frontend
+ *     picks it up on next fetch.
  */
 
 import { FALLBACK_CONTENT, type FallbackContentKey } from './fallback-content';
 
-const BATCH_LIMIT = 50;
-
-export interface ResolvedContentValue {
-  key: string;
-  type: 'text' | 'image';
-  val: string;
-  fallbackUsed: boolean;
-  isActive: boolean;
+/**
+ * Shape of the envelope returned by GET /api/v1/content.
+ * Each locale key maps to a flat string map (key → value).
+ */
+export interface ContentEnvelope {
+  en: Record<string, string>;
+  ar: Record<string, string>;
+  version: string;
 }
-
-export type ContentBatchResponse = Record<string, ResolvedContentValue>;
-
-interface ContentBatchEnvelope {
-  success: boolean;
-  data: ContentBatchResponse | null;
-  message?: string;
-}
-
-const getApiBaseUrl = () => {
-  const envUrl = process.env.NEXT_PUBLIC_ICARE_API_URL;
-  if (envUrl) return envUrl.replace(/\/$/, '');
-  return '/api/icare';
-};
 
 /**
- * Fetch a batch of content keys. Sends parallel requests when keys > BATCH_LIMIT.
- * Returns a map keyed by BE dotted key. Missing keys are absent from the map.
+ * Fetch all dynamic content from the backend in a single call.
  *
- * Memoizes a single 404 outcome per session: once the BE confirms the
- * `/api/v1/content` endpoint doesn't exist (or any other hard failure), we
- * stop hitting the network for it. Content state is pre-populated with
- * FALLBACK_CONTENT in ShopContext, so a skipped call is invisible to the UI.
+ * The endpoint returns every active entry in the system, grouped by
+ * locale. No query parameters — the whole catalog is returned.
+ *
+ * @param signal Optional AbortSignal for cancellation (e.g. unmount).
+ * @returns The content envelope, or throws on network failure.
  */
-let endpointUnavailable = false;
-let endpointWarned = false;
+export async function fetchAllContent(signal?: AbortSignal): Promise<ContentEnvelope> {
+  const res = await fetch('/api/v1/content', {
+    signal,
+    headers: { Accept: 'application/json' },
+  });
 
-export async function fetchContentBatch(
-  keys: ReadonlyArray<string>,
-  lang: 'en' | 'ar' = 'en',
-  signal?: AbortSignal,
-): Promise<ContentBatchResponse> {
-  if (keys.length === 0) return {};
-  if (endpointUnavailable) return {};
-  const baseUrl = getApiBaseUrl();
-
-  const batches: string[][] = [];
-  for (let i = 0; i < keys.length; i += BATCH_LIMIT) {
-    batches.push(keys.slice(i, i + BATCH_LIMIT));
+  if (!res.ok) {
+    throw new Error(`Content envelope fetch failed: ${res.status} ${res.statusText}`);
   }
 
-  const responses = await Promise.all(batches.map(async (batch) => {
-    const url = `${baseUrl}/api/v1/content?keys=${encodeURIComponent(batch.join(','))}&lang=${lang}`;
-    let response: Response;
-    try {
-      response = await fetch(url, {
-        method: 'GET',
-        headers: { Accept: 'application/json' },
-        signal,
-      });
-    } catch {
-      // Network failure — fall back to defaults already in state.
-      return {};
-    }
-    if (!response.ok) {
-      // Content state is pre-populated with FALLBACK_CONTENT in ShopContext.
-      // A failed batch just means fallbacks stay. Don't throw — that
-      // would surface an unhandled error to the UI for what is a
-      // graceful-degradation path. Remember the failure so we stop
-      // re-hitting an endpoint that doesn't exist.
-      endpointUnavailable = true;
-      if (!endpointWarned && process.env.NODE_ENV !== 'production') {
-        endpointWarned = true;
-        // eslint-disable-next-line no-console
-        console.warn(`[content-client] BE content endpoint unavailable (HTTP ${response.status}); using shipped fallbacks.`);
-      }
-      return {};
-    }
-    try {
-      const body = (await response.json()) as ContentBatchEnvelope;
-      if (!body.success || !body.data) {
-        return {};
-      }
-      return body.data;
-    } catch {
-      return {};
-    }
-  }));
+  const data: ContentEnvelope = await res.json();
 
-  return responses.reduce<ContentBatchResponse>((merged, batch) => {
-    Object.assign(merged, batch);
-    return merged;
-  }, {});
+  // Defensive: ensure envelope has the shape we expect.
+  return {
+    en: (data && data.en) || {},
+    ar: (data && data.ar) || {},
+    version: data?.version ?? new Date().toISOString(),
+  };
 }
 
 /**
- * Build a complete content map by merging fallback content with a batch
- * response. Backend values win; fallback fills any key the BE didn't return.
+ * Merge a locale slice from the envelope on top of FALLBACK_CONTENT.
  *
- * Pure / sync / cheap — safe to call inside `useMemo`.
+ * Pure function. Backend values win; fallback fills any key the backend
+ * didn't return. Only keys present in FALLBACK_CONTENT are accepted
+ * (unknown keys from the backend are ignored to keep the type safe).
+ *
+ * @param localeSlice The `en` or `ar` slice from ContentEnvelope.
  */
 export function mergeWithFallback(
-  batch: ContentBatchResponse,
-  lang: 'en' | 'ar' = 'en',
+  localeSlice: Record<string, string> | null | undefined,
 ): Record<FallbackContentKey, string> {
   const merged: Record<string, string> = { ...FALLBACK_CONTENT };
-  for (const [key, resolved] of Object.entries(batch)) {
-    if (resolved && typeof resolved.val === 'string' && resolved.val.length > 0) {
-      merged[key] = resolved.val;
+
+  if (!localeSlice || typeof localeSlice !== 'object') {
+    return merged as Record<FallbackContentKey, string>;
+  }
+
+  for (const [key, value] of Object.entries(localeSlice)) {
+    // A backend key present with a string value (including '') overrides the
+    // fallback — admins can clear a field by saving ''. Non-string/missing
+    // values are ignored so the fallback still applies.
+    if (typeof value === 'string' && key in merged) {
+      merged[key] = value;
     }
   }
-  // `lang` is passed for future per-locale overrides; the batch endpoint
-  // already selects the locale server-side and returns the resolved string.
-  void lang;
+
   return merged as Record<FallbackContentKey, string>;
 }
 
 /**
- * The full list of dotted keys the storefront may request. Sourced from
- * `Object.keys(FALLBACK_CONTENT)`. Keeps the FE in sync with the BE
- * registry by construction.
+ * The full list of snake_case keys the storefront may request. Sourced
+ * from Object.keys(FALLBACK_CONTENT). Keeps the FE in sync with the BE
+ * registry by construction — any key added to FALLBACK_CONTENT is
+ * automatically fetchable from the backend.
  */
-export const ALL_CONTENT_KEYS: ReadonlyArray<FallbackContentKey> = Object.keys(FALLBACK_CONTENT) as FallbackContentKey[];
+export const ALL_CONTENT_KEYS: ReadonlyArray<FallbackContentKey> = Object.keys(
+  FALLBACK_CONTENT,
+) as FallbackContentKey[];

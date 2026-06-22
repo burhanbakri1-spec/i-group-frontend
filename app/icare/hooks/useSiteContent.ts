@@ -51,7 +51,13 @@ const resolveShippingPageContent = (
   lang: Language,
 ): ShippingPageContent => {
   const fallback = EMPTY_SHIPPING_PAGE_CONTENT;
-  const overrides: Partial<ShippingPageContent> = content?.[lang] ?? content?.en ?? content?.ar ?? {};
+  // Active locale wins; fall back to en (the primary locale) when the active
+  // locale slice is absent. Never cascade to the non-primary locale — serving
+  // Arabic shipping text to an English user (or vice-versa) is worse than
+  // showing the empty defaults.
+  const overrides: Partial<ShippingPageContent> = lang === 'en'
+    ? (content?.en ?? {})
+    : (content?.[lang] ?? content?.en ?? {});
 
   return {
     ...fallback,
@@ -90,7 +96,7 @@ export const useSiteContent = (lang: Language) => {
     console.warn('useSiteContent called without lang');
   }
 
-  const { settings, socialLinks: contextSocialLinks, content } = useShop();
+  const { settings, socialLinks: contextSocialLinks, content, contentByLocale } = useShop();
 
   return useMemo(() => {
     const g = settings?.general || {};
@@ -102,10 +108,16 @@ export const useSiteContent = (lang: Language) => {
 
     const socialLinks = normalizeSocialLinksResponse(contextSocialLinks);
 
-    // Single source lookup. content state is pre-populated with FALLBACK_CONTENT
-    // at provider init (ShopContext.tsx), so every key has a value the moment
-    // the component mounts. No fallback chain needed at read time.
-    const read = (field: string): string => content[CONTENT_FIELD_TO_KEY[field]] ?? '';
+    // Pick the active locale's merged content, falling back to en when the
+    // AR slice is missing/empty for a key. contentByLocale holds both slices
+    // merged with FALLBACK_CONTENT, so every key resolves to a string.
+    const activeContent = contentByLocale?.[lang] ?? content;
+    const fallbackContent = contentByLocale?.en ?? content;
+    const read = (field: string): string => {
+      const key = CONTENT_FIELD_TO_KEY[field];
+      const val = activeContent[key] ?? fallbackContent[key] ?? '';
+      return val;
+    };
 
     return {
       // ── Brand ──
@@ -342,5 +354,5 @@ export const useSiteContent = (lang: Language) => {
       currencyCode: FE_LITERALS.currencyCode,
       itemsPerPage: FE_LITERALS.itemsPerPage,
     };
-  }, [settings, contextSocialLinks, content, lang]);
+  }, [settings, contextSocialLinks, content, contentByLocale, lang]);
 };

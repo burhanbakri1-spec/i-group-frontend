@@ -72,6 +72,31 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
     aboutValuesImage, aboutFounderNoteHeading, aboutFounderLetter,
   } = useSiteContent(lang);
 
+  // Defense-in-depth: FALLBACK_CONTENT pre-populates these, but if a future
+  // key is removed from the registry the consumer still gets a brand-safe label
+  // instead of an invisible empty heading.
+  const aboutFallbacks = {
+    heroHeadline: aboutHeroHeadline || 'A new PHILOSOPHY on SKINCARE.',
+    heroCta: aboutHeroCta || 'SHOP NOW',
+    intentionalTitle: aboutIntentionalTitle || 'intentional skincare',
+    intentionalText: aboutIntentionalText || 'iCare is a line of curated skincare essentials.',
+    foundationLabel: aboutFoundationLabel || 'The Foundation',
+    foundationTitle: aboutFoundationTitle || 'one of everything really good.',
+    foundationText1: aboutFoundationText1 || 'Founded on the belief that beauty is about essentials.',
+    foundationText2: aboutFoundationText2 || 'Every iCare product is developed with intent.',
+    teamLabel: aboutTeamLabel || 'Meet the team',
+    teamTitle: aboutTeamTitle || 'our crew.',
+    teamDescription: aboutTeamDescription || 'A diverse group of experts.',
+    member1Name: aboutTeamMember1Name || 'sarah jenkins',
+    member1Title: aboutTeamMember1Title || 'creative director',
+    member2Name: aboutTeamMember2Name || 'dr. amira fahad',
+    member2Title: aboutTeamMember2Title || 'lead dermatologist',
+    member3Name: aboutTeamMember3Name || 'elena rodriguez',
+    member3Title: aboutTeamMember3Title || 'product development',
+    founderNoteHeading: aboutFounderNoteHeading || 'A NOTE FROM OUR FOUNDER',
+    founderLetter: aboutFounderLetter || 'My journey towards healthier skin inspired me.',
+  };
+
   // TODO: Move valuesData to CMS (useSiteContent) for centralized content management.
   // Now driven from translations[lang] for bilingual support.
   const valuesData = [
@@ -96,8 +121,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
         image={aboutHeroImage}
         fallbackImage={DEFAULT_HERO_IMAGE}
          alt={t.aboutAltBrand}
-        title={aboutHeroHeadline}
-        ctaLabel={aboutHeroCta}
+        title={aboutFallbacks.heroHeadline}
+        ctaLabel={aboutFallbacks.heroCta}
         onCtaClick={() => onNavigate?.('shop')}
         priority
       />
@@ -117,10 +142,10 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
           <ScrollReveal direction="right" viewportMargin="-80px">
             <div className="bg-[#F2F1ED] p-10 md:p-20 rounded-[16px] lg:max-w-xl -mt-20 mx-4 lg:mt-0 lg:mx-0 z-10">
               <h2 className="text-[32px] md:text-[48px] font-bold tracking-tight text-[#67645E] mb-6 lowercase">
-                {aboutIntentionalTitle}
+                {aboutFallbacks.intentionalTitle}
               </h2>
               <p className="text-[16px] md:text-[18px] text-[#84827E] leading-[1.6]">
-                {aboutIntentionalText}
+                {aboutFallbacks.intentionalText}
               </p>
             </div>
           </ScrollReveal>
@@ -134,17 +159,17 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
             <ScrollReveal direction="left" viewportMargin="-80px">
               <div className="flex flex-col items-center space-y-8 md:space-y-10 order-2 lg:order-1 px-4 lg:px-0">
                 <div className="space-y-2">
-                  <span className="text-[10px] font-black tracking-[0.3em] uppercase text-[#999]">{aboutFoundationLabel}</span>
+                  <span className="text-[10px] font-black tracking-[0.3em] uppercase text-[#999]">{aboutFallbacks.foundationLabel}</span>
                   <h2 className="text-[42px] md:text-[64px] font-bold leading-[0.9] tracking-[-0.04em] text-[#67645E] lowercase">
-                    {aboutFoundationTitle}
+                    {aboutFallbacks.foundationTitle}
                   </h2>
                 </div>
                 <div className="space-y-6 max-w-lg">
                   <p className="text-[18px] text-[#84827E] leading-relaxed">
-                    {aboutFoundationText1}
+                    {aboutFallbacks.foundationText1}
                   </p>
                   <p className="text-[16px] text-[#777] leading-relaxed">
-                    {aboutFoundationText2}
+                    {aboutFallbacks.foundationText2}
                   </p>
                 </div>
               </div>
@@ -200,13 +225,13 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
           <ScrollReveal direction="bottom" viewportMargin="-60px">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-black/10 pb-10">
               <div className="space-y-4">
-                <span className="text-[10px] font-black tracking-[0.3em] uppercase text-[#999]">{aboutTeamLabel}</span>
+                <span className="text-[10px] font-black tracking-[0.3em] uppercase text-[#999]">{aboutFallbacks.teamLabel}</span>
                 <h2 className="text-[42px] md:text-[64px] font-bold leading-[0.9] tracking-[-0.04em] text-[#67645E] lowercase">
-                  {aboutTeamTitle}
+                  {aboutFallbacks.teamTitle}
                 </h2>
               </div>
               <p className="text-[16px] text-[#706E6A] max-w-sm leading-relaxed">
-                {aboutTeamDescription}
+                {aboutFallbacks.teamDescription}
               </p>
             </div>
           </ScrollReveal>
@@ -223,8 +248,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
                   />
                 </div>
                 <div className="space-y-1 px-4 text-center">
-                  <h4 className="text-[20px] font-black tracking-tight text-[#67645E] lowercase">{aboutTeamMember1Name}</h4>
-                  <p className="text-[12px] font-bold uppercase tracking-widest text-[#999]">{aboutTeamMember1Title}</p>
+                  <h4 className="text-[20px] font-black tracking-tight text-[#67645E] lowercase">{aboutFallbacks.member1Name}</h4>
+                  <p className="text-[12px] font-bold uppercase tracking-widest text-[#999]">{aboutFallbacks.member1Title}</p>
                 </div>
               </div>
             </ScrollReveal>
@@ -240,8 +265,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
                   />
                 </div>
                 <div className="space-y-1 px-4 text-center">
-                  <h4 className="text-[20px] font-black tracking-tight text-[#67645E] lowercase">{aboutTeamMember2Name}</h4>
-                  <p className="text-[12px] font-bold uppercase tracking-widest text-[#999]">{aboutTeamMember2Title}</p>
+                  <h4 className="text-[20px] font-black tracking-tight text-[#67645E] lowercase">{aboutFallbacks.member2Name}</h4>
+                  <p className="text-[12px] font-bold uppercase tracking-widest text-[#999]">{aboutFallbacks.member2Title}</p>
                 </div>
               </div>
             </ScrollReveal>
@@ -257,8 +282,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
                   />
                 </div>
                 <div className="space-y-1 px-4 text-center">
-                  <h4 className="text-[20px] font-black tracking-tight text-[#67645E] lowercase">{aboutTeamMember3Name}</h4>
-                  <p className="text-[12px] font-bold uppercase tracking-widest text-[#999]">{aboutTeamMember3Title}</p>
+                  <h4 className="text-[20px] font-black tracking-tight text-[#67645E] lowercase">{aboutFallbacks.member3Name}</h4>
+                  <p className="text-[12px] font-bold uppercase tracking-widest text-[#999]">{aboutFallbacks.member3Title}</p>
                 </div>
               </div>
             </ScrollReveal>
@@ -271,11 +296,11 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
         <ScrollReveal direction="bottom" viewportMargin="-60px">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <h2 className="text-[12px] font-black tracking-[0.3em] uppercase text-[#706E6A]">
-              {aboutFounderNoteHeading}
+              {aboutFallbacks.founderNoteHeading}
             </h2>
-            
+
             <p className="text-[20px] md:text-[26px] text-[#67645E] leading-[1.6] font-[400] tracking-tight">
-              {aboutFounderLetter}
+              {aboutFallbacks.founderLetter}
             </p>
           </div>
         </ScrollReveal>

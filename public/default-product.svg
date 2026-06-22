@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <title>Product image</title>
+  <desc>Placeholder shown when no product image is available from the backend.</desc>
+  <rect width="400" height="400" fill="#F2F1ED"/>
+  <rect x="20" y="20" width="360" height="360" fill="none" stroke="#D6D4CD" stroke-width="1"/>
+  <g transform="translate(200 200)">
+    <rect x="-40" y="-100" width="80" height="20" rx="4" fill="#67645E"/>
+    <rect x="-50" y="-80" width="100" height="160" rx="12" fill="#67645E" opacity="0.85"/>
+    <rect x="-30" y="0" width="60" height="60" rx="4" fill="#F2F1ED" opacity="0.2"/>
+  </g>
+</svg>

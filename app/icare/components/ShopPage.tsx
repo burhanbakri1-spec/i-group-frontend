@@ -18,6 +18,103 @@ interface ShopPageProps {
 const SORT_OPTIONS = ['all', 'newest', 'price: low to high', 'price: high to low'];
 const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872] focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 
+// Offline-first default product list. Rendered when fetchCatalogProducts()
+// returns null (BE unreachable / misconfigured) so the shop grid always shows
+// at least 4 items. Product shape mirrors mapBackendProductToProduct output
+// — only the fields ShopPage / ProductCard actually read are populated.
+const DEFAULT_PRODUCTS: Product[] = [
+  {
+    id: 'fallback-glazing-milk',
+    name: 'Glazing Milk',
+    title: 'Glazing Milk',
+    description: 'Facial treatment essence',
+    price: '$29',
+    rawPrice: 29,
+    image: 'https://images.unsplash.com/photo-1616683693504-3ce769069d67?q=80&w=800',
+    primaryImage: 'https://images.unsplash.com/photo-1616683693504-3ce769069d67?q=80&w=800',
+    secondaryImage: 'https://images.unsplash.com/photo-1666025062728-c33a25e8ee3f?q=80&w=800',
+    category: 'Skincare',
+    reviews: '12847',
+    stockStatus: 'in_stock',
+    stock: 100,
+  },
+  {
+    id: 'fallback-barrier-cream',
+    name: 'Barrier Restore Cream',
+    title: 'Barrier Restore Cream',
+    description: 'Rich barrier moisturizer',
+    price: '$38',
+    rawPrice: 38,
+    image: 'https://images.unsplash.com/photo-1670201203150-bf8771401590?q=80&w=800',
+    primaryImage: 'https://images.unsplash.com/photo-1670201203150-bf8771401590?q=80&w=800',
+    secondaryImage: 'https://images.unsplash.com/photo-1635870224943-26189bd9e527?q=80&w=800',
+    category: 'Skincare',
+    reviews: '8203',
+    stockStatus: 'in_stock',
+    stock: 100,
+  },
+  {
+    id: 'fallback-pocket-blush',
+    name: 'Pocket Blush',
+    title: 'Pocket Blush',
+    description: 'Creamy long-wearing tint',
+    price: '$22',
+    rawPrice: 22,
+    image: 'https://images.unsplash.com/photo-1611960555774-35f9d21c7e25?q=80&w=800',
+    primaryImage: 'https://images.unsplash.com/photo-1611960555774-35f9d21c7e25?q=80&w=800',
+    secondaryImage: 'https://images.unsplash.com/photo-1728994062543-74a1dc2c9392?q=80&w=800',
+    category: 'Makeup',
+    reviews: '15892',
+    stockStatus: 'in_stock',
+    stock: 100,
+  },
+  {
+    id: 'fallback-peptide-lip',
+    name: 'Peptide Lip Tint',
+    title: 'Peptide Lip Tint',
+    description: 'Nourishing color treatment',
+    price: '$22',
+    rawPrice: 22,
+    image: 'https://images.unsplash.com/photo-1589221134210-f010476445e2?q=80&w=800',
+    primaryImage: 'https://images.unsplash.com/photo-1589221134210-f010476445e2?q=80&w=800',
+    secondaryImage: 'https://images.unsplash.com/photo-1710580889701-9fa8f2cd5927?q=80&w=800',
+    category: 'Makeup',
+    reviews: '21506',
+    stockStatus: 'in_stock',
+    stock: 100,
+  },
+  {
+    id: 'fallback-eye-treatment',
+    name: 'Peptide Eye Treatment',
+    title: 'Peptide Eye Treatment',
+    description: 'Brightening eye complex',
+    price: '$34',
+    rawPrice: 34,
+    image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=800',
+    primaryImage: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=800',
+    secondaryImage: 'https://images.unsplash.com/photo-1635631414456-6a9dc5051a3d?q=80&w=800',
+    category: 'Skincare',
+    reviews: '5129',
+    stockStatus: 'in_stock',
+    stock: 100,
+  },
+  {
+    id: 'fallback-glazing-fluid',
+    name: 'Peptide Glazing Fluid',
+    title: 'Peptide Glazing Fluid',
+    description: 'Dewy hydration serum',
+    price: '$32',
+    rawPrice: 32,
+    image: 'https://images.unsplash.com/photo-1638609927040-8a7e97cd9d6a?q=80&w=800',
+    primaryImage: 'https://images.unsplash.com/photo-1638609927040-8a7e97cd9d6a?q=80&w=800',
+    secondaryImage: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=800',
+    category: 'Skincare',
+    reviews: '9342',
+    stockStatus: 'in_stock',
+    stock: 100,
+  },
+];
+
 const getProductTimestamp = (product: Product) => {
   const timestamp = new Date(product.date ?? '').getTime();
   return Number.isFinite(timestamp) ? timestamp : 0;
@@ -69,7 +166,10 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
     loadData();
   }, []);
 
-  const allProducts = useMemo(() => catalogProducts ?? [], [catalogProducts]);
+  const allProducts = useMemo(
+    () => (catalogProducts && catalogProducts.length > 0 ? catalogProducts : DEFAULT_PRODUCTS),
+    [catalogProducts]
+  );
 
   const filteredProducts = useMemo(() => {
     let result: Product[] = [...allProducts];
@@ -131,7 +231,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
   }
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-white">
+    <div className="min-h-screen bg-white pb-32">
       <PageHero
         image="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1920"
         fallbackImage="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1920"

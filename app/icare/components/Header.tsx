@@ -296,12 +296,22 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
   }, [pathname]);
 
   const isStandardHero = hasIcareStandardHero(pathname);
-  // All standard hero routes share a dark hero at the top, so the header
-  // pill stays transparent and the logo inverts to white over it. Once the
-  // user scrolls past the hero, the pill switches to its solid light style
-  // and the logo reverts to its native dark version.
+  // Subset of standard hero routes whose hero image is dark enough that the
+  // transparent pill + white logo are visible on top of it. The broader
+  // isStandardHero set still drives the scroll/condensed behaviour for every
+  // standard hero route, but only confirmed dark-hero routes flip the
+  // header pill transparent, the nav text white, and the logo to its
+  // inverted (white) tone. Lighter hero routes keep the warm-gray pill and
+  // the logo in its native dark tone so it remains visible.
+  const DARK_HERO_PATHS = new Set(['/icare', '/icare/shop']);
+  const isDarkHeroRoute = (() => {
+    if (!pathname) return false;
+    const normalized = pathname.length > 1 ? pathname.replace(/\/$/, '') : pathname;
+    return DARK_HERO_PATHS.has(normalized);
+  })();
   const isConnected =
     isStandardHero
+    && isDarkHeroRoute
     && !isScrolled
     && !isShopHovered
     && !hasScrolledPastHero;

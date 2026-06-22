@@ -13,6 +13,13 @@ interface PromoSectionProps {
 export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) => {
   const shouldReduceMotion = useReducedMotion();
   const { promoBadge, promoHeadline, promoDescription, promoCtaLabel, promoImage } = useSiteContent(lang);
+  const promoFallbacks = {
+    badge: promoBadge || 'New Arrival',
+    headline: promoHeadline || 'chilly little flush',
+    description: promoDescription || 'Warm up your cheeks with Pocket Blush. A touch of creamy, long-wearing color that mimics the flush you get after stepping in from the cold.',
+    cta: promoCtaLabel || 'POCKET BLUSH',
+    image: promoImage || 'https://images.unsplash.com/photo-1653784097013-786a8965ea3b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200',
+  };
   return (
     <section className="icare-index-section icare-split-banner rounded-[var(--icare-section-radius)] p-[var(--icare-section-inset)]">
       <div className="contents">
@@ -29,7 +36,7 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) 
             <span
               className="mb-6 block text-[12.8px] font-bold uppercase leading-[1.5] tracking-[0.02em] text-[#67645E] md:text-[12.8px]"
             >
-              {lang === 'en' ? promoBadge : 'وصول جديد'}
+              {lang === 'en' ? promoFallbacks.badge : 'وصول جديد'}
             </span>
 
             {/* Main Title - Lowercase, Swiss 400, ImageWithContent-h2 size */}
@@ -46,7 +53,7 @@ viewport={{ once: false }}
               }}
               >
                 {lang === 'en' ? (
-                  <>{promoHeadline}</>
+                  <>{promoFallbacks.headline}</>
                 ) : (
                   <>احمرار <br /> صغير بارد</>
                 )}
@@ -62,7 +69,7 @@ viewport={{ once: false }}
               transition={{ delay: 0.12, duration: 0.35 }}
             >
               {lang === 'en'
-                ? promoDescription
+                ? promoFallbacks.description
                 : 'دفئي خديك مع Pocket Blush. لمسة من اللون الكريمي طويل الأمد الذي يحاكي الاحمرار الذي تحصلين عليه بعد الدخول من البرد.'
               }
             </motion.p>
@@ -77,7 +84,7 @@ viewport={{ once: false }}
 viewport={{ once: false }}
               transition={{ delay: 0.18, duration: 0.35 }}
               >
-                <span>{lang === 'en' ? promoCtaLabel : 'بوكيت بلاش'}</span>
+                <span>{lang === 'en' ? promoFallbacks.cta : 'بوكيت بلاش'}</span>
               </motion.button>
             </div>
           </motion.div>
@@ -93,9 +100,9 @@ viewport={{ once: false }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             className="w-full h-full"
           >
-            <ImageWithFallback 
-              src={promoImage} 
-              alt="icare Pocket Blush" 
+            <ImageWithFallback
+              src={promoFallbacks.image}
+              alt="icare Pocket Blush"
               className="w-full h-full object-contain"
             />
           </motion.div>

@@ -26,6 +26,14 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
     contactFaqCta,
   } = useSiteContent(lang);
 
+  const contactFallbacks = {
+    email: contactEmail || 'hello@icare.com',
+    emailLabel: contactEmailLabel || 'email',
+    wholesaleEmail: contactWholesaleEmail || 'wholesale@icare.com',
+    wholesaleLabel: contactWholesaleLabel || 'wholesale',
+    faqTitle: contactFaqTitle || 'frequently asked questions',
+  };
+
   return (
     <div className="min-h-screen bg-[#F1F0ED] pb-32">
       <PageHero
@@ -54,12 +62,12 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
                   </p>
                   <div className="pt-4 md:pt-6 border-t border-black/5 space-y-4 md:space-y-6">
                     <div>
-                      <span className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/40 mb-1">{contactEmailLabel}</span>
-                      <a href={`mailto:${contactEmail}`} className="text-[14px] md:text-[18px] text-black font-black hover:opacity-50 transition-opacity lowercase">{contactEmail}</a>
+                      <span className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/40 mb-1">{contactFallbacks.emailLabel}</span>
+                      <a href={`mailto:${contactFallbacks.email}`} className="text-[14px] md:text-[18px] text-black font-black hover:opacity-50 transition-opacity lowercase">{contactFallbacks.email}</a>
                     </div>
                     <div>
-                      <span className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/40 mb-1">{contactWholesaleLabel}</span>
-                      <a href={`mailto:${contactWholesaleEmail}`} className="text-[14px] md:text-[18px] text-black font-black hover:opacity-50 transition-opacity lowercase">{contactWholesaleEmail}</a>
+                      <span className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/40 mb-1">{contactFallbacks.wholesaleLabel}</span>
+                      <a href={`mailto:${contactFallbacks.wholesaleEmail}`} className="text-[14px] md:text-[18px] text-black font-black hover:opacity-50 transition-opacity lowercase">{contactFallbacks.wholesaleEmail}</a>
                     </div>
                   </div>
                 </div>
@@ -70,7 +78,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
           {/* FAQ Link */}
           <ScrollReveal direction="bottom" delay={0.1} viewportMargin="-40px">
             <div className="bg-[#F2F1ED] p-6 md:p-10 rounded-[24px] md:rounded-[40px] space-y-4 border border-black/[0.03]">
-              <h3 className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em]">{contactFaqTitle}</h3>
+              <h3 className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em]">{contactFallbacks.faqTitle}</h3>
               <p className="text-[12px] md:text-[14px] text-[#5C5A56] leading-relaxed opacity-70">
                 {contactFaqText || t.pages.contact.faqText}
               </p>

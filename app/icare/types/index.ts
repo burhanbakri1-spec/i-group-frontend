@@ -191,6 +191,7 @@ export interface ShopContextType {
   settings: AppSettings | null;
   socialLinks: unknown;
   content: Record<string, string>;
+  contentByLocale: { en: Record<string, string>; ar: Record<string, string> };
 }
 
 export interface AppSettings {
