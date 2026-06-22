@@ -17,6 +17,7 @@
  */
 
 import { FALLBACK_CONTENT, type FallbackContentKey } from './fallback-content';
+import { getIcareApiBaseUrl } from './api-client';
 
 /**
  * Shape of the envelope returned by GET /api/v1/content.
@@ -38,7 +39,7 @@ export interface ContentEnvelope {
  * @returns The content envelope, or throws on network failure.
  */
 export async function fetchAllContent(signal?: AbortSignal): Promise<ContentEnvelope> {
-  const res = await fetch('/api/v1/content', {
+  const res = await fetch(`${getIcareApiBaseUrl()}/api/v1/content`, {
     signal,
     headers: { Accept: 'application/json' },
   });
@@ -47,13 +48,17 @@ export async function fetchAllContent(signal?: AbortSignal): Promise<ContentEnve
     throw new Error(`Content envelope fetch failed: ${res.status} ${res.statusText}`);
   }
 
-  const data: ContentEnvelope = await res.json();
+  const body = await res.json();
+  // The backend AppResponseInterceptor wraps all responses in
+  // { success: true, data: <payload>, ... }. Unwrap the data envelope.
+  const payload: ContentEnvelope | undefined =
+    body && typeof body === 'object' && body.success ? body.data : body;
 
   // Defensive: ensure envelope has the shape we expect.
   return {
-    en: (data && data.en) || {},
-    ar: (data && data.ar) || {},
-    version: data?.version ?? new Date().toISOString(),
+    en: (payload && payload.en) || {},
+    ar: (payload && payload.ar) || {},
+    version: payload?.version ?? new Date().toISOString(),
   };
 }
 
