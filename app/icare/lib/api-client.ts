@@ -136,11 +136,12 @@ const request = async <T>(
   path: string,
   options: RequestInit & { token?: string; query?: Record<string, QueryValue> } = {},
 ): Promise<T> => {
-  const { token, query, headers, ...init } = options;
+  const { token, query, signal, headers, ...init } = options;
   const hasBody = init.body !== undefined && init.body !== null;
   try {
     const response = await fetch(buildUrl(path, query), {
       ...init,
+      ...(signal ? { signal } : {}),
       headers: {
         ...(hasBody ? { 'Content-Type': 'application/json' } : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -391,7 +392,7 @@ export const icareApi = {
   },
 
   content: {
-    all: () =>
-      request<ContentEnvelope>('/api/v1/content'),
+    all: (signal?: AbortSignal) =>
+      request<ContentEnvelope>('/api/v1/content', signal ? { signal } : {}),
   },
 };

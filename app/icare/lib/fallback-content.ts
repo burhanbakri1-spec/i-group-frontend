@@ -29,6 +29,10 @@ export const FALLBACK_CONTENT = {
   home_hero_headline: 'the barrier butter.',
   home_hero_image:
     'https://images.unsplash.com/photo-1593231945511-9e141a85b017?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1600',
+  home_hero_subtitle: '',
+  home_hero_badge: '',
+  home_hero_description: '',
+  home_hero_cta: 'SHOP NOW',
 
   // ── Home sections ──
   home_trending_title: 'trending essentials',
@@ -275,6 +279,10 @@ export const CONTENT_FIELD_TO_KEY: Record<string, FallbackContentKey> = {
   // Home hero
   heroHeadline: 'home_hero_headline',
   heroImage: 'home_hero_image',
+  heroSubtitle: 'home_hero_subtitle',
+  heroBadge: 'home_hero_badge',
+  heroDescription: 'home_hero_description',
+  heroCta: 'home_hero_cta',
   // Home sections
   trendingTitle: 'home_trending_title',
   marqueeText: 'home_marquee_text',

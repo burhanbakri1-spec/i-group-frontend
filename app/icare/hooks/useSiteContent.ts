@@ -122,10 +122,10 @@ export const useSiteContent = (lang: Language) => {
     return {
       // ── Brand ──
       siteName: read('siteName'),
-      metaTitle: read('siteName'),
-      metaDescription: FE_LITERALS.metaDescription,
-      siteDescription: FE_LITERALS.siteDescription,
-      siteUrl: FE_LITERALS.siteUrl,
+      metaTitle: g.meta_title || read('siteName'),
+      metaDescription: g.meta_description || FE_LITERALS.metaDescription,
+      siteDescription: g.site_description || FE_LITERALS.siteDescription,
+      siteUrl: g.site_url || FE_LITERALS.siteUrl,
       ogImage: read('ogImage'),
 
       // ── Announcement ──
@@ -136,6 +136,10 @@ export const useSiteContent = (lang: Language) => {
       // ── Home Hero ──
       heroHeadline: read('heroHeadline'),
       heroImage: read('heroImage'),
+      heroSubtitle: read('heroSubtitle'),
+      heroBadge: read('heroBadge'),
+      heroDescription: read('heroDescription'),
+      heroCta: read('heroCta'),
 
       // ── Home Sections ──
       trendingTitle: read('trendingTitle'),
@@ -351,7 +355,7 @@ export const useSiteContent = (lang: Language) => {
       enableProductReviews: FE_LITERALS.enableProductReviews,
       enableGuestCheckout: FE_LITERALS.enableGuestCheckout,
       defaultCountry: FE_LITERALS.defaultCountry,
-      currencyCode: FE_LITERALS.currencyCode,
+      currencyCode: g.currency_code || FE_LITERALS.currencyCode,
       itemsPerPage: FE_LITERALS.itemsPerPage,
     };
   }, [settings, contextSocialLinks, content, contentByLocale, lang]);

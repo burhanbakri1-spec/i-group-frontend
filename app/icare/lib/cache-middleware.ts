@@ -11,7 +11,7 @@ interface PendingEntry<T> {
 }
 
 const CACHE_TIERS = {
-  reference: 60 * 60 * 1000,
+  reference: 5 * 60 * 1000,
   userProfile: 5 * 60 * 1000,
   list: 30 * 1000,
   realtime: 0,

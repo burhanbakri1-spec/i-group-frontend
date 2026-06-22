@@ -42,7 +42,7 @@ export async function fetchAllContent(signal?: AbortSignal): Promise<ContentEnve
   // Use the same request()/parseEnvelope path as every other icareApi call:
   // buildUrl() applies the proxy base, parseEnvelope() unwraps {success,data},
   // and the auth/network error handling is identical to settings/products/etc.
-  const payload = await icareApi.content.all();
+  const payload = await icareApi.content.all(signal);
 
   // Defensive: ensure envelope has the shape we expect.
   return {
