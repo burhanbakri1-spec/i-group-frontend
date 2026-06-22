@@ -192,6 +192,7 @@ export interface ShopContextType {
   socialLinks: unknown;
   content: Record<string, string>;
   contentByLocale: { en: Record<string, string>; ar: Record<string, string> };
+  contentVersion: string;
 }
 
 export interface AppSettings {

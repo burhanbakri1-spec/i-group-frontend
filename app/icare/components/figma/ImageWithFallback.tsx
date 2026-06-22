@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { resolveMediaUrl, isSafeImageUrl } from '../../lib/media-url';
+import { useShop } from '../../context/ShopContext';
 
 interface ImageWithFallbackProps {
   src?: string;
@@ -61,10 +62,25 @@ export function ImageWithFallback({
 }: ImageWithFallbackProps) {
   const [loaded, setLoaded] = useState(false);
   const [didError, setDidError] = useState(false);
+  // contentVersion is the BE envelope timestamp. Appending it as a query
+  // string forces the browser to bypass its HTTP cache when the admin
+  // uploads a replacement image (same URL, different bytes).
+  const { contentVersion } = useShop();
   const resolved = isSafeImageUrl(src) ? resolveMediaUrl(src) : '';
   const fallbackResolved = fallbackSrc && isPublicAssetPath(fallbackSrc)
     ? fallbackSrc
     : resolveMediaUrl(fallbackSrc);
+
+  // Append a cache-busting query param to http(s) URLs only. Root-relative
+  // proxied paths (/api/icare/..., /uploads/...) and the Next.js
+  // /default-*.svg fallbacks don't need it (and adding ?v= would break
+  // the rewrite rules that strip the prefix).
+  const applyCacheBuster = (url: string): string => {
+    if (!contentVersion || !url) return url;
+    if (!/^https?:\/\//.test(url)) return url;
+    const sep = url.includes('?') ? '&' : '?';
+    return `${url}${sep}v=${encodeURIComponent(contentVersion)}`;
+  };
 
   const shouldShowFallback = !resolved || didError;
 
@@ -83,7 +99,7 @@ export function ImageWithFallback({
     );
   }
 
-  const imageSrc = shouldShowFallback ? fallbackResolved : resolved;
+  const imageSrc = applyCacheBuster(shouldShowFallback ? fallbackResolved : resolved);
 
   return (
     <div className={`relative ${className ?? ''}`} style={style}>

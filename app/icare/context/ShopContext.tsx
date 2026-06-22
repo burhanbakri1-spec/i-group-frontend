@@ -85,6 +85,11 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     en: FALLBACK_CONTENT as Record<FallbackContentKey, string>,
     ar: FALLBACK_CONTENT as Record<FallbackContentKey, string>,
   }));
+  // Content version timestamp (ISO) from the BE envelope. Used as a
+  // cache-busting suffix on image URLs so the browser re-fetches when
+  // admin uploads a replacement (otherwise the browser serves the old
+  // file from its HTTP cache because the URL is unchanged).
+  const [contentVersion, setContentVersion] = useState<string>('');
 
   const accessToken = session?.accessToken ?? null;
   const user = session?.user ?? null;
@@ -199,6 +204,7 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           const ar = mergeWithFallback(allContent.ar || {}) as Record<FallbackContentKey, string>;
           setContent(en);
           setContentByLocale({ en, ar });
+          setContentVersion(allContent.version || '');
         }
       } catch (error) {
         if (controller.signal.aborted) return;
@@ -360,6 +366,7 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         socialLinks,
         content,
         contentByLocale,
+        contentVersion,
       }}
     >
       {children}
