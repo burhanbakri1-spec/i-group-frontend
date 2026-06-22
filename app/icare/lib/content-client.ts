@@ -17,7 +17,6 @@
  */
 
 import { FALLBACK_CONTENT, type FallbackContentKey } from './fallback-content';
-import { getIcareApiBaseUrl } from './api-client';
 
 /**
  * Shape of the envelope returned by GET /api/v1/content.
@@ -39,7 +38,7 @@ export interface ContentEnvelope {
  * @returns The content envelope, or throws on network failure.
  */
 export async function fetchAllContent(signal?: AbortSignal): Promise<ContentEnvelope> {
-  const res = await fetch(`${getIcareApiBaseUrl()}/api/v1/content`, {
+  const res = await fetch('/api/v1/content', {
     signal,
     headers: { Accept: 'application/json' },
   });
