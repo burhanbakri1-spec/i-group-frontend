@@ -17,6 +17,7 @@
  */
 
 import { FALLBACK_CONTENT, type FallbackContentKey } from './fallback-content';
+import { icareApi } from './api-client';
 
 /**
  * Shape of the envelope returned by GET /api/v1/content.
@@ -38,20 +39,10 @@ export interface ContentEnvelope {
  * @returns The content envelope, or throws on network failure.
  */
 export async function fetchAllContent(signal?: AbortSignal): Promise<ContentEnvelope> {
-  const res = await fetch('/api/v1/content', {
-    signal,
-    headers: { Accept: 'application/json' },
-  });
-
-  if (!res.ok) {
-    throw new Error(`Content envelope fetch failed: ${res.status} ${res.statusText}`);
-  }
-
-  const body = await res.json();
-  // The backend AppResponseInterceptor wraps all responses in
-  // { success: true, data: <payload>, ... }. Unwrap the data envelope.
-  const payload: ContentEnvelope | undefined =
-    body && typeof body === 'object' && body.success ? body.data : body;
+  // Use the same request()/parseEnvelope path as every other icareApi call:
+  // buildUrl() applies the proxy base, parseEnvelope() unwraps {success,data},
+  // and the auth/network error handling is identical to settings/products/etc.
+  const payload = await icareApi.content.all();
 
   // Defensive: ensure envelope has the shape we expect.
   return {

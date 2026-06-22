@@ -26,6 +26,7 @@ import {
   PaginatedData,
   UserAddress,
 } from '../types';
+import type { ContentEnvelope } from './content-client';
 
 type QueryValue = string | number | boolean | null | undefined;
 
@@ -387,5 +388,10 @@ export const icareApi = {
 
   social: {
     links: () => request<Record<string, string>>('/api/v1/social-links'),
+  },
+
+  content: {
+    all: () =>
+      request<ContentEnvelope>('/api/v1/content'),
   },
 };
