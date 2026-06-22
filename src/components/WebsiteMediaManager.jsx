@@ -1,6 +1,6 @@
 import React from "react";
 import { ImageOff, ImagePlus, Save, Trash2, Upload } from "lucide-react";
-import { withWebsiteMediaVersion } from "../data/websiteMedia.js";
+import { defaultWebsiteMedia, withWebsiteMediaVersion } from "../data/websiteMedia.js";
 import { uploadImage } from "../utils/api.js";
 
 const emptyItem = {
@@ -44,6 +44,25 @@ function groupItems(items) {
     groups[key] = [...(groups[key] || []), item];
     return groups;
   }, {});
+}
+
+function defaultManagerItem(item) {
+  return {
+    ...item,
+    id: "",
+    _draftKey: `default-${item.sectionKey}`,
+    fallbackImageUrl: item.fallbackImageUrl || item.imageUrl || "",
+    imageUrl: "",
+  };
+}
+
+function mergeDefaultMediaItems(items) {
+  const seenSectionKeys = new Set((items || []).map((item) => item.sectionKey).filter(Boolean));
+  const missingDefaults = defaultWebsiteMedia
+    .filter((item) => item.sectionKey && !seenSectionKeys.has(item.sectionKey))
+    .map(defaultManagerItem);
+
+  return [...(items || []), ...missingDefaults];
 }
 
 function MediaEditor({ item, language, onDelete, onSave }) {
@@ -204,7 +223,8 @@ function MediaEditor({ item, language, onDelete, onSave }) {
 function WebsiteMediaManager({ language = "en", items = [], onDelete, onSave }) {
   const [drafts, setDrafts] = React.useState([]);
   const isArabic = language === "ar";
-  const grouped = groupItems([...items, ...drafts].sort(
+  const registeredItems = React.useMemo(() => mergeDefaultMediaItems(items), [items]);
+  const grouped = groupItems([...registeredItems, ...drafts].sort(
     (a, b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0),
   ));
 
