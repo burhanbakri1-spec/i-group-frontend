@@ -2,7 +2,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ProductCard } from './ProductCard';
 import { ChevronDown, Grid2X2, LayoutGrid } from 'lucide-react';
-import { fetchCatalogProducts, fetchCategoryRoots } from '../lib/catalog-client';
+import { fetchCatalogProducts, fetchCategoryRoots, fetchCategoryChildren } from '../lib/catalog-client';
+import { useSearchParams } from 'next/navigation';
 import { Language, translations } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { Product, BackendCategory } from '../types';
@@ -131,21 +132,26 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
   const [activeSort, setActiveSort] = useState('all');
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState(12);
+  const searchParams = useSearchParams();
+  const [childrenByRoot, setChildrenByRoot] = useState<Record<string, BackendCategory[]>>({});
+  const [activeChild, setActiveChild] = useState<string | null>(null);
+  const [loadingChildren, setLoadingChildren] = useState(false);
 
   const selectedRoot = useMemo(
     () => rootCategories.find((category) => category.slug === activeMain) ?? null,
     [activeMain, rootCategories]
   );
 
-  // Build a flat set of ids covered by the selected root: the root itself,
-  // plus any product whose category string matches the root's name.
-  // Products whose categoryId is the root id (or whose category name matches)
-  // are shown — sub-categories are auto-included under their root pill.
+  // Build a flat set of ids covered by the selected root: the root itself
+  // plus every child category id (children are auto-included under the
+  // root pill unless the user has narrowed further via activeChild).
   const rootMatchedIds = useMemo(() => {
     if (!selectedRoot) return null;
     const ids = new Set<number>([selectedRoot.id]);
+    const children = childrenByRoot[selectedRoot.slug] ?? [];
+    for (const child of children) ids.add(child.id);
     return ids;
-  }, [selectedRoot]);
+  }, [selectedRoot, childrenByRoot]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -165,6 +171,72 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
     };
     loadData();
   }, []);
+
+  // Load children for the currently selected root (lazy, cached in
+  // childrenByRoot). Errored roots are stored as empty arrays so we
+  // don't refetch on every render.
+  useEffect(() => {
+    if (!activeMain) return;
+    if (childrenByRoot[activeMain]) return;
+    let cancelled = false;
+    setLoadingChildren(true);
+    fetchCategoryChildren(activeMain)
+      .then((children) => {
+        if (cancelled) return;
+        setChildrenByRoot((prev) => ({ ...prev, [activeMain]: children ?? [] }));
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setChildrenByRoot((prev) => ({ ...prev, [activeMain]: [] }));
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingChildren(false);
+      });
+    return () => { cancelled = true; };
+  }, [activeMain, childrenByRoot]);
+
+  // React to ?category=<slug> in the URL. Root slugs auto-select the root;
+  // child slugs auto-select the owning root and the child. If neither
+  // rootCategories nor the relevant children have loaded yet we wait and
+  // re-run when they arrive. To make deep-links to child slugs work
+  // without a prior root click, lazily load children for any unloaded
+  // roots on first miss so the next pass can resolve the child.
+  useEffect(() => {
+    const urlCategory = searchParams.get('category');
+    if (!urlCategory) {
+      setActiveMain(null);
+      setActiveChild(null);
+      return;
+    }
+    const root = rootCategories.find(c => c.slug === urlCategory);
+    if (root) {
+      setActiveMain(root.slug);
+      setActiveChild(null);
+      return;
+    }
+    for (const r of rootCategories) {
+      const children = childrenByRoot[r.slug] ?? [];
+      const child = children.find(c => c.slug === urlCategory);
+      if (child) {
+        setActiveMain(r.slug);
+        setActiveChild(child.slug);
+        return;
+      }
+    }
+    const unloaded = rootCategories.filter(r => !childrenByRoot[r.slug]);
+    if (unloaded.length === 0) return;
+    let cancelled = false;
+    Promise.all(unloaded.map(r => fetchCategoryChildren(r.slug).catch(() => [])))
+      .then(results => {
+        if (cancelled) return;
+        setChildrenByRoot(prev => {
+          const next = { ...prev };
+          unloaded.forEach((r, i) => { next[r.slug] = results[i] ?? []; });
+          return next;
+        });
+      });
+    return () => { cancelled = true; };
+  }, [searchParams, rootCategories, childrenByRoot]);
 
   const allProducts = useMemo(
     () => (catalogProducts && catalogProducts.length > 0 ? catalogProducts : DEFAULT_PRODUCTS),
@@ -187,6 +259,17 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
         return cat === selectedRoot.name.trim().toLowerCase();
       });
     }
+    // Optional child narrowing: when activeChild is set, restrict the
+    // already-root-filtered list to that specific child only.
+    if (activeChild && selectedRoot) {
+      const child = (childrenByRoot[selectedRoot.slug] ?? []).find(c => c.slug === activeChild);
+      if (child) {
+        result = result.filter(p =>
+          p.categoryId === child.id ||
+          p.category?.trim().toLowerCase() === child.name.trim().toLowerCase()
+        );
+      }
+    }
     // No activeMain → Shop All: show all products (no filter applied).
 
     switch (activeSort) {
@@ -204,7 +287,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
     }
 
     return result;
-  }, [allProducts, activeSort, activeMain, selectedRoot, rootMatchedIds]);
+  }, [allProducts, activeSort, activeMain, selectedRoot, rootMatchedIds, activeChild, childrenByRoot]);
 
   const resetFilters = () => {
     setActiveMain(null);
@@ -263,6 +346,35 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
           </div>
         </div>
       </div>
+
+      {/* Category Filter — child layer (shown only when a root is selected) */}
+      {selectedRoot && (
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pb-4 -mt-4">
+          <div className="overflow-x-auto no-scrollbar">
+            <div className="flex justify-center gap-2 px-1 md:px-4 min-w-max">
+              <button
+                onClick={() => setActiveChild(null)}
+                className={`px-4 md:px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-colors ${CONTROL_FOCUS_CLASS} ${!activeChild ? 'bg-[#67645E] text-white' : 'bg-white text-[#67645E] border border-[#DDDDDD]'}`}
+              >
+                {t.pages.shop.shopAll ?? 'All'} {selectedRoot.name}
+              </button>
+              {loadingChildren ? (
+                <span className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#84827E]">…</span>
+              ) : (
+                (childrenByRoot[selectedRoot.slug] ?? []).map((child) => (
+                  <button
+                    key={child.slug}
+                    onClick={() => setActiveChild(child.slug)}
+                    className={`px-4 md:px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-colors ${CONTROL_FOCUS_CLASS} ${activeChild === child.slug ? 'bg-[#67645E] text-white' : 'bg-white text-[#67645E] border border-[#DDDDDD]'}`}
+                  >
+                    {child.name}
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Toolbar */}
       <div className={`max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-5 flex justify-between items-center border border-[#DDDDDD] mb-8 md:mb-10 md:sticky md:top-3 bg-white rounded-[12px] ${isSortOpen ? 'z-[65]' : 'z-40'}`}>
