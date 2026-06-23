@@ -73,7 +73,7 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNa
 
   const activeItem = commitmentItems.find((item) => item.id === activeId) ?? commitmentItems[0];
 
-  const pillBase = 'relative isolate overflow-hidden rounded-full px-8 py-2.5 text-[15.73px] font-bold uppercase leading-[1.5] tracking-[0.02em] text-[#67645E] shadow-[inset_0_0_0_1px_#67645E] transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] before:absolute before:inset-0 before:-z-10 before:origin-bottom before:rounded-full before:bg-[#67645E] before:transition-transform before:duration-500 before:ease-[cubic-bezier(0.76,0,0.24,1)] hover:-translate-y-px hover:text-white hover:before:scale-y-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F1F0ED]';
+  const pillBase = 'relative isolate overflow-hidden rounded-full border border-[#67645E] px-8 py-2.5 text-[15.73px] font-bold uppercase leading-[1.5] tracking-[0.02em] text-[#67645E] transition-[color,transform,border-color] duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] before:absolute before:inset-0 before:-z-10 before:origin-bottom before:rounded-full before:bg-[#67645E] before:transition-transform before:duration-500 before:ease-[cubic-bezier(0.76,0,0.24,1)] hover:-translate-y-px hover:border-[#67645E] hover:text-white hover:before:scale-y-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F1F0ED]';
 
   return (
     <section dir={lang === 'ar' ? 'rtl' : 'ltr'} className="icare-index-section icare-mission-section">
@@ -93,7 +93,7 @@ export const CommitmentSection: React.FC<CommitmentSectionProps> = ({ lang, onNa
               <button
                 type="button"
                 onClick={() => onNavigate('story')}
-                className="relative isolate overflow-hidden rounded-full px-8 py-2.5 text-[15.73px] font-bold uppercase leading-[1.5] tracking-[0.02em] text-[#67645E] shadow-[inset_0_0_0_1px_#67645E] transition-all duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] before:absolute before:inset-0 before:-z-10 before:origin-bottom before:scale-y-0 before:rounded-full before:bg-[#67645E] before:transition-transform before:duration-500 before:ease-[cubic-bezier(0.76,0,0.24,1)] hover:-translate-y-px hover:text-white hover:before:scale-y-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F1F0ED]"
+                className={pillBase}
               >
                 {activeItem.cta}
               </button>

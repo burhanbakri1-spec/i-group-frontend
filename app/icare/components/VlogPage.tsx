@@ -134,7 +134,7 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
             <p className="text-[13px] text-red-600 font-medium">{error}</p>
             <button
               onClick={loadVlogs}
-              className="px-6 py-2 bg-[#67645E] text-white rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#7B7872] transition-colors"
+              className="inline-flex min-h-12 items-center justify-center whitespace-nowrap px-6 py-2 bg-[#67645E] text-white rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#7B7872] transition-colors"
             >
               {t.pages.vlog.retry}
             </button>

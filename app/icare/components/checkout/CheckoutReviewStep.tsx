@@ -45,7 +45,7 @@ export const CheckoutReviewStep: React.FC<CheckoutReviewStepProps> = ({
         <button
           onClick={onPlaceOrder}
           disabled={isSubmitting}
-          className={`w-full px-6 py-4 bg-[#67645E] text-white rounded-full hover:bg-[#5A5853] transition-colors flex items-center justify-center gap-2 text-lg font-medium disabled:opacity-50 ${CONTROL_FOCUS_CLASS}`}
+          className={`inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#67645E] px-6 py-4 text-[14px] font-medium text-white whitespace-nowrap hover:bg-[#5A5853] transition-colors disabled:opacity-50 ${CONTROL_FOCUS_CLASS}`}
         >
           <Lock size={20} />
           {isSubmitting ? checkoutSubmittingText : checkoutPlaceOrder}

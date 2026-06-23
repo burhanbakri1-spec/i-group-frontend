@@ -67,7 +67,7 @@ export const PageHero: React.FC<PageHeroProps> = ({
             <button
               type="button"
               onClick={onCtaClick}
-              className="relative isolate inline-flex items-center justify-center overflow-hidden rounded-full px-8 py-2.5 text-[13px] font-bold uppercase leading-[1.5] text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.95)] transition-[color,transform] duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] before:absolute before:inset-0 before:-z-10 before:origin-bottom before:scale-y-0 before:rounded-full before:bg-white before:transition-transform before:duration-500 before:ease-[cubic-bezier(0.76,0,0.24,1)] hover:-translate-y-px hover:text-[#67645E] hover:before:scale-y-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/30"
+              className="relative isolate inline-flex items-center justify-center overflow-hidden rounded-full border border-white/95 px-8 py-2.5 text-[13px] font-bold uppercase leading-[1.5] text-white transition-[color,transform,border-color] duration-500 ease-[cubic-bezier(0.76,0,0.24,1)] before:absolute before:inset-0 before:-z-10 before:origin-bottom before:scale-y-0 before:rounded-full before:bg-white before:transition-transform before:duration-500 before:ease-[cubic-bezier(0.76,0,0.24,1)] hover:-translate-y-px hover:border-white hover:text-[#67645E] hover:before:scale-y-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/30"
             >
               {ctaLabel}
             </button>

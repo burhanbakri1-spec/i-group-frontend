@@ -57,7 +57,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
             <p className="text-sm md:text-base text-[#67645E] mb-8">{ct.authRequiredMessage}</p>
             <button
               onClick={() => onNavigate('account')}
-              className={`px-8 py-3 bg-[#67645E] text-white rounded-full text-[12px] font-black uppercase tracking-[0.2em] hover:bg-[#5A5853] transition-colors ${CONTROL_FOCUS_CLASS}`}
+              className={`inline-flex min-h-12 items-center justify-center whitespace-nowrap px-8 py-3 bg-[#67645E] text-white rounded-full text-[12px] font-black uppercase tracking-[0.2em] hover:bg-[#5A5853] transition-colors ${CONTROL_FOCUS_CLASS}`}
             >
               {ct.signInToCheckout}
             </button>
@@ -164,14 +164,14 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ lang, onNavigate }) 
                     {checkout.step > 1 && (
                       <button
                         onClick={checkout.previousStep}
-                        className={`flex-1 px-6 py-3 border border-[#67645E] rounded-full hover:bg-[#F1F0ED] transition-colors ${CONTROL_FOCUS_CLASS}`}
+                        className={`inline-flex min-h-12 flex-1 items-center justify-center whitespace-nowrap rounded-full border border-[#67645E] px-6 py-3 hover:bg-[#F1F0ED] transition-colors ${CONTROL_FOCUS_CLASS}`}
                       >
                         {siteContent.checkoutNavBack}
                       </button>
                     )}
                     <button
                       onClick={checkout.nextStep}
-                      className={`flex-1 px-6 py-3 bg-[#67645E] text-white rounded-full hover:bg-[#5A5853] transition-colors flex items-center justify-center gap-2 ${CONTROL_FOCUS_CLASS}`}
+                      className={`inline-flex min-h-12 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#67645E] px-6 py-3 text-white hover:bg-[#5A5853] transition-colors ${CONTROL_FOCUS_CLASS}`}
                     >
                       {siteContent.checkoutNavContinue}
                       <ChevronRight size={18} />

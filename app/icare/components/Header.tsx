@@ -555,13 +555,13 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                       animate="center"
                       exit="exit"
                       transition={calmTween}
-                      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-6"
+                      className="flex gap-4 overflow-x-auto no-scrollbar px-6 pb-2"
                     >
                       {visiblePreviewProducts.map((product) => (
                         <button
                           type="button"
                           key={product.id}
-                          className={`bg-[var(--rb-bg-surface)] rounded-[var(--rb-radius-card)] p-4 flex flex-col group cursor-pointer hover:bg-[var(--rb-bg-light)] transition-colors duration-200 text-left ${FOCUS_VISIBLE_CLASS}`}
+                          className={`flex-none w-[clamp(15rem,18vw,19rem)] bg-[var(--rb-bg-surface)] rounded-[var(--rb-radius-card)] p-4 flex flex-col group cursor-pointer hover:bg-[var(--rb-bg-light)] transition-colors duration-200 text-left ${FOCUS_VISIBLE_CLASS}`}
                           onClick={() => { onProductSelect?.(product); setIsShopHovered(false); }}
                           aria-label={`${t.shopNow} ${product.title ?? product.name}`}
                         >

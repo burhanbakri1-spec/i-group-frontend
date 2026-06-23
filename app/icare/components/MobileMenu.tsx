@@ -147,10 +147,10 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
                     type="button"
                     key={product.id}
                     onClick={() => { onProductSelect?.(product); onClose(); }}
-                    className={`w-full bg-[var(--rb-pure-white)] rounded-[var(--rb-radius-card)] p-4 flex items-center gap-5 relative group active:scale-[0.99] transition-transform duration-150 text-left ${FOCUS_VISIBLE_CLASS}`}
+                    className={`w-full bg-[var(--rb-pure-white)] rounded-[var(--rb-radius-card)] p-4 flex items-center gap-4 relative group active:scale-[0.99] transition-transform duration-150 text-left ${FOCUS_VISIBLE_CLASS}`}
                     aria-label={`${t.ui.openProduct} ${product.title ?? product.name}`}
                   >
-                    <div className="w-20 h-20 bg-[var(--rb-bg-light)] rounded-[var(--rb-radius-card)] flex items-center justify-center p-2">
+                    <div className="w-20 h-20 bg-[var(--rb-bg-light)] rounded-[var(--rb-radius-card)] flex items-center justify-center p-2 shrink-0">
                       <ImageWithFallback 
                         src={product.primaryImage} 
                         alt={product.title ?? product.name}
@@ -158,18 +158,18 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
                       />
                     </div>
                     
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       {product.label && (
                         <p className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[var(--rb-primary-text)] mb-1">
                           {product.label}
                         </p>
                       )}
-                      <div className="flex items-start justify-between">
+                      <div className="flex items-start justify-between gap-2">
                         <h4 className="text-[13px] font-bold uppercase tracking-tight text-[var(--rb-near-black)] leading-tight">
                           {product.title ?? product.name}
                         </h4>
                       </div>
-                      <p className="text-[12px] text-[var(--rb-gray-84827E)] font-medium leading-tight mt-1">
+                      <p className="text-[12px] text-[var(--rb-gray-84827E)] font-medium leading-[1.4] mt-1">
                         {product.description ?? <>{product.originalPrice && <span className="line-through mr-1">{product.originalPrice}</span>}{product.price}</>}
                       </p>
                     </div>

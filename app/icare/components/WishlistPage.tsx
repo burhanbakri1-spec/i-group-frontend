@@ -47,13 +47,13 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
         <div className="text-center mb-8 md:mb-12">
           <div className="flex items-center justify-center gap-2 md:gap-3 mb-4">
             <Heart size={28} className="text-[#67645E] md:w-8 md:h-8" fill="#67645E" />
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-light tracking-tight">{t.wishlist}</h1>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-light leading-none tracking-tight">{t.wishlist}</h1>
           </div>
           <p className="text-sm md:text-base text-[#67645E] mb-4 px-4">{t.cartDrawer.saveForLater}</p>
           {wishlistItems.length > 0 && (
             <div className="flex items-center justify-center gap-4 md:gap-6">
               <p className="text-xs md:text-sm text-[#67645E]">{wishlistItems.length} {t.cartDrawer.items}</p>
-              <button className={`flex items-center gap-2 text-xs md:text-sm text-[#67645E] hover:text-black transition-colors ${SURFACE_FOCUS_CLASS}`}>
+              <button className={`inline-flex min-h-9 items-center gap-2 whitespace-nowrap text-xs md:text-sm text-[#67645E] hover:text-black transition-colors ${SURFACE_FOCUS_CLASS}`}>
                 <Share2 size={14} className="md:w-4 md:h-4" />
                 {t.cartDrawer.share}
               </button>
@@ -74,7 +74,7 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
             </div>
             <h2 className="text-xl md:text-2xl font-light mb-2">{wishlistEmpty}</h2>
             <p className="text-sm md:text-base text-[#84827E] mb-8">{wishlistEmptySubtext}</p>
-            <button onClick={() => onNavigate?.('shop')} className={`px-6 md:px-8 py-3 bg-[#67645E] text-white text-sm md:text-base rounded-full hover:bg-[#7B7872] transition-colors ${CONTROL_FOCUS_CLASS}`}>
+            <button onClick={() => onNavigate?.('shop')} className={`inline-flex min-h-12 items-center justify-center whitespace-nowrap px-6 md:px-8 py-3 bg-[#67645E] text-white text-sm md:text-base rounded-full hover:bg-[#7B7872] transition-colors ${CONTROL_FOCUS_CLASS}`}>
               {t.shopNow}
             </button>
           </motion.div>
@@ -136,7 +136,7 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
                   {/* Add to Bag Button */}
                   <button 
                     onClick={(e) => handleAddToBag(product, e)}
-                    className={`w-full py-3 bg-[#67645E] text-white text-sm uppercase tracking-wider rounded-full hover:bg-[#7B7872] transition-colors flex items-center justify-center gap-2 ${CONTROL_FOCUS_CLASS}`}
+                    className={`inline-flex min-h-12 w-full items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#67645E] px-6 py-3 text-sm uppercase tracking-wider text-white hover:bg-[#7B7872] transition-colors ${CONTROL_FOCUS_CLASS}`}
                   >
                     <ShoppingBag size={16} />
                     {t.cartDrawer.addToBag}

@@ -144,7 +144,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
             </motion.button>
           </div>
 
-          <div className="h-full flex items-center justify-center py-0">
+          <div className="relative flex flex-1 min-h-0 items-center justify-center py-0">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentIndex}
@@ -152,12 +152,12 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-                className="w-full"
+                className="relative flex h-full w-full items-center justify-center"
               >
                 <ImageWithFallback 
                   src={current.primaryImage}
                   alt={current.title ?? current.name}
-                  className="w-full h-full object-contain mix-blend-multiply drop-shadow-sm"
+                  className="h-full w-full max-h-full max-w-full object-contain mix-blend-multiply drop-shadow-sm"
                 />
               </motion.div>
             </AnimatePresence>
@@ -200,7 +200,7 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
                   whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
                   onClick={() => onProductSelect(current)}
                   /* Rhode pill: 15.73px / 400 / 23.6px / 0.314px ls / uppercase. */
-                  className="bg-[#67645E] text-white rounded-full w-full py-3 md:py-4 text-[15.73px] font-bold tracking-[0.02em] uppercase hover:bg-[#555] transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDECEB]"
+                  className="inline-flex min-h-12 w-full items-center justify-center whitespace-nowrap bg-[#67645E] text-white rounded-full py-3 md:py-4 text-[15.73px] font-bold tracking-[0.02em] uppercase hover:bg-[#555] transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDECEB]"
                 >
                   {t.pages.showcase.view} — {current.originalPrice && <><span className="line-through text-white/60 mr-1">{current.originalPrice}</span> </>}{current.price}
                 </motion.button>

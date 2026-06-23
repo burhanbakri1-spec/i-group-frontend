@@ -57,13 +57,13 @@ export class CheckoutErrorBoundary extends React.Component<
             <div className="flex flex-col gap-3">
               <button
                 onClick={this.handleRetry}
-                className={`w-full px-6 py-3 bg-[#67645E] text-white rounded-full hover:bg-[#5A5853] transition-colors text-sm font-medium ${CONTROL_FOCUS_CLASS}`}
+                className={`inline-flex min-h-12 w-full items-center justify-center whitespace-nowrap px-6 py-3 bg-[#67645E] text-white rounded-full hover:bg-[#5A5853] transition-colors text-sm font-medium ${CONTROL_FOCUS_CLASS}`}
               >
                 {ct.errorBoundaryRetry}
               </button>
               <button
                 onClick={this.handleBackToShop}
-                className={`w-full px-6 py-3 border border-[#DDDDDD] rounded-full hover:bg-[#F1F0ED] transition-colors text-sm ${CONTROL_FOCUS_CLASS}`}
+                className={`inline-flex min-h-12 w-full items-center justify-center whitespace-nowrap px-6 py-3 border border-[#DDDDDD] rounded-full hover:bg-[#F1F0ED] transition-colors text-sm ${CONTROL_FOCUS_CLASS}`}
               >
                 {ct.errorBoundaryBack}
               </button>

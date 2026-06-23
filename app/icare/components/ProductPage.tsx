@@ -538,14 +538,14 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                    whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
                    onClick={() => isSelectedVariantPurchasable && addToCart(purchasableProduct)}
                   disabled={!isSelectedVariantPurchasable}
-                   className={`w-full bg-[#67645E] text-white py-5 rounded-full text-[12px] md:text-[13px] font-black uppercase tracking-[0.2em] hover:bg-[#67645E]/90 transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${CONTROL_FOCUS_CLASS}`}
+                    className={`inline-flex min-h-12 w-full items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#67645E] px-6 py-5 text-[12px] md:text-[13px] font-black uppercase tracking-[0.2em] text-white hover:bg-[#67645E]/90 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${CONTROL_FOCUS_CLASS}`}
                 >
                   <ShoppingBag size={16} />
                     {isSelectedVariantPurchasable
                       ? `${productAddToBag || t.product.addToBag} — ${purchasableProduct.price}`
                       : (productSoldOut || t.product.soldOut)}
                 </motion.button>
-                <div className="flex items-center justify-center gap-2 text-[9px] md:text-[10px] font-bold text-[#84827E]">
+                <div className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-[9px] md:text-[10px] font-bold text-[#84827E]">
                   {productAfterpayText || t.product.orAfterpay} <span className="text-black font-black bg-[#ACEBFF] px-1.5 py-0.5 rounded italic">Afterpay</span>
                 </div>
               </div>
@@ -650,14 +650,14 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                 <div className="flex items-center gap-4">
                   <button
                     onClick={() => setIsWriteReviewOpen(true)}
-                    className={`flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#67645E] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#67645E]/90 transition-colors ${CONTROL_FOCUS_CLASS}`}
+                    className={`inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap px-6 py-2.5 rounded-full bg-[#67645E] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#67645E]/90 transition-colors ${CONTROL_FOCUS_CLASS}`}
                   >
                     {t.product.writeReview}
                   </button>
                   <div ref={filterDropdownRef} className="relative">
                     <button
                       onClick={() => { setIsFilterDropdownOpen((prev) => !prev); setIsSortDropdownOpen(false); }}
-                      className={`flex items-center gap-2 px-6 py-2.5 rounded-full border text-[10px] font-black uppercase tracking-widest transition-colors ${CONTROL_FOCUS_CLASS} ${reviewRatingFilter ? 'bg-[#67645E] text-white border-[#67645E]' : 'border-[#DDDDDD] hover:bg-[#67645E] hover:text-white'}`}
+                       className={`inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap px-6 py-2.5 rounded-full border text-[10px] font-black uppercase tracking-widest transition-colors ${CONTROL_FOCUS_CLASS} ${reviewRatingFilter ? 'bg-[#67645E] text-white border-[#67645E]' : 'border-[#DDDDDD] hover:bg-[#67645E] hover:text-white'}`}
                     >
                        {reviewRatingFilter ? `${reviewRatingFilter} stars` : (reviewFilterButton || t.product.reviewFilter)}
                       <ChevronDown size={12} className={`transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`} />
@@ -687,7 +687,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                   <div ref={sortDropdownRef} className="relative">
                     <button
                       onClick={() => { setIsSortDropdownOpen((prev) => !prev); setIsFilterDropdownOpen(false); }}
-                      className={`flex items-center gap-2 px-6 py-2.5 rounded-full border border-[#DDDDDD] text-[10px] font-black uppercase tracking-widest hover:border-[#67645E] transition-colors bg-white ${CONTROL_FOCUS_CLASS}`}
+                       className={`inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap px-6 py-2.5 rounded-full border border-[#DDDDDD] text-[10px] font-black uppercase tracking-widest hover:border-[#67645E] transition-colors bg-white ${CONTROL_FOCUS_CLASS}`}
                     >
                       {reviewSortBy === 'recent' ? t.product.mostRecent : reviewSortBy === 'highest' ? t.product.highestRated : reviewSortBy === 'lowest' ? t.product.lowestRated : t.product.mostHelpful}
                       <ChevronDown size={12} className={`transition-transform ${isSortDropdownOpen ? 'rotate-180' : ''}`} />
@@ -747,7 +747,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
               {!isReviewsExpanded && (
                 <button 
                   onClick={() => setIsReviewsExpanded(true)}
-                  className={`px-12 py-3 rounded-full border border-[#DDDDDD] text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#67645E] hover:text-white transition-colors duration-200 bg-white ${CONTROL_FOCUS_CLASS}`}
+                   className={`inline-flex min-h-11 items-center justify-center px-12 py-3 rounded-full border border-[#DDDDDD] text-[11px] font-black uppercase tracking-[0.2em] whitespace-nowrap hover:bg-[#67645E] hover:text-white transition-colors duration-200 bg-white ${CONTROL_FOCUS_CLASS}`}
                 >
                   {reviewShowMore || t.product.showMore}
                 </button>
@@ -755,7 +755,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
               {isReviewsExpanded && hasMoreReviews && (
                 <button 
                   onClick={loadMoreReviews}
-                  className={`px-12 py-3 rounded-full border border-[#DDDDDD] text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#67645E] hover:text-white transition-colors duration-200 bg-white ${CONTROL_FOCUS_CLASS}`}
+                   className={`inline-flex min-h-11 items-center justify-center px-12 py-3 rounded-full border border-[#DDDDDD] text-[11px] font-black uppercase tracking-[0.2em] whitespace-nowrap hover:bg-[#67645E] hover:text-white transition-colors duration-200 bg-white ${CONTROL_FOCUS_CLASS}`}
                 >
                   {t.product.loadMoreReviews}
                 </button>
@@ -763,7 +763,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
               {isReviewsExpanded && (
                 <button 
                   onClick={() => { setIsReviewsExpanded(false); setAdditionalReviews([]); setReviewPage(1); }}
-                  className={`px-8 py-2 rounded-full border border-[#DDDDDD] text-[10px] font-bold uppercase tracking-widest hover:border-[#67645E] transition-colors ${CONTROL_FOCUS_CLASS}`}
+                   className={`inline-flex min-h-10 items-center justify-center px-8 py-2 rounded-full border border-[#DDDDDD] text-[10px] font-bold uppercase tracking-widest whitespace-nowrap hover:border-[#67645E] transition-colors ${CONTROL_FOCUS_CLASS}`}
                 >
                   {reviewShowLess || t.product.showLess}
                 </button>

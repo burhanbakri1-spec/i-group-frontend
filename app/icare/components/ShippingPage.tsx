@@ -135,7 +135,7 @@ export const ShippingPage: React.FC<ShippingPageProps> = ({ lang }) => {
         <div className="bg-[#67645E] text-white py-16 text-center">
           <h3 className="text-2xl font-light mb-4">{text.ctaTitle}</h3>
           <p className="text-[#CCC] mb-8">{text.ctaDescription}</p>
-          <button onClick={() => window.location.href = '/icare/contact'} className="px-8 py-3 bg-white text-black rounded-full hover:bg-[#EEE] transition-colors">
+          <button onClick={() => window.location.href = '/icare/contact'} className="inline-flex min-h-12 items-center justify-center whitespace-nowrap px-8 py-3 bg-white text-black rounded-full hover:bg-[#EEE] transition-colors">
             {text.ctaButton}
           </button>
         </div>

@@ -81,7 +81,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                   </p>
                   <button
                     onClick={() => { onClose(); onNavigate('shop'); }}
-                    className={`px-6 py-3 bg-[#67645E] text-white text-sm uppercase tracking-wider rounded-full hover:bg-[#5A5853] transition-colors ${CONTROL_FOCUS_CLASS}`}
+                   className={`inline-flex min-h-12 items-center justify-center whitespace-nowrap px-6 py-3 bg-[#67645E] text-white text-sm uppercase tracking-wider rounded-full hover:bg-[#5A5853] transition-colors ${CONTROL_FOCUS_CLASS}`}
                   >
                     {t.shopNow}
                   </button>
@@ -187,7 +187,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                 
                 <button 
                   onClick={handleCheckout}
-                  className={`w-full py-4 bg-[#67645E] text-white text-[14px] font-[900] tracking-wider uppercase rounded-full hover:bg-[#5A5853] transition-colors duration-200 motion-reduce:transition-none ${DARK_CONTROL_FOCUS_CLASS}`}
+                  className={`inline-flex min-h-12 w-full items-center justify-center whitespace-nowrap rounded-full bg-[#67645E] px-6 py-4 text-[14px] font-[900] tracking-wider uppercase text-white hover:bg-[#5A5853] transition-colors duration-200 motion-reduce:transition-none ${DARK_CONTROL_FOCUS_CLASS}`}
                 >
                   {isAuthenticated ? t.checkout : t.cartDrawer.signInToCheckout}
                 </button>

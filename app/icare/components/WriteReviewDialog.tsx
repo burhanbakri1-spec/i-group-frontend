@@ -262,7 +262,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                     </p>
                     <button
                       onClick={onLoginRequest}
-                      className={`bg-[#67645E] text-white px-8 py-3.5 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#7B7872] transition-colors ${CONTROL_FOCUS_CLASS}`}
+                      className={`inline-flex min-h-12 items-center justify-center whitespace-nowrap bg-[#67645E] text-white px-8 py-3.5 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#7B7872] transition-colors ${CONTROL_FOCUS_CLASS}`}
                     >
                       {t.reviewDialog.login}
                     </button>
@@ -529,7 +529,7 @@ export const WriteReviewDialog: React.FC<WriteReviewDialogProps> = ({
                         whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
                         onClick={handleSubmit}
                         disabled={isSubmitting}
-                        className={`w-full bg-[#67645E] text-white py-4 rounded-full text-[12px] font-black uppercase tracking-[0.2em] hover:bg-[#7B7872] transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed ${CONTROL_FOCUS_CLASS}`}
+                        className={`inline-flex min-h-12 w-full items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#67645E] px-6 py-4 text-[12px] font-black uppercase tracking-[0.2em] text-white hover:bg-[#7B7872] transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed ${CONTROL_FOCUS_CLASS}`}
                       >
                         {isSubmitting ? (
                           <>

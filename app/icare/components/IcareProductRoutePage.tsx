@@ -54,7 +54,7 @@ export const IcareProductRoutePage = ({ slug }: { slug: string }) => {
           </p>
           <button
             onClick={() => navigateToPage('shop')}
-            className="px-10 py-4 bg-[#67645E] text-white rounded-full text-[12px] font-black uppercase tracking-[0.2em] hover:bg-[#7B7872] transition-colors"
+            className="inline-flex min-h-12 items-center justify-center whitespace-nowrap px-10 py-4 bg-[#67645E] text-white rounded-full text-[12px] font-black uppercase tracking-[0.2em] hover:bg-[#7B7872] transition-colors"
           >
             back to shop
           </button>

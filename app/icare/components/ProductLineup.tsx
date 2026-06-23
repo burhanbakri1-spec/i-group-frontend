@@ -91,7 +91,7 @@ const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, label, n
                   transition={{ duration: shouldReduceMotion ? 0 : 0.18 }}
                   className="absolute inset-0 flex items-center justify-center z-20"
                 >
-                  <button type="button" className={`bg-[#67645E] text-white px-8 py-3.5 rounded-full flex items-center gap-2 ${CONTROL_FOCUS_CLASS}`} onClick={(event) => { event.stopPropagation(); selectProduct(); }}>
+                  <button type="button" className={`inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap bg-[#67645E] text-white px-8 py-3.5 rounded-full ${CONTROL_FOCUS_CLASS}`} onClick={(event) => { event.stopPropagation(); selectProduct(); }}>
                     <Plus size={16} strokeWidth={3} />
                      <span className="text-[11px] font-black uppercase tracking-[0.2em]">{quickAddText}</span>
                   </button>
@@ -206,7 +206,7 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ lang, onProductSel
           <p className="text-[13px] text-red-600 font-medium">{error}</p>
           <button
             onClick={loadProducts}
-            className={`px-6 py-2 bg-[#67645E] text-white rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#67645E]/90 transition-colors ${CONTROL_FOCUS_CLASS}`}
+            className={`inline-flex min-h-12 items-center justify-center whitespace-nowrap px-6 py-2 bg-[#67645E] text-white rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#67645E]/90 transition-colors ${CONTROL_FOCUS_CLASS}`}
           >
             {t.product.retry || 'Retry'}
           </button>
@@ -255,14 +255,14 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ lang, onProductSel
         <div className="hidden lg:block">
             <button 
             onClick={() => scroll('left')}
-            className={`absolute top-[40%] left-0 -translate-y-1/2 w-14 h-14 bg-white rounded-full border border-[#DDDDDD] flex items-center justify-center z-30 hover:bg-[#67645E] hover:text-white transition-colors opacity-0 group-hover:opacity-100 ${CONTROL_FOCUS_CLASS}`}
+            className={`absolute top-1/2 left-0 -translate-y-1/2 w-14 h-14 bg-white rounded-full border border-[#DDDDDD] flex items-center justify-center z-30 hover:bg-[#67645E] hover:text-white transition-colors opacity-0 group-hover:opacity-100 ${CONTROL_FOCUS_CLASS}`}
             aria-label="Scroll related products left"
             >
             <ChevronRight size={24} className="rotate-180" />
             </button>
             <button 
             onClick={() => scroll('right')}
-            className={`absolute top-[40%] right-0 -translate-y-1/2 w-14 h-14 bg-white rounded-full border border-[#DDDDDD] flex items-center justify-center z-30 hover:bg-[#67645E] hover:text-white transition-colors opacity-0 group-hover:opacity-100 ${CONTROL_FOCUS_CLASS}`}
+            className={`absolute top-1/2 right-0 -translate-y-1/2 w-14 h-14 bg-white rounded-full border border-[#DDDDDD] flex items-center justify-center z-30 hover:bg-[#67645E] hover:text-white transition-colors opacity-0 group-hover:opacity-100 ${CONTROL_FOCUS_CLASS}`}
             aria-label="Scroll related products right"
             >
             <ChevronRight size={24} />

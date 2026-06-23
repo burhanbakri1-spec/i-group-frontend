@@ -421,7 +421,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
 
               <button
                 onClick={() => logout()}
-                className={`border border-[#5C5A56] text-[#5C5A56] px-14 py-3 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors duration-200 active:scale-[0.98] motion-reduce:active:scale-100 ${CONTROL_FOCUS_CLASS}`}
+                className={`inline-flex min-h-12 items-center justify-center whitespace-nowrap border border-[#5C5A56] px-14 py-3 rounded-full text-[11px] font-black uppercase tracking-[0.2em] text-[#5C5A56] hover:bg-black hover:text-white transition-colors duration-200 active:scale-[0.98] motion-reduce:active:scale-100 ${CONTROL_FOCUS_CLASS}`}
               >
                 {authSignOut}
               </button>
@@ -473,7 +473,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
 
               {(formError || authError) && <p className="text-sm text-red-600">{formError ?? authError}</p>}
 
-              <button disabled={isSubmitting} className={`mt-8 border border-[#5C5A56] text-[#5C5A56] px-14 py-3 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors duration-200 active:scale-[0.98] motion-reduce:active:scale-100 disabled:opacity-50 flex items-center gap-2 ${CONTROL_FOCUS_CLASS}`}>
+              <button disabled={isSubmitting} className={`mt-8 inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap border border-[#5C5A56] px-14 py-3 rounded-full text-[11px] font-black uppercase tracking-[0.2em] text-[#5C5A56] hover:bg-black hover:text-white transition-colors duration-200 active:scale-[0.98] motion-reduce:active:scale-100 disabled:opacity-50 ${CONTROL_FOCUS_CLASS}`}>
                 {isSubmitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-[#5C5A56] border-t-transparent rounded-full animate-spin" />

@@ -151,7 +151,7 @@ export const CheckoutConfirmation: React.FC<CheckoutConfirmationProps> = ({
       )}
       <button
         onClick={() => onNavigate('shop')}
-        className={`px-8 py-3 bg-[#67645E] text-white rounded-full hover:bg-[#5A5853] transition-colors ${CONTROL_FOCUS_CLASS}`}
+        className={`inline-flex min-h-12 items-center justify-center whitespace-nowrap px-8 py-3 bg-[#67645E] text-white rounded-full hover:bg-[#5A5853] transition-colors ${CONTROL_FOCUS_CLASS}`}
       >
         {ct.continueShopping}
       </button>

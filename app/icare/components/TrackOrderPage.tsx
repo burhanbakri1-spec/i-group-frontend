@@ -207,9 +207,7 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
             <button
               type="submit"
               disabled={loadState === 'loading'}
-              className={`w-full px-6 py-3.5 bg-[#67645E] text-white rounded-full
-                hover:bg-[#7B7872] transition-colors disabled:opacity-50 flex items-center
-                justify-center gap-2 text-sm font-medium ${CONTROL_FOCUS_CLASS}`}
+              className={`inline-flex min-h-12 w-full items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#67645E] px-6 py-3.5 text-sm font-medium text-white hover:bg-[#7B7872] transition-colors disabled:opacity-50 ${CONTROL_FOCUS_CLASS}`}
             >
               {loadState === 'loading' ? (
                 <>
@@ -254,10 +252,10 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
               className="border-t border-[#EEE] pt-6"
             >
               {/* Status badge */}
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-medium">
-                  {t.pages.trackOrder.orderPrefix} {result.orderNumber}
-                </h2>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                  <h2 className="text-lg font-medium">
+                    {t.pages.trackOrder.orderPrefix} {result.orderNumber}
+                  </h2>
                 {(() => {
                   const info = getStatusInfo(result.status, lang);
                   return (
@@ -350,10 +348,10 @@ export const TrackOrderPage: React.FC<TrackOrderPageProps> = ({ lang, initialOrd
 
               {/* Footer link */}
               <div className="text-center mt-6 pt-4 border-t border-[#EEE]">
-                <Link
-                  href="/icare/contact"
-                  className={`text-sm text-[#67645E] hover:underline ${CONTROL_FOCUS_CLASS}`}
-                >
+                  <Link
+                    href="/icare/contact"
+                    className={`inline-flex min-h-10 items-center justify-center whitespace-nowrap text-sm text-[#67645E] hover:underline ${CONTROL_FOCUS_CLASS}`}
+                  >
                   {t.pages.trackOrder.needHelp}
                 </Link>
               </div>

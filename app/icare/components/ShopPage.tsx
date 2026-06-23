@@ -313,12 +313,12 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
 
         {visibleCount < filteredProducts.length && (
           <div className="mt-12 md:mt-20 flex justify-center">
-            <button
-              onClick={() => setVisibleCount(prev => prev + 12)}
-              className={`px-12 py-4 min-h-[44px] bg-[#67645E] text-white text-[12px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-[#67645E]/90 transition-colors active:scale-[0.99] ${CONTROL_FOCUS_CLASS}`}
-            >
-              {shopShowMore}
-            </button>
+              <button
+                onClick={() => setVisibleCount(prev => prev + 12)}
+                className={`inline-flex min-h-12 items-center justify-center whitespace-nowrap px-12 py-4 bg-[#67645E] text-white text-[12px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-[#67645E]/90 transition-colors active:scale-[0.99] ${CONTROL_FOCUS_CLASS}`}
+              >
+                {shopShowMore}
+              </button>
           </div>
         )}
 

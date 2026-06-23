@@ -24,7 +24,7 @@ const CartPage: React.FC = () => {
           </div>
           <h1 className="text-[28px] md:text-[36px] font-black lowercase tracking-tight text-[#67645E]">{t.cartDrawer.empty}</h1>
           <p className="text-[14px] text-[#84827E]">{t.cartDrawer.emptyDesc}</p>
-          <button onClick={() => navigateToPage('shop')} className="px-10 py-4 bg-[#67645E] text-white rounded-full text-[12px] font-black uppercase tracking-[0.2em] hover:bg-[#5A5853] transition-colors">
+          <button onClick={() => navigateToPage('shop')} className="inline-flex min-h-12 items-center justify-center px-10 py-4 bg-[#67645E] text-white rounded-full text-[12px] font-black uppercase tracking-[0.2em] whitespace-nowrap hover:bg-[#5A5853] transition-colors">
             {t.cartDrawer.shopNow}
           </button>
         </motion.div>
@@ -35,9 +35,9 @@ const CartPage: React.FC = () => {
   return (
       <div className="min-h-screen bg-[#F1F0ED] pb-24">
         <div className="max-w-[1200px] mx-auto px-4 md:px-8 pt-8">
-          <button onClick={() => navigateToPage('shop')} className="inline-flex items-center gap-2 text-[13px] text-[#84827E] hover:text-[#67645E] mb-8 transition-colors">
-          <ArrowLeft size={16} /> {t.cartDrawer.continue}
-        </button>
+          <button onClick={() => navigateToPage('shop')} className="inline-flex min-h-10 items-center gap-2 whitespace-nowrap text-[13px] text-[#84827E] hover:text-[#67645E] mb-8 transition-colors">
+            <ArrowLeft size={16} /> {t.cartDrawer.continue}
+          </button>
 
         <h1 className="text-[32px] md:text-[42px] font-black lowercase tracking-tight text-[#67645E] mb-10">{t.cartDrawer.title} ({cartCount} {t.cartDrawer.items})</h1>
 
@@ -77,7 +77,7 @@ const CartPage: React.FC = () => {
               <h3 className="text-[12px] font-black uppercase tracking-[0.2em] text-[#67645E] mb-6">{t.cartDrawer.orderSummary}</h3>
               <div className="flex justify-between text-[14px] text-[#67645E] mb-2"><span>{t.cartDrawer.subtotal}</span><span className="font-bold">${cartTotal.toFixed(2)}</span></div>
               <p className="text-[11px] text-[#84827E] mb-6">{t.cartDrawer.shippingCalculated}</p>
-              <button onClick={handleCheckout} className="w-full py-4 bg-[#67645E] text-white rounded-full text-[12px] font-black uppercase tracking-[0.2em] hover:bg-[#5A5853] transition-colors">{isAuthenticated ? t.cartDrawer.checkout : t.cartDrawer.signInToCheckout}</button>
+              <button onClick={handleCheckout} className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-[#67645E] px-6 py-4 text-[12px] font-black uppercase tracking-[0.2em] whitespace-nowrap text-white hover:bg-[#5A5853] transition-colors">{isAuthenticated ? t.cartDrawer.checkout : t.cartDrawer.signInToCheckout}</button>
             </div>
           </div>
         </div>

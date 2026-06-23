@@ -96,13 +96,13 @@ export const OrderConfirmationContent: React.FC<OrderConfirmationContentProps> =
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/icare/shop"
-                className={`px-6 py-3 bg-[#67645E] text-white rounded-full hover:bg-[#7B7872] transition-colors ${CONTROL_FOCUS_CLASS}`}
+                className={`inline-flex min-h-12 items-center justify-center whitespace-nowrap rounded-full bg-[#67645E] px-6 py-3 text-white hover:bg-[#7B7872] transition-colors ${CONTROL_FOCUS_CLASS}`}
               >
                 {ct.continueShopping}
               </Link>
               <Link
                 href="/icare/contact"
-                className={`px-6 py-3 border border-[#67645E] text-[#67645E] rounded-full hover:bg-[#F1F0ED] transition-colors ${CONTROL_FOCUS_CLASS}`}
+                className={`inline-flex min-h-12 items-center justify-center whitespace-nowrap rounded-full border border-[#67645E] px-6 py-3 text-[#67645E] hover:bg-[#F1F0ED] transition-colors ${CONTROL_FOCUS_CLASS}`}
               >
                 Contact Support
               </Link>
@@ -123,7 +123,7 @@ export const OrderConfirmationContent: React.FC<OrderConfirmationContentProps> =
         {/* Back navigation */}
         <Link
           href="/icare/shop"
-          className={`inline-flex items-center gap-2 text-xs md:text-sm text-[#84827E] hover:text-[#67645E] mb-6 transition-colors ${CONTROL_FOCUS_CLASS}`}
+          className={`inline-flex min-h-10 items-center gap-2 whitespace-nowrap text-xs md:text-sm text-[#84827E] hover:text-[#67645E] mb-6 transition-colors ${CONTROL_FOCUS_CLASS}`}
         >
           <ArrowLeft size={16} />
           {ct.continueShopping}
@@ -219,13 +219,13 @@ export const OrderConfirmationContent: React.FC<OrderConfirmationContentProps> =
           <div className="flex flex-col sm:flex-row gap-4 mt-8 pt-6 border-t border-[#EEE]">
             <Link
               href="/icare/shop"
-              className={`flex-1 px-6 py-3 border border-[#67645E] text-[#67645E] rounded-full text-center hover:bg-[#F1F0ED] transition-colors ${CONTROL_FOCUS_CLASS}`}
+              className={`inline-flex min-h-12 flex-1 items-center justify-center whitespace-nowrap rounded-full border border-[#67645E] px-6 py-3 text-center text-[#67645E] hover:bg-[#F1F0ED] transition-colors ${CONTROL_FOCUS_CLASS}`}
             >
               {ct.continueShopping}
             </Link>
             <Link
               href={`/icare/track-order?orderNumber=${order.orderNumber}`}
-              className={`flex-1 px-6 py-3 bg-[#67645E] text-white rounded-full text-center hover:bg-[#7B7872] transition-colors ${CONTROL_FOCUS_CLASS}`}
+              className={`inline-flex min-h-12 flex-1 items-center justify-center whitespace-nowrap rounded-full bg-[#67645E] px-6 py-3 text-center text-white hover:bg-[#7B7872] transition-colors ${CONTROL_FOCUS_CLASS}`}
             >
               Track Your Order
             </Link>

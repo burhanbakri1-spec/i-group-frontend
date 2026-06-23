@@ -165,8 +165,8 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
       {/* Coupon input */}
       <div className="mt-6 pt-4 border-t border-[#EEE]">
         {appliedCoupon ? (
-          <div className="flex items-center justify-between bg-[#F1F0ED] border border-[#DDDDDD] rounded-[12px] px-3 py-2">
-            <div>
+          <div className="flex items-center justify-between gap-3 bg-[#F1F0ED] border border-[#DDDDDD] rounded-[12px] px-3 py-2">
+            <div className="min-w-0">
               <p className="text-xs text-[#67645E] font-medium">
                 {ct.couponApplied}
               </p>
@@ -177,7 +177,7 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
             <button
               onClick={handleRemoveCoupon}
               disabled={couponLoading}
-              className="text-xs text-[#67645E] hover:text-[#5A5853] underline"
+              className="inline-flex min-h-9 items-center whitespace-nowrap text-xs text-[#67645E] hover:text-[#5A5853] underline"
             >
               {ct.couponRemove}
             </button>
@@ -195,12 +195,12 @@ export const CheckoutOrderSummary: React.FC<CheckoutOrderSummaryProps> = ({
                 onKeyDown={handleCouponKeyDown}
                 placeholder={ct.couponPlaceholder}
                 disabled={couponLoading}
-                className="flex-1 px-3 py-2 border border-[#DDDDDD] rounded text-sm text-[#67645E] placeholder:text-[#84827E] focus:outline-none focus:border-[#67645E] focus:ring-2 focus:ring-[#7B7872]/70 disabled:opacity-50"
+                className="flex-1 min-w-0 px-3 py-2 border border-[#DDDDDD] rounded text-sm text-[#67645E] placeholder:text-[#84827E] focus:outline-none focus:border-[#67645E] focus:ring-2 focus:ring-[#7B7872]/70 disabled:opacity-50"
               />
               <button
                 onClick={handleCouponApply}
                 disabled={!couponInput.trim() || couponLoading}
-                className="px-4 py-2 bg-[#67645E] text-white text-xs rounded-full hover:bg-[#5A5853] disabled:opacity-40 transition-colors whitespace-nowrap"
+                className="inline-flex min-h-10 items-center justify-center px-4 py-2 bg-[#67645E] text-white text-xs rounded-full hover:bg-[#5A5853] disabled:opacity-40 transition-colors whitespace-nowrap"
               >
                 {couponLoading ? (
                   <span className="inline-flex items-center gap-1">

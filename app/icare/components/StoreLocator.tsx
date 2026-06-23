@@ -233,7 +233,7 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
                         target="_blank"
                         rel="noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#67645E] text-white rounded-full text-[8px] lg:text-[10px] font-black uppercase tracking-widest hover:opacity-90 transition-all active:scale-95"
+                        className="inline-flex min-h-10 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#67645E] px-4 py-2.5 text-[8px] lg:text-[10px] font-black uppercase tracking-widest text-white hover:opacity-90 transition-all active:scale-95"
                       >
                         <Navigation size={10} />
                         {t.pages.storeLocator.directions}
@@ -244,7 +244,7 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
                         rel="noreferrer"
                         aria-label={`${store.name} Google Maps`}
                         onClick={(e) => e.stopPropagation()}
-                        className="w-8 h-8 lg:w-12 lg:h-12 flex items-center justify-center border border-black/10 rounded-full hover:border-black transition-all active:scale-95"
+                        className="inline-flex min-h-10 min-w-10 lg:min-h-12 lg:min-w-12 items-center justify-center border border-black/10 rounded-full hover:border-black transition-all active:scale-95"
                       >
                         <ExternalLink size={12} className="text-black/40" />
                       </a>

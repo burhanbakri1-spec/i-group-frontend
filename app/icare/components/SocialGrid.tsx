@@ -37,7 +37,7 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang, onNavigate }) => {
         <motion.button
           onClick={() => onNavigate('vlog')}
           /* Rhode pill: 15.73px / 400 / 23.6px / 0.314px ls / uppercase. */
-          className="relative hidden overflow-hidden rounded-full px-8 py-2 text-[15.73px] font-bold uppercase leading-[1.5] tracking-[0.02em] text-[#67645E] shadow-[inset_0_0_0_1px_#67645E] transition-all duration-300 group hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 md:block"
+          className="relative hidden overflow-hidden rounded-full border border-[#67645E] px-8 py-2 text-[15.73px] font-bold uppercase leading-[1.5] tracking-[0.02em] text-[#67645E] transition-[color,transform,border-color] duration-300 group hover:border-[#67645E] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 md:block"
           initial={shouldReduceMotion ? false : { opacity: 0, x: 10 }}
           whileInView={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
           viewport={{ once: true }}

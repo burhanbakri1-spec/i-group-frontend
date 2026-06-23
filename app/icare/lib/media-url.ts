@@ -7,16 +7,23 @@
  * (javascript:, vbscript:, data: non-image) so they never reach the renderer.
  *
  * Other modules MUST call this instead of inlining their own normalization.
+ *
+ * Upload paths (/uploads/..., /public/uploads/...) are resolved to the
+ * backend media origin so the browser loads them directly — no Next.js
+ * rewrite proxy hop, no socket hangup. The origin is taken from
+ * NEXT_PUBLIC_IMAGE_BASE_URL (public env var). When unset (local dev without
+ * a remote backend), paths fall back to root-relative and the Next.js
+ * rewrite in next.config.ts handles the proxying.
  */
 
 const IMAGE_BASE_URL = (process.env.NEXT_PUBLIC_IMAGE_BASE_URL || '').replace(/\/$/, '');
 const IMAGE_PROXY_BASE_URL = '/api/icare';
 const BASE_PREFIX = IMAGE_BASE_URL || IMAGE_PROXY_BASE_URL;
 
-const PROXIED_ROOT_RELATIVE_PREFIXES: readonly string[] = [
+// Upload prefixes that should resolve to the backend media origin directly.
+const UPLOAD_PREFIXES: readonly string[] = [
   '/uploads/',
   '/public/uploads/',
-  '/api/icare/',
 ];
 
 const startsWithAny = (value: string, prefixes: readonly string[]): boolean => {
@@ -42,7 +49,14 @@ export function resolveMediaUrl(value: string | null | undefined): string {
   if (lower.startsWith('data:image/')) return trimmed;
 
   if (trimmed.startsWith('/')) {
-    if (startsWithAny(trimmed, PROXIED_ROOT_RELATIVE_PREFIXES)) return trimmed;
+    // Upload paths → resolve to the backend media origin directly.
+    // Browser loads from backend, no Next.js proxy hop, no socket hangup.
+    if (IMAGE_BASE_URL && startsWithAny(trimmed, UPLOAD_PREFIXES)) {
+      return `${IMAGE_BASE_URL}${trimmed}`;
+    }
+    // Already-proxied paths (/api/icare/...) stay as-is.
+    if (trimmed.startsWith('/api/icare/')) return trimmed;
+    // Other root-relative paths → prefix with the base (backend or proxy).
     return `${BASE_PREFIX}${trimmed}`;
   }
 

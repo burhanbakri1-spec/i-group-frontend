@@ -181,8 +181,8 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                           <h3 className="text-[12px] font-black text-[#84827E] mb-4 uppercase tracking-[0.1em]">{searchCollectionsHeading}</h3>
                           <div className="space-y-3">
                             {filteredResults.collections.map((item) => (
-                              <button key={`collection-${item}`} className={`flex items-center justify-between w-full group text-left rounded-[8px] ${CONTROL_FOCUS_CLASS}`}>
-                                <span className="text-[16px] font-medium text-[#67645E] lowercase">{item}</span>
+                              <button key={`collection-${item}`} className={`flex items-center justify-between w-full gap-3 rounded-[8px] px-3 py-2 group text-left ${CONTROL_FOCUS_CLASS}`}>
+                                <span className="text-[16px] font-medium leading-[1.3] text-[#67645E] lowercase">{item}</span>
                                 <ArrowRight size={16} className="text-[#84827E] opacity-0 group-hover:opacity-100 transition-all duration-200 motion-reduce:transition-none motion-reduce:translate-x-0 -translate-x-2 group-hover:translate-x-0" />
                               </button>
                             ))}
@@ -196,7 +196,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                           <h3 className="text-[12px] font-black text-[#84827E] mb-6 uppercase tracking-[0.1em]">{searchProductsHeading}</h3>
                           <div className="space-y-6">
                             {filteredResults.products.map((product) => (
-                              <button key={product.id} onClick={() => handleProductSelect(product)} className={`flex items-center gap-5 group cursor-pointer text-left w-full rounded-[8px] ${CONTROL_FOCUS_CLASS}`}>
+                              <button key={product.id} onClick={() => handleProductSelect(product)} className={`flex items-center gap-4 group cursor-pointer text-left w-full rounded-[8px] px-2 py-2 ${CONTROL_FOCUS_CLASS}`}>
                                 <div className="w-14 h-16 bg-white/40 rounded-[8px] overflow-hidden flex-shrink-0 flex items-center justify-center">
                                   <ImageWithFallback 
                                     src={product.primaryImage} 
@@ -204,9 +204,9 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                                     className="w-full h-full object-contain mix-blend-multiply p-1 group-hover:scale-[1.03] transition-transform duration-200 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                                   />
                                 </div>
-                                <div className="flex flex-col">
+                                <div className="flex flex-col min-w-0">
                                   <span className="text-[14px] font-black text-[#67645E] tracking-widest uppercase">{product.name}</span>
-                                  <span className="text-[12px] text-[#67645E] lowercase">{product.category ?? <>{product.originalPrice && <span className="line-through mr-1">{product.originalPrice}</span>}{product.price}</>}</span>
+                                  <span className="text-[12px] leading-[1.4] text-[#67645E] lowercase">{product.category ?? <>{product.originalPrice && <span className="line-through mr-1">{product.originalPrice}</span>}{product.price}</>}</span>
                                 </div>
                               </button>
                             ))}

@@ -37,7 +37,7 @@ export const CartDrawer = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
             
             <div className="flex-1 flex flex-col items-center justify-center text-center">
               <p className="text-[11px] tracking-wider text-[#84827E] uppercase mb-8">{cartEmptyDrawer}</p>
-              <button onClick={onClose} className="bg-[#67645E] text-white w-full min-h-[44px] py-4 rounded-full text-[10px] tracking-[0.2em] uppercase font-medium hover:bg-[#5A5853] transition-colors">
+              <button onClick={onClose} className="inline-flex min-h-12 w-full items-center justify-center whitespace-nowrap bg-[#67645E] text-white py-4 rounded-full text-[10px] tracking-[0.2em] uppercase font-medium hover:bg-[#5A5853] transition-colors">
                 {cartContinueShopping}
               </button>
             </div>
@@ -48,7 +48,7 @@ export const CartDrawer = ({ isOpen, onClose }: { isOpen: boolean, onClose: () =
                 <span className="text-[11px] tracking-widest uppercase font-medium text-[#67645E]">$0.00</span>
               </div>
               <p className="text-[9px] text-[#84827E] tracking-wider uppercase mb-6 text-center">{cartShippingDisclaimer}</p>
-              <button disabled className="bg-[#67645E]/10 text-[#67645E]/40 w-full min-h-[44px] py-4 rounded-full text-[10px] tracking-[0.2em] uppercase font-medium cursor-not-allowed">
+              <button disabled className="inline-flex min-h-12 w-full items-center justify-center whitespace-nowrap bg-[#67645E]/10 text-[#67645E]/40 py-4 rounded-full text-[10px] tracking-[0.2em] uppercase font-medium cursor-not-allowed">
                 {cartCheckoutLabel}
               </button>
             </div>

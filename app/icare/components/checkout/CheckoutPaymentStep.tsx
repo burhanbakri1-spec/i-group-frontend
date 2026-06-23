@@ -43,13 +43,13 @@ export const CheckoutPaymentStep: React.FC<CheckoutPaymentStepProps> = ({
         {/* COD — fully functional */}
         <button
           onClick={() => onSetPaymentMethod('cod')}
-          className={`w-full p-4 border-2 rounded-[12px] flex items-center justify-between transition-colors duration-200 ${CONTROL_FOCUS_CLASS} ${
+          className={`w-full p-4 border-2 rounded-[12px] flex items-center justify-between gap-3 transition-colors duration-200 ${CONTROL_FOCUS_CLASS} ${
             paymentMethod === 'cod'
               ? 'border-[#67645E] bg-[#F1F0ED]'
               : 'border-[#DDDDDD] hover:border-[#67645E]'
           }`}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             <Banknote size={24} />
             <span>{checkoutCodLabel}</span>
           </div>
@@ -58,9 +58,9 @@ export const CheckoutPaymentStep: React.FC<CheckoutPaymentStepProps> = ({
 
         {/* Card — disabled, Coming Soon */}
         <div
-          className={`w-full p-4 border-2 rounded-[12px] flex items-center justify-between border-[#DDDDDD] ${disabledClass}`}
+          className={`w-full p-4 border-2 rounded-[12px] flex items-center justify-between gap-3 border-[#DDDDDD] ${disabledClass}`}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             <CreditCard size={24} />
             <span>{checkoutCardLabel}</span>
             <span className="ml-1 rounded-full bg-[#F0F0F0] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#84827E]">
@@ -75,9 +75,9 @@ export const CheckoutPaymentStep: React.FC<CheckoutPaymentStepProps> = ({
 
         {/* PayPal — disabled, Coming Soon */}
         <div
-          className={`w-full p-4 border-2 rounded-[12px] flex items-center justify-between border-[#DDDDDD] ${disabledClass}`}
+          className={`w-full p-4 border-2 rounded-[12px] flex items-center justify-between gap-3 border-[#DDDDDD] ${disabledClass}`}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             <Wallet size={24} />
             <span>{checkoutPaypalLabel}</span>
             <span className="ml-1 rounded-full bg-[#F0F0F0] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#84827E]">
