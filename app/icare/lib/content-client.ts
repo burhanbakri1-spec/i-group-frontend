@@ -11,8 +11,6 @@
 
 import { FALLBACK_CONTENT, type FallbackContentKey } from './fallback-content';
 import { icareApi } from './api-client';
-import { resolveMediaUrl } from './media-url';
-
 export interface ContentEnvelope {
   en: Record<string, string>;
   ar: Record<string, string>;
@@ -20,27 +18,9 @@ export interface ContentEnvelope {
 }
 
 /**
- * Resolve every string value in a locale slice through resolveMediaUrl.
- * Mirrors mapBackendProductToProduct: URLs are normalized once at map time,
- * never touched again downstream. Non-URL strings pass through unchanged
- * because resolveMediaUrl returns them as-is when they don't look like paths.
- */
-const resolveLocaleValues = (
-  slice: Record<string, string> | null | undefined,
-): Record<string, string> => {
-  if (!slice || typeof slice !== 'object') return {};
-  const out: Record<string, string> = {};
-  for (const [key, value] of Object.entries(slice)) {
-    if (typeof value !== 'string') continue;
-    out[key] = resolveMediaUrl(value);
-  }
-  return out;
-};
-
-/**
  * Fetch all dynamic content from the backend in a single call.
- * Resolves all string values (image URLs included) at map time — same
- * contract as mapBackendProductToProduct. No retry, no cache-busting,
+ * Locale slices pass through verbatim — image URLs are already absolute
+ * and text fields must not be rewritten. No retry, no cache-busting,
  * no version threading.
  *
  * @param signal Optional AbortSignal for cancellation on unmount.
@@ -51,8 +31,8 @@ export async function fetchAllContent(signal?: AbortSignal): Promise<ContentEnve
   const version = (payload && typeof payload.version === 'string' && payload.version) || '';
 
   return {
-    en: resolveLocaleValues(payload && payload.en),
-    ar: resolveLocaleValues(payload && payload.ar),
+    en: payload && payload.en && typeof payload.en === 'object' ? payload.en : {},
+    ar: payload && payload.ar && typeof payload.ar === 'object' ? payload.ar : {},
     version,
   };
 }
