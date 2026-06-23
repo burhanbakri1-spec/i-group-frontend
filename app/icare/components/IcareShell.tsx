@@ -120,15 +120,50 @@ export const IcareShell = ({ children }: { children: React.ReactNode }) => {
     navigateToProduct: (product: Product) => navigateToPath(getIcareProductPath(product) ?? getIcarePagePath('shop')),
   }), [lang, navigateToPath]);
 
-  const navigateFromShell = (page: string) => {
+  const navigateFromShell = (page: string, options?: { categorySlug?: string }) => {
     setIsMenuOpen(false);
-    navigateToPath(getIcarePagePath(page));
+    const path = getIcarePagePath(page);
+    const slug = options?.categorySlug;
+    if (slug) {
+      navigateToPath(`${path}?category=${encodeURIComponent(slug)}`);
+    } else {
+      navigateToPath(path);
+    }
   };
 
   const handleProductSelect = (product: Product) => {
     setIsMenuOpen(false);
     setIsSearchOpen(false);
     navigateToPath(getIcareProductPath(product) ?? getIcarePagePath('shop'));
+  };
+
+  const [categorySlugByName, setCategorySlugByName] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { fetchCategoryRoots } = await import('../lib/catalog-client');
+        const roots = await fetchCategoryRoots();
+        if (cancelled) return;
+        const map: Record<string, string> = {};
+        for (const r of roots ?? []) map[r.name.toLowerCase()] = r.slug;
+        setCategorySlugByName(map);
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const handleCategorySelect = (name: string) => {
+    setIsSearchOpen(false);
+    const slug = categorySlugByName[name.toLowerCase()];
+    if (slug) {
+      router.push(`/icare/shop?category=${encodeURIComponent(slug)}`);
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    } else {
+      router.push('/icare/shop');
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }
   };
 
   return (
@@ -167,7 +202,7 @@ export const IcareShell = ({ children }: { children: React.ReactNode }) => {
           <Footer lang={lang} onNavigate={navigateFromShell} />
 
           <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} lang={lang} onNavigate={navigateFromShell} />
-          <SearchDrawer isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} lang={lang} onProductSelect={handleProductSelect} />
+          <SearchDrawer isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} lang={lang} onProductSelect={handleProductSelect} onCategorySelect={handleCategorySelect} />
         </div>
       </IcareShellContext.Provider>
     </ShopProvider>

@@ -13,6 +13,7 @@ interface SearchDrawerProps {
   onClose: () => void;
   lang: Language;
   onProductSelect?: (product: Product) => void;
+  onCategorySelect?: (categorySlug: string) => void;
 }
 
 const DRAWER_BACKDROP_Z_CLASS = 'z-[70]';
@@ -21,7 +22,7 @@ const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 foc
 const INPUT_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 const DRAWER_TRANSITION = { duration: 0.18, ease: 'easeOut' as const };
 
-export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onProductSelect, lang }) => {
+export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onProductSelect, onCategorySelect, lang }) => {
   const shouldReduceMotion = useReducedMotion();
   const {
     searchDrawerTitle,
@@ -181,7 +182,11 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                           <h3 className="text-[12px] font-black text-[#84827E] mb-4 uppercase tracking-[0.1em]">{searchCollectionsHeading}</h3>
                           <div className="space-y-3">
                             {filteredResults.collections.map((item) => (
-                              <button key={`collection-${item}`} className={`flex items-center justify-between w-full gap-3 rounded-[8px] px-3 py-2 group text-left ${CONTROL_FOCUS_CLASS}`}>
+                              <button
+                                key={`collection-${item}`}
+                                onClick={() => onCategorySelect?.(item)}
+                                className={`flex items-center justify-between w-full gap-3 rounded-[8px] px-3 py-2 group text-left ${CONTROL_FOCUS_CLASS}`}
+                              >
                                 <span className="text-[16px] font-medium leading-[1.3] text-[#67645E] lowercase">{item}</span>
                                 <ArrowRight size={16} className="text-[#84827E] opacity-0 group-hover:opacity-100 transition-all duration-200 motion-reduce:transition-none motion-reduce:translate-x-0 -translate-x-2 group-hover:translate-x-0" />
                               </button>
@@ -241,7 +246,11 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
                     {searchableCollections.length > 0 ? (
                       <div className="flex flex-col gap-3">
                         {searchableCollections.map((item) => (
-                          <button key={`default-collection-${item}`} className={`text-left text-[15px] text-[#67645E] font-medium hover:text-black transition-colors lowercase rounded-[8px] ${CONTROL_FOCUS_CLASS}`}>{item}</button>
+                          <button
+                            key={`default-collection-${item}`}
+                            onClick={() => onCategorySelect?.(item)}
+                            className={`text-left text-[15px] text-[#67645E] font-medium hover:text-black transition-colors lowercase rounded-[8px] ${CONTROL_FOCUS_CLASS}`}
+                          >{item}</button>
                         ))}
                       </div>
                     ) : (

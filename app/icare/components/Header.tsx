@@ -12,7 +12,7 @@ import { hasIcareStandardHero } from '../lib/hero-routes';
 interface HeaderProps {
   onOpenCart: () => void;
   onOpenSearch: () => void;
-  onNavigate: (page: string) => void;
+  onNavigate: (page: string, options?: { categorySlug?: string }) => void;
   onProductSelect?: (product: Product) => void;
   onOpenMenu: () => void;
   isDrawerOpen?: boolean;
@@ -496,7 +496,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                       key={t.categories.all}
                       onMouseEnter={() => setPreviewByIndex(0)}
                       onFocus={() => setPreviewByIndex(0)}
-                      onClick={() => { onNavigate('shop'); closeShopMenu(); }}
+                      onClick={() => { onNavigate('shop', { categorySlug: '' }); closeShopMenu(); }}
                       className={`rounded-full px-1 text-[12.8px] font-bold uppercase tracking-[0.02em] leading-[1.5] relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
                         clampedActivePreviewIndex === 0 ? 'text-[var(--rb-near-black)]' : 'text-[var(--rb-primary-text)]'
                       }`}
@@ -512,7 +512,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                         key={cat.slug}
                         onMouseEnter={() => setPreviewByIndex(index + 1)}
                         onFocus={() => setPreviewByIndex(index + 1)}
-                        onClick={() => { onNavigate('shop'); closeShopMenu(); }}
+                        onClick={() => { onNavigate('shop', { categorySlug: cat.slug }); closeShopMenu(); }}
                         /* Match system 12.8px / 700 / 0.256px rhythm for secondary nav pills. */
                         className={`rounded-full px-1 text-[12.8px] font-bold uppercase tracking-[0.02em] leading-[1.5] relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
                           clampedActivePreviewIndex === index + 1 ? 'text-[var(--rb-near-black)]' : 'text-[var(--rb-primary-text)]'
