@@ -154,7 +154,6 @@ export const IcareShell = ({ children }: { children: React.ReactNode }) => {
             onNavigate={navigateFromShell}
             onProductSelect={handleProductSelect}
             onOpenCart={() => setIsCartOpen(true)}
-            onOpenSearch={() => setIsSearchOpen(true)}
             lang={lang}
             onToggleLang={() => setLang((currentLang) => currentLang === 'en' ? 'ar' : 'en')}
           />

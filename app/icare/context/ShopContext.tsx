@@ -85,10 +85,9 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     en: FALLBACK_CONTENT as Record<FallbackContentKey, string>,
     ar: FALLBACK_CONTENT as Record<FallbackContentKey, string>,
   }));
-  // Content version timestamp (ISO) from the BE envelope. Used as a
-  // cache-busting suffix on image URLs so the browser re-fetches when
-  // admin uploads a replacement (otherwise the browser serves the old
-  // file from its HTTP cache because the URL is unchanged).
+  // Content version timestamp (ISO) from the BE envelope. Kept for backward
+  // compat in the context shape but no longer used for cache-busting —
+  // image URLs are resolved once at map time, identical to the catalog path.
   const [contentVersion, setContentVersion] = useState<string>('');
 
   const accessToken = session?.accessToken ?? null;

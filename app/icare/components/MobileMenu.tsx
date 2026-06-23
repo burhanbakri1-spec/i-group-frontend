@@ -15,7 +15,6 @@ interface MobileMenuProps {
   onNavigate: (page: string) => void;
   onProductSelect?: (product: Product) => void;
   onOpenCart: () => void;
-  onOpenSearch?: () => void;
   lang: Language;
   onToggleLang: () => void;
 }
@@ -23,9 +22,7 @@ interface MobileMenuProps {
 const SHOP_ALL_SENTINEL = '__ALL__';
 const FOCUS_VISIBLE_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67645E]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--rb-bg-warm-gray)]';
 
-export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavigate, onProductSelect, onOpenCart, onOpenSearch, lang, onToggleLang }) => {
-  // onOpenSearch is passed from parent but not currently used in this component
-  void onOpenSearch;
+export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavigate, onProductSelect, onOpenCart, lang, onToggleLang }) => {
   const t = translations[lang];
   const shopAllLabel = t.categories.all;
   const [activeCategory, setActiveCategory] = useState(SHOP_ALL_SENTINEL);
@@ -47,7 +44,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
   const mobileCategories = useMemo(() => {
     if (remoteProducts.length === 0) return [];
     const backendCategories = Array.from(new Set(remoteProducts
-      .map((product) => product.category?.trim().toUpperCase())
+      .map((product) => product.category?.trim().toLowerCase())
       .filter((category): category is string => Boolean(category))));
 
     return [SHOP_ALL_SENTINEL, ...backendCategories];
@@ -57,7 +54,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
 
   const displayProducts = useMemo<Product[]>(() => {
     return remoteProducts
-       .filter((product) => activeMobileCategory === SHOP_ALL_SENTINEL || product.category?.trim().toUpperCase() === activeMobileCategory)
+       .filter((product) => activeMobileCategory === SHOP_ALL_SENTINEL || product.category?.trim().toLowerCase() === activeMobileCategory)
       .slice(0, 4);
   }, [activeMobileCategory, remoteProducts]);
 

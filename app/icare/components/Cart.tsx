@@ -21,7 +21,7 @@ const DRAWER_TRANSITION = { duration: 0.18, ease: 'easeOut' as const };
 
 export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate }) => {
   const { cartItems, removeFromCart, updateQuantity, cartTotal, cartCount, isAuthenticated } = useShop();
-  const { freeShippingThreshold, cartShippingUnlockedText, cartShippingDisclaimer } = useSiteContent(lang);
+  const { freeShippingThreshold, cartShippingUnlockedText, cartShippingDisclaimer, currencyCode } = useSiteContent(lang);
   const t = translations[lang];
   const shouldReduceMotion = useReducedMotion();
   const hasUnlockedShipping = Number.isFinite(freeShippingThreshold) && cartTotal >= freeShippingThreshold;
@@ -143,7 +143,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                               <button
                                 onClick={() => updateQuantity(item.id, item.quantity - 1)}
                                 className={`w-8 h-8 flex items-center justify-center border border-[#DDDDDD] rounded-full hover:border-[#67645E] transition-colors ${CONTROL_FOCUS_CLASS}`}
-                                aria-label={t.cartDrawer!.decreaseQuantity!.replace('{item}', item.title!)}
+                                aria-label={t.cartDrawer?.decreaseQuantity?.replace('{item}', item.title ?? 'Item')}
                               >
                                 <Minus size={14} />
                               </button>
@@ -151,7 +151,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                               <button
                                 onClick={() => updateQuantity(item.id, item.quantity + 1)}
                                 className={`w-8 h-8 flex items-center justify-center border border-[#DDDDDD] rounded-full hover:border-[#67645E] transition-colors ${CONTROL_FOCUS_CLASS}`}
-                                aria-label={t.cartDrawer!.increaseQuantity!.replace('{item}', item.title!)}
+                                aria-label={t.cartDrawer?.increaseQuantity?.replace('{item}', item.title ?? 'Item')}
                               >
                                 <Plus size={14} />
                               </button>
@@ -160,7 +160,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                             <button
                               onClick={() => removeFromCart(item.id)}
                               className={`text-[#67645E] hover:text-red-600 transition-colors ${CONTROL_FOCUS_CLASS}`}
-                              aria-label={t.cartDrawer!.removeFromCart!.replace('{item}', item.title!)}
+                              aria-label={t.cartDrawer?.removeFromCart?.replace('{item}', item.title ?? 'Item')}
                             >
                               <Trash2 size={18} />
                             </button>
@@ -181,7 +181,7 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose, lang, onNavigate })
                     {t.cartDrawer.subtotal}
                   </span>
                   <span className="font-[900] text-[#67645E]">
-                    USD {cartTotal.toFixed(2)}
+                    {currencyCode} {cartTotal.toFixed(2)}
                   </span>
                 </div>
                 
