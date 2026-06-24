@@ -166,7 +166,7 @@ function Header({
       return {
         titleEn: index === 0 ? "Start here" : "Shop featured products",
         titleAr: index === 0 ? "ابدأ من هنا" : "تسوق المنتجات المميزة",
-        image: product.image || fallbackCards[index].image,
+        image: fallbackCards[index].image,
         categoryId: product.categoryId,
         productSlug: product.slug,
       };

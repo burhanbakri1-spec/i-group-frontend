@@ -33,7 +33,7 @@ function Footer({ onNavigate, t }) {
             type="button"
           >
             <span>{t("footer.shop")}</span>
-            <span className="footer-section-icon" aria-hidden="true">{openSection === "shop" ? "−" : "+"}</span>
+            <span className="footer-section-icon" aria-hidden="true">{openSection === "shop" ? "\u2212" : "+"}</span>
           </button>
           <p className="footer-brand-text">{t("footer.description")}</p>
           <nav>
@@ -54,7 +54,7 @@ function Footer({ onNavigate, t }) {
             type="button"
           >
             <span>About</span>
-            <span className="footer-section-icon" aria-hidden="true">{openSection === "about" ? "−" : "+"}</span>
+            <span className="footer-section-icon" aria-hidden="true">{openSection === "about" ? "\u2212" : "+"}</span>
           </button>
           <nav>
             <button onClick={() => onNavigate("about")} type="button">About us</button>
@@ -74,7 +74,7 @@ function Footer({ onNavigate, t }) {
             type="button"
           >
             <span>Help & support</span>
-            <span className="footer-section-icon" aria-hidden="true">{openSection === "help" ? "−" : "+"}</span>
+            <span className="footer-section-icon" aria-hidden="true">{openSection === "help" ? "\u2212" : "+"}</span>
           </button>
           <nav>
             <button type="button">Frequently asked questions</button>
