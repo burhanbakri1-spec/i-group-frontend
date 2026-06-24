@@ -43,6 +43,21 @@ function isIsolatedProductImage(src = "") {
   return /\.svg(?:\?|$)/i.test(src) || src.includes("/images/products/");
 }
 
+function normalizeHomeProductVariants(product = {}) {
+  if (!Array.isArray(product?.variants) || !product.variants.length) return [];
+
+  return product.variants.map((variant, index) => ({
+    id: variant.id || `${product.id || product.slug || "product"}-variant-${index}`,
+    colorName: variant.color_name || variant.colorName || "Default",
+    colorValue: variant.color_value || variant.colorValue || "",
+    size: variant.size || product.sizes?.[0]?.size || "500ml",
+    price: Number(variant.price || product.sizes?.[0]?.price || 0),
+    stock: Math.max(0, Number(variant.stock ?? variant.stockQty ?? product.stockQty ?? 24)),
+    image: variant.image_url || variant.imageUrl || variant.image || "",
+    sortOrder: Number(variant.sort_order ?? variant.sortOrder ?? index),
+  }));
+}
+
 function HomeCommunityGallery({ galleryImages = [] }) {
   const images = galleryImages.filter(Boolean).slice(0, 4);
 
@@ -419,10 +434,51 @@ function PurchaseExperienceShowcase({ language, onAddToCart, onViewProduct, prod
     { size: "5L", price: 85 },
   ];
   const options = (product?.sizes?.length ? product.sizes : fallbackSizes).slice(0, 3);
+  const productVariants = React.useMemo(() => normalizeHomeProductVariants(product), [product]);
+  const colorOptions = React.useMemo(() => {
+    const colorMap = new Map();
+    productVariants
+      .slice()
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+      .forEach((variant) => {
+        const key = variant.colorName || "Default";
+        if (!colorMap.has(key)) colorMap.set(key, variant);
+      });
+    return Array.from(colorMap.values());
+  }, [productVariants]);
   const [selectedSize, setSelectedSize] = React.useState(options[0]?.size || "500ml");
+  const [selectedColor, setSelectedColor] = React.useState(colorOptions[0]?.colorName || "Default");
   const [purchaseType, setPurchaseType] = React.useState("once");
+
+  React.useEffect(() => {
+    setSelectedSize(options[0]?.size || "500ml");
+  }, [product?.id]);
+
+  React.useEffect(() => {
+    setSelectedColor((currentColor) =>
+      colorOptions.some((option) => option.colorName === currentColor)
+        ? currentColor
+        : colorOptions[0]?.colorName || "Default"
+    );
+  }, [colorOptions]);
+
   const selectedOption = options.find((option) => option.size === selectedSize) || options[0];
-  const image = product?.image || "/images/products/multi-surface-cleaner.svg";
+  const selectedColorOption =
+    colorOptions.find((option) => option.colorName === selectedColor) || colorOptions[0] || null;
+  const selectedVariantForCart =
+    productVariants.find((variant) => variant.colorName === selectedColor && variant.size === selectedSize) || null;
+  const selectedSizeVariant = productVariants.find((variant) => variant.size === selectedSize) || null;
+  const selectedColorImage = selectedColorOption?.image || "";
+  const image =
+    selectedVariantForCart?.image ||
+    selectedSizeVariant?.image ||
+    selectedColorImage ||
+    product?.hoverImage ||
+    product?.secondaryImage ||
+    product?.images?.[1] ||
+    product?.galleryImages?.[1] ||
+    product?.image ||
+    "/images/products/multi-surface-cleaner.svg";
   const name =
     getLocalized(product?.name, language) ||
     (isArabic ? "منظف متعدد الاستخدامات" : "Every Surface Cleaner");
@@ -437,7 +493,7 @@ function PurchaseExperienceShowcase({ language, onAddToCart, onViewProduct, prod
 
   function handleAddToCart() {
     if (product && onAddToCart) {
-      onAddToCart(product, selectedOption?.size || product.sizes?.[0]?.size);
+      onAddToCart(product, selectedOption?.size || product.sizes?.[0]?.size, selectedVariantForCart);
       return;
     }
     if (product?.slug) onViewProduct(product.slug);
@@ -452,6 +508,42 @@ function PurchaseExperienceShowcase({ language, onAddToCart, onViewProduct, prod
             <h2>{name}</h2>
             <p className="pi-desc">{description}</p>
           </div>
+
+          {colorOptions.length > 0 && (
+            <div className="pi-color-field">
+              <p className="pi-label">{isArabic ? "\u0627\u0644\u0644\u0648\u0646" : "Color"}</p>
+              <div className="pi-color-card">
+                <img
+                  alt=""
+                  aria-hidden="true"
+                  loading="lazy"
+                  onError={(event) => {
+                    event.currentTarget.src = "/images/products/product-placeholder.svg";
+                  }}
+                  src={image}
+                />
+                <div>
+                  <p>{isArabic ? "\u0627\u062e\u062a\u0631 \u0627\u0644\u0644\u0648\u0646" : "Choose your Color"}</p>
+                  <div className="pi-color-swatches" role="radiogroup" aria-label={isArabic ? "\u0627\u0644\u0644\u0648\u0646" : "Color"}>
+                    {colorOptions.map((option) => (
+                      <button
+                        aria-checked={selectedColor === option.colorName}
+                        aria-label={option.colorName}
+                        className={selectedColor === option.colorName ? "pi-color-swatch active" : "pi-color-swatch"}
+                        key={option.colorName}
+                        onClick={() => setSelectedColor(option.colorName)}
+                        role="radio"
+                        style={{ background: option.colorValue || "#1db7d8" }}
+                        title={option.colorName}
+                        type="button"
+                      />
+                    ))}
+                  </div>
+                  <span className="pi-color-name">{selectedColor}</span>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="pi-card-field">
             <p className="pi-label">{isArabic ? "الأحجام" : "Options"}</p>
