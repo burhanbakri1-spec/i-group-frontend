@@ -710,13 +710,11 @@ export type ShowcaseTheme = PresentationTheme | string | Record<string, unknown>
 
 export interface BackendShowcaseUnit {
   id: number;
-  productId: number;
   type?: ShowcaseUnitType | string | null;
   payload?: ShowcaseUnitPayload | unknown;
   theme?: ShowcaseTheme;
   image?: string | null;
   title?: string | null;
-  description?: string | null;
   sortOrder: number;
   direction?: ContentDirection | string | null;
   isActive: boolean;

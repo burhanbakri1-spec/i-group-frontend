@@ -839,24 +839,12 @@ export const fetchProductShowcase = async (slug: string): Promise<import('../typ
     for (const unit of units as BackendShowcaseUnit[]) {
       const typeResult = unitTypeScheme.safeParse(unit.type);
       if (!typeResult.success) {
-        console.warn('[fetchProductShowcase] Skipping unit', {
-          slug,
-          unitId: unit.id,
-          type: unit.type,
-          reason: 'unknown_type',
-        });
         continue;
       }
 
       const confirmedType = typeResult.data;
       const payloadSchema = payloadSchemaFor[confirmedType];
       if (!payloadSchema) {
-        console.warn('[fetchProductShowcase] Skipping unit', {
-          slug,
-          unitId: unit.id,
-          type: confirmedType,
-          reason: 'no_schema',
-        });
         continue;
       }
 
@@ -877,24 +865,10 @@ export const fetchProductShowcase = async (slug: string): Promise<import('../typ
           }
         }
       } catch (parseError) {
-        console.warn('[fetchProductShowcase] Skipping unit', {
-          slug,
-          unitId: unit.id,
-          type: confirmedType,
-          reason: 'zod_parse_exception',
-          error: parseError instanceof Error ? parseError.message : String(parseError),
-        });
         continue;
       }
 
       if (!payloadResult.success) {
-        console.warn('[fetchProductShowcase] Skipping unit', {
-          slug,
-          unitId: unit.id,
-          type: confirmedType,
-          reason: 'zod_invalid_payload',
-          errors: payloadResult.error.issues?.map(i => `${i.path.join('.')}: ${i.message}`).join('; '),
-        });
         continue;
       }
 

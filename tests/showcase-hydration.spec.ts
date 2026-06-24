@@ -1,10 +1,10 @@
-/**
+﻿/**
  * tests/showcase-hydration.spec.ts
  *
  * Tests for:
  * - Zod schema loosening (hero_gallery.images min 1)
  * - Hydration fallback when only top-level image is set
- * - Structured skipped-unit logs include slug, unitId, type, reason
+ * - Skipped units do not emit console warnings
  *
  * Run: cd i-group && npx vitest run tests/showcase-hydration.spec.ts
  */
@@ -15,7 +15,6 @@ import * as apiClient from '../app/icare/lib/api-client';
 
 const makeBackendUnit = (overrides: Partial<BackendShowcaseUnit> = {}): BackendShowcaseUnit => ({
   id: 1,
-  productId: 1,
   type: 'hero_gallery',
   sortOrder: 0,
   isActive: true,
@@ -30,7 +29,6 @@ const makeBackendUnit = (overrides: Partial<BackendShowcaseUnit> = {}): BackendS
 // Minimal BackendShowcaseUnit shape used for these tests.
 type BackendShowcaseUnit = {
   id: number;
-  productId: number;
   type: string;
   sortOrder: number;
   isActive: boolean;
@@ -127,7 +125,7 @@ describe('fetchProductShowcase hydration + Zod loosening', () => {
     });
   });
 
-  it('completely invalid payload logs zod_invalid_payload reason and skips unit', async () => {
+  it('completely invalid payload is silently skipped (no warn)', async () => {
     const localWarn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     const localError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     vi.spyOn(apiClient.icareApi, 'isConfigured').mockReturnValue(true);
@@ -142,15 +140,7 @@ describe('fetchProductShowcase hydration + Zod loosening', () => {
 
     const result = await fetchProductShowcase('slug-d');
     expect(result).toBeNull();
-    expect(localWarn).toHaveBeenCalledWith(
-      '[fetchProductShowcase] Skipping unit',
-      expect.objectContaining({
-        slug: 'slug-d',
-        unitId: 104,
-        type: 'hero_gallery',
-        reason: 'zod_invalid_payload',
-      }),
-    );
+    expect(localWarn).not.toHaveBeenCalled();
     localWarn.mockRestore();
     localError.mockRestore();
   });
@@ -162,7 +152,7 @@ describe('fetchProductShowcase hydration + Zod loosening', () => {
     await expect(fetchProductShowcase('slug-e')).resolves.toBeNull();
   });
 
-  it('unknown type logs unknown_type reason and skips unit', async () => {
+  it('unknown type is silently skipped (no warn)', async () => {
     const localWarn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     const localError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     vi.spyOn(apiClient.icareApi, 'isConfigured').mockReturnValue(true);
@@ -177,20 +167,12 @@ describe('fetchProductShowcase hydration + Zod loosening', () => {
 
     const result = await fetchProductShowcase('slug-f');
     expect(result).toBeNull();
-    expect(localWarn).toHaveBeenCalledWith(
-      '[fetchProductShowcase] Skipping unit',
-      expect.objectContaining({
-        slug: 'slug-f',
-        unitId: 105,
-        type: 'unknown_thing',
-        reason: 'unknown_type',
-      }),
-    );
+    expect(localWarn).not.toHaveBeenCalled();
     localWarn.mockRestore();
     localError.mockRestore();
   });
 
-  it('propagates slug into every warn log', async () => {
+  it('multiple skipped units do not emit any warnings', async () => {
     const localWarn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     const localError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     vi.spyOn(apiClient.icareApi, 'isConfigured').mockReturnValue(true);
@@ -211,9 +193,7 @@ describe('fetchProductShowcase hydration + Zod loosening', () => {
 
     await fetchProductShowcase('slug-g');
     const calls = localWarn.mock.calls.filter((call) => call[0] === '[fetchProductShowcase] Skipping unit');
-    for (const call of calls) {
-      expect(call[1]).toMatchObject({ slug: 'slug-g' });
-    }
+    expect(calls).toHaveLength(0);
     localWarn.mockRestore();
     localError.mockRestore();
   });
