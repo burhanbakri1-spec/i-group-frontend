@@ -131,6 +131,38 @@ function normalizeFormVariant(variant = {}, index = 0, product = {}) {
   };
 }
 
+function cleanupDuplicateVariants(variants) {
+  const groups = new Map();
+
+  variants.forEach((variant) => {
+    const key = `${(variant.color_name || "").toLowerCase()}|${(variant.color_value || "").toLowerCase()}|${(variant.size || "").toLowerCase()}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(variant);
+  });
+
+  const result = [];
+  groups.forEach((group) => {
+    if (group.length === 1) {
+      result.push(group[0]);
+      return;
+    }
+
+    const best = group.reduce((a, b) => {
+      const score = (v) =>
+        (v.image_url ? 100 : 0) +
+        (v.price && Number(v.price) > 0 ? 10 : 0) +
+        (v.stock !== undefined && v.stock !== null && Number(v.stock) >= 0 ? 5 : 0) +
+        (v.id ? 2 : 0);
+      return score(a) >= score(b) ? a : b;
+    });
+
+    const bestImage = best.image_url || group.find((v) => v.image_url)?.image_url || "";
+    result.push({ ...best, image_url: bestImage });
+  });
+
+  return result;
+}
+
 function normalizeProductVariantsForForm(product = {}) {
   product = product || {};
   if (Array.isArray(product.variants) && product.variants.length) {
@@ -234,7 +266,7 @@ function sizesFromFormVariants(variants, fallbackSize, fallbackPrice) {
 function createProductFromForm(form) {
   const id = form.id || `product-${Date.now()}`;
   const slug = form.slug || makeSlug(form.nameEn);
-  const variants = (form.variants || [])
+  let variants = (form.variants || [])
     .filter((variant) => variant.color_name && variant.size)
     .map((variant, index) => ({
       ...normalizeFormVariant(variant, index, form),
@@ -243,6 +275,8 @@ function createProductFromForm(form) {
       stock: Math.max(0, Number(variant.stock || 0)),
       sort_order: index,
     }));
+
+  variants = cleanupDuplicateVariants(variants).map((v, i) => ({ ...v, sort_order: i }));
   const galleryImages = (form.galleryImages || [])
     .filter((image) => image.image_url)
     .map((image, index) => ({

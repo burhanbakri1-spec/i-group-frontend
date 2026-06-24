@@ -87,9 +87,9 @@ function normalizeProductVariants(product = {}) {
   if (Array.isArray(product.variants) && product.variants.length) {
     return product.variants.map((variant, index) => ({
       id: variant.id || `${product.id || "product"}-variant-${index}`,
-      colorName: variant.color_name || variant.colorName || "Default",
+      colorName: (variant.color_name || variant.colorName || "Default").trim(),
       colorValue: variant.color_value || variant.colorValue || "",
-      size: variant.size || "500ml",
+      size: (variant.size || "500ml").trim(),
       price: Number(variant.price || 0),
       stock: Math.max(0, Number(variant.stock ?? variant.stockQty ?? product.stockQty ?? 24)),
       image: variant.image_url || variant.imageUrl || variant.image || "",
@@ -101,12 +101,16 @@ function normalizeProductVariants(product = {}) {
     id: `${product.id || "product"}-variant-${index}`,
     colorName: "Default",
     colorValue: "",
-    size: sizeOption.size || "500ml",
+    size: (sizeOption.size || "500ml").trim(),
     price: Number(sizeOption.price || 0),
     stock: Math.max(0, Number(product.stockQty ?? 24)),
     image: product.image || "",
     sortOrder: index,
   }));
+}
+
+function normalizeText(str) {
+  return (str || "").toString().trim().toLowerCase();
 }
 
 function normalizeProductGallery(product = {}, selectedImage = "") {
@@ -253,8 +257,8 @@ function ProductDetailsPage({
   }, []);
 
   React.useEffect(() => {
-    const availableForColor = productVariants.filter((variant) => variant.colorName === selectedColor);
-    if (availableForColor.length && !availableForColor.some((variant) => variant.size === selectedSize)) {
+    const availableForColor = productVariants.filter((variant) => normalizeText(variant.colorName) === normalizeText(selectedColor));
+    if (availableForColor.length && !availableForColor.some((variant) => normalizeText(variant.size) === normalizeText(selectedSize))) {
       setSelectedSize(availableForColor[0].size);
     }
   }, [productVariants, selectedColor, selectedSize]);
@@ -274,10 +278,10 @@ function ProductDetailsPage({
   }
 
   const category = categories.find((item) => item.id === product.categoryId);
-  const colorOptions = Array.from(new Map(productVariants.map((variant) => [variant.colorName, variant])).values());
-  const sizeOptions = productVariants.filter((variant) => variant.colorName === selectedColor);
+  const colorOptions = Array.from(new Map(productVariants.map((variant) => [normalizeText(variant.colorName), variant])).values());
+  const sizeOptions = productVariants.filter((variant) => normalizeText(variant.colorName) === normalizeText(selectedColor));
   const selectedVariant =
-    sizeOptions.find((variant) => variant.size === selectedSize) ||
+    sizeOptions.find((variant) => normalizeText(variant.size) === normalizeText(selectedSize)) ||
     sizeOptions[0] ||
     productVariants[0];
   const selectedOption = selectedVariant

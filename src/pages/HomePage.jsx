@@ -48,14 +48,18 @@ function normalizeHomeProductVariants(product = {}) {
 
   return product.variants.map((variant, index) => ({
     id: variant.id || `${product.id || product.slug || "product"}-variant-${index}`,
-    colorName: variant.color_name || variant.colorName || "Default",
+    colorName: (variant.color_name || variant.colorName || "Default").trim(),
     colorValue: variant.color_value || variant.colorValue || "",
-    size: variant.size || product.sizes?.[0]?.size || "500ml",
+    size: (variant.size || product.sizes?.[0]?.size || "500ml").trim(),
     price: Number(variant.price || product.sizes?.[0]?.price || 0),
     stock: Math.max(0, Number(variant.stock ?? variant.stockQty ?? product.stockQty ?? 24)),
     image: variant.image_url || variant.imageUrl || variant.image || "",
     sortOrder: Number(variant.sort_order ?? variant.sortOrder ?? index),
   }));
+}
+
+function normalizeText(str) {
+  return (str || "").toString().trim().toLowerCase();
 }
 
 function HomeCommunityGallery({ galleryImages = [] }) {
@@ -441,7 +445,7 @@ function PurchaseExperienceShowcase({ language, onAddToCart, onViewProduct, prod
       .slice()
       .sort((a, b) => a.sortOrder - b.sortOrder)
       .forEach((variant) => {
-        const key = variant.colorName || "Default";
+        const key = normalizeText(variant.colorName || "Default");
         if (!colorMap.has(key)) colorMap.set(key, variant);
       });
     return Array.from(colorMap.values());
@@ -456,7 +460,7 @@ function PurchaseExperienceShowcase({ language, onAddToCart, onViewProduct, prod
 
   React.useEffect(() => {
     setSelectedColor((currentColor) =>
-      colorOptions.some((option) => option.colorName === currentColor)
+      colorOptions.some((option) => normalizeText(option.colorName) === normalizeText(currentColor))
         ? currentColor
         : colorOptions[0]?.colorName || "Default"
     );
@@ -464,10 +468,10 @@ function PurchaseExperienceShowcase({ language, onAddToCart, onViewProduct, prod
 
   const selectedOption = options.find((option) => option.size === selectedSize) || options[0];
   const selectedColorOption =
-    colorOptions.find((option) => option.colorName === selectedColor) || colorOptions[0] || null;
+    colorOptions.find((option) => normalizeText(option.colorName) === normalizeText(selectedColor)) || colorOptions[0] || null;
   const selectedVariantForCart =
-    productVariants.find((variant) => variant.colorName === selectedColor && variant.size === selectedSize) || null;
-  const selectedSizeVariant = productVariants.find((variant) => variant.size === selectedSize) || null;
+    productVariants.find((variant) => normalizeText(variant.colorName) === normalizeText(selectedColor) && normalizeText(variant.size) === normalizeText(selectedSize)) || null;
+  const selectedSizeVariant = productVariants.find((variant) => normalizeText(variant.size) === normalizeText(selectedSize)) || null;
   const selectedColorImage = selectedColorOption?.image || "";
   const image =
     selectedVariantForCart?.image ||
