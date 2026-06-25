@@ -5615,7 +5615,7 @@ main {
   padding: 110px 18px 40px;
   background:
     linear-gradient(90deg, rgba(0, 0, 0, 0.44), rgba(0, 0, 0, 0.08)),
-    url("/images/products/concentrated-wax-car-shampoo.svg") center/cover no-repeat,
+    var(--cart-empty-background-image, url("/images/products/concentrated-wax-car-shampoo.svg")) center/cover no-repeat,
     #b9aa8a;
 }
 

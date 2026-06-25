@@ -1,6 +1,9 @@
 import React from "react";
 import QuantityControl from "../components/QuantityControl.jsx";
 import { placeholderImage } from "../data/products.js";
+import { getWebsiteMediaImage } from "../data/websiteMedia.js";
+
+const cartEmptyFallbackImage = "/images/products/concentrated-wax-car-shampoo.svg";
 
 const cartCopy = {
   en: {
@@ -125,6 +128,7 @@ function CartPage({
   products,
   t,
   total,
+  websiteMedia = [],
 }) {
   const isArabic = language === "ar";
   const text = cartCopy[language] || cartCopy.en;
@@ -167,10 +171,18 @@ function CartPage({
   const productPool = products.filter((product) => !cartProductIds.has(product.id));
   const compactRecommendations = productPool.slice(0, 3);
   const largeRecommendations = productPool.slice(0, 6);
+  const emptyCartBackgroundImage =
+    getWebsiteMediaImage(websiteMedia, "cart_empty_background_image", cartEmptyFallbackImage) ||
+    cartEmptyFallbackImage;
 
   if (cartItems.length === 0) {
     return (
-      <section className="cart-empty-hero">
+      <section
+        className="cart-empty-hero"
+        style={{
+          "--cart-empty-background-image": `url("${emptyCartBackgroundImage.replace(/"/g, '\\"')}")`,
+        }}
+      >
         <div className="cart-empty-overlay">
           <h1>{text.emptyTitle}</h1>
           <div className="cart-empty-actions">

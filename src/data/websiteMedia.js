@@ -701,6 +701,15 @@ export const defaultWebsiteMedia = [
     sortOrder: 5,
     isActive: true,
   },
+  {
+    id: "website-media-cart-empty-background",
+    sectionKey: "cart_empty_background_image",
+    sectionLabel: "Cart empty background image",
+    groupKey: "sections",
+    imageUrl: "/images/products/concentrated-wax-car-shampoo.svg",
+    sortOrder: 6,
+    isActive: true,
+  },
 ];
 
 export function withWebsiteMediaVersion(imageUrl, version) {

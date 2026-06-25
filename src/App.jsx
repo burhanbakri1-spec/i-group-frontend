@@ -950,6 +950,7 @@ function App() {
             products={demoProducts}
             t={t}
             total={cartTotal}
+            websiteMedia={websiteMedia}
           />
         )}
 
