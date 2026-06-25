@@ -96,7 +96,7 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
     setLoading(true);
     setError(null);
     try {
-      const items = await fetchProductMediaVlogs(12);
+      const items = await fetchProductMediaVlogs(12, lang);
       setRemoteVlogs(items ?? []);
     } catch (err) {
       console.error('Failed to load vlogs', err);

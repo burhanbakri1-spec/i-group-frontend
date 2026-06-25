@@ -35,11 +35,11 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose, onNavig
   useEffect(() => {
     if (!isOpen) return;
     const loadProducts = async () => {
-      const products = await fetchCatalogProducts();
+      const products = await fetchCatalogProducts(undefined, lang);
       setRemoteProducts(products ?? []);
     };
     loadProducts();
-  }, [isOpen]);
+  }, [isOpen, lang]);
 
   const mobileCategories = useMemo(() => {
     if (remoteProducts.length === 0) return [];

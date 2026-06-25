@@ -17,6 +17,8 @@ import {
   ProductVariant,
 } from '../types';
 import { resolveMediaUrl } from './media-url';
+import { Language } from '../translations';
+import { pickLocalized, pickLocalizedTrimmed } from './localized';
 
 type NumericInput = string | number | null | undefined;
 
@@ -51,9 +53,9 @@ export const isPurchasableStock = (stockStatus?: string, stock?: number) => {
   return true;
 };
 
-const getProductLabel = (product: BackendProduct) => {
+const getProductLabel = (product: BackendProduct, lang: Language = 'en') => {
   // Admin-set label has highest priority
-  if (product.label) return product.label;
+  if (product.label) return pickLocalized(product.label, lang);
 
   // Check default variant-level sale first
   const defaultVariant = getDefaultVariant(product);
@@ -108,7 +110,7 @@ const dedupeGalleryMedia = (media: ProductGalleryMedia[]) => {
   });
 };
 
-const mapVariantImagesToGalleryMedia = (product: BackendProduct, selectedVariant?: ProductVariant | null): ProductGalleryMedia[] => {
+const mapVariantImagesToGalleryMedia = (product: BackendProduct, lang: Language, selectedVariant?: ProductVariant | null): ProductGalleryMedia[] => {
   const variants = product.variants ?? [];
   // Canonical per-(variant×color) image for the default variant: pick
   // the first active `variantColors` row that carries an image. This
@@ -120,24 +122,24 @@ const mapVariantImagesToGalleryMedia = (product: BackendProduct, selectedVariant
   const selectedVariantMedia = defaultColorImage ? [{
     url: normalizeProductMediaUrl(defaultColorImage),
     mediaType: 'IMAGE' as const,
-    altText: selectedVariant?.name,
+    altText: selectedVariant ? pickLocalized(selectedVariant.name, lang) : null,
   }] : selectedVariant?.image ? [{
     url: normalizeProductMediaUrl(selectedVariant.image),
     mediaType: 'IMAGE' as const,
-    altText: selectedVariant.name,
+    altText: pickLocalized(selectedVariant.name, lang),
   }] : [];
   const remainingVariantMedia = variants
     .filter((variant) => variant.id !== selectedVariant?.id && variant.image)
     .map<ProductGalleryMedia>((variant) => ({
       url: normalizeProductMediaUrl(variant.image),
       mediaType: 'IMAGE',
-      altText: variant.name,
+      altText: pickLocalized(variant.name, lang),
     }));
 
   return [...selectedVariantMedia, ...remainingVariantMedia];
 };
 
-export const mapBackendProductGalleryMedia = (product: BackendProduct, variant?: ProductVariant | null): ProductGalleryMedia[] => {
+export const mapBackendProductGalleryMedia = (product: BackendProduct, lang: Language = 'en', variant?: ProductVariant | null): ProductGalleryMedia[] => {
   const sortedBackendImages = sortProductImagesByBackendPriority(product.images);
   const backendMedia = sortedBackendImages.map<ProductGalleryMedia>((image) => ({
     url: normalizeProductMediaUrl(image.imageUrl),
@@ -145,7 +147,7 @@ export const mapBackendProductGalleryMedia = (product: BackendProduct, variant?:
     altText: image.altText,
     sortOrder: image.sortOrder,
   }));
-  const variantMedia = mapVariantImagesToGalleryMedia(product, variant);
+  const variantMedia = mapVariantImagesToGalleryMedia(product, lang, variant);
 
   // Gallery is the ordered union of variant media (first, for color/variant context)
   // and the backend gallery images sorted by sortOrder.
@@ -157,7 +159,7 @@ export const mapBackendProductGalleryMedia = (product: BackendProduct, variant?:
   ]);
 };
 
-export const mapBackendProductToProduct = (product: BackendProduct, selectedVariant?: ProductVariant | null): Product => {
+export const mapBackendProductToProduct = (product: BackendProduct, lang: Language = 'en', selectedVariant?: ProductVariant | null): Product => {
   const variant = selectedVariant ?? getDefaultVariant(product);
 
   // When a variant is explicitly selected, the variant's price is the source
@@ -181,7 +183,7 @@ export const mapBackendProductToProduct = (product: BackendProduct, selectedVari
     : undefined;
   const ratingAverage = coerceNumber(product.ratingAverage);
   const ratingCount = coerceNumber(product.ratingCount);
-  const galleryMedia = mapBackendProductGalleryMedia(product, variant);
+  const galleryMedia = mapBackendProductGalleryMedia(product, lang, variant);
   const backendImages = galleryMedia.filter((media) => media.mediaType === 'IMAGE').map((media) => media.url);
   const fallbackCardImage = backendImages[0] ?? '';
   const normalizedBackendPrimary = normalizeProductMediaUrl(product.primaryImage);
@@ -189,8 +191,15 @@ export const mapBackendProductToProduct = (product: BackendProduct, selectedVari
   // Card hover: admin-set Product.secondaryImage (no fallback — empty means no hover).
   const cardPrimaryImage = normalizedBackendPrimary || fallbackCardImage;
   const cardSecondaryImage = normalizeProductMediaUrl(product.secondaryImage) || undefined;
-  const categoryName = product.category?.name?.trim() || 'shop all';
-  const brandName = product.brand?.name?.trim();
+  // Localized text fields. The BE may send either a plain string (legacy / en
+  // fallback) or a `{ en, ar }` object — `pickLocalized` handles both safely.
+  // Defaulting `categoryName` to 'shop all' only when truly empty preserves
+  // the existing "no category" UX.
+  const productName = pickLocalized(product.name, lang);
+  const shortDescription = pickLocalized(product.shortDescription, lang, '');
+  const fullDescription = pickLocalized(product.description, lang, '');
+  const categoryName = pickLocalizedTrimmed(product.category?.name, lang, 'shop all') || 'shop all';
+  const brandName = pickLocalizedTrimmed(product.brand?.name, lang, '');
   const normalizedCategoryName = normalizeFilterName(categoryName);
   const normalizedBrandName = normalizeFilterName(brandName);
 
@@ -199,11 +208,11 @@ export const mapBackendProductToProduct = (product: BackendProduct, selectedVari
     backendId: product.id,
     slug: product.slug,
     variantId: variant?.id ?? null,
-    title: product.name,
-    name: product.name,
+    title: productName,
+    name: productName,
     price: formatUsdPrice(displayPrice),
     originalPrice,
-    description: product.shortDescription ?? product.description ?? undefined,
+    description: shortDescription || fullDescription || undefined,
     // `image` is the legacy field kept for backwards compatibility with
     // code that hasn't migrated to `primaryImage` yet. It mirrors `primaryImage`
     // so the storefront has a single source of truth.
@@ -217,17 +226,17 @@ export const mapBackendProductToProduct = (product: BackendProduct, selectedVari
     galleryMedia,
     rating: ratingAverage && ratingAverage > 0 ? ratingAverage.toFixed(1) : '0',
     reviews: ratingCount && ratingCount > 0 ? String(ratingCount) : '0',
-    label: getProductLabel(product),
+    label: getProductLabel(product, lang),
     brand: brandName,
     brandId: product.brand?.id,
     category: categoryName,
     categoryId: product.category?.id,
     stock: variant?.stockQuantity ?? product.stockQuantity,
     stockStatus: variant?.stockStatus ?? product.stockStatus,
-    size: variant?.size ?? product.size ?? null,
+    size: pickLocalized(variant?.size ?? product.size, lang, null),
     main: normalizedCategoryName,
     sub: normalizedBrandName || normalizedCategoryName,
-    type: normalizeFilterName(variant?.name ?? product.size ?? categoryName),
+    type: normalizeFilterName(pickLocalized(variant?.name, lang) || pickLocalized(product.size, lang) || categoryName),
     rawPrice: displayPrice,
     date: product.createdAt,
     variants: product.variants,
@@ -236,7 +245,7 @@ export const mapBackendProductToProduct = (product: BackendProduct, selectedVari
   };
 };
 
-const mapBackendCartItem = (item: BackendCartItem): CartItem => {
+const mapBackendCartItem = (item: BackendCartItem, lang: Language = 'en'): CartItem => {
   const product: BackendProduct = {
     id: item.product.id,
     slug: item.product.slug,
@@ -248,7 +257,7 @@ const mapBackendCartItem = (item: BackendCartItem): CartItem => {
   };
 
   return {
-    ...mapBackendProductToProduct(product, item.variant),
+    ...mapBackendProductToProduct(product, lang, item.variant),
     id: String(item.id),
     cartItemId: item.id,
     backendId: item.product.id,
@@ -257,8 +266,8 @@ const mapBackendCartItem = (item: BackendCartItem): CartItem => {
   };
 };
 
-export const mapBackendCartToCartItems = (cart: BackendCart): CartItem[] => {
-  return cart.items.map(mapBackendCartItem);
+export const mapBackendCartToCartItems = (cart: BackendCart, lang: Language = 'en'): CartItem[] => {
+  return cart.items.map((item) => mapBackendCartItem(item, lang));
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> => (
@@ -278,9 +287,9 @@ export const unwrapAdminListData = <T>(payload: T[] | AdminListData<T>) => {
   return payload.data ?? payload.items ?? payload.records ?? [];
 };
 
-export const mapCategoryNames = (categories: BackendCategory[]) => categories.map((category) => normalizeFilterName(category.name));
+export const mapCategoryNames = (categories: BackendCategory[], lang: Language = 'en') => categories.map((category) => normalizeFilterName(pickLocalizedTrimmed(category.name, lang)));
 
-export const mapBrandNames = (brands: BackendBrand[]) => brands.map((brand) => normalizeFilterName(brand.name));
+export const mapBrandNames = (brands: BackendBrand[], lang: Language = 'en') => brands.map((brand) => normalizeFilterName(pickLocalizedTrimmed(brand.name, lang)));
 
 const formatListValue = (value: string[] | string | null | undefined, fallback: string) => {
   if (Array.isArray(value)) return value.join(', ');
@@ -316,14 +325,14 @@ const getFaqGroupKey = (faq: BackendFaq) => {
 
 const getFaqGroupId = (faq: BackendFaq) => faq.category?.slug || getFaqGroupKey(faq);
 
-const getFaqGroupName = (faq: BackendFaq) => faq.category?.name || (getFaqGroupKey(faq) === GENERAL_FAQ_GROUP_ID ? GENERAL_FAQ_GROUP_NAME : `CATEGORY ${getFaqGroupKey(faq)}`);
+const getFaqGroupName = (faq: BackendFaq, lang: Language) => pickLocalized(faq.category?.name, lang) || (getFaqGroupKey(faq) === GENERAL_FAQ_GROUP_ID ? GENERAL_FAQ_GROUP_NAME : `CATEGORY ${getFaqGroupKey(faq)}`);
 
-const mapFaqItems = (faqs: BackendFaq[]) => faqs
+const mapFaqItems = (faqs: BackendFaq[], lang: Language) => faqs
   .filter((faq) => faq.isActive !== false)
   .sort(sortBySortOrder)
-  .map((faq) => ({ q: faq.question, a: faq.answer }));
+  .map((faq) => ({ q: pickLocalized(faq.question, lang), a: pickLocalized(faq.answer, lang) }));
 
-const mapFaqsWithExplicitCategories = (faqs: BackendFaq[], categories: BackendFaqCategory[]) => {
+const mapFaqsWithExplicitCategories = (faqs: BackendFaq[], categories: BackendFaqCategory[], lang: Language) => {
   const activeCategories = categories
     .filter((category) => category.isActive !== false)
     .sort(sortBySortOrder);
@@ -333,24 +342,24 @@ const mapFaqsWithExplicitCategories = (faqs: BackendFaq[], categories: BackendFa
     if (categoryIds.has(category.id)) return [];
     categoryIds.add(category.id);
 
-    const items = mapFaqItems(faqs.filter((faq) => faq.categoryId === category.id || faq.category?.id === category.id));
+    const items = mapFaqItems(faqs.filter((faq) => faq.categoryId === category.id || faq.category?.id === category.id), lang);
     if (items.length === 0) return [];
 
     return [{
       id: category.slug || String(category.id),
-      name: category.name,
+      name: pickLocalized(category.name, lang),
       items,
     }];
   });
 
-  const uncategorizedItems = mapFaqItems(faqs.filter((faq) => !faq.categoryId && !faq.category));
+  const uncategorizedItems = mapFaqItems(faqs.filter((faq) => !faq.categoryId && !faq.category), lang);
   return [
     ...categoryGroups,
     ...(uncategorizedItems.length > 0 ? [{ id: GENERAL_FAQ_GROUP_ID, name: GENERAL_FAQ_GROUP_NAME, items: uncategorizedItems }] : []),
   ];
 };
 
-const mapFaqsWithEmbeddedCategories = (faqs: BackendFaq[]) => {
+const mapFaqsWithEmbeddedCategories = (faqs: BackendFaq[], lang: Language) => {
   const groupedFaqs = new Map<string, { id: string; name: string; sortOrder: number; faqs: BackendFaq[] }>();
 
   faqs
@@ -361,7 +370,7 @@ const mapFaqsWithEmbeddedCategories = (faqs: BackendFaq[]) => {
       const existingGroup = groupedFaqs.get(key);
       const group = existingGroup ?? {
         id: getFaqGroupId(faq),
-        name: getFaqGroupName(faq),
+        name: getFaqGroupName(faq, lang),
         sortOrder: faq.sortOrder ?? 0,
         faqs: [],
       };
@@ -376,10 +385,10 @@ const mapFaqsWithEmbeddedCategories = (faqs: BackendFaq[]) => {
     .map((group) => ({
       id: group.id,
       name: group.name,
-      items: mapFaqItems(group.faqs),
+      items: mapFaqItems(group.faqs, lang),
     }));
 };
 
-export const mapBackendFaqsToGroups = (faqs: BackendFaq[], categories: BackendFaqCategory[]): FAQCategoryGroup[] => {
-  return categories.length > 0 ? mapFaqsWithExplicitCategories(faqs, categories) : mapFaqsWithEmbeddedCategories(faqs);
+export const mapBackendFaqsToGroups = (faqs: BackendFaq[], categories: BackendFaqCategory[], lang: Language = 'en'): FAQCategoryGroup[] => {
+  return categories.length > 0 ? mapFaqsWithExplicitCategories(faqs, categories, lang) : mapFaqsWithEmbeddedCategories(faqs, lang);
 };

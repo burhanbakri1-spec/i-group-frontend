@@ -49,10 +49,10 @@ export const LandingProductShowcase: React.FC<LandingProductShowcaseProps> = ({ 
     let mounted = true;
 
     const loadProducts = async () => {
-      const featuredProducts = await fetchProductShortcut('featured', SHOWCASE_PRODUCT_LIMIT);
+      const featuredProducts = await fetchProductShortcut('featured', lang, SHOWCASE_PRODUCT_LIMIT);
       const fallbackProducts = featuredProducts?.length
         ? featuredProducts
-        : await fetchCatalogProducts();
+        : await fetchCatalogProducts(undefined, lang);
 
       if (mounted) {
         setProducts((fallbackProducts ?? []).slice(0, SHOWCASE_PRODUCT_LIMIT));
@@ -64,7 +64,7 @@ export const LandingProductShowcase: React.FC<LandingProductShowcaseProps> = ({ 
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [lang]);
 
   if (products === null) {
     return <LandingProductShowcaseSkeleton lang={lang} />;

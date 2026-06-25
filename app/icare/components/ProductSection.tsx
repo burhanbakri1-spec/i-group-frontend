@@ -20,12 +20,12 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ lang, onProductSelect 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      const data = await fetchCatalogProducts();
+      const data = await fetchCatalogProducts(undefined, lang);
       setProducts(data ?? []);
       setLoading(false);
     };
     loadData();
-  }, []);
+  }, [lang]);
 
   const displayProducts = products ?? [];
 

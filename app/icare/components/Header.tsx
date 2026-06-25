@@ -6,6 +6,7 @@ import { translations, Language } from '../translations';
 import { useShop } from '../context/ShopContext';
 import { usePathname } from 'next/navigation';
 import { BackendCategory, Product } from '../types';
+import { pickLocalized, pickLocalizedTrimmed } from '../lib/localized';
 import { fetchCatalogProducts, fetchCategoryRoots } from '../lib/catalog-client';
 import { hasIcareStandardHero } from '../lib/hero-routes';
 
@@ -163,7 +164,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
     let cancelled = false;
     const loadData = async () => {
       const [products, categories] = await Promise.all([
-        fetchCatalogProducts(),
+        fetchCatalogProducts(undefined, lang),
         fetchCategoryRoots(),
       ]);
       if (cancelled) return;
@@ -174,18 +175,18 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
     };
     loadData();
     return () => { cancelled = true; };
-  }, []);
+  }, [lang]);
 
   const megaMenuCategories = useMemo(() => {
     if (rootCategories.length > 0) {
-      return [t.categories.all, ...rootCategories.map((c) => c.name)];
+      return [t.categories.all, ...rootCategories.map((c) => pickLocalized(c.name, lang))];
     }
     if (previewProducts.length === 0) return [];
     const backendCategories = Array.from(new Set(previewProducts
       .map((product) => product.category?.trim())
       .filter((category): category is string => Boolean(category))));
     return [t.categories.all, ...backendCategories];
-  }, [rootCategories, previewProducts, t.categories.all]);
+  }, [rootCategories, previewProducts, t.categories.all, lang]);
 
   const clampedActivePreviewIndex = megaMenuCategories.length > 0
     ? Math.min(activePreviewIndex, megaMenuCategories.length - 1)
@@ -208,7 +209,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
     // Otherwise (fallback path with derived names), fall back to a string match
     // on the product's `category` field — same approach the Shop filter uses.
     const activeRoot = rootCategories.find(
-      (c) => c.name.trim().toLowerCase() === activeName
+      (c) => pickLocalizedTrimmed(c.name, lang).toLowerCase() === activeName
     );
 
     return previewProducts
@@ -518,7 +519,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                           clampedActivePreviewIndex === index + 1 ? 'text-[var(--rb-near-black)]' : 'text-[var(--rb-primary-text)]'
                         }`}
                       >
-                        {cat.name}
+                        {pickLocalized(cat.name, lang)}
                         {clampedActivePreviewIndex === index + 1 && (
                           <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="absolute -bottom-2 start-0 w-full h-[1px] bg-[var(--rb-near-black)]" />
                         )}

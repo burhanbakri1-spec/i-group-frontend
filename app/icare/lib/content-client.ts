@@ -43,10 +43,16 @@ export async function fetchAllContent(signal?: AbortSignal): Promise<ContentEnve
  * Pure function. Backend values win; fallback fills any key the backend
  * didn't return. Only keys present in FALLBACK_CONTENT are accepted.
  *
+ * Defensive: the BE may return text fields as either a plain string or a
+ * localized object `{ en, ar }`. We coerce both to a string before merging
+ * — strings pass through, objects are flattened by `coerceToString` (which
+ * prefers the active locale and falls back to `en`).
+ *
  * @param localeSlice The `en` or `ar` slice from ContentEnvelope.
  */
 export function mergeWithFallback(
   localeSlice: Record<string, string> | null | undefined,
+  activeLocale: 'en' | 'ar' = 'en',
 ): Record<FallbackContentKey, string> {
   const merged: Record<string, string> = { ...FALLBACK_CONTENT };
 
@@ -55,12 +61,37 @@ export function mergeWithFallback(
   }
 
   for (const [key, value] of Object.entries(localeSlice)) {
-    if (typeof value === 'string' && key in merged) {
-      merged[key] = value;
+    if (key in merged) {
+      const coerced = coerceToString(value, activeLocale);
+      if (coerced !== null) {
+        merged[key] = coerced;
+      }
     }
   }
 
   return merged as Record<FallbackContentKey, string>;
+}
+
+/**
+ * Coerce a content value to a plain string.
+ *
+ * The BE sometimes returns `{ en, ar }` even for content text fields. We
+ * pick the right locale (active → en fallback) and return a string, or
+ * `null` if the value is unusable. Defensive — never throws.
+ */
+function coerceToString(value: unknown, activeLocale: 'en' | 'ar'): string | null {
+  if (value == null) return null;
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && !Array.isArray(value)) {
+    const obj = value as Record<string, unknown>;
+    const fromActive = obj[activeLocale];
+    if (typeof fromActive === 'string' && fromActive.trim() !== '') return fromActive;
+    const fromEn = obj.en;
+    if (typeof fromEn === 'string' && fromEn.trim() !== '') return fromEn;
+    const fromAr = obj.ar;
+    if (typeof fromAr === 'string' && fromAr.trim() !== '') return fromAr;
+  }
+  return null;
 }
 
 export const ALL_CONTENT_KEYS: ReadonlyArray<FallbackContentKey> = Object.keys(

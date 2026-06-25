@@ -25,11 +25,11 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
 
   useEffect(() => {
     const loadShowcaseProducts = async () => {
-      const featuredProducts = await fetchProductShortcut('featured', 4);
+      const featuredProducts = await fetchProductShortcut('featured', lang, 4);
       setRemoteProducts(featuredProducts ?? []);
     };
     loadShowcaseProducts();
-  }, []);
+  }, [lang]);
 
   const showcaseProducts = remoteProducts ?? [];
 

@@ -14,6 +14,7 @@ import { Language } from '../translations';
 import { Product } from '../types';
 import { getIcarePagePath, getIcareProductPath } from '../lib/routes';
 import { hasIcareStandardHero } from '../lib/hero-routes';
+import { pickLocalized } from '../lib/localized';
 
 interface IcareShellContextValue {
   lang: Language;
@@ -147,12 +148,12 @@ export const IcareShell = ({ children }: { children: React.ReactNode }) => {
         const roots = await fetchCategoryRoots();
         if (cancelled) return;
         const map: Record<string, string> = {};
-        for (const r of roots ?? []) map[r.name.toLowerCase()] = r.slug;
+        for (const r of roots ?? []) map[pickLocalized(r.name, lang).toLowerCase()] = r.slug;
         setCategorySlugByName(map);
       } catch {}
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [lang]);
 
   const handleCategorySelect = (name: string) => {
     setIsSearchOpen(false);

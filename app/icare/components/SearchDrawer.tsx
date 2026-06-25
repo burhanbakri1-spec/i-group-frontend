@@ -58,17 +58,17 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
           icareApi.brands.list({ search: searchQuery || undefined, page: 1, limit: 12, isActive: true }),
         ]);
         if (productPayload.status === 'fulfilled') {
-          setRemoteProducts(unwrapListData(productPayload.value).map((product) => mapBackendProductToProduct(product)));
+          setRemoteProducts(unwrapListData(productPayload.value).map((product) => mapBackendProductToProduct(product, lang)));
         } else {
           setRemoteProducts([]);
         }
         if (categoriesPayload.status === 'fulfilled') {
-          setRemoteCollections(mapCategoryNames(unwrapListData(categoriesPayload.value)));
+          setRemoteCollections(mapCategoryNames(unwrapListData(categoriesPayload.value), lang));
         } else {
           setRemoteCollections([]);
         }
         if (brandPayload.status === 'fulfilled') {
-          setRemoteBrands(mapBrandNames(unwrapListData(brandPayload.value)));
+          setRemoteBrands(mapBrandNames(unwrapListData(brandPayload.value), lang));
         } else {
           setRemoteBrands([]);
         }
@@ -82,7 +82,7 @@ export const SearchDrawer: React.FC<SearchDrawerProps> = ({ isOpen, onClose, onP
 
     const searchTimer = window.setTimeout(loadSearchData, 250);
     return () => window.clearTimeout(searchTimer);
-  }, [isOpen, searchQuery]);
+  }, [isOpen, searchQuery, lang]);
 
   const searchableCollections = remoteCollections;
   const searchableProducts = remoteProducts;

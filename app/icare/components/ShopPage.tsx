@@ -10,6 +10,7 @@ import { Product, BackendCategory } from '../types';
 import { ProductGridSkeleton } from './ui/skeletons';
 import { PageHero } from './PageHero';
 import { ScrollReveal } from './ui/ScrollReveal';
+import { pickLocalized, pickLocalizedTrimmed } from '../lib/localized';
 
 interface ShopPageProps {
   lang: Language;
@@ -158,7 +159,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
       try {
         const [roots, products] = await Promise.all([
           fetchCategoryRoots(),
-          fetchCatalogProducts(),
+          fetchCatalogProducts(undefined, lang),
         ]);
         setRootCategories(Array.isArray(roots) ? roots : []);
         setCatalogProducts(products ?? []);
@@ -170,7 +171,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
       }
     };
     loadData();
-  }, []);
+  }, [lang]);
 
   // Load children for the currently selected root (lazy, cached in
   // childrenByRoot). Errored roots are stored as empty arrays so we
@@ -252,11 +253,12 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
       // or whose category string matches the root's name.
       // Sub-categories are auto-included (products whose category string
       // matches a child name are still shown under the root pill).
+      const selectedRootName = pickLocalizedTrimmed(selectedRoot.name, lang).toLowerCase();
       result = result.filter((p) => {
         if (p.categoryId !== undefined) return rootMatchedIds?.has(p.categoryId) ?? false;
         const cat = p.category?.trim().toLowerCase() ?? '';
         if (!cat) return false;
-        return cat === selectedRoot.name.trim().toLowerCase();
+        return cat === selectedRootName;
       });
     }
     // Optional child narrowing: when activeChild is set, restrict the
@@ -264,9 +266,10 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
     if (activeChild && selectedRoot) {
       const child = (childrenByRoot[selectedRoot.slug] ?? []).find(c => c.slug === activeChild);
       if (child) {
+        const childName = pickLocalizedTrimmed(child.name, lang).toLowerCase();
         result = result.filter(p =>
           p.categoryId === child.id ||
-          p.category?.trim().toLowerCase() === child.name.trim().toLowerCase()
+          p.category?.trim().toLowerCase() === childName
         );
       }
     }
@@ -287,7 +290,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
     }
 
     return result;
-  }, [allProducts, activeSort, activeMain, selectedRoot, rootMatchedIds, activeChild, childrenByRoot]);
+  }, [allProducts, activeSort, activeMain, selectedRoot, rootMatchedIds, activeChild, childrenByRoot, lang]);
 
   const resetFilters = () => {
     setActiveMain(null);
@@ -340,7 +343,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
                 onClick={() => selectRoot(cat.slug)}
                 className={`px-6 md:px-8 py-2.5 rounded-full text-[12px] font-black uppercase tracking-widest transition-colors ${CONTROL_FOCUS_CLASS} ${activeMain === cat.slug ? 'bg-[#67645E] text-white' : 'bg-white text-[#67645E] border border-[#DDDDDD]'}`}
               >
-                {cat.name}
+                {pickLocalized(cat.name, lang)}
               </button>
             ))}
           </div>
@@ -356,7 +359,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
                 onClick={() => setActiveChild(null)}
                 className={`px-4 md:px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-colors ${CONTROL_FOCUS_CLASS} ${!activeChild ? 'bg-[#67645E] text-white' : 'bg-white text-[#67645E] border border-[#DDDDDD]'}`}
               >
-                {t.pages.shop.shopAll ?? 'All'} {selectedRoot.name}
+                {t.pages.shop.shopAll ?? 'All'} {pickLocalized(selectedRoot.name, lang)}
               </button>
               {loadingChildren ? (
                 <span className="px-4 py-2 text-[10px] font-black uppercase tracking-widest text-[#84827E]">…</span>
@@ -367,7 +370,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
                     onClick={() => setActiveChild(child.slug)}
                     className={`px-4 md:px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-colors ${CONTROL_FOCUS_CLASS} ${activeChild === child.slug ? 'bg-[#67645E] text-white' : 'bg-white text-[#67645E] border border-[#DDDDDD]'}`}
                   >
-                    {child.name}
+                    {pickLocalized(child.name, lang)}
                   </button>
                 ))
               )}

@@ -14,6 +14,7 @@ import { cacheMiddleware } from '../lib/cache-middleware';
 import { WriteReviewDialog } from './WriteReviewDialog';
 import { useIcareShell } from './IcareShell';
 import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
+import { pickLocalized } from '../lib/localized';
 
 interface ProductPageProps {
   product: Product;
@@ -113,6 +114,7 @@ const ReviewItem = ({ review, content, helpfulCount = 0, onHelpfulVote }: Review
 const getProductImageGallery = (
   displayProduct: Product,
   selectedVariant: ProductVariant | null,
+  lang: Language,
   selectedColorId?: number | null,
 ): ProductGalleryMedia[] => {
   // Color-aware gallery: if a color is selected and the current variant has per-color images,
@@ -133,7 +135,7 @@ const getProductImageGallery = (
   }
 
   if (displayProduct.backendProduct) {
-    const baseMedia = mapBackendProductGalleryMedia(displayProduct.backendProduct, selectedVariant)
+    const baseMedia = mapBackendProductGalleryMedia(displayProduct.backendProduct, lang, selectedVariant)
       .filter((media) => media.mediaType === 'IMAGE');
     if (colorImage) {
       // Reorder: put color image first if not already present
@@ -147,10 +149,10 @@ const getProductImageGallery = (
 
   const variantImages: ProductGalleryMedia[] = [
     ...(colorImage ? [{ url: colorImage, mediaType: 'IMAGE' as const, altText: 'color' }] : []),
-    ...(selectedVariant?.image ? [{ url: selectedVariant.image, mediaType: 'IMAGE' as const, altText: selectedVariant.name }] : []),
+    ...(selectedVariant?.image ? [{ url: selectedVariant.image, mediaType: 'IMAGE' as const, altText: pickLocalized(selectedVariant.name, lang) }] : []),
     ...(displayProduct.variants ?? [])
       .filter((variant) => variant.id !== selectedVariant?.id && variant.image)
-      .map((variant) => ({ url: variant.image ?? '', mediaType: 'IMAGE' as const, altText: variant.name })),
+      .map((variant) => ({ url: variant.image ?? '', mediaType: 'IMAGE' as const, altText: pickLocalized(variant.name, lang) })),
   ];
 
   const fallbackImages: ProductGalleryMedia[] = displayProduct.galleryMedia?.length
@@ -221,8 +223,8 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
   const isRtl = lang === 'ar';
 
   const displayImages = useMemo(
-    () => getProductImageGallery(displayProduct, selectedVariant, selectedColorId),
-    [displayProduct, selectedVariant, selectedColorId],
+    () => getProductImageGallery(displayProduct, selectedVariant, lang, selectedColorId),
+    [displayProduct, selectedVariant, selectedColorId, lang],
   );
   const displayImagesKey = displayImages.map((image) => image.url).join('|');
   const activeImageResetKey = `${product.id}|${product.slug ?? ''}|${selectedVariant?.id ?? ''}`;
@@ -234,9 +236,9 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
   const activeProduct = displayImages[safeActiveImageIndex];
   const purchasableProduct = useMemo(
     () => displayProduct.backendProduct
-      ? mapBackendProductToProduct(displayProduct.backendProduct, selectedVariant)
+      ? mapBackendProductToProduct(displayProduct.backendProduct, lang, selectedVariant)
       : displayProduct,
-    [displayProduct, selectedVariant],
+    [displayProduct, selectedVariant, lang],
   );
   const isSelectedVariantPurchasable = isPurchasableStock(purchasableProduct.stockStatus, purchasableProduct.stock);
 
@@ -249,10 +251,10 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
         return;
       }
 
-      const productDetail = await fetchProductBySlug(product.slug);
+      const productDetail = await fetchProductBySlug(product.slug, lang);
       if (productDetail) {
         const defaultVariant = productDetail.backendProduct ? getDefaultVariant(productDetail.backendProduct) : productDetail.variants?.find((variant) => variant.id === productDetail.variantId) ?? null;
-        setDisplayProduct(productDetail.backendProduct ? mapBackendProductToProduct(productDetail.backendProduct, defaultVariant) : productDetail);
+        setDisplayProduct(productDetail.backendProduct ? mapBackendProductToProduct(productDetail.backendProduct, lang, defaultVariant) : productDetail);
         setSelectedVariant(defaultVariant);
         setRemoteReviews(productDetail.backendProduct?.reviews?.recent?.map(mapBackendReviewToProductReview) ?? []);
       } else {
@@ -261,7 +263,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
     };
 
     loadProductDetail();
-  }, [product]);
+  }, [product, lang]);
 
   useEffect(() => {
     const loadProductSupportData = async () => {
@@ -271,7 +273,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
       }
       const [reviewData, relatedData] = await Promise.all([
         fetchProductReviews(product.slug, 10, { page: 1, sortBy: reviewSortBy, rating: reviewRatingFilter }),
-        fetchRelatedProducts(product.slug, 8),
+        fetchRelatedProducts(product.slug, lang, 8),
       ]);
       setRemoteReviews(reviewData ?? []);
       setRelatedProducts(relatedData ?? []);
@@ -459,7 +461,10 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                         {t.product.color}:
                       </span>
                       <span className="text-[12px] md:text-[13px] text-[#67645E] lowercase font-black">
-                        {activeColors.find((c) => c.id === selectedColorId)?.name ?? '—'}
+                        {(() => {
+                          const c = activeColors.find((c) => c.id === selectedColorId);
+                          return c ? pickLocalized(c.name, lang) : '—';
+                        })()}
                       </span>
                       {currentColorStock !== null && currentColorStock > 0 && currentColorStock <= 5 && (
                         <span className="text-[10px] md:text-[11px] font-bold text-amber-700 lowercase">
@@ -483,8 +488,8 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                             key={color.id}
                             type="button"
                             onClick={() => setSelectedColorId(color.id)}
-                            aria-label={color.name}
-                            title={color.name}
+                            aria-label={pickLocalized(color.name, lang)}
+                            title={pickLocalized(color.name, lang)}
                             disabled={isOutOfStock}
                             className={`relative h-9 w-9 md:h-11 md:w-11 rounded-full overflow-hidden border-2 transition-all ${CONTROL_FOCUS_CLASS} ${
                               isSelected
@@ -498,7 +503,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                             {color.image ? (
                               <ImageWithFallback
                                 src={color.image}
-                                alt={color.name}
+                                alt={pickLocalized(color.name, lang)}
                                 className="h-full w-full object-cover"
                               />
                             ) : null}
@@ -525,7 +530,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                       disabled={!isPurchasableStock(variant.stockStatus, variant.stockQuantity)}
                       className={`font-black underline underline-offset-4 flex items-center gap-1 rounded-md lowercase ${CONTROL_FOCUS_CLASS} ${selectedVariant?.id === variant.id ? 'text-[#67645E]' : 'text-[#84827E] hover:text-[#67645E]'} disabled:text-black/30 disabled:cursor-not-allowed`}
                     >
-                      {variant.name}
+                      {pickLocalized(variant.name, lang)}
                       {variant.isDefault && <ChevronDown size={14} />}
                     </button>
                   ))}
@@ -558,7 +563,8 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
 
             const details: { label: string; value: string | string[] }[] = [];
 
-            if (bp.howToUse) details.push({ label: t.product.howToUse, value: bp.howToUse });
+            const howToUse = pickLocalized(bp.howToUse, lang);
+            if (howToUse) details.push({ label: t.product.howToUse, value: howToUse });
             if (bp.ingredients?.length) details.push({ label: t.product.ingredients, value: bp.ingredients });
             if (bp.benefits?.length) details.push({ label: t.product.benefits, value: bp.benefits });
             if (bp.skinTypes?.length) details.push({ label: t.product.skinTypes, value: bp.skinTypes });

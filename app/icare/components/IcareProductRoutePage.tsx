@@ -20,7 +20,7 @@ export const IcareProductRoutePage = ({ slug }: { slug: string }) => {
     const loadProduct = async () => {
       setIsLoading(true);
       setIsUnavailable(false);
-      const productDetail = await fetchProductBySlug(slug);
+      const productDetail = await fetchProductBySlug(slug, lang);
       if (!isMounted) return;
       setProduct(productDetail);
       setIsUnavailable(!productDetail);
@@ -31,7 +31,7 @@ export const IcareProductRoutePage = ({ slug }: { slug: string }) => {
     return () => {
       isMounted = false;
     };
-  }, [slug]);
+  }, [slug, lang]);
 
   if (isLoading) {
     return (

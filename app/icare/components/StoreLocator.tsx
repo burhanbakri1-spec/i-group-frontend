@@ -7,6 +7,7 @@ import { useSiteContent } from '../hooks/useSiteContent';
 import { icareApi, IcareApiError } from '../lib/api-client';
 import { BackendStore, PaginatedData } from '../types';
 import { StoreLocatorSkeleton } from './ui/skeletons';
+import { pickLocalized } from '../lib/localized';
 
 // Leaflet map — client-side only
 import 'leaflet/dist/leaflet.css';
@@ -48,12 +49,12 @@ const normalizeCoordinate = (value: BackendStore['latitude']) => {
 
 const normalizeIsActive = (value: BackendStore['isActive']) => value === undefined || value === null || value === true || value === 'true' || value === 1 || value === '1';
 
-const normalizeStores = (response: PaginatedData<BackendStore> | BackendStore[]): Store[] => {
+const normalizeStores = (response: PaginatedData<BackendStore> | BackendStore[], lang: Language = 'en'): Store[] => {
   const rawStores = isPaginatedStoreResponse(response) ? response.data : response;
   return rawStores
     .map((item, index) => ({
       id: String(item.id ?? index),
-      name: item.name ?? item.title ?? 'store',
+      name: pickLocalized(item.name ?? item.title, lang, 'store'),
       address: item.address ?? '',
       city: item.city ?? '',
       country: item.country ?? '',
@@ -82,7 +83,7 @@ const matchesStoreSearch = (store: Store, query: string) => {
     .some((value) => value.toLowerCase().includes(normalizedQuery));
 };
 
-const fetchActiveStores = async () => normalizeStores(await icareApi.stores.list({ isActive: true }));
+const fetchActiveStores = async (lang: Language) => normalizeStores(await icareApi.stores.list({ isActive: true }), lang);
 
 export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
   const { storeLocatorTagline, storeLocatorNoResults } = useSiteContent(lang);
@@ -94,7 +95,7 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
   const loadStores = async () => {
     setFetchState('loading');
     try {
-      const nextStores = await fetchActiveStores();
+      const nextStores = await fetchActiveStores(lang);
       setStores(nextStores);
       setFetchState(nextStores.length > 0 ? 'success' : 'empty');
     } catch (err) {
@@ -109,7 +110,7 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
     const loadInitialStores = async () => {
       setFetchState('loading');
       try {
-        const nextStores = await fetchActiveStores();
+        const nextStores = await fetchActiveStores(lang);
         if (cancelled) return;
         setStores(nextStores);
         setFetchState(nextStores.length > 0 ? 'success' : 'empty');

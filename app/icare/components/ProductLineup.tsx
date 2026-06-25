@@ -157,14 +157,14 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ lang, onProductSel
       return;
     }
     try {
-      const bestsellers = await fetchProductShortcut('bestsellers', 8);
+      const bestsellers = await fetchProductShortcut('bestsellers', lang, 8);
       setRemoteProducts(bestsellers ?? []);
     } catch (err) {
       console.error('Failed to load product lineup', err);
       setError(err instanceof Error ? err.message : 'Failed to load products.');
       setRemoteProducts([]);
     }
-  }, [products, useShortcutFallback]);
+  }, [products, useShortcutFallback, lang]);
 
   useEffect(() => {
     void Promise.resolve().then(loadProducts);

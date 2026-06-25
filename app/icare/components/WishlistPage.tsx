@@ -29,11 +29,11 @@ export const WishlistPage: React.FC<WishlistPageProps> = ({ lang, onProductSelec
   const t = translations[lang];
   useEffect(() => {
     const loadRecommendations = async () => {
-      const bestsellers = await fetchProductShortcut('bestsellers', 4);
+      const bestsellers = await fetchProductShortcut('bestsellers', lang, 4);
       if (bestsellers && bestsellers.length > 0) setRecommendations(bestsellers);
     };
     loadRecommendations();
-  }, []);
+  }, [lang]);
 
   const handleAddToBag = (product: Product, e: React.MouseEvent) => {
     e.stopPropagation();

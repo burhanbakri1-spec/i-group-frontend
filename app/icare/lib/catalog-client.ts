@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { icareApi, IcareApiError } from './api-client';
 import { cachedFetch, cacheMiddleware } from './cache-middleware';
 import { resolveMediaUrl } from './media-url';
+import { Language } from '../translations';
+import { pickLocalized } from './localized';
 import {
   mapBackendFaqsToGroups,
   mapBackendProductToProduct,
@@ -90,7 +92,7 @@ const fetchActiveProductBySlug = async (slug: string) => {
   return products.find((product) => product.slug?.trim().toLowerCase() === normalizedSlug) ?? null;
 };
 
-export const fetchCatalogProducts = async (categoryId?: number): Promise<Product[] | null> => {
+export const fetchCatalogProducts = async (categoryId?: number, lang: Language = 'en'): Promise<Product[] | null> => {
   try {
     if (!icareApi.isConfigured()) {
       return null;
@@ -110,7 +112,7 @@ export const fetchCatalogProducts = async (categoryId?: number): Promise<Product
         ? primaryProducts
         : [...shortcutProducts, ...fallbackProducts];
 
-      return dedupeBackendProducts(backendProducts).map((product) => mapBackendProductToProduct(product));
+      return dedupeBackendProducts(backendProducts).map((product) => mapBackendProductToProduct(product, lang));
     }, { tier: 'list', query: keyQuery });
   } catch (error) {
     // Suppress offline network noise; components render backend-empty states.
@@ -146,21 +148,21 @@ export const fetchCategoryChildren = async (slug: string) => {
   }
 };
 
-export const fetchProductBySlug = async (slug: string): Promise<Product | null> => {
+export const fetchProductBySlug = async (slug: string, lang: Language = 'en'): Promise<Product | null> => {
   if (!icareApi.isConfigured()) return null;
 
   try {
     return await cachedFetch(`/api/v1/products/${slug}`, async () => {
       try {
         const product = await icareApi.products.detail(slug);
-        if (product) return mapBackendProductToProduct(product);
+        if (product) return mapBackendProductToProduct(product, lang);
       } catch (detailError) {
         if (!(detailError instanceof IcareApiError && (detailError.status === 0 || detailError.status === 404))) {
           console.error('Error fetching iCare product detail; falling back to active product list:', detailError);
         }
       }
       const fallbackProduct = await fetchActiveProductBySlug(slug);
-      return fallbackProduct ? mapBackendProductToProduct(fallbackProduct) : null;
+      return fallbackProduct ? mapBackendProductToProduct(fallbackProduct, lang) : null;
     }, { tier: 'list' });
   } catch (fallbackError) {
     if (!(fallbackError instanceof IcareApiError && fallbackError.status === 0)) {
@@ -179,12 +181,12 @@ const productShortcutLoaders = {
   onSale: icareApi.products.onSale,
 };
 
-export const fetchProductShortcut = async (shortcut: ProductShortcut, limit = 8): Promise<Product[] | null> => {
+export const fetchProductShortcut = async (shortcut: ProductShortcut, lang: Language = 'en', limit = 8): Promise<Product[] | null> => {
   try {
     if (!icareApi.isConfigured()) return null;
     return await cachedFetch(`/api/v1/products/${shortcut}`, async () => {
       const products = await productShortcutLoaders[shortcut](limit);
-      return products.map((product) => mapBackendProductToProduct(product));
+      return products.map((product) => mapBackendProductToProduct(product, lang));
     }, { tier: 'list', query: { limit } });
   } catch (error) {
     if (!(error instanceof IcareApiError && error.status === 0)) {
@@ -194,12 +196,12 @@ export const fetchProductShortcut = async (shortcut: ProductShortcut, limit = 8)
   }
 };
 
-export const fetchRelatedProducts = async (slug: string, limit = 8): Promise<Product[] | null> => {
+export const fetchRelatedProducts = async (slug: string, lang: Language = 'en', limit = 8): Promise<Product[] | null> => {
   try {
     if (!icareApi.isConfigured()) return null;
     return await cachedFetch(`/api/v1/products/${slug}/related`, async () => {
       const products = await icareApi.products.related(slug);
-      return products.slice(0, limit).map((product) => mapBackendProductToProduct(product));
+      return products.slice(0, limit).map((product) => mapBackendProductToProduct(product, lang));
     }, { tier: 'list' });
   } catch (error) {
     if (!(error instanceof IcareApiError && error.status === 0)) {
@@ -233,7 +235,7 @@ export const fetchProductReviews = async (
   }
 };
 
-export const fetchFaqGroups = async (): Promise<FAQCategoryGroup[] | null> => {
+export const fetchFaqGroups = async (lang: Language = 'en'): Promise<FAQCategoryGroup[] | null> => {
   try {
     if (!icareApi.isConfigured()) return null;
     return await cachedFetch('/api/v1/faq-groups', async () => {
@@ -251,7 +253,7 @@ export const fetchFaqGroups = async (): Promise<FAQCategoryGroup[] | null> => {
       if (categoryResult.status === 'rejected' && !(categoryResult.reason instanceof IcareApiError && categoryResult.reason.status === 0)) {
         console.error('Error fetching iCare FAQ categories:', categoryResult.reason);
       }
-      return mapBackendFaqsToGroups(unwrapListData(faqResult.value), categories);
+      return mapBackendFaqsToGroups(unwrapListData(faqResult.value), categories, lang);
     }, { tier: 'reference' });
   } catch (error) {
     if (!(error instanceof IcareApiError && error.status === 0)) {
@@ -261,7 +263,7 @@ export const fetchFaqGroups = async (): Promise<FAQCategoryGroup[] | null> => {
   }
 };
 
-export async function fetchProductMediaVlogs(limit = 12): Promise<VlogContentItem[]> {
+export async function fetchProductMediaVlogs(limit = 12, lang: Language = 'en'): Promise<VlogContentItem[]> {
   try {
     if (!icareApi.isConfigured()) return [];
     return await cachedFetch('/api/v1/vlogs', async () => {
@@ -274,11 +276,13 @@ export async function fetchProductMediaVlogs(limit = 12): Promise<VlogContentIte
         const hostedThumbnail = normalizedThumbnail ? '' : getHostedVideoThumbnail(normalizedVideoUrl);
         const videoPreviewUrl = !normalizedThumbnail && !hostedThumbnail && isDirectVideoUrl(normalizedVideoUrl) ? normalizedVideoUrl : null;
         const image = normalizedThumbnail || hostedThumbnail;
+        const title = pickLocalized(vlog.title, lang) || 'Vlog';
+        const subtitle = pickLocalized(vlog.description, lang);
 
         return {
           id: String(vlog.id),
-          title: vlog.title || 'Vlog',
-          subtitle: vlog.description || '',
+          title,
+          subtitle,
           image,
           thumbnailType: image ? 'image' : videoPreviewUrl ? 'video' : 'fallback',
           videoPreviewUrl,

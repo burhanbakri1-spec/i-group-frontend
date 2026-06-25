@@ -199,8 +199,8 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         );
         if (controller.signal.aborted) return;
         if (allContent) {
-          const en = mergeWithFallback(allContent.en || {}) as Record<FallbackContentKey, string>;
-          const ar = mergeWithFallback(allContent.ar || {}) as Record<FallbackContentKey, string>;
+          const en = mergeWithFallback(allContent.en || {}, 'en') as Record<FallbackContentKey, string>;
+          const ar = mergeWithFallback(allContent.ar || {}, 'ar') as Record<FallbackContentKey, string>;
           setContent(en);
           setContentByLocale({ en, ar });
           setContentVersion(allContent.version || '');

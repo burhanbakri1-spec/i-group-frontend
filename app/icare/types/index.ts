@@ -266,11 +266,21 @@ export interface PaginatedData<T> {
 
 export type BackendNumeric = string | number;
 
+/**
+ * Translatable text fields come back from the BE as either a plain string
+ * (typically the English fallback) or a localized object `{ en, ar }`.
+ * Use `pickLocalized` from `lib/localized.ts` to read these values —
+ * never call `.trim()` / render them directly. Centralizing the read path
+ * makes the "object is not a valid React child" / "x?.trim is not a
+ * function" bugs structurally impossible to reintroduce.
+ */
+export type LocalizedText = string | { en?: string | null; ar?: string | null };
+
 export interface BackendCategory {
   id: number;
   slug: string;
-  name: string;
-  description?: string | null;
+  name: LocalizedText;
+  description?: LocalizedText | null;
   image?: string | null;
   parentId?: number | null;
   isActive?: boolean;
@@ -280,8 +290,8 @@ export interface BackendCategory {
 export interface BackendBrand {
   id: number;
   slug: string;
-  name: string;
-  description?: string | null;
+  name: LocalizedText;
+  description?: LocalizedText | null;
   country?: string | null;
   logo?: string | null;
   website?: string | null;
@@ -291,7 +301,7 @@ export interface BackendBrand {
 
 export interface ProductColor {
   id: number;
-  name: string;
+  name: LocalizedText;
   hexCode: string;
   image?: string | null;
   isActive?: boolean;
@@ -312,7 +322,7 @@ export interface ProductVariantColor {
 
 export interface ProductVariant {
   id: number;
-  name: string;
+  name: LocalizedText;
   sku?: string | null;
   colorCode?: string | null;
   image?: string | null;
@@ -339,11 +349,11 @@ export interface BackendProductImage {
 export interface BackendProduct {
   id: number;
   slug: string;
-  name: string;
+  name: LocalizedText;
   sku?: string | null;
-  shortDescription?: string | null;
-  description?: string | null;
-  howToUse?: string | null;
+  shortDescription?: LocalizedText | null;
+  description?: LocalizedText | null;
+  howToUse?: LocalizedText | null;
   ingredients?: string[];
   benefits?: string[];
   skinTypes?: string[];
@@ -354,7 +364,7 @@ export interface BackendProduct {
   salePriceCurrency?: string | null;
   stockQuantity?: number;
   stockStatus?: string;
-  size?: string | null;
+  size?: LocalizedText | null;
   primaryImage?: string | null;
   secondaryImage?: string | null;
   primaryPrice?: BackendNumeric | null;
@@ -364,7 +374,7 @@ export interface BackendProduct {
   isFeatured?: boolean;
   isNew?: boolean;
   isBestseller?: boolean;
-  label?: string | null;
+  label?: LocalizedText | null;
   ratingAverage?: BackendNumeric | null;
   ratingCount?: BackendNumeric | null;
   salesCount?: number;
@@ -421,17 +431,17 @@ export interface BackendProductReviewsSummary {
 
 export interface BackendFaqCategory {
   id: number;
-  name: string;
+  name: LocalizedText;
   slug?: string;
-  description?: string | null;
+  description?: LocalizedText | null;
   isActive?: boolean;
   sortOrder?: number;
 }
 
 export interface BackendFaq {
   id: number;
-  question: string;
-  answer: string;
+  question: LocalizedText;
+  answer: LocalizedText;
   categoryId?: number | null;
   isActive?: boolean;
   isFeatured?: boolean;
@@ -441,9 +451,9 @@ export interface BackendFaq {
 
 export interface BackendVideo {
   id: number;
-  title: string;
+  title: LocalizedText;
   slug: string;
-  description?: string | null;
+  description?: LocalizedText | null;
   videoUrl: string;
   thumbnailUrl?: string | null;
   duration?: number | null;
@@ -458,18 +468,18 @@ export interface BackendVideo {
 
 export interface BackendVideoCategory {
   id: number;
-  name: string;
+  name: LocalizedText;
   slug: string;
-  description?: string | null;
+  description?: LocalizedText | null;
   isActive?: boolean;
   sortOrder?: number;
 }
 
 export interface BackendVlog {
   id: number;
-  title: string;
+  title: LocalizedText;
   slug: string;
-  description?: string | null;
+  description?: LocalizedText | null;
   videoUrl: string;
   thumbnailUrl?: string | null;
   isFeatured?: boolean;
@@ -491,8 +501,8 @@ export interface AllSettingsResponse {
 
 export interface BackendStore {
   id?: string | number;
-  name?: string | null;
-  title?: string | null;
+  name?: LocalizedText | null;
+  title?: LocalizedText | null;
   address?: string | null;
   city?: string | null;
   country?: string | null;
