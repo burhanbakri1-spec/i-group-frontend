@@ -127,6 +127,14 @@ function normalizeProductGallery(product = {}, selectedImage = "") {
   return gallery.length ? gallery : [selectedImage || product.image || placeholderImage];
 }
 
+function getDetailSectionImage(detailImages = {}, ...keys) {
+  for (const key of keys) {
+    const value = detailImages?.[key];
+    if (value) return value;
+  }
+  return "";
+}
+
 function ProductImage({ alt, className = "", src, ...imageProps }) {
   return (
     <img
@@ -296,12 +304,39 @@ function ProductDetailsPage({
   ];
   const selectedUseOption = useOptions.find((item) => item.id === selectedUse) || useOptions[0];
   const selectedColorImage = sizeOptions.find((variant) => variant.image)?.image;
-  const detailImages = product?.detailSectionImages || product?.detail_section_images || {};
+  const detailImages = {
+    ...(product?.detail_section_images || {}),
+    ...(product?.detailSectionImages || {}),
+  };
   const detailMainImage =
     product?.detailMainImage ||
     product?.detail_main_image ||
-    detailImages?.mainImage ||
-    detailImages?.main_image;
+    getDetailSectionImage(detailImages, "mainImage", "main_image");
+  const practicalBannerImage = getDetailSectionImage(
+    detailImages,
+    "practicalBanner",
+    "practical_banner",
+    "bannerStatements",
+    "banner_statements",
+    "statementBanner",
+    "statement_banner"
+  );
+  const ingredientsImage = getDetailSectionImage(
+    detailImages,
+    "ingredients",
+    "ingredientsImage",
+    "ingredients_image"
+  );
+  const faqImage = getDetailSectionImage(detailImages, "faq", "faqImage", "faq_image");
+  const getHowItWorksImage = (stepNumber) =>
+    getDetailSectionImage(
+      detailImages,
+      `howItWorks${stepNumber}`,
+      `how_it_works_${stepNumber}`,
+      `how_it_works${stepNumber}`,
+      "howItWorks",
+      "how_it_works"
+    );
   const selectedImage =
     detailMainImage ||
     selectedVariant?.image ||
@@ -660,13 +695,13 @@ function ProductDetailsPage({
           <div className="detail-step-thumbs">
             {steps.map((step, index) => (
               <button className={activeStep === index ? "active" : ""} key={`${localized(step.title, language)}-${index}`} onClick={() => setActiveStep(index)} type="button">
-                <ProductImage alt={localized(step.title, language)} src={step.image || detailImages[`howItWorks${index + 1}`] || detailImages.howItWorks || product.image} />
+                <ProductImage alt={localized(step.title, language)} src={getHowItWorksImage(index + 1) || step.image || product.image || placeholderImage} />
               </button>
             ))}
           </div>
         </div>
         <figure className="detail-how-image">
-          <ProductImage alt={localized(steps[activeStep]?.title, language)} src={steps[activeStep]?.image || detailImages[`howItWorks${activeStep + 1}`] || detailImages.howItWorks || product.image} />
+          <ProductImage alt={localized(steps[activeStep]?.title, language)} src={getHowItWorksImage(activeStep + 1) || steps[activeStep]?.image || product.image || placeholderImage} />
         </figure>
       </section>
 
@@ -719,7 +754,7 @@ function ProductDetailsPage({
         onTouchEnd={(event) => handleStatementDragEnd(event.changedTouches[0]?.clientX || 0)}
         onTouchStart={(event) => setDragStart(event.touches[0]?.clientX || 0)}
       >
-        <ProductImage alt={productName} src={detailImages.practicalBanner || product.hoverImage || product.image} />
+        <ProductImage alt={productName} src={practicalBannerImage || product.hoverImage || product.image || placeholderImage} />
         <div className="detail-statement-track" style={{ transform: `translateX(${language === "ar" ? activeStatement * 100 : activeStatement * -100}%)` }}>
           {statements.map((statement, index) => (
             <h2 key={`${statement}-${index}`}>{statement}</h2>
@@ -739,7 +774,7 @@ function ProductDetailsPage({
           <button className="detail-light-button" type="button">{txt.ingredients}</button>
         </div>
         <figure>
-          <ProductImage alt={productName} src={detailImages.ingredients || product.image} />
+          <ProductImage alt={productName} src={ingredientsImage || product.image || placeholderImage} />
         </figure>
       </section>
 
@@ -777,7 +812,7 @@ function ProductDetailsPage({
 
       <section className="detail-faq-section">
         <figure>
-          <ProductImage alt={productName} src={detailImages.faq || product.hoverImage || product.image} />
+          <ProductImage alt={productName} src={faqImage || product.hoverImage || product.image || placeholderImage} />
         </figure>
         <div>
           <h2>{txt.faqTitle}</h2>
