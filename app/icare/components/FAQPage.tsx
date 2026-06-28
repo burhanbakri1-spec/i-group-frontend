@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Language, translations } from '../translations';
 import { Plus, Minus } from 'lucide-react';
 import { PageHero } from './PageHero';
-import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
+import { ScrollReveal } from './ui/ScrollReveal';
 
 interface FAQPageProps {
   lang: Language;
@@ -62,7 +62,7 @@ export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F1F0ED] pb-32 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white pb-32">
       <PageHero
         image="https://images.unsplash.com/photo-1768483018807-bd0b9ab86539?q=80&w=2000"
         fallbackImage="https://images.unsplash.com/photo-1768483018807-bd0b9ab86539?q=80&w=2000"
@@ -72,7 +72,7 @@ export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
         priority
       />
 
-      <div className="max-w-[1400px] mx-auto grid grid-cols-12 gap-4 mt-12 px-2 md:px-8 lg:px-12">
+      <div className="max-w-[1400px] mx-auto grid grid-cols-12 gap-4 mt-12 px-4 sm:px-6 md:px-8 lg:px-12">
         
         {/* Sidebar */}
         <aside className="col-span-4 md:col-span-3">

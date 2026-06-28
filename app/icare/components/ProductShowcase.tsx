@@ -15,11 +15,20 @@ interface ProductShowcaseProps {
   onProductSelect: (product: Product) => void;
 }
 
+const StarIcon = () => (
+  <svg viewBox="0 0 20 20" aria-hidden="true" className="fill-current">
+    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+  </svg>
+);
+
+const getProductSubtitle = (product: Product) =>
+  product.sub?.trim() || product.description?.trim() || '';
+
 export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang, onProductSelect }) => {
   void products;
   const t = translations[lang];
   const shouldReduceMotion = useReducedMotion();
-  const { productShowcaseLoading, productShowcaseEmpty } = useSiteContent(lang);
+  const { productShowcaseEmpty } = useSiteContent(lang);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [remoteProducts, setRemoteProducts] = useState<Product[] | null>(null);
 
@@ -36,16 +45,9 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
   if (remoteProducts === null) {
     return (
       <section className="icare-index-section icare-morning-section">
-        <div className="rounded-[8px] bg-white p-8 md:p-12">
-          <div className="flex gap-6 md:gap-8">
-            <SkeletonPulse className="flex-1 aspect-[4/3] rounded-xl" />
-            <div className="flex-1 flex flex-col justify-center space-y-4">
-              <SkeletonPulse className="h-4 w-1/4 rounded" />
-              <SkeletonPulse className="h-8 w-3/4 rounded" />
-              <SkeletonPulse className="h-4 w-2/3 rounded" />
-              <SkeletonPulse className="h-4 w-1/2 rounded" />
-            </div>
-          </div>
+        <div className="icare-morning-skeleton">
+          <SkeletonPulse className="icare-morning-skeleton__media" />
+          <SkeletonPulse className="icare-morning-skeleton__panel" />
         </div>
       </section>
     );
@@ -54,168 +56,140 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
   if (showcaseProducts.length === 0) {
     return (
       <section className="icare-index-section icare-morning-section">
-        <div className="rounded-[8px] bg-white p-12 text-center text-[12px] font-bold uppercase tracking-[0.2em] text-[#84827E]">
-          {productShowcaseEmpty}
-        </div>
+        <div className="icare-morning-empty">{productShowcaseEmpty}</div>
       </section>
     );
   }
 
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % showcaseProducts.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + showcaseProducts.length) % showcaseProducts.length);
-  };
-
+  const slideCount = showcaseProducts.length;
+  const nextSlide = () => setCurrentIndex((prev) => (prev + 1) % slideCount);
+  const prevSlide = () => setCurrentIndex((prev) => (prev - 1 + slideCount) % slideCount);
   const current = showcaseProducts[currentIndex];
+  const lifestyleImage = current.secondaryImage ?? current.primaryImage;
+  const subtitle = getProductSubtitle(current);
+  const reviewCount = current.reviews?.trim() || '0';
 
   return (
-    <section className="icare-index-section icare-morning-section">
+    <section dir={lang === 'ar' ? 'rtl' : 'ltr'} className="icare-index-section icare-morning-section">
       <ScrollReveal direction="bottom" viewportMargin="-60px">
-        <div className="icare-morning-header">
-            <h2 className="text-center text-[12.8px] font-bold uppercase leading-[1.5] tracking-[0.02em] text-[#67645E]">
-            {t.pages.showcase.featuredSkincare}
-          </h2>
-        </div>
+        <header className="icare-morning-header">
+          <h2 className="icare-morning-title">{t.pages.showcase.featuredSkincare}</h2>
+        </header>
       </ScrollReveal>
+
       <div className="icare-morning-grid">
-        
-        {/* Left Column: Lifestyle Image */}
         <ScrollReveal direction="left" viewportMargin="-80px">
-          <div className="icare-morning-panel relative aspect-[3/4] md:aspect-auto md:min-h-[44.25rem]">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentIndex}
-                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 1.03 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                className="w-full h-full"
-              >
-                <ImageWithFallback 
-                  src={current.secondaryImage ?? current.primaryImage}
-                  alt={current.title ?? current.name}
-                  className="w-full h-full object-cover object-center"
-                />
-              </motion.div>
-            </AnimatePresence>
-            
-            <div className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 flex gap-1.5 md:gap-2 z-10 bg-black/10 px-2 md:px-4 py-1 md:py-2 rounded-full">
-              {showcaseProducts.map((_, i) => (
+          <div className="icare-morning-media">
+            <div className="icare-morning-media__viewport">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`media-${currentIndex}`}
+                  initial={shouldReduceMotion ? false : { opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={shouldReduceMotion ? undefined : { opacity: 0 }}
+                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                  className="icare-morning-media__slide"
+                >
+                  <ImageWithFallback
+                    src={lifestyleImage}
+                    alt={current.title ?? current.name}
+                    className="icare-morning-media__image"
+                  />
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            <div className="icare-morning-media__dots" role="tablist" aria-label={t.pages.showcase.featuredSkincare}>
+              {showcaseProducts.map((_, index) => (
                 <button
-                  key={i}
-                  onClick={() => setCurrentIndex(i)}
-                  className={`w-1.5 h-1.5 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/20 ${i === currentIndex ? 'bg-white w-5 md:w-6' : 'bg-white/55'}`}
-                  aria-label={t.pages.showcase.showProduct.replace('{index}', String(i + 1))}
+                  key={index}
+                  type="button"
+                  role="tab"
+                  aria-selected={index === currentIndex}
+                  aria-label={t.pages.showcase.showProduct.replace('{index}', String(index + 1))}
+                  onClick={() => setCurrentIndex(index)}
+                  className={`icare-morning-media__dot${index === currentIndex ? ' is-active' : ''}`}
                 />
               ))}
             </div>
           </div>
         </ScrollReveal>
 
-        {/* Right Column: Product Info Box */}
         <ScrollReveal direction="right" viewportMargin="-80px">
-          <div className="icare-morning-panel relative flex flex-col justify-between p-5 sm:p-8 md:p-8 md:min-h-[44.25rem]">
-          
-          <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 flex justify-between px-1 md:px-8 z-20 pointer-events-none">
-            <motion.button 
-              onClick={prevSlide}
-              className="w-9 h-9 md:w-14 md:h-14 border border-[#DDDDDD] bg-white rounded-full flex items-center justify-center pointer-events-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDECEB]"
-              whileHover={{ backgroundColor: "rgba(103,100,94,0.06)" }}
-              whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
-              initial={shouldReduceMotion ? false : { opacity: 0, x: -10 }}
-              animate={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
-              transition={{ duration: 0.25 }}
-            >
-              <ArrowLeft size={14} strokeWidth={1.5} />
-            </motion.button>
-            <motion.button 
-              onClick={nextSlide}
-              className="w-9 h-9 md:w-14 md:h-14 border border-[#DDDDDD] bg-white rounded-full flex items-center justify-center pointer-events-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDECEB]"
-              whileHover={{ backgroundColor: "rgba(103,100,94,0.06)" }}
-              whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
-              initial={shouldReduceMotion ? false : { opacity: 0, x: 10 }}
-              animate={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
-              transition={{ duration: 0.25 }}
-            >
-              <ArrowRight size={14} strokeWidth={1.5} />
-            </motion.button>
-          </div>
-
-          <div className="relative flex flex-1 min-h-0 items-center justify-center py-0">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentIndex}
-                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-                className="relative flex h-full w-full items-center justify-center"
+          <div className="icare-morning-products">
+            <article className="icare-morning-product">
+              <button
+                type="button"
+                className="icare-morning-product__nav icare-morning-product__nav--prev"
+                onClick={prevSlide}
+                aria-label={t.pages.showcase.previousProduct}
               >
-                <ImageWithFallback 
-                  src={current.primaryImage}
-                  alt={current.title ?? current.name}
-                  className="h-full w-full max-h-full max-w-full object-contain mix-blend-multiply drop-shadow-sm"
-                />
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          <div className="flex justify-between items-end w-full relative z-10">
-            <AnimatePresence mode="wait">
-              <motion.div 
-                key={currentIndex}
-                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-2 md:space-y-6 w-full"
+                <ArrowLeft size={16} strokeWidth={1.5} aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className="icare-morning-product__nav icare-morning-product__nav--next"
+                onClick={nextSlide}
+                aria-label={t.pages.showcase.nextProduct}
               >
-                <div className="flex items-center gap-1.5">
-                  <div className="flex text-[#67645E]">
-                    {[...Array(5)].map((_, i) => (
-                      <svg key={i} className="w-2 md:w-3 h-2 md:h-3 fill-current" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ))}
-                  </div>
-                  <span className="text-[8px] md:text-[12.8px] font-bold text-[#67645E] tracking-[0.02em] uppercase leading-[1.5]">({current.reviews})</span>
-                </div>
+                <ArrowRight size={16} strokeWidth={1.5} aria-hidden="true" />
+              </button>
 
-                <div className="space-y-0.5 md:space-y-2">
-                  <div className="flex items-center gap-2">
-                    <ImageWithFallback src="/icare-logo.png" alt={t.pages.showcase.imageAlt} className="h-3 md:h-5 w-auto object-contain hidden sm:block" />
-                    <h3 className="text-[14px] sm:text-[20px] md:text-[28px] font-bold tracking-normal text-[#67645E] lowercase leading-[1.1]">
-                      {current.title ?? current.name}
-                    </h3>
-                  </div>
-                    <p className="text-[10px] sm:text-[12.8px] md:text-[12.8px] text-[#67645E] font-bold tracking-[0.02em] leading-[1.5]">
-                    {current.description}
-                  </p>
-                </div>
+              <div className="icare-morning-product__stage">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={`product-${currentIndex}`}
+                    initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={shouldReduceMotion ? undefined : { opacity: 0 }}
+                    transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+                    className="icare-morning-product__image"
+                  >
+                    <ImageWithFallback
+                      src={current.primaryImage}
+                      alt={current.title ?? current.name}
+                      className="icare-morning-product__image-media"
+                    />
+                  </motion.div>
+                </AnimatePresence>
+              </div>
 
-                <motion.button
-                  whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
-                  onClick={() => onProductSelect(current)}
-                  /* Rhode pill: 15.73px / 400 / 23.6px / 0.314px ls / uppercase. */
-                  className="inline-flex min-h-12 w-full items-center justify-center whitespace-nowrap bg-[#67645E] text-white rounded-full py-3 md:py-4 text-[15.73px] font-bold tracking-[0.02em] uppercase hover:bg-[#555] transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDECEB]"
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`details-${currentIndex}`}
+                  initial={shouldReduceMotion ? false : { opacity: 0, x: lang === 'ar' ? 8 : -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={shouldReduceMotion ? undefined : { opacity: 0 }}
+                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                  className="icare-morning-product__details"
                 >
-                  {t.pages.showcase.view} — {current.originalPrice && <><span className="line-through text-white/60 mr-1">{current.originalPrice}</span> </>}{current.price}
-                </motion.button>
-              </motion.div>
-            </AnimatePresence>
+                  <div className="icare-morning-product__meta">
+                    <div className="icare-morning-product__rating">
+                      <div className="icare-morning-product__stars">
+                        {[...Array(5)].map((_, index) => (
+                          <StarIcon key={index} />
+                        ))}
+                      </div>
+                      <span className="icare-morning-product__reviews">({reviewCount})</span>
+                    </div>
+                    <p className="icare-morning-product__title">{current.title ?? current.name}</p>
+                    {subtitle ? <p className="icare-morning-product__subtitle">{subtitle}</p> : null}
+                  </div>
+                </motion.div>
+              </AnimatePresence>
 
-            <div className="flex flex-col items-end hidden md:flex">
-               <div className="text-[56px] md:text-[80px] font-[900] tracking-tighter text-[#67645E]/5 leading-none select-none">
-                0{currentIndex + 1}
+              <button
+                type="button"
+                className="icare-morning-product__cta"
+                onClick={() => onProductSelect(current)}
+              >
+                {t.pages.showcase.addToCart}
+              </button>
+
+              <div className="icare-morning-product__index" aria-hidden="true">
+                {currentIndex + 1}/{slideCount}
               </div>
-              <div className="text-[12px] font-bold tracking-[0.3em] text-[#67645E] opacity-40">
-                {currentIndex + 1} / {showcaseProducts.length}
-              </div>
-            </div>
-          </div>
+            </article>
           </div>
         </ScrollReveal>
       </div>

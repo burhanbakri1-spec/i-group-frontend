@@ -45,6 +45,9 @@
     --rb-text-xs--line-height: 1.2;
     --rb-text-2xs: 0.8rem;            /* 12.8px — Rhode micro text (announce/footer links/labels) */
     --rb-text-2xs--line-height: 1.5;  /* 19.2px */
+    --rb-text-header-nav: clamp(0.75rem, 0.725rem + 0.16vw, 0.8125rem); /* Rhode Header nav — slightly below u-pSize */
+    --rb-text-header-nav--line-height: 1.5;
+    --rb-text-mega-category: max(0.8rem, 1.125vw); /* Rhode Header-mega-menu-category */
     --rb-text-sm: 0.875rem;
     --rb-text-sm--line-height: 1.25;
     --rb-text-base: 1rem;            /* 16px */
@@ -76,10 +79,20 @@
     --rb-text-imagewithcontent-h2--letter-spacing: 0.02em; /* 0.437px */
     --rb-text-mission-h2: 1.6082rem;      /* 25.7316px — Rhode TabbedSection "mission" h2 */
     --rb-text-mission-h2--line-height: 1.5; /* 38.5974px */
+    /* Rhode TabbedSection body (u-hSize): calc(1.6rem + 0.2vw) mobile, 2.525vw @ 821px+ */
+    --rb-text-mission-body: calc(1.6rem + 0.2vw);
+    --rb-text-mission-body--line-height: 1.2;
+    /* Rhode TabbedSection tab labels (u-pSize__Large): fluid on mobile, max() on desktop */
+    --rb-text-mission-tab: calc(1.25rem + 0.2vw);
+    --rb-text-mission-tab--line-height: 1.5;
     --rb-text-rhode-you-h2: 1.375rem;     /* 22px — Rhode + you title */
     --rb-text-rhode-you-h2--line-height: 1.2; /* 26.4px */
     --rb-text-sun-kissed-h2: 1.25rem;     /* 20px — "SUN-KISSED + LUMINOUS" */
     --rb-text-sun-kissed-h2--line-height: 1.4; /* 28px */
+
+    /* Shared mobile-mode condition used throughout this file:
+       @media (max-aspect-ratio: 2 / 3)
+       i.e. height is at least 1.5x width. */
 
     --rb-text-pill: 0.9832rem;            /* 15.7316px — Rhode button / pill text */
     --rb-text-pill--line-height: 1.5;     /* 23.5974px */
@@ -141,30 +154,68 @@
     --rb-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
     --rb-shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.10);
 
-    /* Hero/header layout controls. Tune these to move every standard hero together.
-       --icare-announcement-bottom is measured live in IcareShell and reflects the
-       announcement bar's actual rendered bottom; when the bar is absent or has no
-       slides it resolves to 0, so the header sits flush at --icare-header-top-gap. */
+    /* ─── Rhode global page frame (single source of truth) ───
+       Matched to rhodeskin.com body padding at ~1062px:
+       15px top · ~24px horizontal · ~24px bottom. All shell children
+       (announcement, header, hero, sections) align to these gutters. */
+    --icare-page-gutter: clamp(1rem, 2.28vw, 1.53125rem);
+    --icare-page-top-gap: 0.9375rem;
+    --icare-page-bottom-gap: clamp(1rem, 2.28vw, 1.53125rem);
+    --icare-content-inset: clamp(1rem, 2.5vw, 2rem);
+
+    /* Hero/header layout controls.
+       --icare-announcement-bottom and --icare-hero-top are measured live in
+       IcareShell. The visible gap between the announcement bar and hero frame
+       is --icare-hero-stack-gap; the fixed header is pinned to the hero top. */
     --icare-announcement-bottom: 0px;
-    --icare-header-inset: clamp(1.25rem, 4vw, 3rem);
-    --icare-header-top-gap: 0.625rem;
-    --icare-header-top: calc(var(--icare-announcement-bottom) + var(--icare-header-top-gap));
-    --icare-hero-inset: clamp(1.25rem, 4vw, 3rem);
+    --icare-hero-stack-gap: 0.625rem;
+    --icare-announcement-control-width: 2.5625rem;
+    --icare-header-inset: var(--icare-page-gutter);
+    --icare-header-top: var(
+      --icare-hero-top,
+      calc(var(--icare-announcement-bottom) + var(--icare-hero-stack-gap))
+    );
+    --icare-hero-inset: 0px;
     --icare-hero-top-gap: 0rem;
     --icare-hero-bottom-gap: 1rem;
     --icare-hero-height: calc(100vh - 11.875rem);
     --icare-hero-min-height: 40rem;
     --icare-hero-radius: 12px;
     --icare-hero-media-scale: 1.018;
-    --icare-section-inset: clamp(1.25rem, 4vw, 3rem);
+    --icare-section-inset: 0px;
     --icare-section-gap: clamp(1rem, 2.5vw, 1.75rem);
     --icare-section-radius: 12px;
     --icare-feature-radius: 8px;
+    --icare-main-top-offset: 6rem;
   }
 }
 
 @layer base {
-  /* iCare Shell — enforce warm beige background + brand brown text */
+  /* iCare shell — Rhode page frame + brand defaults */
+  .icare-shell {
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-color: var(--rb-pure-white);
+    color: var(--rb-primary-text);
+    font-family: var(--font-swiss);
+    padding:
+      var(--icare-page-top-gap)
+      var(--icare-page-gutter)
+      var(--icare-page-bottom-gap);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .icare-shell ::selection {
+    background-color: var(--rb-taupe-7B7872);
+    color: var(--rb-pure-white);
+  }
+
+  .icare-main--offset {
+    padding-top: var(--icare-main-top-offset);
+  }
+
+  /* Legacy alias */
   .rb-shell {
     background-color: var(--rb-bg-warm-gray);
     color: var(--rb-primary-text);
@@ -173,7 +224,6 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Global selection tuned to the warm palette */
   .rb-shell ::selection {
     background-color: var(--rb-taupe-7B7872);
     color: var(--rb-pure-white);
@@ -230,47 +280,112 @@
 @layer components {
   .icare-announcement {
     position: relative;
-    inset-inline-start: var(--icare-header-inset);
     z-index: 50;
-    width: calc(100% - (var(--icare-header-inset) * 2));
+    width: 100%;
   }
 
   .icare-announcement__body {
     position: relative;
-    display: flex;
-    min-height: 2.5rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
     align-items: center;
-    justify-content: center;
+    min-height: 3rem;
     border-radius: 10px;
     background: var(--rb-bg-warm-gray);
     color: var(--rb-primary-text);
-    padding: 0.625rem 2.5rem;
-    text-align: center;
+    padding: 0.625rem 0.9375rem;
   }
 
   .icare-announcement__viewport {
     position: relative;
-    display: grid;
-    width: 100%;
-    min-height: 0.875rem;
-    place-items: center;
+    grid-row: 1;
+    grid-column: 1;
+    min-width: 0;
+    padding-inline: var(--icare-announcement-control-width);
     overflow: hidden;
   }
 
-  .icare-announcement__slide {
+  .icare-announcement__track {
+    display: flex;
     width: 100%;
+    transition: transform 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .icare-announcement__slide {
+    display: flex;
+    flex: 0 0 100%;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 1.75rem;
     margin: 0;
-    max-width: calc(100% - 1.5rem);
     color: var(--rb-primary-text);
-    /* Match Rhode announcement-bar slide typography:
-       12.8px / 400 / 19.2px line-height / 0.256px tracking / case preserved as authored. */
-    font-size: var(--rb-text-2xs);
-    font-weight: var(--rb-font-weight-normal);
-    line-height: var(--rb-text-2xs--line-height);
-    letter-spacing: var(--rb-tracking-wide);
     text-align: center;
-    text-transform: none;
-    white-space: nowrap;
+  }
+
+  .icare-announcement__slide p {
+    width: auto;
+    max-width: 100%;
+    margin: 0;
+    /* Match Rhode TopBanner typography: 12px / 700 / 14px / 0.24px / uppercase */
+    font-size: 0.75rem;
+    font-weight: var(--rb-font-weight-bold);
+    line-height: 0.875rem;
+    letter-spacing: 0.015em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .icare-announcement__slide-lines--stacked {
+    display: inline;
+  }
+
+  .icare-announcement__slide-lines--inline {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .icare-announcement__slide-lines--stacked {
+      display: none;
+    }
+
+    .icare-announcement__slide-lines--inline {
+      display: inline;
+    }
+  }
+
+  .icare-announcement__controls {
+    grid-row: 1;
+    grid-column: 1;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-self: end;
+    align-self: center;
+  }
+
+  .icare-announcement__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    color: var(--rb-primary-text);
+    background: transparent;
+    border: 0;
+    border-radius: 4px;
+    line-height: 0;
+    cursor: pointer;
+  }
+
+  .icare-announcement__toggle:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--rb-primary-text) 70%, transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .icare-announcement__track {
+      transition: none;
+    }
   }
 
   .icare-header-shell {
@@ -281,11 +396,297 @@
     z-index: 60;
   }
 
+  .icare-header-bar {
+    display: flex;
+    min-height: 4rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem min(2rem, 3vw);
+  }
+
+  .icare-header-logo {
+    height: 4rem;
+  }
+
+  .icare-header-nav {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+  }
+
+  .icare-header-menu-button {
+    display: none;
+  }
+
+  .icare-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.4375rem;
+  }
+
+  .icare-header-action-label,
+  .icare-header-account-action {
+    display: inline-flex;
+  }
+
+  .icare-header-action-icon,
+  .icare-header-cart-mobile {
+    display: none;
+  }
+
+  .icare-header-link {
+    padding: 0 0.25rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    cursor: pointer;
+    font-size: var(--rb-text-header-nav);
+    font-weight: var(--rb-font-weight-bold);
+    line-height: var(--rb-text-header-nav--line-height);
+    letter-spacing: var(--rb-tracking-wide);
+    text-transform: uppercase;
+    transition: color 300ms ease;
+  }
+
+  .icare-header-link--muted {
+    color: var(--rb-primary-text);
+  }
+
+  .icare-header-link--muted:hover {
+    color: var(--rb-near-black);
+  }
+
+  .icare-header-link--inverse {
+    color: var(--rb-pure-white);
+  }
+
+  .icare-header-link--inverse:hover {
+    color: rgb(255 255 255 / 0.75);
+  }
+
+  .icare-header-lang {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.3125rem 0.625rem;
+    border-radius: 999px;
+    font-size: var(--rb-text-header-nav);
+    font-weight: var(--rb-font-weight-bold);
+    line-height: var(--rb-text-header-nav--line-height);
+    letter-spacing: var(--rb-tracking-wide);
+    transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+  }
+
+  .icare-header-lang--muted {
+    border: 1px solid var(--rb-border-light);
+    color: var(--rb-primary-text);
+  }
+
+  .icare-header-lang--muted:hover {
+    background: rgb(0 0 0 / 0.05);
+  }
+
+  .icare-header-lang--inverse {
+    border: 1px solid rgb(255 255 255 / 0.35);
+    color: var(--rb-pure-white);
+  }
+
+  .icare-header-lang--inverse:hover {
+    background: rgb(255 255 255 / 0.1);
+  }
+
+  @media (max-aspect-ratio: 2 / 3) {
+    .icare-header-logo {
+      height: 3rem;
+    }
+
+    .icare-header-menu-button {
+      display: inline-flex;
+    }
+
+    .icare-header-nav,
+    .icare-header-action-label,
+    .icare-header-account-action {
+      display: none;
+    }
+
+    .icare-header-action-icon,
+    .icare-header-cart-mobile {
+      display: inline-flex;
+    }
+  }
+
+  .icare-header-mega {
+    overflow: hidden;
+    padding: 0 min(2rem, 3vw) 1.5rem;
+  }
+
+  .icare-header-mega__inner {
+    max-width: 64rem;
+    margin: 0 auto;
+  }
+
+  .icare-header-mega__categories-wrap {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 0.75rem;
+  }
+
+  .icare-header-mega__categories {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem 2rem;
+  }
+
+  .icare-header-mega__category {
+    position: relative;
+    padding: 0 0.25rem 0.5rem;
+    border: 0;
+    background: transparent;
+    color: var(--rb-gray-ACA9A5);
+    cursor: pointer;
+    font-size: var(--rb-text-mega-category);
+    font-weight: var(--rb-font-weight-bold);
+    line-height: 1;
+    letter-spacing: var(--rb-tracking-wide);
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: color 200ms ease;
+  }
+
+  .icare-header-mega__category.is-active,
+  .icare-header-mega__category:hover {
+    color: var(--rb-gray-6D6E70);
+  }
+
+  .icare-header-mega__category-indicator {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--rb-primary-text);
+  }
+
+  .icare-header-mega__products {
+    padding-top: 3.125rem;
+  }
+
+  .icare-header-mega__track {
+    display: flex;
+    justify-content: center;
+    gap: 0.625rem;
+    overflow-x: auto;
+    padding: 0 0.5rem 1rem;
+    scroll-snap-type: x proximity;
+  }
+
+  .icare-header-mega__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .icare-header-mega__card {
+    display: flex;
+    flex: 0 0 clamp(10.5rem, 14vw, 13.5rem);
+    flex-direction: column;
+    align-items: center;
+    gap: 0.625rem;
+    width: clamp(10.5rem, 14vw, 13.5rem);
+    padding: 1rem 0 1.5rem;
+    border: 0;
+    border-radius: 8px;
+    background: var(--rb-pure-white);
+    color: inherit;
+    cursor: pointer;
+    scroll-snap-align: start;
+    text-align: left;
+    transition: background-color 200ms ease;
+  }
+
+  .icare-header-mega__card:hover {
+    background: var(--rb-bg-light);
+  }
+
+  .icare-header-mega__card-media {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: max(3.125rem, 15.2778vw);
+    max-width: 100%;
+  }
+
+  .icare-header-mega__card-image {
+    aspect-ratio: 1;
+    width: 100%;
+  }
+
+  .icare-header-mega__card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .icare-header-mega__card-badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 0.25rem 0.5rem;
+    border-radius: 10px;
+    background: var(--rb-primary-text);
+    color: var(--rb-pure-white);
+    font-family: var(--font-rektorat);
+    font-size: 0.625rem;
+    font-weight: var(--rb-font-weight-extrabold);
+    line-height: 0.75;
+    letter-spacing: -0.006875rem;
+    text-transform: lowercase;
+  }
+
+  .icare-header-mega__card-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+    padding: 0 1.5rem;
+  }
+
+  .icare-header-mega__card-title {
+    margin: 0;
+    color: var(--rb-primary-text);
+    font-size: var(--rb-text-sm);
+    font-weight: var(--rb-font-weight-bold);
+    line-height: 1.2;
+    letter-spacing: var(--rb-tracking-wide);
+    text-transform: uppercase;
+  }
+
+  .icare-header-mega__card-subtitle {
+    margin: 0;
+    color: var(--rb-primary-text);
+    font-size: var(--rb-text-sm);
+    font-weight: var(--rb-font-weight-normal);
+    line-height: 1.5;
+    letter-spacing: var(--rb-tracking-wide);
+    text-transform: lowercase;
+  }
+
+  .icare-header-mega__empty {
+    padding: 4rem 1.5rem;
+    color: var(--rb-primary-text);
+    font-size: var(--rb-text-2xs);
+    font-weight: var(--rb-font-weight-bold);
+    letter-spacing: var(--rb-tracking-wide);
+    text-align: center;
+    text-transform: uppercase;
+  }
+
   .icare-page-hero {
-    /* The hero starts just below the header's gap so the hero image bleeds
-       behind the fixed, transparent header — no manual announcement arithmetic. */
-    margin-top: var(--icare-header-top-gap);
-    padding: var(--icare-hero-top-gap) var(--icare-hero-inset) var(--icare-hero-bottom-gap);
+    /* Gap below the announcement bar; the fixed header is pinned to this section's top. */
+    margin-top: var(--icare-hero-stack-gap);
+    padding: var(--icare-hero-top-gap) 0 var(--icare-hero-bottom-gap);
     background: var(--rb-pure-white);
   }
 
@@ -320,11 +721,116 @@
   }
 
   .icare-page-hero__content {
-    padding: clamp(1rem, 2.5vw, 2rem) var(--icare-hero-inset) var(--icare-hero-bottom-gap);
+    padding: var(--icare-content-inset) var(--icare-content-inset) var(--icare-hero-bottom-gap);
   }
 
   .icare-index-section {
-    margin: 0 var(--icare-section-inset) var(--icare-section-gap);
+    margin: 0 0 var(--icare-section-gap);
+  }
+
+  .icare-store-locator {
+    overflow: hidden;
+    border-radius: var(--icare-section-radius);
+    background: var(--rb-bg-warm-gray);
+  }
+
+  .icare-store-locator__frame {
+    display: grid;
+    grid-template-columns: minmax(20rem, 0.72fr) minmax(0, 1.28fr);
+    min-height: clamp(40rem, calc(100vh - 8rem), 52rem);
+    overflow: hidden;
+    border-radius: inherit;
+    background: var(--rb-bg-warm-gray);
+  }
+
+  .icare-store-locator__panel {
+    z-index: 1;
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    overflow: hidden;
+    border-inline-end: 1px solid var(--rb-border-light);
+    background: var(--rb-bg-warm-gray);
+  }
+
+  .icare-store-locator__header {
+    padding: clamp(1rem, 2.2vw, 2rem);
+    display: grid;
+    gap: clamp(1rem, 2vw, 2rem);
+  }
+
+  .icare-store-locator__results {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    border-top: 1px solid rgb(0 0 0 / 0.05);
+    padding: 1rem clamp(1rem, 2.2vw, 2rem) 2rem;
+  }
+
+  .icare-store-locator__map {
+    position: relative;
+    min-width: 0;
+    min-height: inherit;
+    overflow: hidden;
+    background: var(--rb-bg-surface);
+  }
+
+  .icare-store-locator__map .leaflet-container {
+    width: 100%;
+    height: 100%;
+  }
+
+  .icare-legal-section {
+    overflow: hidden;
+    border-radius: var(--icare-section-radius);
+    background: var(--rb-bg-warm-gray);
+  }
+
+  .icare-legal-section__inner {
+    width: min(100%, 62rem);
+    min-height: clamp(32rem, calc(100vh - 8rem), 52rem);
+    margin: 0 auto;
+    padding: clamp(3rem, 8vw, 7rem) clamp(1.5rem, 5vw, 4rem);
+  }
+
+  .icare-legal-section__title {
+    margin: 0 0 clamp(2rem, 4vw, 3rem);
+    color: var(--rb-primary-text);
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    font-weight: var(--rb-font-weight-black);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+  }
+
+  .icare-legal-section__content {
+    display: grid;
+    gap: clamp(1.75rem, 3vw, 2.5rem);
+    color: var(--rb-primary-text);
+  }
+
+  .icare-legal-section__block {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .icare-legal-section__heading {
+    margin: 0;
+    color: var(--rb-pure-black);
+    font-size: var(--rb-text-sm);
+    font-weight: var(--rb-font-weight-extrabold);
+    line-height: 1.5;
+    letter-spacing: var(--rb-tracking-wide);
+    text-transform: uppercase;
+  }
+
+  .icare-legal-section__body {
+    max-width: 62rem;
+    margin: 0;
+    color: var(--rb-primary-text);
+    font-size: var(--rb-text-base);
+    font-weight: var(--rb-font-weight-normal);
+    line-height: 1.65;
+    letter-spacing: var(--rb-tracking-normal);
   }
 
   .icare-product-rail-section {
@@ -485,8 +991,11 @@
   }
 
   .icare-product-card--standard .icare-product-card__surface {
-    background: var(--rb-pure-white);
-    padding: 1rem;
+    /* Rhode .Product-card */
+    min-height: 27.5rem;
+    border-radius: 12px;
+    background: var(--rb-bg-warm-gray);
+    padding: 0;
   }
 
   .icare-product-card--showcase .icare-product-card__surface {
@@ -530,13 +1039,30 @@
     cursor: none;
   }
 
+  .icare-product-card--standard .icare-product-card__main-action {
+    position: absolute;
+    inset: 0;
+    min-height: 27.5rem;
+  }
+
   .icare-product-card--standard .icare-product-card__primary {
-    grid-template-rows: auto auto;
+    position: absolute;
+    inset: 0;
+    min-height: 27.5rem;
+    transition: opacity 700ms cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+  .icare-product-card--standard .icare-product-card__initial {
+    height: 100%;
   }
 
   .icare-product-card.is-loading {
     display: block;
     min-height: clamp(36rem, 48vw, 46rem);
+  }
+
+  .icare-product-card--standard.is-loading {
+    min-height: 27.5rem;
   }
 
   .icare-product-card.is-loading > * {
@@ -558,9 +1084,25 @@
   }
 
   .icare-product-card--standard .icare-product-card__media {
-    aspect-ratio: 1 / 1;
-    padding: 0;
-    border-radius: var(--rb-radius-card);
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    aspect-ratio: unset;
+    padding: clamp(3.25rem, 14%, 4.25rem) clamp(1rem, 8%, 1.75rem)
+      clamp(6.75rem, 30%, 8.75rem);
+    border-radius: 0;
+  }
+
+  .icare-product-card--standard .icare-product-card__media > .icare-product-card__image,
+  .icare-product-card--standard .icare-product-card__media > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(90%, 18rem);
+    height: min(74%, 21.75rem);
+    max-width: calc(100% - 1.5rem);
+    max-height: calc(100% - 6.5rem);
   }
 
   .icare-product-card--showcase .icare-product-card__media {
@@ -603,8 +1145,21 @@
   .icare-product-card--standard .icare-product-card__image {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    min-width: 0;
+    min-height: 0;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center;
     transform: none;
+  }
+
+  .icare-product-card--standard .icare-product-card__media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
   }
 
   .icare-product-card--showcase .icare-product-card__image {
@@ -625,24 +1180,154 @@
     pointer-events: none;
     position: absolute;
     inset: 0;
-    z-index: 20;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    padding: clamp(3.25rem, 14%, 4.25rem) clamp(1rem, 8%, 1.75rem)
+      clamp(6.75rem, 30%, 8.75rem);
+  }
+
+  .icare-product-card--standard .icare-product-card__hover-image {
+    width: min(90%, 18rem);
+    height: min(74%, 21.75rem);
+    max-width: calc(100% - 1.5rem);
+    max-height: calc(100% - 6.5rem);
+    object-fit: contain;
+    object-position: center;
   }
 
   .icare-product-card__hover-image {
     width: 100%;
+    min-width: 100%;
     height: 100%;
+    min-height: 100%;
     object-fit: cover;
+    object-position: 50% 50%;
+  }
+
+  .icare-product-card__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(1.125rem, 2vw, 1.5rem) clamp(1.125rem, 1.7vw, 1.375rem);
+    pointer-events: none;
+  }
+
+  .icare-product-card__overlay-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    color: var(--rb-primary-text);
+  }
+
+  .icare-product-card__category {
+    margin: 0;
+    color: inherit;
+    font-family: var(--font-rektorat);
+    /* Rhode Product-card-content-title / u-hSize--Medium + Rektorat Heavy */
+    font-size: min(2.25rem, 10.5vw);
+    font-weight: var(--rb-font-weight-bold);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    text-transform: lowercase;
+    opacity: 0.99;
+  }
+
+  .icare-product-card__badges {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5625rem;
+    height: 100%;
+  }
+
+  .icare-product-card__badge {
+    /* Rhode .ContentBadge — top-right label */
+    margin: calc(clamp(1.3125rem, 2.7083333333vw, 2.4375rem) - 1rem)
+      calc(clamp(1rem, 1.4583333333vw, 1.3125rem) - 0.75rem) auto auto;
+    border-radius: 0.625rem;
+    background: var(--rb-primary-text);
+    color: var(--rb-pure-white);
+    font-family: var(--font-rektorat);
+    font-size: clamp(0.625rem, 0.7638888889vw, 0.8125rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.00875rem;
+    text-transform: lowercase;
+    padding: 0.25rem 0.5rem;
+    width: max-content;
+  }
+
+  .icare-product-card__overlay-bottom {
+    pointer-events: none;
+  }
+
+  .icare-product-card__details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 100%;
+    color: var(--rb-primary-text);
+  }
+
+  .icare-product-card__rating {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .icare-product-card__stars {
+    display: flex;
+    color: var(--rb-primary-text);
+  }
+
+  .icare-product-card__stars svg {
+    width: max(0.75rem, 0.8333vw);
+    height: max(0.75rem, 0.8333vw);
+  }
+
+  .icare-product-card__stars svg.is-filled {
+    fill: currentColor;
+  }
+
+  .icare-product-card__stars svg.is-empty {
+    fill: rgb(103 100 94 / 0.18);
+  }
+
+  .icare-product-card__review-count {
+    font-size: 0.875rem;
+    font-weight: var(--rb-font-weight-bold);
+    line-height: 1.5;
+    letter-spacing: var(--rb-tracking-wide);
+  }
+
+  .icare-product-card__title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  .icare-product-card__tagline {
+    margin: 0;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    font-size: 0.875rem;
+    font-weight: var(--rb-font-weight-normal);
+    line-height: 1.5;
+    letter-spacing: var(--rb-tracking-wide);
   }
 
   .icare-product-card__body {
     display: grid;
     background: var(--rb-pure-white);
-  }
-
-  .icare-product-card--standard .icare-product-card__body {
-    gap: 0.55rem;
-    min-height: 8.25rem;
-    padding: 0.625rem 0 0.875rem;
   }
 
   .icare-product-card--showcase .icare-product-card__body {
@@ -673,8 +1358,9 @@
   }
 
   .icare-product-card--standard .icare-product-card__name {
-    font-size: 1.3125rem;
-    line-height: 1.2;
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
   }
 
   .icare-product-card--showcase .icare-product-card__name {
@@ -696,7 +1382,7 @@
 
   .icare-product-card--standard .icare-product-card__description {
     max-width: 28ch;
-    font-size: 1.3125rem;
+    font-size: 0.875rem;
     line-height: 1.5;
   }
 
@@ -722,7 +1408,10 @@
   }
 
   .icare-product-card--standard .icare-product-card__price {
-    font-size: 1.5rem;
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    text-align: right;
   }
 
   .icare-product-card--showcase .icare-product-card__price {
@@ -801,54 +1490,183 @@
     text-transform: none;
   }
 
-  .icare-split-banner {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    background: var(--rb-bg-warm-gray);
-    padding-top: var(--icare-section-gap);
+  .icare-promo-banner {
+    /* Rhode mod_banner — full-bleed image card inside page gutter */
   }
 
-  .icare-split-banner__copy,
-  .icare-split-banner__media,
-  .icare-full-banner,
-  .icare-morning-section {
-    overflow: hidden;
-    border-radius: var(--icare-section-radius);
-    background: var(--rb-bg-warm-gray);
-  }
-
-  .icare-split-banner__copy {
-    order: 1;
-    display: grid;
-    align-content: center;
-    justify-items: center;
-    padding: 2.5rem 2rem 1.25rem;
-    text-align: center;
-  }
-
-  .icare-split-banner__media {
+  .icare-promo-banner__frame {
     position: relative;
-    order: 2;
-    flex: 1;
-    min-height: 0;
-    max-height: 28rem;
+    display: flex;
+    overflow: hidden;
+    flex-direction: column;
+    width: 100%;
+    aspect-ratio: 2.47 / 1;
+    min-height: clamp(16rem, 42vw, 28rem);
+    border-radius: 12px;
+  }
+
+  .icare-promo-banner__media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .icare-promo-banner__media > .icare-promo-banner__image,
+  .icare-promo-banner__media > div {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .icare-promo-banner__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .icare-promo-banner__media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .icare-promo-banner__shade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to right,
+      rgb(0 0 0 / 0.08) 0%,
+      rgb(0 0 0 / 0.34) 42%,
+      rgb(0 0 0 / 0.58) 100%
+    );
+  }
+
+  .icare-promo-banner__content {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    padding: max(1.875rem, 2.08333vw) max(2rem, 5vw) max(1.875rem, 2.08333vw) max(1rem, 2vw);
+    color: var(--rb-pure-white);
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .icare-promo-banner__content-inner {
+    display: flex;
+    width: min(100%, 28rem);
+    max-width: 48%;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    pointer-events: all;
+  }
+
+  .icare-promo-banner__headline {
+    margin: 0;
+    width: 100%;
+    color: inherit;
+    /* Rhode mod_banner h2[data-font-size=s] */
+    font-size: max(1.5rem, 1.66667vw);
+    font-weight: var(--rb-font-weight-normal);
+    line-height: 1.2;
+    letter-spacing: var(--rb-tracking-normal);
+    text-transform: lowercase;
+    white-space: break-spaces;
+  }
+
+  .icare-promo-banner__headline b {
+    font-weight: var(--rb-font-weight-bold);
+  }
+
+  .icare-promo-banner__description {
+    margin: 0;
+    width: 100%;
+    color: inherit;
+    font-size: max(calc(0.825rem + 0.2vw), 0.925vw);
+    font-weight: var(--rb-font-weight-normal);
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    white-space: break-spaces;
+  }
+
+  .icare-promo-banner__cta {
+    margin-top: 0.4rem;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border: 1px solid rgb(255 255 255 / 0.95);
+    border-radius: var(--rb-radius-pill);
+    background: transparent;
+    padding: 0.625rem 2rem;
+    color: var(--rb-pure-white);
+    cursor: pointer;
+    font-size: var(--rb-text-pill);
+    font-weight: var(--rb-font-weight-normal);
+    line-height: var(--rb-text-pill--line-height);
+    letter-spacing: var(--rb-text-pill--letter-spacing);
+    text-transform: uppercase;
+    transition:
+      color 500ms cubic-bezier(0.76, 0, 0.24, 1),
+      border-color 500ms cubic-bezier(0.76, 0, 0.24, 1),
+      transform 500ms cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+  .icare-promo-banner__cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--rb-pure-white);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 500ms cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+  .icare-promo-banner__cta:hover {
+    border-color: var(--rb-pure-white);
+    color: var(--rb-primary-text);
+    transform: translateY(-1px);
+  }
+
+  .icare-promo-banner__cta:hover::before {
+    transform: scaleY(1);
+  }
+
+  .icare-promo-banner__cta:focus-visible {
+    outline: 2px solid var(--rb-pure-white);
+    outline-offset: 4px;
   }
 
   .icare-full-banner {
     position: relative;
+    overflow: hidden;
     min-height: 44rem;
+    border-radius: var(--icare-section-radius);
     color: var(--rb-pure-white);
   }
 
   .icare-full-banner__media {
     position: absolute;
     inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
   }
 
   .icare-full-banner__shade {
     position: absolute;
     inset: 0;
+    border-radius: inherit;
     background: linear-gradient(to top, rgb(0 0 0 / 0.28), transparent 55%);
   }
 
@@ -864,26 +1682,424 @@
   }
 
   .icare-morning-section {
-    padding: 1.75rem;
+    overflow: hidden;
   }
 
   .icare-morning-header {
     display: flex;
     justify-content: center;
-    margin: 1.5rem 0 4.5rem;
+    margin: 0 0 max(2.5rem, 2.7778vw);
+    text-align: center;
+  }
+
+  .icare-morning-title {
+    margin: 0;
+    color: var(--rb-primary-text);
+    font-size: var(--rb-text-sun-kissed-h2);
+    font-weight: var(--rb-font-weight-bold);
+    line-height: var(--rb-text-sun-kissed-h2--line-height);
+    letter-spacing: var(--rb-tracking-wide);
+    text-transform: uppercase;
   }
 
   .icare-morning-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(24rem, 1fr);
-    gap: 2.375rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
   }
 
-  .icare-morning-panel {
-    height: 28rem;
+  .icare-morning-media {
+    position: relative;
     overflow: hidden;
+    border-radius: var(--icare-section-radius) var(--icare-section-radius) 0 0;
+    background: var(--rb-bg-warm-gray);
+  }
+
+  .icare-morning-media__viewport {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 109%;
+  }
+
+  .icare-morning-media__slide {
+    position: absolute;
+    inset: 0;
+  }
+
+  .icare-morning-media__slide > .icare-morning-media__image,
+  .icare-morning-media__slide > div {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .icare-morning-media__slide img,
+  .icare-morning-media__image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .icare-morning-media__slide img[src="/default-product.svg"],
+  .icare-morning-media__image img[src="/default-product.svg"] {
+    box-sizing: border-box;
+    object-fit: contain;
+    padding: clamp(1.25rem, 4vw, 2.5rem);
+  }
+
+  .icare-morning-media__dots {
+    position: absolute;
+    left: 50%;
+    bottom: max(1.25rem, 2.08333vw);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    min-height: max(0.6875rem, 0.763889vw);
+    transform: translateX(-50%);
+  }
+
+  .icare-morning-media__dot {
+    width: max(0.6875rem, 0.763889vw);
+    height: max(0.6875rem, 0.763889vw);
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.5);
+    cursor: pointer;
+    transition: opacity 200ms ease, width 200ms ease;
+  }
+
+  .icare-morning-media__dot.is-active {
+    opacity: 0.8;
+    background: rgb(255 255 255 / 0.8);
+  }
+
+  .icare-morning-products {
+    overflow: hidden;
+    border-radius: 0 0 var(--icare-section-radius) var(--icare-section-radius);
+    background: var(--rb-bg-warm-gray);
+  }
+
+  .icare-morning-product {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100%;
+    padding: max(1.25rem, 1.80556vw) max(1.5625rem, 2.08333vw);
+  }
+
+  .icare-morning-product__stage {
+    position: relative;
+    order: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    width: max(9.125rem, 36.3889vw);
+    height: max(9.125rem, 36.3889vw);
+    z-index: 2;
+  }
+
+  .icare-morning-product__image {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .icare-morning-product__image > .icare-morning-product__image-media,
+  .icare-morning-product__image > div {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .icare-morning-product__image img,
+  .icare-morning-product__image-media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+  }
+
+  .icare-morning-product__nav {
+    position: absolute;
+    top: max(8rem, 22vw);
+    z-index: 3;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: max(2.75rem, 3.0556vw);
+    height: max(2.75rem, 3.0556vw);
+    padding: 0;
+    border: 1px solid var(--rb-gray-6D6E70);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--rb-primary-text);
+    cursor: pointer;
+    transition: background-color 200ms ease;
+  }
+
+  .icare-morning-product__nav:hover {
+    background: rgb(103 100 94 / 0.06);
+  }
+
+  .icare-morning-product__nav:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--rb-primary-text) 70%, transparent);
+  }
+
+  .icare-morning-product__nav--prev {
+    left: max(1.25rem, 2.08333vw);
+  }
+
+  .icare-morning-product__nav--next {
+    right: max(1.25rem, 2.08333vw);
+  }
+
+  .icare-morning-product__details {
+    order: 1;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .icare-morning-product__meta {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .icare-morning-product__rating {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    color: var(--rb-primary-text);
+  }
+
+  .icare-morning-product__stars {
+    display: flex;
+    color: var(--rb-primary-text);
+  }
+
+  .icare-morning-product__stars svg {
+    width: max(0.75rem, 0.8333vw);
+    height: max(0.75rem, 0.8333vw);
+  }
+
+  .icare-morning-product__reviews {
+    font-size: max(0.875rem, 1.25vw);
+    font-weight: var(--rb-font-weight-bold);
+    line-height: 1.5;
+    letter-spacing: var(--rb-tracking-wide);
+    text-transform: uppercase;
+  }
+
+  .icare-morning-product__title,
+  .icare-morning-product__subtitle {
+    margin: 0;
+    color: var(--rb-primary-text);
+    font-size: max(0.875rem, 1.25vw);
+    line-height: 1.5;
+  }
+
+  .icare-morning-product__title {
+    font-weight: var(--rb-font-weight-bold);
+    text-transform: uppercase;
+  }
+
+  .icare-morning-product__subtitle {
+    font-weight: var(--rb-font-weight-normal);
+    text-transform: lowercase;
+  }
+
+  .icare-morning-product__cta {
+    position: relative;
+    isolation: isolate;
+    order: 3;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    width: fit-content;
+    margin-top: max(0.75rem, 0.8333vw);
+    padding: 0.3125rem 2rem;
+    border: 1px solid var(--rb-primary-text);
+    border-radius: var(--rb-radius-pill);
+    background: transparent;
+    color: var(--rb-primary-text);
+    cursor: pointer;
+    font-size: var(--rb-text-pill);
+    font-weight: var(--rb-font-weight-normal);
+    line-height: var(--rb-text-pill--line-height);
+    letter-spacing: var(--rb-text-pill--letter-spacing);
+    text-transform: uppercase;
+    transition:
+      color 500ms cubic-bezier(0.76, 0, 0.24, 1),
+      border-color 500ms cubic-bezier(0.76, 0, 0.24, 1),
+      transform 500ms cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+  .icare-morning-product__cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--rb-primary-text);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 500ms cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+  .icare-morning-product__cta:hover {
+    color: var(--rb-pure-white);
+    transform: translateY(-1px);
+  }
+
+  .icare-morning-product__cta:hover::before {
+    transform: scaleY(1);
+  }
+
+  .icare-morning-product__cta:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--rb-primary-text) 70%, transparent);
+  }
+
+  .icare-morning-product__index {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    padding: max(1.25rem, 1.80556vw) max(0.75rem, 2.43056vw);
+    background: var(--rb-bg-warm-gray);
+    color: var(--rb-primary-text);
+    font-size: max(3.125rem, 3.47222vw);
+    font-weight: var(--rb-font-weight-bold);
+    line-height: 0.95;
+    text-align: end;
+    pointer-events: none;
+  }
+
+  .icare-morning-empty {
+    padding: 3rem 1.5rem;
     border-radius: var(--icare-section-radius);
-    background: var(--rb-pure-white);
+    background: var(--rb-bg-warm-gray);
+    color: var(--rb-gray-84827E);
+    font-size: var(--rb-text-pill);
+    font-weight: var(--rb-font-weight-bold);
+    letter-spacing: var(--rb-tracking-wide);
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .icare-morning-skeleton {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .icare-morning-skeleton__media {
+    aspect-ratio: 1 / 1.09;
+    border-radius: var(--icare-section-radius);
+    background: var(--rb-bg-warm-gray);
+  }
+
+  .icare-morning-skeleton__panel {
+    min-height: 24rem;
+    border-radius: var(--icare-section-radius);
+    background: var(--rb-bg-warm-gray);
+  }
+
+  /* Shared mobile mode: height is at least 1.5x width. */
+  @media (max-aspect-ratio: 2 / 3) {
+    .icare-morning-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      overflow: hidden;
+      border-radius: var(--icare-section-radius);
+    }
+
+    .icare-morning-media {
+      flex: 0 0 auto;
+      border-radius: var(--icare-section-radius) var(--icare-section-radius) 0 0;
+    }
+
+    .icare-morning-media__viewport {
+      padding-bottom: 109%;
+    }
+
+    .icare-morning-media__dot {
+      width: 0.4375rem;
+      height: 0.4375rem;
+      background: rgb(255 255 255 / 0.45);
+    }
+
+    .icare-morning-media__dot.is-active {
+      width: 0.4375rem;
+      background: var(--rb-pure-white);
+      opacity: 1;
+    }
+
+    .icare-morning-products {
+      flex: 1 1 auto;
+      border-radius: 0 0 var(--icare-section-radius) var(--icare-section-radius);
+    }
+
+    .icare-morning-product {
+      min-height: auto;
+      padding: 1.25rem 1.5625rem 1.5rem;
+    }
+
+    .icare-morning-product__details {
+      order: 1;
+      margin-bottom: 0.75rem;
+    }
+
+    .icare-morning-product__stage {
+      order: 2;
+      width: min(14rem, 58vw);
+      height: min(14rem, 58vw);
+      margin: 0.25rem auto 1rem;
+    }
+
+    .icare-morning-product__cta {
+      order: 3;
+      align-self: flex-start;
+      margin-top: 0;
+    }
+
+    .icare-morning-product__index,
+    .icare-morning-product__nav {
+      display: none;
+    }
+
+    .icare-morning-product__title,
+    .icare-morning-product__subtitle,
+    .icare-morning-product__reviews {
+      font-size: 0.875rem;
+    }
+
+    .icare-morning-skeleton {
+      overflow: hidden;
+      border-radius: var(--icare-section-radius);
+    }
+
+    .icare-morning-skeleton__media {
+      border-radius: var(--icare-section-radius) var(--icare-section-radius) 0 0;
+    }
+
+    .icare-morning-skeleton__panel {
+      min-height: 20rem;
+      border-radius: 0 0 var(--icare-section-radius) var(--icare-section-radius);
+    }
   }
 
   .icare-ugc-grid {
@@ -927,16 +2143,198 @@
 
   .icare-mission-panel,
   .icare-mission-image {
-    min-height: 34.5rem;
     overflow: hidden;
     border-radius: var(--icare-section-radius);
     background: var(--rb-bg-warm-gray);
   }
 
   .icare-mission-panel {
+    grid-column: 1;
+    grid-row: 1;
     display: flex;
     flex-direction: column;
-    padding: 2rem;
+    min-height: 34.5rem;
+    padding: clamp(2.5rem, 3.5vw, 3.75rem);
+  }
+
+  .icare-mission-image {
+    position: relative;
+    grid-column: 2;
+    grid-row: 1;
+    min-height: 34.5rem;
+  }
+
+  .icare-mission-image__media,
+  .icare-mission-image > div:not(.icare-mission-image__shade) {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: inherit;
+  }
+
+  .icare-mission-image img,
+  .icare-mission-image__media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: inherit;
+  }
+
+  .icare-mission-image__shade {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    background: rgb(0 0 0 / 0.05);
+  }
+
+  .icare-mission-copy {
+    margin-bottom: 0;
+  }
+
+  /* Rhode TabbedSection body copy (u-hSize): fluid heading-scale text, not 16px base. */
+  .icare-mission-detail {
+    max-width: max(30rem, 28vw);
+    margin: 0 0 1.5rem;
+    color: var(--rb-primary-text);
+    font-size: var(--rb-text-mission-body);
+    font-weight: var(--rb-font-weight-normal);
+    line-height: var(--rb-text-mission-body--line-height);
+    letter-spacing: var(--rb-tracking-normal);
+  }
+
+  /* Rhode outline pill: 15.73px / 400 / uppercase ghost button. */
+  .icare-mission-cta {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid var(--rb-primary-text);
+    border-radius: var(--rb-radius-pill);
+    background: transparent;
+    color: var(--rb-primary-text);
+    cursor: pointer;
+    padding: 0.625rem 2rem;
+    font-size: var(--rb-text-pill);
+    font-weight: var(--rb-font-weight-normal);
+    line-height: var(--rb-text-pill--line-height);
+    letter-spacing: var(--rb-text-pill--letter-spacing);
+    text-transform: uppercase;
+    transition:
+      color 500ms cubic-bezier(0.76, 0, 0.24, 1),
+      border-color 500ms cubic-bezier(0.76, 0, 0.24, 1),
+      transform 500ms cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+  .icare-mission-cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--rb-primary-text);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 500ms cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+  .icare-mission-cta:hover {
+    border-color: var(--rb-primary-text);
+    color: var(--rb-pure-white);
+    transform: translateY(-1px);
+  }
+
+  .icare-mission-cta:hover::before {
+    transform: scaleY(1);
+  }
+
+  .icare-mission-cta:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--rb-primary-text) 70%, transparent);
+  }
+
+  .icare-mission-tabs {
+    margin-top: auto;
+  }
+
+  .icare-mission-tab {
+    display: flex;
+    align-items: center;
+    padding: 1rem 0;
+    border-top: 1px solid var(--rb-gray-CCCCCC);
+    cursor: pointer;
+    opacity: 0.75;
+    transition: color 300ms ease, opacity 300ms ease;
+  }
+
+  .icare-mission-tab.is-active {
+    opacity: 1;
+  }
+
+  .icare-mission-tab:last-child {
+    border-bottom: 1px solid var(--rb-gray-CCCCCC);
+  }
+
+  /* Rhode TabbedSection toggles: u-pSize__Large / bold / lowercase / 1rem row padding. */
+  .icare-mission-tab__title {
+    margin: 0;
+    color: var(--rb-primary-text);
+    font-size: var(--rb-text-mission-tab);
+    font-weight: var(--rb-font-weight-bold);
+    line-height: var(--rb-text-mission-tab--line-height);
+    letter-spacing: var(--rb-tracking-normal);
+    text-transform: lowercase;
+  }
+
+  /* Shared mobile mode: height is at least 1.5x width. */
+  @media (max-aspect-ratio: 2 / 3) {
+    .icare-mission-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      overflow: hidden;
+      border-radius: var(--icare-section-radius);
+    }
+
+    .icare-mission-image {
+      position: relative;
+      order: 1;
+      flex: 0 0 auto;
+      min-height: 0;
+      aspect-ratio: 4 / 3;
+      border-radius: var(--icare-section-radius) var(--icare-section-radius) 0 0;
+    }
+
+    .icare-mission-image__media,
+    .icare-mission-image > div:not(.icare-mission-image__shade) {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .icare-mission-panel {
+      order: 2;
+      flex: 1 1 auto;
+      min-height: 0;
+      border-radius: 0 0 var(--icare-section-radius) var(--icare-section-radius);
+      padding: clamp(1.5rem, 4vw, 2rem) clamp(1.25rem, 4vw, 1.75rem) clamp(1.75rem, 5vw, 2.25rem);
+    }
+
+    .icare-mission-detail {
+      max-width: none;
+      margin-bottom: 1.25rem;
+    }
+
+    .icare-mission-tabs {
+      margin-top: 1.5rem;
+    }
   }
 
   .icare-footer-newsletter-form {
@@ -996,6 +2394,14 @@
 
 }
 
+/* Rhode u-hSize / u-pSize__Large desktop breakpoints (theme.css @ 821px). */
+@media (min-width: 821px) {
+  :root {
+    --rb-text-mission-body: 2.525vw;
+    --rb-text-mission-tab: max(1.5rem + 0.2vw, 1.85vw);
+  }
+}
+
 @media (hover: none), (pointer: coarse) {
   .icare-swipe-rail__viewport,
   .icare-product-card__main-action {
@@ -1007,20 +2413,19 @@
   }
 }
 
-@media (max-width: 980px) {
+@media (max-aspect-ratio: 2 / 3) {
   :root {
-    --icare-header-inset: 1.25rem;
-    --icare-header-top-gap: 0.625rem;
-    --icare-hero-inset: 1.25rem;
+    --icare-page-gutter: 1.25rem;
+    --icare-page-bottom-gap: 1.25rem;
+    --icare-hero-stack-gap: 0.625rem;
     --icare-hero-height: calc(100vh - 22.25rem);
     --icare-hero-min-height: 30.5rem;
     --icare-hero-radius: 10px;
-    --icare-section-inset: 1.25rem;
     --icare-section-gap: 1.125rem;
   }
 
   .icare-morning-section {
-    padding: 1rem;
+    padding: 0;
   }
 
   .icare-landing-products {
@@ -1045,6 +2450,21 @@
     width: min(84vw, 28rem);
   }
 
+  .icare-promo-banner__frame {
+    aspect-ratio: 1.15 / 1;
+    min-height: clamp(18rem, 72vw, 24rem);
+  }
+
+  .icare-promo-banner__content {
+    align-items: center;
+    padding: max(1.25rem, 1.38889vw);
+  }
+
+  .icare-promo-banner__content-inner {
+    width: min(100%, 34rem);
+    max-width: 92%;
+  }
+
   .icare-product-card--showcase .icare-product-card__primary {
     min-height: 36rem;
   }
@@ -1059,23 +2479,11 @@
 
   .icare-morning-grid,
   .icare-mission-section {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-
-  .icare-morning-panel {
-    min-height: 22rem;
+    gap: 0;
   }
 
   .icare-ugc-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .icare-mission-panel {
-    padding: 1rem;
-  }
-
-  .icare-mission-image {
   }
 
   .icare-footer-newsletter-form {
@@ -1085,10 +2493,26 @@
   .icare-footer-newsletter-button {
     width: max-content;
   }
+
+  .icare-store-locator__frame {
+    display: flex;
+    min-height: auto;
+    flex-direction: column;
+  }
+
+  .icare-store-locator__panel {
+    min-height: 45vh;
+    border-inline-end: 0;
+    border-bottom: 1px solid var(--rb-border-light);
+  }
+
+  .icare-store-locator__map {
+    min-height: 55vh;
+  }
 }
 
 /* ─── Tablet Breakpoint (768px–1023px) ─── */
-@media (min-width: 768px) and (max-width: 1023px) {
+@media (min-width: 768px) and (max-width: 1023px) and (max-aspect-ratio: 2 / 3) {
   :root {
     --icare-section-gap: 1.5rem;
     --icare-hero-height: calc(100vh - 18rem);
@@ -1104,10 +2528,9 @@
     min-height: 30rem;
   }
 
-  .icare-morning-grid,
-  .icare-mission-section {
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+  .icare-morning-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
   }
 
   .icare-ugc-grid {
@@ -1116,11 +2539,10 @@
 }
 
 /* ─── Mobile Trending Scroll (used in ProductSection) ─── */
-@media (max-width: 767px) {
+@media (max-width: 767px) and (max-aspect-ratio: 2 / 3) {
   :root {
-    --icare-header-inset: 1.125rem;
-    --icare-hero-inset: 1.125rem;
-    --icare-section-inset: 1.125rem;
+    --icare-page-gutter: 1.125rem;
+    --icare-page-bottom-gap: 1.125rem;
     --icare-section-gap: 1.125rem;
     --icare-hero-height: calc(100vh - 14rem);
     --icare-hero-min-height: 28rem;
@@ -1168,6 +2590,55 @@
 @media (prefers-reduced-motion: reduce) {
   .skeleton-content {
     animation: none;
+  }
+}
+
+/* Rhode half-product-image desktop/non-mobile mode. */
+@media (min-width: 1040px), (min-aspect-ratio: 2 / 3) {
+  .icare-morning-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: max(2.375rem, 2.63889vw);
+  }
+
+  .icare-morning-media {
+    border-radius: var(--icare-section-radius);
+    min-height: max(45rem, 50vw);
+    height: max(45rem, 50vw);
+    max-height: max(45rem, 50vw);
+  }
+
+  .icare-morning-media__viewport {
+    height: 100%;
+    min-height: max(45rem, 50vw);
+    padding-bottom: 0;
+  }
+
+  .icare-morning-products {
+    border-radius: var(--icare-section-radius);
+  }
+
+  .icare-morning-product {
+    justify-content: flex-end;
+    min-height: max(45rem, 50vw);
+  }
+
+  .icare-morning-product__stage {
+    order: 1;
+  }
+
+  .icare-morning-product__details {
+    order: 2;
+    margin-bottom: max(0.9375rem, 1.04167vw);
+  }
+
+  .icare-morning-product__nav {
+    display: inline-flex;
+    top: 38%;
+  }
+
+  .icare-morning-product__index {
+    padding: max(4.375rem, 4.86111vw) max(0.75rem, 2.43056vw) max(0.9375rem, 1.04167vw);
   }
 }
 

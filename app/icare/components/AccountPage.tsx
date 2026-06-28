@@ -161,7 +161,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
 
   return (
     <div className="min-h-screen bg-white">
-      <section className="icare-index-section bg-[#F1F0ED] rounded-[12px] overflow-hidden" style={{ marginTop: 'var(--icare-header-top-gap)' }}>
+      <section className="icare-index-section bg-[#F1F0ED] rounded-[12px] overflow-hidden" style={{ marginTop: 'var(--icare-hero-stack-gap)' }}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 items-stretch">
       {/* Left Section: Image and Message */}
       <div className="relative h-[45vh] md:h-[80vh] w-full overflow-hidden z-0">

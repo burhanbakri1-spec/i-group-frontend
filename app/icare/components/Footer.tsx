@@ -59,7 +59,7 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
   });
 
   return (
-    <footer className="bg-[#F1F0ED] font-sans mx-4 sm:mx-6 lg:mx-8 mb-8 rounded-[24px] overflow-hidden border border-[#DDDDDD]">
+    <footer className="bg-[#F1F0ED] font-sans mb-0 rounded-[24px] overflow-hidden border border-[#DDDDDD]">
       {/* 1. LOGO SECTION */}
       <div className="w-full py-16 md:py-24 overflow-hidden flex justify-center items-center">
         <motion.h2 

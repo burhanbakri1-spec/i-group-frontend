@@ -22,7 +22,6 @@ interface HeaderProps {
 }
 
 const FOCUS_VISIBLE_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67645E]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--rb-bg-warm-gray)]';
-const MUTED_TEXT_CLASS = 'text-[var(--rb-primary-text)] hover:text-[var(--rb-near-black)]';
 const SHOP_MEGA_MENU_ID = 'icare-shop-mega-menu';
 const HEADER_HIDE_SCROLL_THRESHOLD = 220;
 const HEADER_SHOW_SCROLL_THRESHOLD = 32;
@@ -31,6 +30,9 @@ const HEADER_HIDE_DELAY_MS = 200;
 const HEADER_MOTION_EASE = [0.76, 0, 0.24, 1] as const;
 const PREVIEW_LIMIT = 8;
 const PREVIEW_SLIDE_DISTANCE = 60;
+
+const getMegaMenuSubtitle = (product: Product) =>
+  product.sub?.trim() || product.description?.trim() || '';
 
 export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavigate, onProductSelect, onOpenMenu, isDrawerOpen, lang, onToggleLang }) => {
   const t = translations[lang];
@@ -222,7 +224,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
         return cat === activeName;
       })
       .slice(0, PREVIEW_LIMIT);
-  }, [previewProducts, clampedActivePreviewIndex, megaMenuCategories, rootCategories]);
+  }, [previewProducts, clampedActivePreviewIndex, megaMenuCategories, rootCategories, lang]);
 
   const setPreviewByIndex = (nextIndex: number) => {
     if (nextIndex === clampedActivePreviewIndex) return;
@@ -241,8 +243,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
 
       setIsScrolled(currentScrollY > 40 || !isStandardHeroRoute);
 
-      if (isStandardHeroRoute && currentScrollY > 40) {
-        setHasScrolledPastHero(true);
+      if (isStandardHeroRoute) {
+        setHasScrolledPastHero(currentScrollY > 40);
+      } else {
+        setHasScrolledPastHero(false);
       }
 
       // While the shop mega menu is open, freeze the header in place.
@@ -325,8 +329,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
   const wrapperBg = isConnected
     ? 'bg-transparent'
     : 'bg-[var(--rb-bg-warm-gray)] shadow-[0_1rem_2rem_rgba(103,100,94,0.06)]';
-  const navTextClass = isConnected ? 'text-white hover:text-white/75' : MUTED_TEXT_CLASS;
   const logoToneClass = isConnected ? 'brightness-0 invert' : '';
+  const headerLinkClass = `${FOCUS_VISIBLE_CLASS} icare-header-link ${isConnected ? 'icare-header-link--inverse' : 'icare-header-link--muted'}`;
+  const headerLangClass = `${FOCUS_VISIBLE_CLASS} icare-header-lang ${isConnected ? 'icare-header-lang--inverse' : 'icare-header-lang--muted'}`;
 
   // When condensed, lift the header up so the white plate shows as a gap above it.
   // Left/right positions stay tied to --icare-header-inset (no horizontal shift).
@@ -370,20 +375,18 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
         <div
           className={`overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] border ${isConnected ? 'border-transparent' : 'border-[var(--rb-border-light)]'} ${radiusClass} ${wrapperBg}`}
         >
-          <header
-            className="flex min-h-[64px] items-center justify-between px-4 py-4 md:px-8 md:py-5"
-          >
+          <header className="icare-header-bar">
           {/* Navigation */}
-          <div className="flex items-center gap-10">
+          <div className="flex items-center">
             <button 
               onClick={onOpenMenu}
               onMouseEnter={closeShopMenu}
-              className={`p-2 rounded-full transition-colors lg:hidden ${FOCUS_VISIBLE_CLASS} ${isConnected ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}
+              className={`icare-header-menu-button p-2 rounded-full transition-colors ${FOCUS_VISIBLE_CLASS} ${isConnected ? 'hover:bg-white/10' : 'hover:bg-black/5'}`}
                aria-label={t.openMenu}
              >
               <Menu size={20} className={isConnected ? 'text-white' : 'text-[var(--rb-primary-text)]'} />
             </button>
-            <nav className="hidden lg:flex items-center gap-7">
+            <nav className="icare-header-nav">
               <button
                 ref={shopButtonRef}
                 onMouseEnter={showShop}
@@ -397,8 +400,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                     onNavigate('shop');
                   }
                 }}
-                /* Match system header nav links: 12.8px / 700 / 19.2px / 0.256px ls / uppercase. */
-                className={`rounded-full px-1 text-[clamp(0.875rem,0.6vw+0.75rem,1rem)] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
+                className={headerLinkClass}
                 aria-haspopup="true"
                 aria-expanded={isShopHovered}
                 aria-controls={SHOP_MEGA_MENU_ID}
@@ -408,16 +410,16 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
               <button
                 onClick={() => onNavigate('story')}
                 onMouseEnter={closeShopMenu}
-                className={`rounded-full px-1 text-[clamp(0.875rem,0.6vw+0.75rem,1rem)] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
+                className={headerLinkClass}
               >
                 {t.story}
               </button>
               <button
                 onClick={onToggleLang}
                 onMouseEnter={closeShopMenu}
-                className={`text-[clamp(0.875rem,0.6vw+0.75rem,1rem)] font-bold flex items-center gap-2 border px-3 py-1.5 rounded-full transition-colors ${FOCUS_VISIBLE_CLASS} ${isConnected ? 'border-white/35 text-white hover:bg-white/10' : 'border-[var(--rb-border-light)] text-[var(--rb-primary-text)] hover:bg-black/5'}`}
+                className={headerLangClass}
               >
-                <Globe size={14} />
+                <Globe size={12} />
                  {lang === 'en' ? t.langToggleAr : t.langToggleEn}
               </button>
             </nav>
@@ -426,7 +428,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
           {/* Logo */}
           <motion.button
             onClick={() => onNavigate('home')}
-            className={`absolute left-1/2 -translate-x-1/2 h-12 md:h-14 lg:h-16 w-auto flex items-center justify-center rounded-full ${FOCUS_VISIBLE_CLASS}`}
+            className={`icare-header-logo absolute left-1/2 -translate-x-1/2 w-auto flex items-center justify-center rounded-full ${FOCUS_VISIBLE_CLASS}`}
             whileHover={shouldReduceMotion ? undefined : { scale: 1.015 }}
             whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
             transition={calmTween}
@@ -440,31 +442,31 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
           </motion.button>
 
           {/* Actions */}
-          <div className="flex items-center gap-3 md:gap-6">
+          <div className="icare-header-actions">
             <button
                 onClick={onOpenSearch}
                 onMouseEnter={closeShopMenu}
-                className={`rounded-full px-1 text-[clamp(0.875rem,0.6vw+0.75rem,1rem)] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
+                className={headerLinkClass}
                 aria-label={t.search}
             >
-              <span className="hidden md:inline">{t.search}</span>
-              <Search size={20} className="md:hidden" />
+              <span className="icare-header-action-label">{t.search}</span>
+              <Search size={20} className="icare-header-action-icon" />
             </button>
             <button
               onClick={() => onNavigate('account')}
               onMouseEnter={closeShopMenu}
-              className={`rounded-full px-1 text-[clamp(0.875rem,0.6vw+0.75rem,1rem)] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors hidden md:block ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
+              className={`${headerLinkClass} icare-header-account-action`}
             >
               {t.account}
             </button>
             <button
               onClick={onOpenCart}
               onMouseEnter={closeShopMenu}
-              className={`rounded-full px-1 text-[clamp(0.875rem,0.6vw+0.75rem,1rem)] font-bold uppercase leading-[1.5] tracking-[0.02em] transition-colors relative ${FOCUS_VISIBLE_CLASS} ${navTextClass}`}
+              className={`${headerLinkClass} relative`}
               aria-label={t.cart}
             >
-              <span className="hidden md:inline">{t.cart} ({cartCount})</span>
-              <div className="md:hidden flex items-center gap-1 relative">
+              <span className="icare-header-action-label">{t.cart} ({cartCount})</span>
+              <div className="icare-header-cart-mobile items-center gap-1 relative">
                 <ShoppingBag size={20} />
                 {cartCount > 0 && (
                   <span className={`absolute -top-2 ${lang === 'ar' ? '-left-2' : '-right-2'} w-5 h-5 text-[10px] font-black rounded-full flex items-center justify-center ${isConnected ? 'bg-white text-[var(--rb-primary-text)]' : 'bg-black text-white'}`}>
@@ -486,110 +488,116 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="overflow-hidden px-4 md:px-6 pb-4"
+              className="icare-header-mega"
               onMouseEnter={showShop}
             >
-              <div className="max-w-[1440px] mx-auto px-10">
+              <div className="icare-header-mega__inner">
                 {megaMenuCategories.length > 0 && (
-                  <div className="flex justify-center gap-6 mb-4 px-6">
-                    {/* "All" button */}
+                  <div className="icare-header-mega__categories-wrap">
+                    <div className="icare-header-mega__categories" role="tablist">
                       <button
-                      key={t.categories.all}
-                      onMouseEnter={() => setPreviewByIndex(0)}
-                      onFocus={() => setPreviewByIndex(0)}
-                      onClick={() => { onNavigate('shop', { categorySlug: '' }); closeShopMenu(); }}
-                      className={`rounded-full px-1 text-[12.8px] font-bold uppercase tracking-[0.02em] leading-[1.5] relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
-                        clampedActivePreviewIndex === 0 ? 'text-[var(--rb-near-black)]' : 'text-[var(--rb-primary-text)]'
-                      }`}
-                    >
-                      {t.categories.all}
-                      {clampedActivePreviewIndex === 0 && (
-                        <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="absolute -bottom-2 start-0 w-full h-[1px] bg-black" />
-                      )}
-                    </button>
-                    {/* Root category buttons */}
-                    {rootCategories.length > 0 ? rootCategories.map((cat, index) => (
-                      <button
-                        key={cat.slug}
-                        onMouseEnter={() => setPreviewByIndex(index + 1)}
-                        onFocus={() => setPreviewByIndex(index + 1)}
-                        onClick={() => { onNavigate('shop', { categorySlug: cat.slug }); closeShopMenu(); }}
-                        /* Match system 12.8px / 700 / 0.256px rhythm for secondary nav pills. */
-                        className={`rounded-full px-1 text-[12.8px] font-bold uppercase tracking-[0.02em] leading-[1.5] relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
-                          clampedActivePreviewIndex === index + 1 ? 'text-[var(--rb-near-black)]' : 'text-[var(--rb-primary-text)]'
-                        }`}
+                        type="button"
+                        role="tab"
+                        aria-selected={clampedActivePreviewIndex === 0}
+                        onMouseEnter={() => setPreviewByIndex(0)}
+                        onFocus={() => setPreviewByIndex(0)}
+                        onClick={() => { onNavigate('shop', { categorySlug: '' }); closeShopMenu(); }}
+                        className={`icare-header-mega__category${clampedActivePreviewIndex === 0 ? ' is-active' : ''} ${FOCUS_VISIBLE_CLASS}`}
                       >
-                        {pickLocalized(cat.name, lang)}
-                        {clampedActivePreviewIndex === index + 1 && (
-                          <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="absolute -bottom-2 start-0 w-full h-[1px] bg-[var(--rb-near-black)]" />
+                        {t.categories.all}
+                        {clampedActivePreviewIndex === 0 && (
+                          <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="icare-header-mega__category-indicator start-0 w-full" />
                         )}
                       </button>
-                    )) : (
-                      /* Fallback when no root categories: use derived names */
-                      megaMenuCategories.filter(c => c !== t.categories.all).map((cat, index) => (
+                      {rootCategories.length > 0 ? rootCategories.map((cat, index) => (
                         <button
-                          key={cat}
+                          type="button"
+                          role="tab"
+                          key={cat.slug}
+                          aria-selected={clampedActivePreviewIndex === index + 1}
                           onMouseEnter={() => setPreviewByIndex(index + 1)}
                           onFocus={() => setPreviewByIndex(index + 1)}
-                          onClick={() => { onNavigate('shop'); closeShopMenu(); }}
-                          className={`rounded-full px-1 text-[12.8px] font-bold uppercase tracking-[0.02em] leading-[1.5] relative transition-colors duration-200 ${FOCUS_VISIBLE_CLASS} ${
-                            clampedActivePreviewIndex === index + 1 ? 'text-[var(--rb-near-black)]' : 'text-[var(--rb-primary-text)]'
-                          }`}
+                          onClick={() => { onNavigate('shop', { categorySlug: cat.slug }); closeShopMenu(); }}
+                          className={`icare-header-mega__category${clampedActivePreviewIndex === index + 1 ? ' is-active' : ''} ${FOCUS_VISIBLE_CLASS}`}
                         >
-                          {cat}
+                          {pickLocalized(cat.name, lang)}
                           {clampedActivePreviewIndex === index + 1 && (
-                            <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="absolute -bottom-2 left-0 w-full h-[1px] bg-[var(--rb-near-black)]" />
+                            <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="icare-header-mega__category-indicator start-0 w-full" />
                           )}
                         </button>
-                      ))
-                    )}
+                      )) : (
+                        megaMenuCategories.filter((category) => category !== t.categories.all).map((cat, index) => (
+                          <button
+                            type="button"
+                            role="tab"
+                            key={cat}
+                            aria-selected={clampedActivePreviewIndex === index + 1}
+                            onMouseEnter={() => setPreviewByIndex(index + 1)}
+                            onFocus={() => setPreviewByIndex(index + 1)}
+                            onClick={() => { onNavigate('shop'); closeShopMenu(); }}
+                            className={`icare-header-mega__category${clampedActivePreviewIndex === index + 1 ? ' is-active' : ''} ${FOCUS_VISIBLE_CLASS}`}
+                          >
+                            {cat}
+                            {clampedActivePreviewIndex === index + 1 && (
+                              <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="icare-header-mega__category-indicator start-0 w-full" />
+                            )}
+                          </button>
+                        ))
+                      )}
+                    </div>
                   </div>
                 )}
 
                 {visiblePreviewProducts.length > 0 ? (
-                  <AnimatePresence mode="wait" initial={false} custom={previewDirection}>
-                    <motion.div
-                      key={clampedActivePreviewIndex}
-                      custom={previewDirection}
-                      variants={previewVariants}
-                      initial="enter"
-                      animate="center"
-                      exit="exit"
-                      transition={calmTween}
-                      className="flex gap-4 overflow-x-auto no-scrollbar px-6 pb-2"
-                    >
-                      {visiblePreviewProducts.map((product) => (
-                        <button
-                          type="button"
-                          key={product.id}
-                          className={`flex-none w-[clamp(15rem,18vw,19rem)] bg-[var(--rb-bg-surface)] rounded-[var(--rb-radius-card)] p-4 flex flex-col group cursor-pointer hover:bg-[var(--rb-bg-light)] transition-colors duration-200 text-left ${FOCUS_VISIBLE_CLASS}`}
-                          onClick={() => { onProductSelect?.(product); setIsShopHovered(false); }}
-                          aria-label={`${t.shopNow} ${product.title ?? product.name}`}
-                        >
-                          <div className="relative aspect-square mb-3 flex items-center justify-center p-4">
-                            <ImageWithFallback
-                              src={product.primaryImage}
-                              alt={product.title ?? product.name}
-                              className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-200"
-                            />
-                          </div>
-                          <div className="mt-auto">
-                            <h4 className="text-[14px] font-bold uppercase tracking-[0.02em] text-[var(--rb-near-black)] mb-1">
-                              {product.title ?? product.name}
-                            </h4>
-                            <p className="text-[14px] text-[var(--rb-primary-text)] font-normal tracking-[0.02em] leading-[1.5] mb-2">
-                              {product.description ?? <>{product.originalPrice && <span className="line-through mr-1">{product.originalPrice}</span>}{product.price}</>}
-                            </p>
-                            <span className="text-[12.8px] font-normal uppercase tracking-[0.02em] border-b border-[var(--rb-near-black)] pb-0.5 self-start group-hover:opacity-70 transition-opacity">
-                              {t.shopNow}
-                            </span>
-                          </div>
-                        </button>
-                      ))}
-                    </motion.div>
-                  </AnimatePresence>
+                  <div className="icare-header-mega__products">
+                    <AnimatePresence mode="wait" initial={false} custom={previewDirection}>
+                      <motion.div
+                        key={clampedActivePreviewIndex}
+                        custom={previewDirection}
+                        variants={previewVariants}
+                        initial="enter"
+                        animate="center"
+                        exit="exit"
+                        transition={calmTween}
+                        className="icare-header-mega__track"
+                      >
+                        {visiblePreviewProducts.map((product) => {
+                          const subtitle = getMegaMenuSubtitle(product);
+                          return (
+                            <button
+                              type="button"
+                              key={product.id}
+                              className={`icare-header-mega__card ${FOCUS_VISIBLE_CLASS}`}
+                              onClick={() => { onProductSelect?.(product); setIsShopHovered(false); }}
+                              aria-label={`${t.shopNow} ${product.title ?? product.name}`}
+                            >
+                              <div className="icare-header-mega__card-media">
+                                {product.label ? (
+                                  <span className="icare-header-mega__card-badge">{product.label}</span>
+                                ) : null}
+                                <div className="icare-header-mega__card-image">
+                                  <ImageWithFallback
+                                    src={product.primaryImage}
+                                    alt={product.title ?? product.name}
+                                  />
+                                </div>
+                              </div>
+                              <div className="icare-header-mega__card-copy">
+                                <h4 className="icare-header-mega__card-title">
+                                  {product.title ?? product.name}
+                                </h4>
+                                {subtitle ? (
+                                  <p className="icare-header-mega__card-subtitle">{subtitle}</p>
+                                ) : null}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
                 ) : (
-                  <div className="px-10 py-16 text-center text-[13px] font-bold uppercase tracking-[0.2em] text-[var(--rb-primary-text)]">
+                  <div className="icare-header-mega__empty">
                      {t.productPreviewsUnavailable}
                   </div>
                 )}

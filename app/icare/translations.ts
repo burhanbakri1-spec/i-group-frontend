@@ -204,6 +204,9 @@ export const translations = {
       },
       showcase: {
         featuredSkincare: "featured skincare essentials",
+        addToCart: "add to cart",
+        previousProduct: "Previous product",
+        nextProduct: "Next product",
         view: "VIEW",
         showProduct: "Show product {index}",
         imageAlt: "icare",
@@ -638,6 +641,9 @@ export const translations = {
       },
       showcase: {
         featuredSkincare: "أساسيات العناية بالبشرة المميزة",
+        addToCart: "أضف إلى السلة",
+        previousProduct: "المنتج السابق",
+        nextProduct: "المنتج التالي",
         view: "عرض",
         showProduct: "عرض المنتج {index}",
         imageAlt: "آي كير",

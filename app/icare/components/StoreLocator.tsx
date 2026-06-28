@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
 import { Search, Navigation, ExternalLink } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -91,6 +91,7 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
   const [stores, setStores] = useState<Store[]>([]);
   const [fetchState, setFetchState] = useState<'loading' | 'success' | 'error' | 'empty'>('loading');
   const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
+  const loadedLangRef = useRef<Language | null>(null);
 
   const loadStores = async () => {
     setFetchState('loading');
@@ -106,7 +107,11 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
   };
 
   useEffect(() => {
+    if (loadedLangRef.current === lang) return;
+
+    loadedLangRef.current = lang;
     let cancelled = false;
+
     const loadInitialStores = async () => {
       setFetchState('loading');
       try {
@@ -123,7 +128,7 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
     };
     loadInitialStores();
     return () => { cancelled = true; };
-  }, []);
+  });
 
   const filteredStores = stores.filter((store) => matchesStoreSearch(store, searchQuery));
   const t = translations[lang];
@@ -138,12 +143,13 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F1F0ED] overflow-hidden px-4 sm:px-6 lg:px-8">
-      <div className="flex flex-col md:flex-row h-[calc(100vh-96px)]">
+    <div className="min-h-screen bg-white pb-32">
+      <section className="icare-index-section icare-store-locator">
+        <div className="icare-store-locator__frame">
 
         {/* Sidebar: List */}
-        <div className="w-full md:w-[320px] lg:w-[450px] flex flex-col border-r border-[#DDDDDD] h-[45vh] md:h-full overflow-hidden bg-white z-10">
-          <div className="p-4 lg:p-8 space-y-4 lg:space-y-8">
+        <div className="icare-store-locator__panel">
+          <div className="icare-store-locator__header">
             <header>
               <h1 className="text-[24px] lg:text-[42px] font-brand lowercase italic leading-none mb-1 lg:mb-2">{t.pages.storeLocator.title}</h1>
               <p className="text-[9px] lg:text-[11px] font-bold uppercase tracking-widest text-black/40">
@@ -165,7 +171,7 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
           </div>
 
           {/* Results List */}
-          <div className="flex-1 overflow-y-auto px-4 lg:px-8 pb-8 no-scrollbar border-t md:border-t-0 border-black/5">
+          <div className="icare-store-locator__results no-scrollbar">
             <div className="space-y-3 pt-4">
               {fetchState === 'loading' && (
                 <StoreLocatorSkeleton count={4} />
@@ -261,7 +267,7 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
         </div>
 
         {/* Map Area */}
-        <div className="flex-1 relative overflow-hidden h-[55vh] md:h-full">
+        <div className="icare-store-locator__map">
           <StoreLocatorMap
             stores={filteredStores}
             selectedStoreId={selectedStoreId}
@@ -283,7 +289,8 @@ export const StoreLocator: React.FC<StoreLocatorProps> = ({ lang }) => {
             </div>
           )}
         </div>
-      </div>
+        </div>
+      </section>
 
       <style dangerouslySetInnerHTML={{ __html: `.no-scrollbar::-webkit-scrollbar { display: none; }` }} />
     </div>

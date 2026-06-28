@@ -4,6 +4,7 @@ const STANDARD_HERO_PATHS = new Set([
   '/icare/story',
   '/icare/contact',
   '/icare/faq',
+  '/icare/shipping',
   '/icare/vlog',
 ]);
 

@@ -6,161 +6,83 @@ interface PolicyPageProps {
   lang: Language;
 }
 
-export const PrivacyPolicy: React.FC<PolicyPageProps> = ({ lang }) => {
-  const t = translations[lang];
-  
-  return (
-    <div className="min-h-screen bg-[#F1F0ED] pt-32 pb-24 px-6 md:px-12 max-w-[800px] mx-auto">
-      <motion.div 
+type LegalSection = {
+  title: string;
+  body: string;
+};
+
+const LegalPageShell = ({ title, sections }: { title: string; sections: LegalSection[] }) => (
+  <div className="min-h-screen bg-white pb-32">
+    <section className="icare-index-section icare-legal-section">
+      <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="space-y-8"
+        className="icare-legal-section__inner"
       >
-        <h1 className="text-[24px] md:text-[32px] font-black uppercase tracking-tight">
-          {t.legal.privacyPolicy.title}
+        <h1 className="icare-legal-section__title">
+          {title}
         </h1>
-        
-        <div className="prose prose-sm max-w-none text-[#5C5B57] space-y-6 leading-relaxed">
-          <section className="space-y-3">
-            <h2 className="text-[14px] font-bold text-black uppercase tracking-wider">
-              {t.legal.privacyPolicy.section1Title}
-            </h2>
-            <p className="text-[14px]">
-              {t.legal.privacyPolicy.section1Body}
-            </p>
-          </section>
 
-          <section className="space-y-3">
-            <h2 className="text-[14px] font-bold text-black uppercase tracking-wider">
-              {t.legal.privacyPolicy.section2Title}
-            </h2>
-            <p className="text-[14px]">
-              {t.legal.privacyPolicy.section2Body}
-            </p>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-[14px] font-bold text-black uppercase tracking-wider">
-              {t.legal.privacyPolicy.section3Title}
-            </h2>
-            <p className="text-[14px]">
-              {t.legal.privacyPolicy.section3Body}
-            </p>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-[14px] font-bold text-black uppercase tracking-wider">
-              {t.legal.privacyPolicy.section4Title}
-            </h2>
-            <p className="text-[14px]">
-              {t.legal.privacyPolicy.section4Body}
-            </p>
-          </section>
+        <div className="icare-legal-section__content">
+          {sections.map((section) => (
+            <section key={section.title} className="icare-legal-section__block">
+              <h2 className="icare-legal-section__heading">
+                {section.title}
+              </h2>
+              <p className="icare-legal-section__body">
+                {section.body}
+              </p>
+            </section>
+          ))}
         </div>
       </motion.div>
-    </div>
+    </section>
+  </div>
+);
+
+export const PrivacyPolicy: React.FC<PolicyPageProps> = ({ lang }) => {
+  const t = translations[lang];
+
+  return (
+    <LegalPageShell
+      title={t.legal.privacyPolicy.title}
+      sections={[
+        { title: t.legal.privacyPolicy.section1Title, body: t.legal.privacyPolicy.section1Body },
+        { title: t.legal.privacyPolicy.section2Title, body: t.legal.privacyPolicy.section2Body },
+        { title: t.legal.privacyPolicy.section3Title, body: t.legal.privacyPolicy.section3Body },
+        { title: t.legal.privacyPolicy.section4Title, body: t.legal.privacyPolicy.section4Body },
+      ]}
+    />
   );
 };
 
 export const TermsOfService: React.FC<PolicyPageProps> = ({ lang }) => {
   const t = translations[lang];
-  
+
   return (
-    <div className="min-h-screen bg-[#F1F0ED] pt-32 pb-24 px-6 md:px-12 max-w-[800px] mx-auto">
-      <motion.div 
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-8"
-      >
-        <h1 className="text-[24px] md:text-[32px] font-black uppercase tracking-tight">
-          {t.legal.termsOfService.title}
-        </h1>
-        
-        <div className="prose prose-sm max-w-none text-[#5C5B57] space-y-6 leading-relaxed">
-          <section className="space-y-3">
-            <h2 className="text-[14px] font-bold text-black uppercase tracking-wider">
-              {t.legal.termsOfService.section1Title}
-            </h2>
-            <p className="text-[14px]">
-              {t.legal.termsOfService.section1Body}
-            </p>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-[14px] font-bold text-black uppercase tracking-wider">
-              {t.legal.termsOfService.section2Title}
-            </h2>
-            <p className="text-[14px]">
-              {t.legal.termsOfService.section2Body}
-            </p>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-[14px] font-bold text-black uppercase tracking-wider">
-              {t.legal.termsOfService.section3Title}
-            </h2>
-            <p className="text-[14px]">
-              {t.legal.termsOfService.section3Body}
-            </p>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-[14px] font-bold text-black uppercase tracking-wider">
-              {t.legal.termsOfService.section4Title}
-            </h2>
-            <p className="text-[14px]">
-              {t.legal.termsOfService.section4Body}
-            </p>
-          </section>
-        </div>
-      </motion.div>
-    </div>
+    <LegalPageShell
+      title={t.legal.termsOfService.title}
+      sections={[
+        { title: t.legal.termsOfService.section1Title, body: t.legal.termsOfService.section1Body },
+        { title: t.legal.termsOfService.section2Title, body: t.legal.termsOfService.section2Body },
+        { title: t.legal.termsOfService.section3Title, body: t.legal.termsOfService.section3Body },
+        { title: t.legal.termsOfService.section4Title, body: t.legal.termsOfService.section4Body },
+      ]}
+    />
   );
 };
 
 export const AccessibilityStatement: React.FC<PolicyPageProps> = ({ lang }) => {
   const t = translations[lang];
-  
+
   return (
-    <div className="min-h-screen bg-[#F1F0ED] pt-32 pb-24 px-6 md:px-12 max-w-[800px] mx-auto">
-      <motion.div 
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-8"
-      >
-        <h1 className="text-[24px] md:text-[32px] font-black uppercase tracking-tight">
-          {t.legal.accessibility.title}
-        </h1>
-        
-        <div className="prose prose-sm max-w-none text-[#5C5B57] space-y-6 leading-relaxed">
-          <section className="space-y-3">
-            <h2 className="text-[14px] font-bold text-black uppercase tracking-wider">
-              {t.legal.accessibility.commitmentTitle}
-            </h2>
-            <p className="text-[14px]">
-              {t.legal.accessibility.commitmentBody}
-            </p>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-[14px] font-bold text-black uppercase tracking-wider">
-              {t.legal.accessibility.conformanceTitle}
-            </h2>
-            <p className="text-[14px]">
-              {t.legal.accessibility.conformanceBody}
-            </p>
-          </section>
-
-          <section className="space-y-3">
-            <h2 className="text-[14px] font-bold text-black uppercase tracking-wider">
-              {t.legal.accessibility.feedbackTitle}
-            </h2>
-            <p className="text-[14px]">
-              {t.legal.accessibility.feedbackBody}
-            </p>
-          </section>
-        </div>
-      </motion.div>
-    </div>
+    <LegalPageShell
+      title={t.legal.accessibility.title}
+      sections={[
+        { title: t.legal.accessibility.commitmentTitle, body: t.legal.accessibility.commitmentBody },
+        { title: t.legal.accessibility.conformanceTitle, body: t.legal.accessibility.conformanceBody },
+        { title: t.legal.accessibility.feedbackTitle, body: t.legal.accessibility.feedbackBody },
+      ]}
+    />
   );
 };

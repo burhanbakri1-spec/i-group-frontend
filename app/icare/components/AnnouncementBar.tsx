@@ -1,26 +1,63 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { useReducedMotion } from 'motion/react';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { useIcareShell } from './IcareShell';
-import { Language, translations } from '../translations';
+import { translations } from '../translations';
 
-const SENTENCE_SPLIT_PATTERN = /\s*(?:\||\n|•|؛)\s*/;
+const SLIDE_SPLIT_PATTERN = /\s*(?:•|\|\||\n\n)\s*/;
 
 const splitAnnouncementText = (text: string) => {
   const normalizedText = text.trim();
   if (!normalizedText) return [];
 
   const directSegments = normalizedText
-    .split(SENTENCE_SPLIT_PATTERN)
+    .split(SLIDE_SPLIT_PATTERN)
     .map((segment) => segment.trim())
     .filter(Boolean);
 
   if (directSegments.length > 1) return directSegments;
 
-  return normalizedText
-    .split(/(?<=[.!?])\s+(?=[A-Z0-9])/)
-    .map((segment) => segment.trim())
-    .filter(Boolean);
+  return [normalizedText];
+};
+
+const AnnouncementPauseIcon = () => (
+  <svg width="9" height="11" viewBox="0 0 9 11" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect width="3" height="11" fill="currentColor" />
+    <rect x="6" width="3" height="11" fill="currentColor" />
+  </svg>
+);
+
+const AnnouncementPlayIcon = () => (
+  <svg width="10" height="12" viewBox="0 0 10 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path
+      d="M9.5 5.13397C10.1667 5.51888 10.1667 6.48113 9.5 6.86603L2 11.1962C1.33333 11.5811 0.5 11.0999 0.5 10.3301L0.500001 1.66987C0.500001 0.900072 1.33333 0.418947 2 0.803847L9.5 5.13397Z"
+      fill="currentColor"
+    />
+  </svg>
+);
+
+const AnnouncementSlideText = ({ text }: { text: string }) => {
+  const lines = text.split(/\||\n/).map((line) => line.trim()).filter(Boolean);
+
+  if (lines.length <= 1) {
+    return <>{text}</>;
+  }
+
+  return (
+    <>
+      <span className="icare-announcement__slide-lines icare-announcement__slide-lines--stacked">
+        {lines.map((line, index) => (
+          <React.Fragment key={`${line}-${index}`}>
+            {index > 0 ? <br /> : null}
+            {line}
+          </React.Fragment>
+        ))}
+      </span>
+      <span className="icare-announcement__slide-lines icare-announcement__slide-lines--inline">
+        {lines.join(' | ')}
+      </span>
+    </>
+  );
 };
 
 export const AnnouncementBar: React.FC = () => {
@@ -37,14 +74,14 @@ export const AnnouncementBar: React.FC = () => {
 
   useEffect(() => {
     setActiveSlideIndex(0);
-  }, [slides.length]);
+  }, [slides.length, announcementText]);
 
   useEffect(() => {
     if (!hasMultipleSlides || isPaused || shouldReduceMotion) return;
 
     const intervalId = window.setInterval(() => {
       setActiveSlideIndex((currentIndex) => (currentIndex + 1) % slides.length);
-    }, 4200);
+    }, 5000);
 
     return () => window.clearInterval(intervalId);
   }, [hasMultipleSlides, isPaused, shouldReduceMotion, slides.length]);
@@ -52,44 +89,39 @@ export const AnnouncementBar: React.FC = () => {
   if (slides.length === 0) return null;
 
   return (
-      <section data-icare-announcement className="icare-announcement" aria-label={t.announcementsAriaLabel}>
+    <section data-icare-announcement className="icare-announcement" aria-label={t.announcementsAriaLabel}>
       <div className="icare-announcement__body">
         <div className="icare-announcement__viewport" aria-live="polite">
-          <AnimatePresence initial={false} mode="wait">
-            <motion.p
-              key={`${activeSlideIndex}-${activeSlide}`}
-              className="icare-announcement__slide overflow-hidden text-ellipsis whitespace-nowrap"
-              initial={shouldReduceMotion ? false : { x: lang === 'ar' ? -12 : 12, opacity: 0 }}
-              animate={shouldReduceMotion ? undefined : { x: 0, opacity: 1 }}
-              exit={shouldReduceMotion ? undefined : { x: lang === 'ar' ? 12 : -12, opacity: 0 }}
-              transition={{ duration: 0.32, ease: [0.76, 0, 0.24, 1] }}
-            >
-              {activeSlide}
-            </motion.p>
-          </AnimatePresence>
+          <div
+            className="icare-announcement__track"
+            style={{
+              transform: `translate3d(calc(-100% * ${activeSlideIndex}), 0, 0)`,
+            }}
+          >
+            {slides.map((slide) => (
+              <div key={slide} className="icare-announcement__slide">
+                <p>
+                  <AnnouncementSlideText text={slide} />
+                </p>
+              </div>
+            ))}
+          </div>
+          {hasMultipleSlides ? (
+            <p className="sr-only">{activeSlide}</p>
+          ) : null}
         </div>
 
-        {hasMultipleSlides ? (
+        <div className="icare-announcement__controls">
           <button
             type="button"
+            className="icare-announcement__toggle"
             aria-label={isPaused ? t.resumeSlider : t.pauseSlider}
             aria-pressed={isPaused}
             onClick={() => setIsPaused((currentValue) => !currentValue)}
-            className="absolute end-2 top-1/2 flex -translate-y-1/2 items-center justify-center p-2 text-[#67645E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67645E]/70"
           >
-            {isPaused ? (
-              <span
-                aria-hidden="true"
-                className="block h-0 w-0 border-y-[5px] border-l-[8px] border-y-transparent border-l-current"
-              />
-            ) : (
-              <>
-                <span className="block h-[11px] w-[3px] bg-current" />
-                <span className="ml-[3px] block h-[11px] w-[3px] bg-current" />
-              </>
-            )}
+            {isPaused ? <AnnouncementPlayIcon /> : <AnnouncementPauseIcon />}
           </button>
-        ) : null}
+        </div>
       </div>
     </section>
   );

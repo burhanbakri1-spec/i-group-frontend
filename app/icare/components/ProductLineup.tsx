@@ -184,7 +184,7 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ lang, onProductSel
   if (remoteProducts === null) {
     return (
       <section className="bg-[#F1F0ED] overflow-hidden pt-12 pb-24 lg:pb-32">
-        <div className="max-w-[1600px] mx-auto px-[var(--icare-section-inset)]">
+        <div className="max-w-[1600px] mx-auto">
           <div className="flex gap-5 md:gap-8 overflow-hidden">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="flex-shrink-0 w-[280px] space-y-3">
@@ -202,7 +202,7 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ lang, onProductSel
   if (error) {
     return (
       <section className="bg-[#F1F0ED] overflow-hidden pt-12 pb-24 lg:pb-32">
-        <div className="max-w-[1600px] mx-auto px-[var(--icare-section-inset)] text-center space-y-4">
+        <div className="max-w-[1600px] mx-auto text-center space-y-4">
           <p className="text-[13px] text-red-600 font-medium">{error}</p>
           <button
             onClick={loadProducts}
@@ -218,7 +218,7 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ lang, onProductSel
   if (items.length === 0) {
     return (
       <section className="bg-[#F1F0ED] overflow-hidden pt-12 pb-24 lg:pb-32">
-        <div className="max-w-[1600px] mx-auto px-[var(--icare-section-inset)] text-center text-[12px] font-bold uppercase tracking-[0.2em] text-[#84827E]">
+        <div className="max-w-[1600px] mx-auto text-center text-[12px] font-bold uppercase tracking-[0.2em] text-[#84827E]">
           {t.product.noRelatedProducts || 'no related products are available yet'}
         </div>
       </section>
@@ -227,7 +227,7 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ lang, onProductSel
 
   return (
     <section className="bg-[#F1F0ED] overflow-hidden pt-12 pb-24 lg:pb-32">
-      <div className="max-w-[1600px] mx-auto px-[var(--icare-section-inset)] relative group">
+      <div className="max-w-[1600px] mx-auto relative group">
         <div 
           ref={scrollRef}
           className="flex gap-5 md:gap-8 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-8 scroll-px-4"

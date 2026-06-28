@@ -791,7 +791,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
             opacity: showBottomBar ? 1 : 0 
           }}
           transition={{ duration: shouldReduceMotion ? 0 : 0.28, ease: [0.32, 0.72, 0, 1] }}
-          className="fixed bottom-0 left-0 w-full bg-white px-[var(--icare-section-inset)] py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex items-center justify-between gap-4 z-50 border-t border-[#DDDDDD]"
+          className="fixed bottom-0 left-0 w-full bg-white px-[var(--icare-page-gutter)] py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex items-center justify-between gap-4 z-50 border-t border-[#DDDDDD]"
         >
           <div className="flex min-w-0 items-center gap-3 md:gap-4">
             <div className="w-11 h-11 bg-white rounded-md flex items-center justify-center p-1.5">

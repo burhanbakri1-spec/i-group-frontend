@@ -31,7 +31,7 @@ const LandingProductShowcaseSkeleton = ({ lang }: { lang: Language }) => {
       {Array.from({ length: 4 }).map((_, index) => (
         <div className="icare-landing-products__item" key={index}>
           <div className="icare-product-card icare-product-card--standard is-loading">
-            <SkeletonPulse className="h-full w-full rounded-[12px]" />
+            <SkeletonPulse className="min-h-[27.5rem] w-full rounded-[12px]" />
           </div>
         </div>
       ))}

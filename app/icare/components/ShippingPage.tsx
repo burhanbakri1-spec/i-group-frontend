@@ -5,6 +5,7 @@ import { Truck, Package, RotateCcw, Globe, Clock, Shield } from 'lucide-react';
 import { Language } from '../translations';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { ScrollReveal, StaggerContainer } from './ui/ScrollReveal';
+import { PageHero } from './PageHero';
 
 interface ShippingPageProps {
   lang: Language;
@@ -35,14 +36,15 @@ export const ShippingPage: React.FC<ShippingPageProps> = ({ lang }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F1F0ED]">
-      {/* Hero Section */}
-      <ScrollReveal direction="bottom" viewportMargin="-100px">
-        <div className="bg-[#F1F0ED] py-20 text-center">
-          <h1 className="text-4xl md:text-5xl font-light tracking-tight mb-4">{text.title}</h1>
-          <p className="text-[#84827E] max-w-2xl mx-auto px-6">{text.subtitle}</p>
-        </div>
-      </ScrollReveal>
+    <div className="min-h-screen bg-white">
+      <PageHero
+        image="https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?q=80&w=2000"
+        fallbackImage="https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?q=80&w=2000"
+        alt={text.title}
+        title={text.title}
+        subtitle={text.subtitle}
+        priority
+      />
 
       {/* Shipping Options */}
       <div className="max-w-7xl mx-auto px-6 py-20">

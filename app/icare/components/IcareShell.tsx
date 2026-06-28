@@ -57,19 +57,40 @@ const PageTransition = ({
 };
 
 const ANNOUNCEMENT_VAR = '--icare-announcement-bottom';
+const HEADER_TOP_VAR = '--icare-header-top';
+const HERO_TOP_VAR = '--icare-hero-top';
 
-const syncAnnouncementOffset = () => {
-  const bar = document.querySelector<HTMLElement>('[data-icare-announcement]');
-  // Use document-space (not viewport-space) so the fixed header's top stays
-  // stable as the user scrolls. offsetTop + offsetHeight is immune to scrollY.
-  let nextValue = '0px';
-  if (bar) {
-    const documentBottom = bar.offsetTop + bar.offsetHeight;
-    nextValue = `${documentBottom}px`;
-  }
+const syncLayoutOffsets = () => {
   const root = document.documentElement;
-  if (root.style.getPropertyValue(ANNOUNCEMENT_VAR) !== nextValue) {
-    root.style.setProperty(ANNOUNCEMENT_VAR, nextValue);
+  const scrollY = window.scrollY;
+
+  const bar = document.querySelector<HTMLElement>('[data-icare-announcement]');
+  let announcementBottom = '0px';
+  if (bar) {
+    announcementBottom = `${bar.getBoundingClientRect().bottom + scrollY}px`;
+  }
+  if (root.style.getPropertyValue(ANNOUNCEMENT_VAR) !== announcementBottom) {
+    root.style.setProperty(ANNOUNCEMENT_VAR, announcementBottom);
+  }
+
+  const hero = document.querySelector<HTMLElement>('[data-icare-hero]');
+  let headerTop = announcementBottom;
+
+  if (hero) {
+    const heroTop = `${hero.getBoundingClientRect().top + scrollY}px`;
+    root.style.setProperty(HERO_TOP_VAR, heroTop);
+    headerTop = heroTop;
+  } else {
+    root.style.removeProperty(HERO_TOP_VAR);
+    if (bar) {
+      const stackGap =
+        getComputedStyle(root).getPropertyValue('--icare-hero-stack-gap').trim() || '0.625rem';
+      headerTop = `calc(${announcementBottom} + ${stackGap})`;
+    }
+  }
+
+  if (root.style.getPropertyValue(HEADER_TOP_VAR) !== headerTop) {
+    root.style.setProperty(HEADER_TOP_VAR, headerTop);
   }
 };
 
@@ -87,22 +108,21 @@ export const IcareShell = ({ children }: { children: React.ReactNode }) => {
     document.documentElement.lang = lang;
   }, [lang]);
 
-  // Keep the fixed header / hero top offsets in lockstep with the actual
-  // rendered announcement bar. Without this, the offset would be hard-coded
-  // in CSS and desync whenever the bar wraps, is empty, or the language toggles.
+  // Keep the fixed header pinned to the hero top (or announcement + gap when
+  // no hero). Re-measure on resize, route change, and hero/bar layout shifts.
   useEffect(() => {
-    syncAnnouncementOffset();
+    syncLayoutOffsets();
 
     if (typeof ResizeObserver === 'undefined') {
-      window.addEventListener('resize', syncAnnouncementOffset);
-      return () => window.removeEventListener('resize', syncAnnouncementOffset);
+      window.addEventListener('resize', syncLayoutOffsets);
+      return () => window.removeEventListener('resize', syncLayoutOffsets);
     }
 
-    const ro = new ResizeObserver(() => syncAnnouncementOffset());
+    const ro = new ResizeObserver(() => syncLayoutOffsets());
     const bar = document.querySelector<HTMLElement>('[data-icare-announcement]');
+    const hero = document.querySelector<HTMLElement>('[data-icare-hero]');
     if (bar) ro.observe(bar);
-    // Also watch the document body so we catch the bar appearing/disappearing
-    // (e.g. when the last slide is removed or language changes mid-session).
+    if (hero) ro.observe(hero);
     ro.observe(document.body);
 
     return () => {
@@ -170,7 +190,7 @@ export const IcareShell = ({ children }: { children: React.ReactNode }) => {
   return (
     <ShopProvider>
       <IcareShellContext.Provider value={contextValue}>
-        <div className={`min-h-screen overflow-x-hidden bg-[var(--rb-pure-white)] font-sans selection:bg-[#7B7872] selection:text-white text-[#67645E] ${lang === 'ar' ? 'font-arabic' : ''}`}>
+        <div className={`icare-shell ${lang === 'ar' ? 'font-arabic' : ''}`}>
           <AnnouncementBar />
 
           <Header
@@ -194,7 +214,7 @@ export const IcareShell = ({ children }: { children: React.ReactNode }) => {
             onToggleLang={() => setLang((currentLang) => currentLang === 'en' ? 'ar' : 'en')}
           />
 
-          <main className={hasStandardHero ? '' : 'pt-24'}>
+          <main className={hasStandardHero ? '' : 'icare-main--offset'}>
             <AnimatePresence>
               <PageTransition lockTop={hasStandardHero} pageKey={pathname}>{children}</PageTransition>
             </AnimatePresence>

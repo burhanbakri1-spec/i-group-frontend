@@ -328,7 +328,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
       />
 
       {/* Category Filter — single root layer */}
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-10">
+      <div className="max-w-[1600px] mx-auto pt-4 pb-10">
         <div className="overflow-x-auto no-scrollbar border-b border-black/10 pb-4">
           <div className="flex justify-center gap-3 px-1 md:px-4 min-w-max">
             <button
@@ -352,7 +352,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
 
       {/* Category Filter — child layer (shown only when a root is selected) */}
       {selectedRoot && (
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pb-4 -mt-4">
+        <div className="max-w-[1600px] mx-auto pb-4 -mt-4">
           <div className="overflow-x-auto no-scrollbar">
             <div className="flex justify-center gap-2 px-1 md:px-4 min-w-max">
               <button
@@ -380,12 +380,12 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
       )}
 
       {/* Toolbar */}
-      <div className={`max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-5 flex justify-between items-center border border-[#DDDDDD] mb-8 md:mb-10 md:sticky md:top-3 bg-white rounded-[12px] ${isSortOpen ? 'z-[65]' : 'z-40'}`}>
-        <div className="relative z-[66]">
-          <button type="button" className={`flex items-center gap-2 cursor-pointer group ${CONTROL_FOCUS_CLASS}`} onClick={() => setIsSortOpen(!isSortOpen)} aria-expanded={isSortOpen}>
-            <span className="text-[14px] text-[#84827E] lowercase font-medium">{shopSortLabel}</span>
-            <span className="text-[14px] text-[#67645E] font-black lowercase">{activeSort}</span>
-            <ChevronDown size={16} className={`transition-transform duration-300 ${isSortOpen ? 'rotate-180' : ''}`} />
+      <div className={`max-w-[1600px] mx-auto mb-8 md:mb-10 md:sticky md:top-3 flex min-h-[3.25rem] items-center justify-between gap-4 border border-[#DDDDDD] bg-white rounded-[12px] px-4 md:px-6 py-3 md:py-4 ${isSortOpen ? 'z-[65]' : 'z-40'}`}>
+        <div className="relative z-[66] flex min-w-0 items-center">
+          <button type="button" className={`inline-flex min-h-9 items-center gap-2 cursor-pointer group ${CONTROL_FOCUS_CLASS}`} onClick={() => setIsSortOpen(!isSortOpen)} aria-expanded={isSortOpen}>
+            <span className="text-[14px] font-medium lowercase leading-none text-[#84827E]">{shopSortLabel}</span>
+            <span className="text-[14px] font-black lowercase leading-none text-[#67645E]">{activeSort}</span>
+            <ChevronDown size={16} className={`shrink-0 transition-transform duration-300 ${isSortOpen ? 'rotate-180' : ''}`} />
           </button>
           <AnimatePresence>
             {isSortOpen && (
@@ -410,14 +410,14 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
           </AnimatePresence>
         </div>
 
-        <div className="flex items-center gap-6">
-          <button onClick={() => setCols(2)} className={`rounded-md transition-colors ${CONTROL_FOCUS_CLASS} ${cols === 2 ? 'text-[#67645E]' : 'text-[#84827E] hover:text-[#67645E]'}`} aria-label="Use two column grid"><LayoutGrid size={22} /></button>
-          <button onClick={() => setCols(3)} className={`rounded-md transition-colors hidden lg:block ${CONTROL_FOCUS_CLASS} ${cols === 3 ? 'text-[#67645E]' : 'text-[#84827E] hover:text-[#67645E]'}`} aria-label="Use three column grid"><Grid2X2 size={22} /></button>
+        <div className="flex shrink-0 items-center gap-4 md:gap-5">
+          <button onClick={() => setCols(2)} className={`inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors ${CONTROL_FOCUS_CLASS} ${cols === 2 ? 'text-[#67645E]' : 'text-[#84827E] hover:text-[#67645E]'}`} aria-label="Use two column grid"><LayoutGrid size={20} strokeWidth={1.75} /></button>
+          <button onClick={() => setCols(3)} className={`inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors hidden lg:inline-flex ${CONTROL_FOCUS_CLASS} ${cols === 3 ? 'text-[#67645E]' : 'text-[#84827E] hover:text-[#67645E]'}`} aria-label="Use three column grid"><Grid2X2 size={20} strokeWidth={1.75} /></button>
         </div>
       </div>
 
       {/* Grid */}
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+      <div className="max-w-[1600px] mx-auto pb-24">
         <ScrollReveal direction="bottom" delay={0.05} viewportMargin="-40px">
           <div className={`grid grid-cols-1 min-[375px]:grid-cols-2 ${cols === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} gap-x-3 gap-y-6 md:gap-x-6 md:gap-y-10 lg:gap-x-8 lg:gap-y-14`}>
             {filteredProducts.slice(0, visibleCount).map((p) => (
