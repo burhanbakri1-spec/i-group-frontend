@@ -35,7 +35,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F1F0ED] pb-32">
+    <div className="min-h-screen bg-white pb-32">
       <PageHero
         image={contactHeroImage}
         fallbackImage="https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=2000"
@@ -45,53 +45,52 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
         priority
       />
 
-      {/* Main Content Layout */}
-      <div className="max-w-[1200px] mx-auto px-4 md:px-12 -mt-20 md:-mt-32 relative z-10 pb-20">
-        <div className="max-w-[600px] mx-auto space-y-12">
-          
-          {/* Info & Guidelines */}
-          <ScrollReveal direction="left" viewportMargin="-60px">
-            <div className="space-y-8 md:space-y-16 pt-8 md:pt-24">
-              <div className="space-y-4 md:space-y-6 px-2 md:px-0">
-                <h2 className="text-[28px] md:text-[42px] font-bold lowercase tracking-tight text-[#67645E] leading-tight">
-                  {contactInfoTitle || t.pages.contact.infoTitle}
-                </h2>
-                <div className="space-y-4 md:space-y-6 text-[13px] md:text-[16px] text-[#5C5A56] leading-relaxed font-medium">
-                  <p className="opacity-80">
-                    {contactSupportInfo || t.pages.contact.supportInfo}
-                  </p>
-                  <div className="pt-4 md:pt-6 border-t border-black/5 space-y-4 md:space-y-6">
-                    <div>
-                      <span className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/40 mb-1">{contactFallbacks.emailLabel}</span>
-                      <a href={`mailto:${contactFallbacks.email}`} className="text-[14px] md:text-[18px] text-black font-black hover:opacity-50 transition-opacity lowercase">{contactFallbacks.email}</a>
-                    </div>
-                    <div>
-                      <span className="block text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/40 mb-1">{contactFallbacks.wholesaleLabel}</span>
-                      <a href={`mailto:${contactFallbacks.wholesaleEmail}`} className="text-[14px] md:text-[18px] text-black font-black hover:opacity-50 transition-opacity lowercase">{contactFallbacks.wholesaleEmail}</a>
-                    </div>
-                  </div>
+      <section className="icare-index-section icare-contact-section">
+        <div className="icare-contact-section__inner">
+          <ScrollReveal direction="bottom" viewportMargin="-60px">
+            <div className="icare-contact-section__copy">
+              <h2 className="icare-contact-section__title">
+                {contactInfoTitle || t.pages.contact.infoTitle}
+              </h2>
+              <p className="icare-contact-section__lede">
+                {contactSupportInfo || t.pages.contact.supportInfo}
+              </p>
+
+              <div className="icare-contact-section__channels">
+                <div className="icare-contact-section__channel">
+                  <span className="icare-contact-section__label">{contactFallbacks.emailLabel}</span>
+                  <a href={`mailto:${contactFallbacks.email}`} className="icare-contact-section__link">
+                    {contactFallbacks.email}
+                  </a>
+                </div>
+
+                <div className="icare-contact-section__channel">
+                  <span className="icare-contact-section__label">{contactFallbacks.wholesaleLabel}</span>
+                  <a href={`mailto:${contactFallbacks.wholesaleEmail}`} className="icare-contact-section__link">
+                    {contactFallbacks.wholesaleEmail}
+                  </a>
                 </div>
               </div>
             </div>
           </ScrollReveal>
 
-          {/* FAQ Link */}
           <ScrollReveal direction="bottom" delay={0.1} viewportMargin="-40px">
-            <div className="bg-[#F2F1ED] p-6 md:p-10 rounded-[24px] md:rounded-[40px] space-y-4 border border-black/[0.03]">
-              <h3 className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em]">{contactFallbacks.faqTitle}</h3>
-              <p className="text-[12px] md:text-[14px] text-[#5C5A56] leading-relaxed opacity-70">
+            <div className="icare-contact-section__faq">
+              <h3 className="icare-contact-section__faq-title">{contactFallbacks.faqTitle}</h3>
+              <p className="icare-contact-section__faq-text">
                 {contactFaqText || t.pages.contact.faqText}
               </p>
               <button
+                type="button"
                 onClick={() => router.push('/icare/faq')}
-                className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.2em] border-b-2 border-black pb-1 hover:opacity-50 transition-all inline-block"
+                className="icare-contact-section__faq-cta"
               >
                 {contactFaqCta || t.pages.contact.faqCta}
               </button>
             </div>
           </ScrollReveal>
         </div>
-      </div>
+      </section>
     </div>
   );
 };

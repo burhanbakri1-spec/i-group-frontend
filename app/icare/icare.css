@@ -833,6 +833,129 @@
     letter-spacing: var(--rb-tracking-normal);
   }
 
+  .icare-contact-section {
+    overflow: hidden;
+    border-radius: var(--icare-section-radius);
+    background: var(--rb-bg-warm-gray);
+  }
+
+  .icare-contact-section__inner {
+    display: grid;
+    align-content: center;
+    width: min(100%, 62rem);
+    min-height: clamp(32rem, calc(100vh - 10rem), 48rem);
+    margin: 0 auto;
+    padding: clamp(3rem, 8vw, 7rem) clamp(1.5rem, 5vw, 4rem);
+    gap: clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .icare-contact-section__copy {
+    display: grid;
+    gap: clamp(1.25rem, 2.5vw, 2rem);
+  }
+
+  .icare-contact-section__title {
+    margin: 0;
+    color: var(--rb-primary-text);
+    font-family: var(--font-rektorat);
+    font-size: clamp(2rem, 4.2vw, 3.75rem);
+    font-weight: var(--rb-font-weight-bold);
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    text-transform: lowercase;
+  }
+
+  .icare-contact-section__lede {
+    max-width: 42rem;
+    margin: 0;
+    color: var(--rb-primary-text);
+    font-size: var(--rb-text-base);
+    font-weight: var(--rb-font-weight-semibold);
+    line-height: 1.6;
+    letter-spacing: var(--rb-tracking-normal);
+    opacity: 0.78;
+  }
+
+  .icare-contact-section__channels {
+    display: grid;
+    gap: clamp(1.25rem, 2vw, 1.75rem);
+    margin-top: clamp(0.5rem, 1.2vw, 1rem);
+    padding-top: clamp(1.5rem, 3vw, 2.25rem);
+    border-top: 1px solid rgb(0 0 0 / 0.06);
+  }
+
+  .icare-contact-section__channel {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .icare-contact-section__label,
+  .icare-contact-section__faq-title,
+  .icare-contact-section__faq-cta {
+    color: var(--rb-pure-black);
+    font-size: var(--rb-text-xs);
+    font-weight: var(--rb-font-weight-black);
+    line-height: 1.2;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .icare-contact-section__label {
+    opacity: 0.42;
+  }
+
+  .icare-contact-section__link {
+    color: var(--rb-pure-black);
+    font-size: clamp(1rem, 1.5vw, 1.25rem);
+    font-weight: var(--rb-font-weight-black);
+    line-height: 1.25;
+    letter-spacing: var(--rb-tracking-normal);
+    text-transform: lowercase;
+    transition: opacity 180ms ease;
+  }
+
+  .icare-contact-section__link:hover {
+    opacity: 0.55;
+  }
+
+  .icare-contact-section__faq {
+    display: grid;
+    max-width: 42rem;
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    gap: clamp(0.875rem, 1.6vw, 1.25rem);
+    border: 1px solid rgb(0 0 0 / 0.04);
+    border-radius: var(--icare-section-radius);
+    background: var(--rb-pure-white);
+  }
+
+  .icare-contact-section__faq-title,
+  .icare-contact-section__faq-text {
+    margin: 0;
+  }
+
+  .icare-contact-section__faq-text {
+    color: var(--rb-primary-text);
+    font-size: var(--rb-text-sm);
+    font-weight: var(--rb-font-weight-normal);
+    line-height: 1.6;
+    letter-spacing: var(--rb-tracking-normal);
+    opacity: 0.72;
+  }
+
+  .icare-contact-section__faq-cta {
+    width: fit-content;
+    padding: 0 0 0.25rem;
+    border: 0;
+    border-bottom: 2px solid currentColor;
+    background: transparent;
+    cursor: pointer;
+    transition: opacity 180ms ease;
+  }
+
+  .icare-contact-section__faq-cta:hover {
+    opacity: 0.55;
+  }
+
   .icare-product-rail-section {
     overflow: hidden;
     background: var(--rb-pure-white);
