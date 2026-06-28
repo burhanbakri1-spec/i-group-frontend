@@ -6,6 +6,7 @@ import { sanitizeTenantRequestBody } from "./middleware/tenantInput.js";
 import adminRoutes from "./routes/admin.js";
 import authRoutes from "./routes/auth.js";
 import cartRoutes from "./routes/cart.js";
+import companyRoutes from "./routes/company.js";
 import employeeRoutes from "./routes/employee.js";
 import homeOfferRoutes from "./routes/homeOffers.js";
 import orderRoutes from "./routes/orders.js";
@@ -49,6 +50,7 @@ app.get("/api/health", (_req, res) => {
   res.json({ ok: true, service: "eb-chemical-backend" });
 });
 
+app.use("/api/company", companyRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/orders", orderRoutes);

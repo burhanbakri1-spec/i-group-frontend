@@ -124,6 +124,17 @@ by products, variants, orders, media, carts, static fallback merging, and admin
 workflows. Replacing them could break Product Details, order history, media
 references, and persisted carts even if row totals appear similar.
 
+## Phase 3 company context foundation
+
+The backend exposes `GET /api/company/context` with public EB Chemical metadata.
+Request hosts are normalized and attached to the internal request context, but
+database-backed domain resolution is not active yet: every host still resolves
+to EB Chemical.
+
+EB Chemical remains the only operational company. Do not enable a second company
+until Super Admin controls, verified domain ownership, and the Phase 1 migration
+have all been validated against a restored staging database.
+
 ## 2. Environment variables
 
 Set these on the backend deployment, including Vercel if the backend is deployed there:
