@@ -1,6 +1,6 @@
 import { products } from "./products.js";
-import { homepageCategoryCards, homepageOffers, reviews as initialReviews } from "../../../src/data/homeContent.js";
-import { defaultWebsiteMedia } from "../../../src/data/websiteMedia.js";
+import { homepageCategoryCards, homepageOffers, reviews as initialReviews } from "./seeds/homeContent.js";
+import { defaultWebsiteMedia } from "./seeds/websiteMedia.js";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";

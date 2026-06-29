@@ -1,6 +1,6 @@
-import { products as frontendProducts } from "../../../src/data/products.js";
+import { products as seedProducts } from "./seeds/products.js";
 
-export const products = frontendProducts.map((product) => ({
+export const products = seedProducts.map((product) => ({
   ...product,
   sizes: product.sizes.map((size) => ({ ...size })),
   badge: { ...product.badge },
