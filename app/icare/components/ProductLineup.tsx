@@ -48,16 +48,16 @@ const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, label, n
       }}
       role="button"
       tabIndex={product ? 0 : -1}
-      className={`w-[min(84vw,320px)] shrink-0 md:w-[420px] bg-white rounded-[12px] p-6 md:p-8 flex flex-col justify-between group cursor-pointer relative overflow-hidden h-[440px] md:h-[500px] ${CONTROL_FOCUS_CLASS}`}
+      className={`icare-lineup__card group ${CONTROL_FOCUS_CLASS}`}
     >
       {/* Top Section: Category and Badge */}
-      <div className="flex justify-between items-start z-10">
-        <h3 className="text-[28px] md:text-[38px] font-bold lowercase tracking-tight text-[#67645E] leading-none">
+      <div className="icare-lineup__card-head">
+        <h3 className="icare-lineup__category">
           {category}
         </h3>
         {label && (
-          <div className="bg-[#67645E] px-4 py-1.5 rounded-full">
-            <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] text-white">
+          <div className="icare-lineup__badge">
+            <span>
               {label}
             </span>
           </div>
@@ -65,20 +65,20 @@ const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, label, n
       </div>
 
       {/* Center Section: Product Image with Quick Add Overlay */}
-      <div className="flex-1 flex items-center justify-center relative py-4">
+      <div className="icare-lineup__media">
         <motion.div
           animate={{ 
             scale: !shouldReduceMotion && isHovered ? 1.02 : 1,
             y: !shouldReduceMotion && isHovered ? -4 : 0
           }}
           transition={{ duration: shouldReduceMotion ? 0 : 0.25, ease: [0.32, 0.72, 0, 1] }}
-          className="w-full h-full flex items-center justify-center"
+          className="icare-lineup__media-motion"
         >
-          <div className="relative w-full h-full flex items-center justify-center">
+          <div className="icare-lineup__image-wrap">
             <ImageWithFallback 
               src={image} 
               alt={name} 
-              className="h-full max-h-[210px] md:max-h-[260px] w-full object-contain"
+              className="icare-lineup__image"
             />
             
             {/* Quick Add Button Overlay */}
@@ -89,11 +89,11 @@ const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, label, n
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: shouldReduceMotion ? 0 : 6, scale: 0.98 }}
                   transition={{ duration: shouldReduceMotion ? 0 : 0.18 }}
-                  className="absolute inset-0 flex items-center justify-center z-20"
+                  className="icare-lineup__quick-add-overlay"
                 >
-                  <button type="button" className={`inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap bg-[#67645E] text-white px-8 py-3.5 rounded-full ${CONTROL_FOCUS_CLASS}`} onClick={(event) => { event.stopPropagation(); selectProduct(); }}>
+                  <button type="button" className={`icare-lineup__quick-add ${CONTROL_FOCUS_CLASS}`} onClick={(event) => { event.stopPropagation(); selectProduct(); }}>
                     <Plus size={16} strokeWidth={3} />
-                     <span className="text-[11px] font-black uppercase tracking-[0.2em]">{quickAddText}</span>
+                     <span>{quickAddText}</span>
                   </button>
                 </motion.div>
               )}
@@ -103,33 +103,33 @@ const LineupCardBase: React.FC<LineupItemProps> = ({ product, category, label, n
       </div>
 
       {/* Bottom Section: Info */}
-      <div className="space-y-2.5 z-10">
+      <div className="icare-lineup__copy">
         {/* Reviews */}
-        <div className="flex items-center gap-1.5">
-          <div className="flex gap-0.5">
+        <div className="icare-lineup__rating">
+          <div className="icare-lineup__stars">
             {[...Array(5)].map((_, i) => (
               <Star key={i} size={11} fill="black" className="text-black" />
             ))}
           </div>
-          <span className="text-[10px] font-bold text-[#84827E]">({reviews})</span>
+          <span>({reviews})</span>
         </div>
 
         {/* Name and Price */}
-        <div className="flex justify-between items-baseline gap-4">
-          <h4 className="text-[12px] md:text-[14px] font-bold lowercase tracking-[0.05em] text-[#67645E] leading-tight flex-1">
+        <div className="icare-lineup__name-row">
+          <h4 className="icare-lineup__name">
             {name}
           </h4>
-          <div className="flex items-center gap-2">
+          <div className="icare-lineup__prices">
             {originalPrice && (
-              <span className="text-[13px] md:text-[15px] font-black text-black/40 line-through">{originalPrice}</span>
+              <span className="icare-lineup__price icare-lineup__price--old">{originalPrice}</span>
             )}
-            <span className="text-[13px] md:text-[15px] font-black text-[#67645E]">
+            <span className="icare-lineup__price">
               {price}
             </span>
           </div>
         </div>
         
-        <p className="text-[11px] md:text-[12px] text-[#84827E] font-medium leading-relaxed">
+        <p className="icare-lineup__description">
           {description}
         </p>
       </div>
@@ -183,12 +183,12 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ lang, onProductSel
 
   if (remoteProducts === null) {
     return (
-      <section className="bg-[#F1F0ED] overflow-hidden pt-12 pb-24 lg:pb-32">
-        <div className="max-w-[1600px] mx-auto">
-          <div className="flex gap-5 md:gap-8 overflow-hidden">
+      <section className="icare-index-section icare-lineup">
+        <div className="icare-lineup__inner">
+          <div className="icare-lineup__track is-loading">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="flex-shrink-0 w-[280px] space-y-3">
-                <SkeletonPulse className="aspect-square w-full rounded-xl" />
+              <div key={i} className="icare-lineup__skeleton">
+                <SkeletonPulse className="aspect-square w-full rounded-[var(--rb-radius-card)]" />
                 <SkeletonPulse className="h-4 w-2/3 rounded" />
                 <SkeletonPulse className="h-4 w-1/3 rounded" />
               </div>
@@ -201,8 +201,8 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ lang, onProductSel
 
   if (error) {
     return (
-      <section className="bg-[#F1F0ED] overflow-hidden pt-12 pb-24 lg:pb-32">
-        <div className="max-w-[1600px] mx-auto text-center space-y-4">
+      <section className="icare-index-section icare-lineup">
+        <div className="icare-lineup__state">
           <p className="text-[13px] text-red-600 font-medium">{error}</p>
           <button
             onClick={loadProducts}
@@ -217,8 +217,8 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ lang, onProductSel
 
   if (items.length === 0) {
     return (
-      <section className="bg-[#F1F0ED] overflow-hidden pt-12 pb-24 lg:pb-32">
-        <div className="max-w-[1600px] mx-auto text-center text-[12px] font-bold uppercase tracking-[0.2em] text-[#84827E]">
+      <section className="icare-index-section icare-lineup">
+        <div className="icare-lineup__state">
           {t.product.noRelatedProducts || 'no related products are available yet'}
         </div>
       </section>
@@ -226,14 +226,14 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ lang, onProductSel
   }
 
   return (
-    <section className="bg-[#F1F0ED] overflow-hidden pt-12 pb-24 lg:pb-32">
-      <div className="max-w-[1600px] mx-auto relative group">
+    <section className="icare-index-section icare-lineup">
+      <div className="icare-lineup__inner group">
         <div 
           ref={scrollRef}
-          className="flex gap-5 md:gap-8 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-8 scroll-px-4"
+          className="icare-lineup__track no-scrollbar"
         >
           {items.map((item) => (
-            <div key={item.id} className="snap-start first:pl-1 last:pr-2">
+            <div key={item.id} className="icare-lineup__item">
                  <LineupCard
                    product={item}
                    category={item.title ?? item.category ?? 'icare'}
@@ -252,17 +252,17 @@ export const ProductLineup: React.FC<ProductLineupProps> = ({ lang, onProductSel
         </div>
 
         {/* Navigation Arrows */}
-        <div className="hidden lg:block">
+        <div className="icare-lineup__nav-wrap">
             <button 
             onClick={() => scroll('left')}
-            className={`absolute top-1/2 left-0 -translate-y-1/2 w-14 h-14 bg-white rounded-full border border-[#DDDDDD] flex items-center justify-center z-30 hover:bg-[#67645E] hover:text-white transition-colors opacity-0 group-hover:opacity-100 ${CONTROL_FOCUS_CLASS}`}
+            className={`icare-lineup__nav icare-lineup__nav--prev ${CONTROL_FOCUS_CLASS}`}
             aria-label="Scroll related products left"
             >
             <ChevronRight size={24} className="rotate-180" />
             </button>
             <button 
             onClick={() => scroll('right')}
-            className={`absolute top-1/2 right-0 -translate-y-1/2 w-14 h-14 bg-white rounded-full border border-[#DDDDDD] flex items-center justify-center z-30 hover:bg-[#67645E] hover:text-white transition-colors opacity-0 group-hover:opacity-100 ${CONTROL_FOCUS_CLASS}`}
+            className={`icare-lineup__nav icare-lineup__nav--next ${CONTROL_FOCUS_CLASS}`}
             aria-label="Scroll related products right"
             >
             <ChevronRight size={24} />

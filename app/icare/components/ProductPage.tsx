@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
-import { Star, ChevronDown, ThumbsUp, ThumbsDown, CheckCircle2, ShoppingBag } from 'lucide-react';
+import { Star, ChevronDown, ThumbsUp, ThumbsDown, CheckCircle2 } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Language, translations } from '../translations';
 import { ProductLineup } from './ProductLineup';
 import { ShowcaseBlock } from './showcase/ShowcaseBlock';
 import { useShop } from '../context/ShopContext';
 import { useSiteContent } from '../hooks/useSiteContent';
+import { usePdpScrollChain } from '../hooks/usePdpScrollChain';
 import { Product, ProductGalleryMedia, ProductReview, ProductVariant, CreateReviewInput } from '../types';
 import { getDefaultVariant, isPurchasableStock, mapBackendProductGalleryMedia, mapBackendProductToProduct, mapBackendReviewToProductReview, normalizeProductMediaUrl } from '../lib/mappers';
 import { fetchProductBySlug, fetchProductReviews, fetchRelatedProducts, submitProductReview, voteReviewHelpful } from '../lib/catalog-client';
@@ -182,7 +183,6 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
     productAddToBag,
     productSoldOut,
     productAfterpayText,
-    productSelectOption,
     productRatingLabel,
     productBuyNow,
     reviewVerifiedLabel,
@@ -205,7 +205,6 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
   const [activeImageSelection, setActiveImageSelection] = useState({ index: 0, galleryKey: '', resetKey: '' });
   const [showBottomBar, setShowBottomBar] = useState(false);
   const [isReviewsExpanded, setIsReviewsExpanded] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
   const [remoteReviews, setRemoteReviews] = useState<ProductReview[] | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[] | null>(null);
   const [isWriteReviewOpen, setIsWriteReviewOpen] = useState(false);
@@ -220,7 +219,13 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
   const lastScrollY = useRef(0);
   const filterDropdownRef = useRef<HTMLDivElement>(null);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
+  const pdpSectionRef = useRef<HTMLElement>(null);
+  const pdpGridRef = useRef<HTMLDivElement>(null);
+  const pdpPanelRef = useRef<HTMLDivElement>(null);
+  const pdpMediaTrackRef = useRef<HTMLDivElement>(null);
   const isRtl = lang === 'ar';
+
+  usePdpScrollChain(pdpSectionRef, pdpGridRef, pdpPanelRef);
 
   const displayImages = useMemo(
     () => getProductImageGallery(displayProduct, selectedVariant, lang, selectedColorId),
@@ -233,7 +238,46 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
     && displayImages[activeImageSelection.index]?.url
     ? activeImageSelection.index
     : 0;
-  const activeProduct = displayImages[safeActiveImageIndex];
+
+  const scrollToMediaSlide = (index: number) => {
+    const track = pdpMediaTrackRef.current;
+    const slide = track?.querySelector<HTMLElement>(`[data-media-index="${index}"]`);
+    if (!slide) return;
+    slide.scrollIntoView({
+      behavior: shouldReduceMotion ? 'auto' : 'smooth',
+      inline: 'start',
+      block: 'nearest',
+    });
+  };
+
+  const handleMediaTrackScroll = () => {
+    const track = pdpMediaTrackRef.current;
+    if (!track) return;
+
+    const slides = [...track.querySelectorAll<HTMLElement>('[data-media-index]')];
+    if (slides.length === 0) return;
+
+    const trackLeft = track.getBoundingClientRect().left;
+    let nextIndex = 0;
+    let minDistance = Infinity;
+
+    slides.forEach((slide, idx) => {
+      const distance = Math.abs(slide.getBoundingClientRect().left - trackLeft);
+      if (distance < minDistance) {
+        minDistance = distance;
+        nextIndex = idx;
+      }
+    });
+
+    if (nextIndex !== safeActiveImageIndex) {
+      setActiveImageSelection({
+        index: nextIndex,
+        galleryKey: displayImagesKey,
+        resetKey: activeImageResetKey,
+      });
+    }
+  };
+
   const purchasableProduct = useMemo(
     () => displayProduct.backendProduct
       ? mapBackendProductToProduct(displayProduct.backendProduct, lang, selectedVariant)
@@ -289,6 +333,17 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
   const hasReviews = displayReviews.length > 0;
   const averageRating = displayProduct.rating ?? '0';
   const reviewCount = displayProduct.reviews ?? '0';
+  const formattedReviewCount = (() => {
+    const count = Number(reviewCount);
+    return Number.isFinite(count)
+      ? count.toLocaleString(lang === 'ar' ? 'ar' : 'en-US')
+      : String(reviewCount);
+  })();
+  const productTagline =
+    displayProduct.sub?.trim()
+    || displayProduct.brand?.trim()
+    || displayProduct.category?.trim()
+    || 'icare essentials';
   const ratingDistribution = displayProduct.backendProduct?.reviews?.summary?.distribution ?? {};
 
   const loadMoreReviews = async () => {
@@ -353,210 +408,171 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
   return (
     <div className={`bg-white min-h-screen overflow-x-hidden selection:bg-[#67645E] selection:text-white ${isRtl ? 'rtl' : 'ltr'}`}>
       
-      {/* 1. HERO SECTION - REFINED FOR MOBILE */}
-      <section className="icare-index-section bg-[#F1F0ED] rounded-[12px] overflow-hidden">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 md:p-6">
-        
-        {/* LEFT COLUMN: IMAGE SLIDER */}
-        <div className="relative aspect-[4/5] rounded-[12px] group z-0 overflow-hidden bg-[#F1F0ED]">
-          <div className="absolute inset-0 overflow-hidden">
-            <AnimatePresence initial={false}>
-              <motion.div
-                key={safeActiveImageIndex}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: shouldReduceMotion ? 0 : 0.25 }}
-                className="absolute inset-0"
+      {/* 1. HERO SECTION — Rhode Product__new two-column layout */}
+      <section ref={pdpSectionRef} className="icare-index-section icare-pdp">
+        <div ref={pdpGridRef} className="icare-pdp__grid">
+
+        {/* LEFT COLUMN: IMAGE GALLERY */}
+        <div className="icare-pdp__media" aria-label={displayProduct.name}>
+          {displayImages.length > 0 ? (
+            <>
+              <div
+                ref={pdpMediaTrackRef}
+                className={`icare-pdp__media-track ${displayImages.length === 1 ? 'icare-pdp__media-track--single' : ''}`}
+                onScroll={handleMediaTrackScroll}
               >
-                {activeProduct?.url ? (
-                  <ImageWithFallback
-                    src={activeProduct.url}
-                    alt={activeProduct.altText || displayProduct.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-[#F2F1ED] flex items-center justify-center text-[11px] font-black uppercase tracking-[0.2em] text-black/30">
-                    no image
+                {displayImages.map((img, idx) => (
+                  <div key={img.url || idx} className="icare-pdp__media-slide" data-media-index={idx}>
+                    <ImageWithFallback
+                      src={img.url}
+                      alt={img.altText || `${displayProduct.name} ${idx + 1}`}
+                      className="icare-pdp__media-image"
+                    />
                   </div>
-                )}
-              </motion.div>
-            </AnimatePresence>
-          </div>
+                ))}
+              </div>
 
-          {/* Floating Navigation Thumbnails - Mobile Optimized */}
-          <div className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 flex flex-col gap-2 md:gap-3 z-20">
-             {displayImages.map((img, idx) => (
-                <button 
-                  key={img.url}
-                  onClick={() => setActiveImageSelection({ index: idx, galleryKey: displayImagesKey, resetKey: activeImageResetKey })}
-                    className={`w-9 h-9 md:w-11 md:h-11 rounded-lg overflow-hidden border-2 transition-colors relative ${CONTROL_FOCUS_CLASS} ${safeActiveImageIndex === idx ? 'border-white ring-2 ring-[#7B7872]/40 opacity-100' : 'border-white/40 opacity-70 hover:opacity-100'}`}
-                >
-                    <ImageWithFallback src={img.url} alt={img.altText || `${displayProduct.name} thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
-                </button>
-              ))}
-           </div>
-
-          {/* Mobile Bottom Indicator */}
-          {displayImages.length > 0 && (
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 md:hidden">
-              {displayImages.map((image, idx) => (
-              <div key={image.url} className={`h-1 rounded-full transition-all duration-200 motion-reduce:transition-none ${safeActiveImageIndex === idx ? 'w-4 bg-white' : 'w-1.5 bg-white/40'}`} />
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* RIGHT COLUMN: PRODUCT INFO - REFINED MOBILE DENSITY */}
-        <div className="bg-white rounded-[12px] p-6 md:p-14 flex flex-col space-y-6 md:space-y-8 md:h-full md:overflow-y-auto no-scrollbar relative z-10">
-          
-          <div className="space-y-3 md:space-y-4">
-               <h1 className="text-[42px] md:text-[72px] font-black tracking-[-0.04em] leading-[0.85] lowercase">
-                {displayProduct.name}
-              </h1>
-             <div className="flex items-center gap-4 md:gap-6">
-                  <p className="text-[9px] md:text-[12px] font-black uppercase tracking-[0.2em] text-[#84827E]">{displayProduct.brand ?? displayProduct.category ?? 'icare essentials'}</p>
-               <div className="flex items-center gap-1">
-                  <div className="flex text-black">
-                    {[...Array(5)].map((_, i) => <Star key={i} size={8} className="md:size-[10px]" fill="currentColor" />)}
-                  </div>
-                    <span className="text-[10px] md:text-[11px] font-bold text-black/55">({displayProduct.reviews ?? '0'})</span>
-               </div>
-             </div>
-          </div>
-
-          <div className="space-y-4 md:space-y-6">
-            <p className="text-[14px] md:text-[15px] leading-relaxed text-[#84827E] font-medium">
-                  {displayProduct.description ?? (productDetailsFallback || 'Product details coming soon')}
-            </p>
-            
-            <div className="space-y-3 text-[13px] md:text-[14px] border-t border-[#DDDDDD] pt-6">
-                <p className="text-[#84827E] leading-relaxed"><span className="font-black lowercase">{t.product.categoryLabel}</span> {displayProduct.category ?? 'icare'} {displayProduct.stockStatus ? `— ${displayProduct.stockStatus.replaceAll('_', ' ')}` : ''}</p>
-                <div className="flex justify-between items-center py-2">
-                  <p className="font-black lowercase">{purchasableProduct.originalPrice ? <>{t.product.originalValueLabel} <span className="text-black/55 line-through ml-1">{purchasableProduct.originalPrice}</span></> : purchasableProduct.label ?? 'selected care'}</p>
-                  <p className="font-black text-[15px] md:text-[18px]">{purchasableProduct.price}</p>
-                </div>
-            </div>
-          </div>
-
-          <div className="pt-4 space-y-6 md:space-y-8">
-              {/* Color picker — shown when product has colors defined and current variant has variant-color data */}
-              {displayProduct.colors && displayProduct.colors.length > 0 && (() => {
-                const activeColors = displayProduct.colors.filter((c) => c.isActive !== false);
-                if (activeColors.length === 0) return null;
-                // Determine stock for the currently selected variant-color combination
-                let currentColorStock: number | null = null;
-                let currentColorStatus: string | null = null;
-                if (selectedVariant?.variantColors && selectedColorId) {
-                  const vc = selectedVariant.variantColors.find((v) => v.colorId === selectedColorId);
-                  if (vc) {
-                    currentColorStock = vc.stockQuantity;
-                    currentColorStatus = vc.stockStatus;
-                  }
-                }
-                return (
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <span className="text-[12px] md:text-[13px] text-[#84827E] lowercase font-black">
-                        {t.product.color}:
-                      </span>
-                      <span className="text-[12px] md:text-[13px] text-[#67645E] lowercase font-black">
-                        {(() => {
-                          const c = activeColors.find((c) => c.id === selectedColorId);
-                          return c ? pickLocalized(c.name, lang) : '—';
-                        })()}
-                      </span>
-                      {currentColorStock !== null && currentColorStock > 0 && currentColorStock <= 5 && (
-                        <span className="text-[10px] md:text-[11px] font-bold text-amber-700 lowercase">
-                          {t.product.onlyLeft.replace('{count}', String(currentColorStock))}
-                        </span>
-                      )}
-                      {currentColorStatus === 'out_of_stock' && (
-                        <span className="text-[10px] md:text-[11px] font-bold text-black/40 lowercase">
-                          {t.product.outOfStock}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      {activeColors.map((color) => {
-                        const isSelected = selectedColorId === color.id;
-                        // Find the variant-color for this color to get stock info
-                        const variantColor = selectedVariant?.variantColors?.find((vc) => vc.colorId === color.id);
-                        const isOutOfStock = variantColor?.stockStatus === 'out_of_stock' || (variantColor?.stockQuantity === 0);
-                        return (
-                          <button
-                            key={color.id}
-                            type="button"
-                            onClick={() => setSelectedColorId(color.id)}
-                            aria-label={pickLocalized(color.name, lang)}
-                            title={pickLocalized(color.name, lang)}
-                            disabled={isOutOfStock}
-                            className={`relative h-9 w-9 md:h-11 md:w-11 rounded-full overflow-hidden border-2 transition-all ${CONTROL_FOCUS_CLASS} ${
-                              isSelected
-                                ? 'border-[#67645E] ring-2 ring-[#67645E]/30 opacity-100 scale-105'
-                                : isOutOfStock
-                                  ? 'border-black/15 opacity-40 cursor-not-allowed'
-                                  : 'border-black/15 opacity-90 hover:opacity-100 hover:border-[#67645E]/40'
-                            }`}
-                            style={!color.image ? { backgroundColor: color.hexCode } : undefined}
-                          >
-                            {color.image ? (
-                              <ImageWithFallback
-                                src={color.image}
-                                alt={pickLocalized(color.name, lang)}
-                                className="h-full w-full object-cover"
-                              />
-                            ) : null}
-                            {isOutOfStock && (
-                              <span className="absolute inset-0 flex items-center justify-center">
-                                <span className="block h-[2px] w-full bg-black/40 rotate-45" />
-                              </span>
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })()}
-
-              {displayProduct.variants && displayProduct.variants.length > 0 && (
-                <div className="flex flex-wrap items-center gap-2 text-[12px] md:text-[13px]">
-                   <span className="text-[#84827E] lowercase">{productSelectOption || t.product.selectOption}</span>
-                  {displayProduct.variants.map((variant) => (
+              {displayImages.length > 1 && (
+                <div className="icare-pdp__thumbnails">
+                  {displayImages.map((img, idx) => (
                     <button
-                      key={variant.id}
-                      onClick={() => setSelectedVariant(variant)}
-                      disabled={!isPurchasableStock(variant.stockStatus, variant.stockQuantity)}
-                      className={`font-black underline underline-offset-4 flex items-center gap-1 rounded-md lowercase ${CONTROL_FOCUS_CLASS} ${selectedVariant?.id === variant.id ? 'text-[#67645E]' : 'text-[#84827E] hover:text-[#67645E]'} disabled:text-black/30 disabled:cursor-not-allowed`}
+                      key={img.url}
+                      type="button"
+                      onClick={() => {
+                        setActiveImageSelection({
+                          index: idx,
+                          galleryKey: displayImagesKey,
+                          resetKey: activeImageResetKey,
+                        });
+                        scrollToMediaSlide(idx);
+                      }}
+                      aria-label={img.altText || `${displayProduct.name} thumbnail ${idx + 1}`}
+                      className={`icare-pdp__thumbnail ${CONTROL_FOCUS_CLASS} ${safeActiveImageIndex === idx ? 'is-active' : ''}`}
                     >
-                      {pickLocalized(variant.name, lang)}
-                      {variant.isDefault && <ChevronDown size={14} />}
+                      <ImageWithFallback src={img.url} alt="" className="h-full w-full object-cover" />
                     </button>
                   ))}
                 </div>
               )}
 
-             <div className="space-y-4">
-                 <motion.button
-                  whileHover={shouldReduceMotion ? undefined : { scale: 1.005 }}
-                   whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
-                   onClick={() => isSelectedVariantPurchasable && addToCart(purchasableProduct)}
-                  disabled={!isSelectedVariantPurchasable}
-                    className={`inline-flex min-h-12 w-full items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#67645E] px-6 py-5 text-[12px] md:text-[13px] font-black uppercase tracking-[0.2em] text-white hover:bg-[#67645E]/90 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${CONTROL_FOCUS_CLASS}`}
-                >
-                  <ShoppingBag size={16} />
-                    {isSelectedVariantPurchasable
-                      ? `${productAddToBag || t.product.addToBag} — ${purchasableProduct.price}`
-                      : (productSoldOut || t.product.soldOut)}
-                </motion.button>
-                <div className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-[9px] md:text-[10px] font-bold text-[#84827E]">
-                  {productAfterpayText || t.product.orAfterpay} <span className="text-black font-black bg-[#ACEBFF] px-1.5 py-0.5 rounded italic">Afterpay</span>
+              {displayImages.length > 1 && (
+                <div className="icare-pdp__mobile-dots md:hidden">
+                  {displayImages.map((image, idx) => (
+                    <div
+                      key={image.url}
+                      className={`h-1 rounded-full transition-all duration-200 motion-reduce:transition-none ${safeActiveImageIndex === idx ? 'w-4 bg-[#67645E]' : 'w-1.5 bg-[#67645E]/30'}`}
+                    />
+                  ))}
                 </div>
+              )}
+            </>
+          ) : (
+            <ImageWithFallback alt={displayProduct.name} className="icare-pdp__media-image" />
+          )}
+        </div>
+
+        {/* RIGHT COLUMN: PRODUCT INFO PANEL */}
+        <div ref={pdpPanelRef} className="icare-pdp__panel">
+
+          <div className="icare-pdp__panel-fold">
+          <h1 className="icare-pdp__title">{displayProduct.name}</h1>
+
+          <div className="icare-pdp__subtitle-row">
+            <p className="icare-pdp__tagline">{productTagline}</p>
+            <div className="icare-pdp__rating" aria-label={productRatingLabel || t.product.ratingLabel}>
+              <div className="flex text-black">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} size={10} fill="currentColor" />
+                ))}
               </div>
+              <span>({formattedReviewCount})</span>
+            </div>
           </div>
 
-          {/* Product Details — collapsible */}
+          <p className="icare-pdp__description">
+            {displayProduct.description ?? (productDetailsFallback || 'Product details coming soon')}
+          </p>
+
+          <div className="icare-pdp__meta">
+            <p>
+              <span className="font-bold lowercase">{t.product.categoryLabel}</span>{' '}
+              {displayProduct.category ?? 'icare'}
+              {displayProduct.stockStatus ? ` — ${displayProduct.stockStatus.replaceAll('_', ' ')}` : ''}
+            </p>
+            <div className="icare-pdp__price-row">
+              <p className="lowercase">
+                {purchasableProduct.originalPrice ? (
+                  <>
+                    {t.product.originalValueLabel}{' '}
+                    <span className="text-black/55 line-through">{purchasableProduct.originalPrice}</span>
+                  </>
+                ) : (
+                  purchasableProduct.label ?? 'selected care'
+                )}
+              </p>
+              <p className="icare-pdp__price">{purchasableProduct.price}</p>
+            </div>
+          </div>
+
+          {/* VARIANT PICKER */}
+          {displayProduct.variants && displayProduct.variants.length > 1 && (
+            <div className="icare-pdp__options">
+              <p className="icare-pdp__options-label">{t.product.color || 'size'}</p>
+              <div className="icare-pdp__options-row">
+                {displayProduct.variants.map((variant) => (
+                  <button
+                    key={variant.id}
+                    type="button"
+                    onClick={() => setSelectedVariant(variant)}
+                    aria-pressed={selectedVariant?.id === variant.id}
+                    className={`icare-pdp__option-btn ${selectedVariant?.id === variant.id ? 'is-selected' : ''} ${CONTROL_FOCUS_CLASS}`}
+                  >
+                    {pickLocalized(variant.name, lang)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* COLOR PICKER */}
+          {displayProduct.colors && displayProduct.colors.length > 0 && (
+            <div className="icare-pdp__options">
+              <p className="icare-pdp__options-label">{t.product.color || 'color'}</p>
+              <div className="icare-pdp__options-row">
+                {displayProduct.colors.filter((c) => c.isActive !== false).map((color) => (
+                  <button
+                    key={color.id}
+                    type="button"
+                    onClick={() => setSelectedColorId(color.id)}
+                    aria-pressed={selectedColorId === color.id}
+                    aria-label={pickLocalized(color.name, lang)}
+                    className={`icare-pdp__color-btn ${selectedColorId === color.id ? 'is-selected' : ''} ${CONTROL_FOCUS_CLASS}`}
+                    style={{ '--swatch': color.hexCode } as React.CSSProperties}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="icare-pdp__cta-block">
+            <motion.button
+              whileHover={shouldReduceMotion ? undefined : { scale: 1 }}
+              whileTap={shouldReduceMotion ? undefined : { scale: 0.995 }}
+              onClick={() => isSelectedVariantPurchasable && addToCart(purchasableProduct)}
+              disabled={!isSelectedVariantPurchasable}
+              className={`icare-pdp__cta ${CONTROL_FOCUS_CLASS}`}
+            >
+              {isSelectedVariantPurchasable
+                ? `${productAddToBag || t.product.addToBag} - ${purchasableProduct.price}`
+                : (productSoldOut || t.product.soldOut)}
+            </motion.button>
+            <div className="icare-pdp__afterpay">
+              {productAfterpayText || t.product.orAfterpay}{' '}
+              <span className="text-black font-black bg-[#ACEBFF] px-1.5 py-0.5 rounded italic">Afterpay</span>
+            </div>
+          </div>
+          </div>
+
           {(() => {
             const bp = displayProduct.backendProduct;
             if (!bp) return null;
@@ -573,38 +589,26 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
             if (details.length === 0) return null;
 
             return (
-              <div className="border-t border-[#DDDDDD] pt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowDetails((prev) => !prev)}
-                  className={`flex items-center justify-between w-full text-[11px] md:text-[12px] font-black uppercase tracking-[0.15em] text-[#67645E] ${CONTROL_FOCUS_CLASS}`}
-                >
-                  <span>{t.product.productDetails}</span>
-                  <ChevronDown
-                    size={14}
-                    className={`transition-transform duration-200 ${showDetails ? 'rotate-180' : ''}`}
-                  />
-                </button>
-                {showDetails && (
-                  <div className="mt-4 space-y-4">
-                    {details.map((detail) => (
-                      <div key={detail.label} className="space-y-1">
-                        <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] text-[#84827E]">
-                          {detail.label}
+              <div className="icare-pdp__details">
+                <h2 className="icare-pdp__details-heading">{t.product.productDetails}</h2>
+                <div className="mt-4 space-y-4">
+                  {details.map((detail) => (
+                    <div key={detail.label} className="space-y-1">
+                      <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] text-[#84827E]">
+                        {detail.label}
+                      </p>
+                      {Array.isArray(detail.value) ? (
+                        <p className="text-[12px] md:text-[13px] text-[#67645E] leading-relaxed">
+                          {detail.value.join(' · ')}
                         </p>
-                        {Array.isArray(detail.value) ? (
-                          <p className="text-[12px] md:text-[13px] text-[#67645E] leading-relaxed">
-                            {detail.value.join(' · ')}
-                          </p>
-                        ) : (
-                          <p className="text-[12px] md:text-[13px] text-[#67645E] leading-relaxed whitespace-pre-line">
-                            {detail.value}
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      ) : (
+                        <p className="text-[12px] md:text-[13px] text-[#67645E] leading-relaxed whitespace-pre-line">
+                          {detail.value}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             );
           })()}
@@ -782,7 +786,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
       {/* 3. LINEUP SECTION */}
       <ProductLineup lang={lang} products={relatedProducts} useShortcutFallback={false} onProductSelect={onProductSelect} />
 
-      {/* FLOATING STICKY BAR */}
+      {/* FLOATING STICKY BAR — Rhode Product-sticky-bar */}
       <AnimatePresence>
         <motion.div 
           initial={{ y: 100, opacity: 0 }}
@@ -791,27 +795,27 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
             opacity: showBottomBar ? 1 : 0 
           }}
           transition={{ duration: shouldReduceMotion ? 0 : 0.28, ease: [0.32, 0.72, 0, 1] }}
-          className="fixed bottom-0 left-0 w-full bg-white px-[var(--icare-page-gutter)] py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex items-center justify-between gap-4 z-50 border-t border-[#DDDDDD]"
+          className={`icare-pdp__sticky-bar${showBottomBar ? '' : ' is-hidden'}`}
         >
-          <div className="flex min-w-0 items-center gap-3 md:gap-4">
-            <div className="w-11 h-11 bg-white rounded-md flex items-center justify-center p-1.5">
-               <ImageWithFallback src={displayProduct.primaryImage} alt={displayProduct.name} className="w-full h-full object-contain mix-blend-multiply" />
+          <div className="icare-pdp__sticky-bar-inner">
+            <div className="icare-pdp__sticky-bar-info">
+              <div className="icare-pdp__sticky-bar-image">
+                <ImageWithFallback src={displayProduct.primaryImage} alt={displayProduct.name} className="w-full h-full object-contain" />
+              </div>
+              <p className="icare-pdp__sticky-bar-title">{displayProduct.name}</p>
             </div>
-            <span className="min-w-0 truncate text-[11px] md:text-[12px] font-black uppercase tracking-[0.14em] md:tracking-[0.2em] text-[#67645E]">{displayProduct.name}</span>
-          </div>
 
-          <motion.button 
-            whileHover={shouldReduceMotion ? undefined : { scale: 1.005 }}
-            whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
-            onClick={() => isSelectedVariantPurchasable && addToCart(purchasableProduct)}
-            disabled={!isSelectedVariantPurchasable}
-            className={`shrink-0 bg-[#67645E] text-white px-5 md:px-8 py-3 rounded-full text-[10px] md:text-[11px] font-black uppercase tracking-[0.16em] md:tracking-[0.2em] hover:bg-[#67645E]/90 transition-colors duration-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${CONTROL_FOCUS_CLASS}`}
-          >
-            <ShoppingBag size={14} />
-            {isSelectedVariantPurchasable
-              ? `${productBuyNow || t.product.buyNow} - ${purchasableProduct.price}`
-              : (productSoldOut || t.product.soldOut).toUpperCase()}
-          </motion.button>
+            <button 
+              type="button"
+              onClick={() => isSelectedVariantPurchasable && addToCart(purchasableProduct)}
+              disabled={!isSelectedVariantPurchasable}
+              className={`icare-pdp__sticky-cta ${CONTROL_FOCUS_CLASS}`}
+            >
+              {isSelectedVariantPurchasable
+                ? `${productBuyNow || t.product.buyNow} - ${purchasableProduct.price}`
+                : (productSoldOut || t.product.soldOut).toUpperCase()}
+            </button>
+          </div>
         </motion.div>
       </AnimatePresence>
 

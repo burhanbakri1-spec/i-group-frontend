@@ -28,7 +28,7 @@ const HEADER_SHOW_SCROLL_THRESHOLD = 32;
 const HEADER_SCROLL_DELTA = 4;
 const HEADER_HIDE_DELAY_MS = 200;
 const HEADER_MOTION_EASE = [0.76, 0, 0.24, 1] as const;
-const PREVIEW_LIMIT = 8;
+const PREVIEW_LIMIT = 4;
 const PREVIEW_SLIDE_DISTANCE = 60;
 
 const getMegaMenuSubtitle = (product: Product) =>
@@ -241,7 +241,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
       const delta = currentScrollY - lastScrollYRef.current;
       const isStandardHeroRoute = hasIcareStandardHero(pathname);
 
-      setIsScrolled(currentScrollY > 40 || !isStandardHeroRoute);
+      // Condensed header plate only after scroll — non-hero routes (e.g. product
+      // pages) must keep the announcement bar visible at the top of the viewport.
+      setIsScrolled(currentScrollY > 40);
 
       if (isStandardHeroRoute) {
         setHasScrolledPastHero(currentScrollY > 40);
@@ -320,8 +322,8 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
     && !isScrolled
     && !isShopHovered
     && !hasScrolledPastHero;
-  // Condensed mode: header sits above the hero with a solid white pill and a tighter top gap.
-  // Activates as soon as the user has scrolled past the hero height (or on non-standard routes).
+  // Condensed mode: header sits above content with a solid white plate and a
+  // tighter top gap once the user has scrolled past the hero (or page top).
   const isCondensed = !isConnected && isScrolled;
   const radiusClass = isShopHovered
     ? 'rounded-[var(--rb-radius-card)]'
@@ -373,7 +375,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
       >
       <div>
         <div
-          className={`overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] border ${isConnected ? 'border-transparent' : 'border-[var(--rb-border-light)]'} ${radiusClass} ${wrapperBg}`}
+          className={`overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] ${radiusClass} ${wrapperBg}`}
         >
           <header className="icare-header-bar">
           {/* Navigation */}

@@ -28,12 +28,6 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) 
     : 'دفئي خديك مع Pocket Blush. لمسة من اللون الكريمي طويل الأمد الذي يحاكي الاحمرار الذي تحصلين عليه بعد الدخول من البرد.';
   const cta = lang === 'en' ? promoFallbacks.cta : 'بوكيت بلاش';
 
-  React.useEffect(() => {
-    // #region agent log
-    fetch('http://127.0.0.1:7247/ingest/f6cc01e8-bb18-44f5-887a-e8a98758696c', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': 'd14496' }, body: JSON.stringify({ sessionId: 'd14496', runId: 'promo-build-fix', hypothesisId: 'H1,H2,H3,H4', location: 'app/icare/components/PromoSection.tsx:31', message: 'PromoSection render inputs after typed reveal fix', data: { lang, shouldReduceMotion, hasPromoImage: Boolean(promoFallbacks.image), revealMode: shouldReduceMotion ? 'reduced' : 'animated' }, timestamp: Date.now() }) }).catch(() => {});
-    // #endregion
-  }, [lang, promoFallbacks.image, shouldReduceMotion]);
-
   const reveal: HTMLMotionProps<'div'> = shouldReduceMotion
     ? {}
     : {
