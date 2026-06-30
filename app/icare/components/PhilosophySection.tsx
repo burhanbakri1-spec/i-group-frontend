@@ -44,8 +44,7 @@ viewport={{ once: false }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.55, ease: [0.76, 0, 0.24, 1] }}
-          className="m-0 text-[clamp(1.25rem,2.4vw,1.6rem)] font-bold leading-[1.4] tracking-normal text-white"
-          style={{ fontFamily: 'var(--font-rektorat)' }}
+          className="icare-full-banner__headline"
         >
           {philosophyFallbacks.headline}
         </motion.h2>
@@ -55,7 +54,7 @@ viewport={{ once: false }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.45, delay: 0.08, ease: [0.76, 0, 0.24, 1] }}
-          className="m-0 max-w-2xl text-[15.73px] font-bold leading-[1.5] tracking-[0.02em] text-white/90 md:text-[15.73px]"
+          className="icare-full-banner__text"
         >
           {philosophyFallbacks.text}
         </motion.p>

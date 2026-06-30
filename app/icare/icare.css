@@ -187,6 +187,12 @@
     --icare-section-radius: 12px;
     --icare-feature-radius: 8px;
     --icare-main-top-offset: 6rem;
+    /* Shared fixed height for paired landing blocks (mission + philosophy). */
+    --icare-index-section-height: 34.5rem; /* 552px */
+    /* Rhode ProductShowcase half-image frames @ 1440. */
+    --icare-morning-image-width: 42.8125rem; /* 685px */
+    --icare-morning-image-height: 53.5rem; /* 856px */
+    --icare-morning-grid-gap: 2.375rem; /* 38px */
   }
 }
 
@@ -1864,6 +1870,9 @@
     background: var(--rb-pure-white);
     padding-top: clamp(1rem, 1.8vw, 1.5rem);
     border-radius: var(--icare-section-radius);
+    /* Rhode Product-card tile — fixed 352×440px @ 16px root, no vw scaling */
+    --icare-product-card-tile-width: 22rem;
+    --icare-product-card-tile-height: 27.5rem;
   }
 
   .icare-landing-products__header {
@@ -1895,10 +1904,31 @@
   }
 
   .icare-landing-products__item {
-    flex: 0 0 clamp(22rem, 31.2vw, 32rem);
-    width: clamp(22rem, 31.2vw, 32rem);
+    flex: 0 0 var(--icare-product-card-tile-width);
+    width: var(--icare-product-card-tile-width);
+    max-width: var(--icare-product-card-tile-width);
     contain: layout paint style;
     scroll-snap-align: start;
+  }
+
+  .icare-landing-products__item .icare-product-card--standard {
+    width: var(--icare-product-card-tile-width);
+    max-width: var(--icare-product-card-tile-width);
+  }
+
+  .icare-landing-products__item .icare-product-card--standard .icare-product-card__surface,
+  .icare-landing-products__item .icare-product-card--standard .icare-product-card__main-action,
+  .icare-landing-products__item .icare-product-card--standard .icare-product-card__primary {
+    width: var(--icare-product-card-tile-width);
+    height: var(--icare-product-card-tile-height);
+    min-height: var(--icare-product-card-tile-height);
+    max-height: var(--icare-product-card-tile-height);
+  }
+
+  .icare-landing-products__item .icare-product-card--standard .icare-product-card__media {
+    width: var(--icare-product-card-tile-width);
+    height: var(--icare-product-card-tile-height);
+    box-sizing: border-box;
   }
 
   .icare-landing-products__empty {
@@ -2591,7 +2621,10 @@
   .icare-full-banner {
     position: relative;
     overflow: hidden;
-    min-height: 44rem;
+    width: 100%;
+    height: var(--icare-index-section-height);
+    min-height: var(--icare-index-section-height);
+    max-height: var(--icare-index-section-height);
     border-radius: var(--icare-section-radius);
     color: var(--rb-pure-white);
   }
@@ -2601,6 +2634,19 @@
     inset: 0;
     overflow: hidden;
     border-radius: inherit;
+  }
+
+  .icare-full-banner__media > * {
+    width: 100%;
+    height: 100%;
+  }
+
+  .icare-full-banner__media img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
   }
 
   .icare-full-banner__shade {
@@ -2618,7 +2664,27 @@
     align-content: end;
     justify-items: start;
     gap: 1rem;
-    padding: clamp(1rem, 3vw, 2rem);
+    padding: 2rem;
+  }
+
+  .icare-full-banner__headline {
+    margin: 0;
+    color: var(--rb-pure-white);
+    font-family: var(--font-rektorat);
+    font-size: 1.6rem;
+    font-weight: var(--rb-font-weight-bold);
+    line-height: 1.4;
+    letter-spacing: var(--rb-tracking-normal);
+  }
+
+  .icare-full-banner__text {
+    margin: 0;
+    max-width: 42rem;
+    color: rgb(255 255 255 / 0.9);
+    font-size: var(--rb-text-pill);
+    font-weight: var(--rb-font-weight-bold);
+    line-height: var(--rb-text-pill--line-height);
+    letter-spacing: var(--rb-text-pill--letter-spacing);
   }
 
   .icare-morning-section {
@@ -2647,6 +2713,10 @@
     flex-direction: column;
     gap: 0;
     width: 100%;
+  }
+
+  .icare-morning-grid > .scroll-reveal {
+    min-width: 0;
   }
 
   .icare-morning-media {
@@ -2745,16 +2815,21 @@
     width: max(9.125rem, 36.3889vw);
     height: max(9.125rem, 36.3889vw);
     z-index: 2;
+    overflow: hidden;
+    flex-shrink: 0;
   }
 
   .icare-morning-product__image {
-    position: relative;
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
   }
 
   .icare-morning-product__image > .icare-morning-product__image-media,
   .icare-morning-product__image > div {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
     height: 100%;
@@ -2769,9 +2844,16 @@
     object-position: center;
   }
 
+  .icare-morning-product__image img[src="/default-product.svg"],
+  .icare-morning-product__image-media img[src="/default-product.svg"] {
+    box-sizing: border-box;
+    object-fit: contain;
+    padding: clamp(1.25rem, 4vw, 2.5rem);
+  }
+
   .icare-morning-product__nav {
     position: absolute;
-    top: max(8rem, 22vw);
+    top: 50%;
     z-index: 3;
     display: none;
     align-items: center;
@@ -2784,6 +2866,7 @@
     background: transparent;
     color: var(--rb-primary-text);
     cursor: pointer;
+    transform: translateY(-50%);
     transition: background-color 200ms ease;
   }
 
@@ -3076,9 +3159,21 @@
 
   .icare-mission-section {
     display: grid;
-    grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 2rem;
     align-items: stretch;
+  }
+
+  .icare-mission-section > .scroll-reveal {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    min-height: 0;
+    width: 100%;
+  }
+
+  .icare-mission-section > .scroll-reveal .icare-mission-image {
+    height: 100%;
   }
 
   .icare-mission-panel,
@@ -3093,15 +3188,17 @@
     grid-row: 1;
     display: flex;
     flex-direction: column;
-    min-height: 34.5rem;
-    padding: clamp(2.5rem, 3.5vw, 3.75rem);
+    height: var(--icare-index-section-height);
+    min-height: var(--icare-index-section-height);
+    max-height: var(--icare-index-section-height);
+    padding: 3rem;
   }
 
   .icare-mission-image {
     position: relative;
-    grid-column: 2;
-    grid-row: 1;
-    min-height: 34.5rem;
+    height: var(--icare-index-section-height);
+    min-height: var(--icare-index-section-height);
+    max-height: var(--icare-index-section-height);
   }
 
   .icare-mission-image__media,
@@ -3138,7 +3235,7 @@
 
   /* Rhode TabbedSection body copy (u-hSize): fluid heading-scale text, not 16px base. */
   .icare-mission-detail {
-    max-width: max(30rem, 28vw);
+    max-width: 30rem;
     margin: 0 0 1.5rem;
     color: var(--rb-primary-text);
     font-size: var(--rb-text-mission-body);
@@ -3238,15 +3335,26 @@
       display: flex;
       flex-direction: column;
       gap: 0;
+      height: auto;
+      min-height: 0;
+      max-height: none;
       overflow: hidden;
       border-radius: var(--icare-section-radius);
+    }
+
+    .icare-mission-section > .scroll-reveal {
+      grid-column: auto;
+      grid-row: auto;
+      height: auto;
     }
 
     .icare-mission-image {
       position: relative;
       order: 1;
       flex: 0 0 auto;
+      height: auto;
       min-height: 0;
+      max-height: none;
       aspect-ratio: 4 / 3;
       border-radius: var(--icare-section-radius) var(--icare-section-radius) 0 0;
     }
@@ -3262,9 +3370,11 @@
     .icare-mission-panel {
       order: 2;
       flex: 1 1 auto;
+      height: auto;
       min-height: 0;
+      max-height: none;
       border-radius: 0 0 var(--icare-section-radius) var(--icare-section-radius);
-      padding: clamp(1.5rem, 4vw, 2rem) clamp(1.25rem, 4vw, 1.75rem) clamp(1.75rem, 5vw, 2.25rem);
+      padding: 2rem 1.75rem 2.25rem;
     }
 
     .icare-mission-detail {
@@ -3334,11 +3444,35 @@
 
 }
 
-/* Rhode u-hSize / u-pSize__Large desktop breakpoints (theme.css @ 821px). */
+/* Rhode u-hSize / u-pSize__Large desktop breakpoints (theme.css @ 821px).
+   Fixed rem values — no vw — so mission block metrics stay stable across browsers. */
 @media (min-width: 821px) {
   :root {
-    --rb-text-mission-body: 2.525vw;
-    --rb-text-mission-tab: max(1.5rem + 0.2vw, 1.85vw);
+    --rb-text-mission-body: 1.675rem;
+    --rb-text-mission-tab: 1.6325rem;
+  }
+
+  .icare-mission-section {
+    height: var(--icare-index-section-height);
+    max-height: var(--icare-index-section-height);
+  }
+
+  .icare-mission-section > .scroll-reveal {
+    height: var(--icare-index-section-height);
+    max-height: var(--icare-index-section-height);
+  }
+
+  .icare-full-banner {
+    height: var(--icare-index-section-height);
+    min-height: var(--icare-index-section-height);
+    max-height: var(--icare-index-section-height);
+  }
+
+  /* Left lifestyle image: aspect-ratio drives column height. */
+  .icare-morning-media {
+    aspect-ratio: 685 / 856;
+    max-height: var(--icare-morning-image-height);
+    overflow: hidden;
   }
 }
 
@@ -3383,11 +3517,6 @@
 
   .icare-landing-products__track {
     padding: 0 1rem 0.25rem;
-  }
-
-  .icare-landing-products__item {
-    flex-basis: min(84vw, 28rem);
-    width: min(84vw, 28rem);
   }
 
   .icare-promo-banner__frame {
@@ -3459,11 +3588,6 @@
     --icare-hero-min-height: 32rem;
   }
 
-  .icare-landing-products__item {
-    flex-basis: min(44vw, 20rem);
-    width: min(44vw, 20rem);
-  }
-
   .icare-product-card--showcase .icare-product-card__primary {
     min-height: 30rem;
   }
@@ -3489,7 +3613,13 @@
   }
 
   .icare-full-banner {
+    height: auto;
     min-height: 24rem;
+    max-height: none;
+  }
+
+  .icare-full-banner__copy {
+    padding: 1.25rem;
   }
 
   .mobile-trending-scroll {
@@ -3535,50 +3665,110 @@
 
 /* Rhode half-product-image desktop/non-mobile mode. */
 @media (min-width: 1040px), (min-aspect-ratio: 2 / 3) {
+  /* Grid: equal 1fr columns, stretched to same row height. */
   .icare-morning-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: max(2.375rem, 2.63889vw);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--icare-morning-grid-gap);
+    align-items: stretch;
   }
 
+  /* Both scroll-reveals become flex columns filling their grid cell. */
+  .icare-morning-grid > .scroll-reveal {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .icare-morning-grid > .scroll-reveal > * {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+  }
+
+  /* Left: lifestyle image fills the column; aspect-ratio on the image
+     drives the shared row height (both columns stretch to match). */
   .icare-morning-media {
+    position: relative;
+    overflow: hidden;
     border-radius: var(--icare-section-radius);
-    min-height: max(45rem, 50vw);
-    height: max(45rem, 50vw);
-    max-height: max(45rem, 50vw);
+    aspect-ratio: 685 / 856;
+    max-height: var(--icare-morning-image-height);
   }
 
+  /* Viewport fills the media container absolutely (no padding-bottom hack). */
   .icare-morning-media__viewport {
+    position: absolute;
+    inset: 0;
+    width: 100%;
     height: 100%;
-    min-height: max(45rem, 50vw);
     padding-bottom: 0;
   }
 
+  /* Right: products panel is a flex column filling the same row height. */
   .icare-morning-products {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
     border-radius: var(--icare-section-radius);
   }
 
+  /* Article fills the panel. */
   .icare-morning-product {
-    justify-content: flex-end;
-    min-height: max(45rem, 50vw);
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: 0;
+    padding-top: 0;
+    padding-bottom: max(1.25rem, 1.80556vw);
   }
 
+  /* Product image fills whatever height remains after text/CTA.
+     aspect-ratio is intentionally removed here — let the column height
+     (driven by the left image) determine how tall the stage is. */
   .icare-morning-product__stage {
     order: 1;
+    flex: 1 1 auto;
+    min-height: 0;
+    position: relative;
+    width: 100%;
+    height: auto;
+    /* Cancel the 821px block's fixed aspect-ratio on the stage. */
+    aspect-ratio: auto;
+    max-height: none;
+    overflow: hidden;
+    margin-bottom: 0.9375rem;
   }
 
   .icare-morning-product__details {
     order: 2;
-    margin-bottom: max(0.9375rem, 1.04167vw);
+    flex-shrink: 0;
+    margin-bottom: 0.9375rem;
+  }
+
+  .icare-morning-product__cta {
+    order: 3;
+    flex-shrink: 0;
+  }
+
+  .icare-morning-product__index {
+    order: 4;
+    flex-shrink: 0;
+    padding: 0.9375rem 0.75rem 0;
   }
 
   .icare-morning-product__nav {
     display: inline-flex;
-    top: 38%;
   }
 
-  .icare-morning-product__index {
-    padding: max(4.375rem, 4.86111vw) max(0.75rem, 2.43056vw) max(0.9375rem, 1.04167vw);
+  .icare-morning-product__nav--prev {
+    left: max(1.25rem, 2.08333vw);
+  }
+
+  .icare-morning-product__nav--next {
+    right: max(1.25rem, 2.08333vw);
   }
 }
 

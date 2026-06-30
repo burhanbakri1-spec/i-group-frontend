@@ -118,24 +118,24 @@ export const ProductShowcase: React.FC<ProductShowcaseProps> = ({ products, lang
         <ScrollReveal direction="right" viewportMargin="-80px">
           <div className="icare-morning-products">
             <article className="icare-morning-product">
-              <button
-                type="button"
-                className="icare-morning-product__nav icare-morning-product__nav--prev"
-                onClick={prevSlide}
-                aria-label={t.pages.showcase.previousProduct}
-              >
-                <ArrowLeft size={16} strokeWidth={1.5} aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                className="icare-morning-product__nav icare-morning-product__nav--next"
-                onClick={nextSlide}
-                aria-label={t.pages.showcase.nextProduct}
-              >
-                <ArrowRight size={16} strokeWidth={1.5} aria-hidden="true" />
-              </button>
-
               <div className="icare-morning-product__stage">
+                <button
+                  type="button"
+                  className="icare-morning-product__nav icare-morning-product__nav--prev"
+                  onClick={prevSlide}
+                  aria-label={t.pages.showcase.previousProduct}
+                >
+                  <ArrowLeft size={16} strokeWidth={1.5} aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  className="icare-morning-product__nav icare-morning-product__nav--next"
+                  onClick={nextSlide}
+                  aria-label={t.pages.showcase.nextProduct}
+                >
+                  <ArrowRight size={16} strokeWidth={1.5} aria-hidden="true" />
+                </button>
+
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={`product-${currentIndex}`}
