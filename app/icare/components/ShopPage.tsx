@@ -137,6 +137,8 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
   const [childrenByRoot, setChildrenByRoot] = useState<Record<string, BackendCategory[]>>({});
   const [activeChild, setActiveChild] = useState<string | null>(null);
   const [loadingChildren, setLoadingChildren] = useState(false);
+  // Holds a slug from the URL that couldn't be resolved yet (children not loaded).
+  const [pendingChildSlug, setPendingChildSlug] = useState<string | null>(null);
 
   const selectedRoot = useMemo(
     () => rootCategories.find((category) => category.slug === activeMain) ?? null,
@@ -196,34 +198,44 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
     return () => { cancelled = true; };
   }, [activeMain, childrenByRoot]);
 
-  // React to ?category=<slug> in the URL. Root slugs auto-select the root;
-  // child slugs auto-select the owning root and the child. If neither
-  // rootCategories nor the relevant children have loaded yet we wait and
-  // re-run when they arrive. To make deep-links to child slugs work
-  // without a prior root click, lazily load children for any unloaded
-  // roots on first miss so the next pass can resolve the child.
+  // Effect A: React to URL ?category= changes only.
+  // Never depends on childrenByRoot — avoids the reset loop where a child-load
+  // causes this effect to fire and then clears activeMain because the URL has
+  // no ?category= param (the original bug).
   useEffect(() => {
     const urlCategory = searchParams.get('category');
     if (!urlCategory) {
       setActiveMain(null);
       setActiveChild(null);
+      setPendingChildSlug(null);
       return;
     }
     const root = rootCategories.find(c => c.slug === urlCategory);
     if (root) {
       setActiveMain(root.slug);
       setActiveChild(null);
+      setPendingChildSlug(null);
       return;
     }
+    // Unknown slug — could be a child category. Defer resolution to Effect B.
+    setPendingChildSlug(urlCategory);
+  }, [searchParams, rootCategories]);
+
+  // Effect B: Resolve a pending child slug once children are available.
+  // Separated from Effect A so child-loads don't re-trigger the URL reset path.
+  useEffect(() => {
+    if (!pendingChildSlug) return;
     for (const r of rootCategories) {
       const children = childrenByRoot[r.slug] ?? [];
-      const child = children.find(c => c.slug === urlCategory);
+      const child = children.find(c => c.slug === pendingChildSlug);
       if (child) {
         setActiveMain(r.slug);
         setActiveChild(child.slug);
+        setPendingChildSlug(null);
         return;
       }
     }
+    // Eagerly fetch children for any root not yet loaded so the next pass can resolve.
     const unloaded = rootCategories.filter(r => !childrenByRoot[r.slug]);
     if (unloaded.length === 0) return;
     let cancelled = false;
@@ -237,7 +249,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
         });
       });
     return () => { cancelled = true; };
-  }, [searchParams, rootCategories, childrenByRoot]);
+  }, [pendingChildSlug, rootCategories, childrenByRoot]);
 
   const allProducts = useMemo(
     () => (catalogProducts && catalogProducts.length > 0 ? catalogProducts : DEFAULT_PRODUCTS),
@@ -294,11 +306,15 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
 
   const resetFilters = () => {
     setActiveMain(null);
+    setActiveChild(null);
+    setPendingChildSlug(null);
     setVisibleCount(12);
   };
 
   const selectRoot = (slug: string | null) => {
     if (!slug) { resetFilters(); return; }
+    // Clear child selection whenever the root changes.
+    if (slug !== activeMain) setActiveChild(null);
     setActiveMain(slug);
   };
 

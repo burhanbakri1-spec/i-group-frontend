@@ -26,6 +26,15 @@ interface ProductPageProps {
 
 const CONTROL_FOCUS_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872] focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 
+/** Rhode bottom-up fill animation for outline pill buttons (dark fill on white). */
+const RHODE_PILL_HOVER = [
+  'relative isolate overflow-hidden',
+  'before:absolute before:inset-0 before:-z-10 before:origin-bottom before:scale-y-0 before:rounded-[inherit]',
+  'before:bg-[#67645E] before:transition-transform before:duration-500 before:ease-[cubic-bezier(0.76,0,0.24,1)]',
+  'transition-[color,transform,border-color] duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]',
+  'hover:-translate-y-px hover:text-white hover:border-[#67645E] hover:before:scale-y-100',
+].join(' ');
+
 interface ReviewItemProps {
   review: ProductReview;
   content: { verifiedLabel: string; hydrationQuestion: string; hydrationLow: string; hydrationHigh: string; helpfulQuestion: string; ageRange: string; skinConcern: string; skinTypeQuestion: string; favoriteFeatures: string };
@@ -667,7 +676,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
                   <div ref={filterDropdownRef} className="relative">
                     <button
                       onClick={() => { setIsFilterDropdownOpen((prev) => !prev); setIsSortDropdownOpen(false); }}
-                       className={`inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap px-6 py-2.5 rounded-full border text-[10px] font-black uppercase tracking-widest transition-colors ${CONTROL_FOCUS_CLASS} ${reviewRatingFilter ? 'bg-[#67645E] text-white border-[#67645E]' : 'border-[#DDDDDD] hover:bg-[#67645E] hover:text-white'}`}
+                       className={`inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap px-6 py-2.5 rounded-full border text-[10px] font-black uppercase tracking-widest ${RHODE_PILL_HOVER} ${CONTROL_FOCUS_CLASS} ${reviewRatingFilter ? 'bg-[#67645E] text-white border-[#67645E]' : 'border-[#DDDDDD] text-[#67645E]'}`}
                     >
                        {reviewRatingFilter ? `${reviewRatingFilter} stars` : (reviewFilterButton || t.product.reviewFilter)}
                       <ChevronDown size={12} className={`transition-transform ${isFilterDropdownOpen ? 'rotate-180' : ''}`} />
@@ -757,7 +766,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
               {!isReviewsExpanded && (
                 <button 
                   onClick={() => setIsReviewsExpanded(true)}
-                   className={`inline-flex min-h-11 items-center justify-center px-12 py-3 rounded-full border border-[#DDDDDD] text-[11px] font-black uppercase tracking-[0.2em] whitespace-nowrap hover:bg-[#67645E] hover:text-white transition-colors duration-200 bg-white ${CONTROL_FOCUS_CLASS}`}
+                  className={`inline-flex min-h-11 items-center justify-center px-12 py-3 rounded-full border border-[#DDDDDD] text-[11px] font-black uppercase tracking-[0.2em] whitespace-nowrap bg-white text-[#67645E] ${RHODE_PILL_HOVER} ${CONTROL_FOCUS_CLASS}`}
                 >
                   {reviewShowMore || t.product.showMore}
                 </button>
@@ -765,7 +774,7 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
               {isReviewsExpanded && hasMoreReviews && (
                 <button 
                   onClick={loadMoreReviews}
-                   className={`inline-flex min-h-11 items-center justify-center px-12 py-3 rounded-full border border-[#DDDDDD] text-[11px] font-black uppercase tracking-[0.2em] whitespace-nowrap hover:bg-[#67645E] hover:text-white transition-colors duration-200 bg-white ${CONTROL_FOCUS_CLASS}`}
+                  className={`inline-flex min-h-11 items-center justify-center px-12 py-3 rounded-full border border-[#DDDDDD] text-[11px] font-black uppercase tracking-[0.2em] whitespace-nowrap bg-white text-[#67645E] ${RHODE_PILL_HOVER} ${CONTROL_FOCUS_CLASS}`}
                 >
                   {t.product.loadMoreReviews}
                 </button>

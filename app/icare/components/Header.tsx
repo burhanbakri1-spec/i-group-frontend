@@ -36,6 +36,7 @@ const getMegaMenuSubtitle = (product: Product) =>
 
 export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavigate, onProductSelect, onOpenMenu, isDrawerOpen, lang, onToggleLang }) => {
   const t = translations[lang];
+  const shopAllLabel = t.pages.shop.shopAll;
   const { cartCount } = useShop();
   const [isShopHovered, setIsShopHovered] = useState(false);
   const [activePreviewIndex, setActivePreviewIndex] = useState(0);
@@ -165,6 +166,20 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
     };
   }, [isShopHovered]);
 
+  // Always reopen mega menu on "shop all" — reset category + scroll when the menu opens/closes.
+  useEffect(() => {
+    if (!isShopHovered) {
+      setActivePreviewIndex(0);
+      setPreviewDirection('right');
+      return;
+    }
+    setActivePreviewIndex(0);
+    setPreviewDirection('right');
+    window.requestAnimationFrame(() => {
+      categoriesScrollRef.current?.scrollTo({ left: 0, behavior: 'auto' });
+    });
+  }, [isShopHovered]);
+
   useEffect(() => {
     let cancelled = false;
     const loadData = async () => {
@@ -184,14 +199,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
 
   const megaMenuCategories = useMemo(() => {
     if (rootCategories.length > 0) {
-      return [t.categories.all, ...rootCategories.map((c) => pickLocalized(c.name, lang))];
+      return [shopAllLabel, ...rootCategories.map((c) => pickLocalized(c.name, lang))];
     }
     if (previewProducts.length === 0) return [];
     const backendCategories = Array.from(new Set(previewProducts
       .map((product) => product.category?.trim())
       .filter((category): category is string => Boolean(category))));
-    return [t.categories.all, ...backendCategories];
-  }, [rootCategories, previewProducts, t.categories.all, lang]);
+    return [shopAllLabel, ...backendCategories];
+  }, [rootCategories, previewProducts, shopAllLabel, lang]);
 
   const clampedActivePreviewIndex = megaMenuCategories.length > 0
     ? Math.min(activePreviewIndex, megaMenuCategories.length - 1)
@@ -573,7 +588,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                         onClick={() => { onNavigate('shop', { categorySlug: '' }); closeShopMenu(); }}
                         className={`icare-header-mega__category${clampedActivePreviewIndex === 0 ? ' is-active' : ''} ${FOCUS_VISIBLE_CLASS}`}
                       >
-                        {t.categories.all}
+                        {shopAllLabel}
                         {clampedActivePreviewIndex === 0 && (
                           <motion.div layoutId="activeCategoryUnderline" transition={calmTween} className="icare-header-mega__category-indicator start-0 w-full" />
                         )}
@@ -595,7 +610,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                           )}
                         </button>
                       )) : (
-                        megaMenuCategories.filter((category) => category !== t.categories.all).map((cat, index) => (
+                        megaMenuCategories.filter((category) => category !== shopAllLabel).map((cat, index) => (
                           <button
                             type="button"
                             role="tab"
