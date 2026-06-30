@@ -306,6 +306,9 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
     setVisibleCount(12);
   }, [activeMain, activeSort]);
 
+  const visibleProducts = filteredProducts.slice(0, visibleCount);
+  const shouldCenterShopGridStart = cols === 3 && visibleProducts.length < 3;
+
   if (loading && !catalogProducts) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white px-4">
@@ -419,8 +422,8 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
       {/* Grid */}
       <div className="max-w-[1600px] mx-auto pb-24">
         <ScrollReveal direction="bottom" delay={0.05} viewportMargin="-40px">
-          <div className={`grid grid-cols-1 min-[375px]:grid-cols-2 ${cols === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} gap-x-3 gap-y-6 md:gap-x-6 md:gap-y-10 lg:gap-x-8 lg:gap-y-14`}>
-            {filteredProducts.slice(0, visibleCount).map((p) => (
+          <div className={`icare-shop-grid${cols === 3 ? ' icare-shop-grid--cols-3' : ''}${shouldCenterShopGridStart ? ' icare-shop-grid--center-start' : ''}`}>
+            {visibleProducts.map((p) => (
               <ProductCard key={p.id} product={p} lang={lang} onSelect={() => onProductSelect(p)} />
             ))}
           </div>

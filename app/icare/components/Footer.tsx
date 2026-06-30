@@ -10,7 +10,10 @@ interface FooterProps {
 }
 
 const FOCUS_VISIBLE_CLASS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7B7872]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F1F0ED]';
-const FOOTER_LINK_CLASS = `min-h-[44px] flex items-center rounded-sm text-[14px] text-[#84827E] hover:text-[#5C5A56] transition-colors text-start ${FOCUS_VISIBLE_CLASS}`;
+const FOOTER_LINK_CLASS = `block py-1 rounded-sm text-[14px] leading-snug text-[#84827E] hover:text-[#5C5A56] transition-colors text-start ${FOCUS_VISIBLE_CLASS}`;
+const FOOTER_SOCIAL_LINK_CLASS = `flex items-center gap-2 py-1 text-[14px] leading-snug text-[#84827E] hover:text-[#5C5A56] transition-colors group ${FOCUS_VISIBLE_CLASS}`;
+const FOOTER_COLUMN_CLASS = 'p-6 md:p-8 lg:p-10 space-y-4';
+const FOOTER_LIST_CLASS = 'space-y-1';
 
 export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
   const {
@@ -64,10 +67,11 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
       <div className="w-full py-16 md:py-24 overflow-hidden flex justify-center items-center">
         <motion.h2 
           className="text-[clamp(4rem,18vw,13rem)] leading-[0.82] font-[900] tracking-[-0.055em] text-[#84827E] lowercase select-none"
-          initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false }}
-          transition={calmTween}
+          style={{ transformPerspective: 900, transformOrigin: '50% 0%' }}
+          initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: -42, scale: 0.9, rotateX: 18 }}
+          whileInView={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1, rotateX: 0 }}
+          viewport={{ once: false, margin: '-10% 0px -10% 0px' }}
+          transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
         >
           icare
         </motion.h2>
@@ -77,8 +81,8 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
       <div className="max-w-full mx-auto grid grid-cols-1 lg:grid-cols-12">
         
         {/* Newsletter Section */}
-        <div className="lg:col-span-5 p-8 md:p-12 space-y-8 border-b lg:border-b-0 border-[#D9D7D2]">
-          <div className="space-y-4">
+        <div className="lg:col-span-5 p-6 md:p-8 lg:p-10 space-y-6 border-b lg:border-b-0 border-[#D9D7D2]">
+          <div className="space-y-2">
             <p className="text-[15px] text-[#67645E] leading-tight font-medium">
               {footerNewsletterText}
             </p>
@@ -87,7 +91,7 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
             </p>
           </div>
           
-          <div className="space-y-4">
+          <div className="space-y-3">
             <form className="icare-footer-newsletter-form" onSubmit={handleNewsletterSubmit}>
               <label className="sr-only" htmlFor="icare-footer-newsletter-email">
                 {footerEmailPlaceholder}
@@ -107,7 +111,7 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
               </button>
             </form>
             <p className="text-[11px] text-[#84827E] leading-tight">
-                {footerPrivacyNotice}
+              {footerPrivacyNotice}
             </p>
           </div>
         </div>
@@ -116,9 +120,9 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
         <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 divide-x divide-[#D9D7D2] border-l border-[#D9D7D2]">
           
           {/* Navigate */}
-          <div className="p-8 md:p-12 space-y-6">
+          <div className={FOOTER_COLUMN_CLASS}>
             <h4 className="text-[12px] font-bold uppercase tracking-widest text-[#67645E]">{footerNavigateTitle}</h4>
-            <ul className="space-y-3">
+            <ul className={FOOTER_LIST_CLASS}>
               <li><button onClick={() => onNavigate?.('shop')} className={FOOTER_LINK_CLASS}>{footerLinkShop}</button></li>
               <li><button onClick={() => onNavigate?.('story')} className={FOOTER_LINK_CLASS}>{footerLinkStory}</button></li>
               <li><button onClick={() => onNavigate?.('vlog')} className={FOOTER_LINK_CLASS}>{footerLinkVlog}</button></li>
@@ -127,17 +131,17 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
           </div>
 
           {/* Social — dynamic from backend */}
-          <div className="p-8 md:p-12 space-y-6">
+          <div className={FOOTER_COLUMN_CLASS}>
             <h4 className="text-[12px] font-bold uppercase tracking-widest text-[#67645E]">{footerSocialTitle}</h4>
             {socialLinks.length > 0 ? (
-              <ul className="space-y-3">
+              <ul className={FOOTER_LIST_CLASS}>
                 {socialLinks.map((social) => (
                   <li key={social.name}>
                     <motion.a
                       href={social.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`flex items-center gap-2 min-h-[44px] text-[14px] text-[#84827E] hover:text-[#5C5A56] transition-colors group ${FOCUS_VISIBLE_CLASS}`}
+                      className={FOOTER_SOCIAL_LINK_CLASS}
                       whileHover={shouldReduceMotion ? undefined : { x: 2 }}
                       transition={calmTween}
                     >
@@ -155,9 +159,9 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
           </div>
 
           {/* Official */}
-          <div className="p-8 md:p-12 space-y-6">
+          <div className={FOOTER_COLUMN_CLASS}>
             <h4 className="text-[12px] font-bold uppercase tracking-widest text-[#67645E]">{footerOfficialTitle}</h4>
-            <ul className="space-y-3">
+            <ul className={FOOTER_LIST_CLASS}>
               <li><button onClick={() => onNavigate?.('privacy')} className={FOOTER_LINK_CLASS}>{footerLinkPrivacy}</button></li>
               <li><button onClick={() => onNavigate?.('terms')} className={FOOTER_LINK_CLASS}>{footerLinkTerms}</button></li>
               <li><button onClick={() => onNavigate?.('accessibility')} className={FOOTER_LINK_CLASS}>{footerLinkAccessibility}</button></li>
@@ -167,19 +171,19 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
           </div>
 
           {/* Support */}
-          <div className="p-8 md:p-12 space-y-6">
+          <div className={FOOTER_COLUMN_CLASS}>
             <h4 className="text-[12px] font-bold uppercase tracking-widest text-[#67645E]">{footerSupportTitle}</h4>
-            <div className="space-y-6">
+            <div className="space-y-4">
               <div className="space-y-1">
-                <p className="text-[13px] text-[#67645E]">{contactSupportHours}</p>
-                <p className="text-[13px] text-[#67645E]">{footerSupportSubtext}</p>
+                <p className="text-[13px] leading-snug text-[#67645E]">{contactSupportHours}</p>
+                <p className="text-[13px] leading-snug text-[#67645E]">{footerSupportSubtext}</p>
               </div>
-              <ul className="space-y-3">
+              <ul className={FOOTER_LIST_CLASS}>
                 <li><button onClick={() => onNavigate?.('privacy')} className={FOOTER_LINK_CLASS}>{footerCookieLink}</button></li>
               </ul>
-              <div className="pt-4">
+              <div className="pt-1">
                 <p className="text-[13px] text-[#84827E]">{footerCopyright}</p>
-                <div className="flex gap-2 mt-4 opacity-40">
+                <div className="flex gap-2 mt-2 opacity-40">
                   <div className="w-8 h-5 bg-black/20 rounded-sm" />
                   <div className="w-8 h-5 bg-black/20 rounded-sm" />
                 </div>
@@ -190,7 +194,7 @@ export const Footer: React.FC<FooterProps> = ({ lang, onNavigate }) => {
       </div>
       
       {/* Bottom Info Bar */}
-      <div className="border-t border-[#D9D7D2] py-6 text-center">
+      <div className="border-t border-[#D9D7D2] py-4 text-center">
         <p className="text-[10px] text-[#84827E] uppercase tracking-[0.2em]">{footerCountryRegion}</p>
       </div>
     </footer>

@@ -7,7 +7,7 @@ import {
 } from '../types';
 import { parseShippingPageContent } from '../lib/settings';
 import { normalizeSocialLinksResponse } from '../lib/social-links';
-import { CONTENT_FIELD_TO_KEY } from '../lib/fallback-content';
+import { CONTENT_FIELD_TO_KEY, FALLBACK_CONTENT } from '../lib/fallback-content';
 
 const EMPTY_SHIPPING_PAGE_CONTENT: ShippingPageContent = {
   title: '',
@@ -115,8 +115,16 @@ export const useSiteContent = (lang: Language) => {
     const fallbackContent = contentByLocale?.en ?? content;
     const read = (field: string): string => {
       const key = CONTENT_FIELD_TO_KEY[field];
-      const val = activeContent[key] ?? fallbackContent[key] ?? '';
-      return val;
+      const fromActive = activeContent?.[key];
+      if (typeof fromActive === 'string' && fromActive.trim().length > 0) return fromActive;
+
+      const fromEnFallback = fallbackContent?.[key];
+      if (typeof fromEnFallback === 'string' && fromEnFallback.trim().length > 0) return fromEnFallback;
+
+      const fromStaticFallback = FALLBACK_CONTENT[key];
+      if (typeof fromStaticFallback === 'string' && fromStaticFallback.trim().length > 0) return fromStaticFallback;
+
+      return '';
     };
 
     return {

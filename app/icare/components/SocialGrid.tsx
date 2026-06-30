@@ -10,10 +10,25 @@ interface SocialGridProps {
   onNavigate: (page: string) => void;
 }
 
+const FOCUS_VISIBLE_CLASS =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
+
+/** Rhode outline pill — fill rises from bottom on hover (matches mission / hero CTAs). */
+const OUTLINE_PILL_BTN_CLASS = [
+  'relative isolate overflow-hidden rounded-full border border-[#67645E]',
+  'px-8 py-2.5 text-[15.73px] font-bold uppercase leading-[1.5] tracking-[0.02em] text-[#67645E]',
+  'transition-[color,transform,border-color] duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]',
+  'before:absolute before:inset-0 before:-z-10 before:origin-bottom before:scale-y-0 before:rounded-full',
+  'before:bg-[#67645E] before:transition-transform before:duration-500 before:ease-[cubic-bezier(0.76,0,0.24,1)]',
+  'hover:-translate-y-px hover:border-[#67645E] hover:text-white hover:before:scale-y-100',
+  FOCUS_VISIBLE_CLASS,
+].join(' ');
+
 export const SocialGrid: React.FC<SocialGridProps> = ({ lang, onNavigate }) => {
   const shouldReduceMotion = useReducedMotion();
   const { socialGridHeading, socialGridCta, socialGridImage1, socialGridImage2, socialGridImage3, socialGridImage4 } = useSiteContent(lang);
   const t = translations[lang];
+  const socialGridCtaLabel = socialGridCta.trim() || (lang === 'ar' ? 'تابعنا على السوشيال' : 'FIND US ON SOCIAL');
 
   const lifestyleImages = [
     { id: 1, src: socialGridImage1, alt: 'icare lifestyle 1' },
@@ -35,22 +50,16 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang, onNavigate }) => {
           {socialGridHeading}
         </motion.h2>
         <motion.button
+          type="button"
           onClick={() => onNavigate('vlog')}
-          /* Rhode pill: 15.73px / 400 / 23.6px / 0.314px ls / uppercase. */
-          className="relative hidden overflow-hidden rounded-full border border-[#67645E] px-8 py-2 text-[15.73px] font-bold uppercase leading-[1.5] tracking-[0.02em] text-[#67645E] transition-[color,transform,border-color] duration-300 group hover:border-[#67645E] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 md:block"
+          className={`${OUTLINE_PILL_BTN_CLASS} hidden md:inline-flex items-center justify-center`}
           initial={shouldReduceMotion ? false : { opacity: 0, x: 10 }}
           whileInView={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.32 }}
           whileTap={shouldReduceMotion ? undefined : { scale: 0.99 }}
         >
-          <motion.span
-            className="absolute inset-0 bg-[#67645E]"
-            initial={{ x: '-100%' }}
-            whileHover={{ x: 0 }}
-            transition={{ duration: 0.24 }}
-          />
-          <span className="relative z-10">{lang === 'en' ? socialGridCta : 'تابعنا على السوشيال'}</span>
+          {socialGridCtaLabel}
         </motion.button>
       </div>
 
@@ -83,10 +92,11 @@ export const SocialGrid: React.FC<SocialGridProps> = ({ lang, onNavigate }) => {
       </SwipeRail>
 
       <button
+        type="button"
         onClick={() => onNavigate('vlog')}
-        className="mt-8 w-full rounded-full border border-[#67645E]/20 py-4 text-[12.8px] font-bold uppercase leading-[1.5] tracking-[0.02em] text-[#67645E] hover:bg-[#67645E]/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDECEB] md:hidden"
+        className={`${OUTLINE_PILL_BTN_CLASS} mt-8 w-full py-4 md:hidden`}
       >
-        {lang === 'en' ? socialGridCta : 'تابعنا على السوشيال'}
+        {socialGridCtaLabel}
       </button>
     </section>
   );

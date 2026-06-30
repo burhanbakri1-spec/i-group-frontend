@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
-import { Menu, Search, ShoppingBag, Globe } from 'lucide-react';
+import { Menu, Search, ShoppingBag, Globe, ArrowLeft, ArrowRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { translations, Language } from '../translations';
 import { useShop } from '../context/ShopContext';
@@ -53,6 +53,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
   const headerHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shopButtonRef = useRef<HTMLButtonElement | null>(null);
   const shopMenuRef = useRef<HTMLDivElement | null>(null);
+  const categoriesScrollRef = useRef<HTMLDivElement | null>(null);
+  const [canScrollCategoriesLeft, setCanScrollCategoriesLeft] = useState(false);
+  const [canScrollCategoriesRight, setCanScrollCategoriesRight] = useState(false);
   const lastScrollYRef = useRef(0);
   const scrollIdleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isShopHoveredRef = useRef(false);
@@ -234,6 +237,60 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
     setPreviewDirection(nextIndex > clampedActivePreviewIndex ? 'right' : 'left');
     setActivePreviewIndex(nextIndex);
   };
+
+  const updateCategoryScrollState = () => {
+    const el = categoriesScrollRef.current;
+    if (!el) {
+      setCanScrollCategoriesLeft(false);
+      setCanScrollCategoriesRight(false);
+      return;
+    }
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    setCanScrollCategoriesLeft(el.scrollLeft > 4);
+    setCanScrollCategoriesRight(el.scrollLeft < maxScroll - 4);
+  };
+
+  const scrollCategories = (direction: 'left' | 'right') => {
+    const el = categoriesScrollRef.current;
+    if (!el) return;
+    const amount = Math.max(el.clientWidth * 0.65, 140);
+    el.scrollBy({
+      left: direction === 'left' ? -amount : amount,
+      behavior: shouldReduceMotion ? 'auto' : 'smooth',
+    });
+  };
+
+  useEffect(() => {
+    if (!isShopHovered) return;
+    const el = categoriesScrollRef.current;
+    if (!el) return;
+
+    updateCategoryScrollState();
+
+    const onScroll = () => updateCategoryScrollState();
+    el.addEventListener('scroll', onScroll, { passive: true });
+    const observer = new ResizeObserver(updateCategoryScrollState);
+    observer.observe(el);
+
+    return () => {
+      el.removeEventListener('scroll', onScroll);
+      observer.disconnect();
+    };
+  }, [isShopHovered, megaMenuCategories.length]);
+
+  useEffect(() => {
+    if (!isShopHovered) return;
+    window.requestAnimationFrame(() => {
+      const activeTab = categoriesScrollRef.current?.querySelector<HTMLElement>(
+        '[role="tab"][aria-selected="true"]',
+      );
+      activeTab?.scrollIntoView({
+        inline: 'nearest',
+        block: 'nearest',
+        behavior: shouldReduceMotion ? 'auto' : 'smooth',
+      });
+    });
+  }, [clampedActivePreviewIndex, isShopHovered, shouldReduceMotion]);
 
   useEffect(() => {
     const updateHeaderState = () => {
@@ -496,7 +553,17 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
               <div className="icare-header-mega__inner">
                 {megaMenuCategories.length > 0 && (
                   <div className="icare-header-mega__categories-wrap">
-                    <div className="icare-header-mega__categories" role="tablist">
+                    <button
+                      type="button"
+                      className={`icare-header-mega__categories-nav icare-header-mega__categories-nav--prev ${FOCUS_VISIBLE_CLASS}`}
+                      aria-label={t.ui.previousPage}
+                      disabled={!canScrollCategoriesLeft}
+                      onClick={() => scrollCategories('left')}
+                    >
+                      <ArrowLeft size={14} strokeWidth={1.5} aria-hidden="true" />
+                    </button>
+                    <div ref={categoriesScrollRef} className="icare-header-mega__categories-scroll no-scrollbar">
+                      <div className="icare-header-mega__categories" role="tablist">
                       <button
                         type="button"
                         role="tab"
@@ -546,7 +613,17 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenSearch, onNavi
                           </button>
                         ))
                       )}
+                      </div>
                     </div>
+                    <button
+                      type="button"
+                      className={`icare-header-mega__categories-nav icare-header-mega__categories-nav--next ${FOCUS_VISIBLE_CLASS}`}
+                      aria-label={t.ui.nextPage}
+                      disabled={!canScrollCategoriesRight}
+                      onClick={() => scrollCategories('right')}
+                    >
+                      <ArrowRight size={14} strokeWidth={1.5} aria-hidden="true" />
+                    </button>
                   </div>
                 )}
 
