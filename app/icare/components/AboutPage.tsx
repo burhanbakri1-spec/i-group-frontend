@@ -155,18 +155,17 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
       {/* 3. OUR FOUNDATION SECTION */}
       <section className="icare-index-section relative flex min-h-[42rem] items-center overflow-hidden rounded-[12px] bg-[#F1F0ED] px-4 py-8 md:min-h-[70vh] md:px-12 md:py-12 lg:min-h-[80vh]">
         <Image
-          src="/images/icare/icare-products-hero.png"
+          src="/images/icare/icare-model-hero.jpeg"
           alt={t.aboutAltTexture}
           fill
           sizes="100vw"
-          className="object-cover"
-          style={{ objectPosition: '55% center' }}
+          className="object-cover object-[43%_center] md:object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#F1F0ED]/95 via-[#F1F0ED]/72 to-[#F1F0ED]/10 md:via-[#F1F0ED]/55" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#F1F0ED]/55 via-[#F1F0ED]/20 to-transparent md:from-[#F1F0ED]/72 md:via-[#F1F0ED]/28" />
         <div className="relative z-10 mx-auto w-full max-w-[1600px]">
           <div className="grid grid-cols-1 items-center lg:grid-cols-2 lg:gap-20">
             <ScrollReveal direction="left" viewportMargin="-80px">
-              <div className="flex max-w-2xl flex-col space-y-8 rounded-[16px] bg-[#F1F0ED]/82 px-6 py-8 shadow-[0_16px_50px_rgba(70,58,42,0.08)] backdrop-blur-[3px] md:space-y-10 md:px-10 md:py-12 lg:px-12">
+              <div className="flex max-w-2xl flex-col space-y-8 rounded-[16px] bg-[#F1F0ED]/78 px-6 py-8 shadow-[0_16px_50px_rgba(70,58,42,0.08)] backdrop-blur-[3px] md:space-y-10 md:px-10 md:py-12 lg:px-12">
                 <div className="space-y-2">
                   <span className="text-[10px] font-black tracking-[0.3em] uppercase text-[#999]">{aboutFallbacks.foundationLabel}</span>
                   <h2 className="text-[42px] md:text-[64px] font-bold leading-[0.9] tracking-[-0.04em] text-[#67645E] lowercase">
