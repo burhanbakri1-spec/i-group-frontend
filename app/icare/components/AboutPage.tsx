@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import Image from 'next/image';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { ChevronDown } from 'lucide-react';
 import { Language, translations } from '../translations';
@@ -51,7 +52,6 @@ const AccordionItem = ({ title, content, isOpen, onClick }: { title: string, con
 
 const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1713425886063-4a49da507ada?q=80&w=2000';
 const DEFAULT_INTENTIONAL_IMAGE = 'https://images.unsplash.com/photo-1644011047934-b00d5aa404d4?q=80&w=1200';
-const DEFAULT_FOUNDATION_IMAGE = 'https://images.unsplash.com/photo-1638609927040-8a7e97cd9d6a?q=80&w=1200';
 const DEFAULT_VALUES_IMAGE = 'https://images.unsplash.com/photo-1642080668102-dc8f5ce8e752?q=80&w=1200';
 const DEFAULT_TEAM_1_IMAGE = 'https://images.unsplash.com/photo-1702261347927-11207f77e751?q=80&w=800';
 const DEFAULT_TEAM_2_IMAGE = 'https://images.unsplash.com/photo-1763692108454-6cfa2b0af5c1?q=80&w=800';
@@ -64,7 +64,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
   const {
     aboutHeroHeadline, aboutHeroCta, aboutHeroImage,
     aboutIntentionalTitle, aboutIntentionalText, aboutIntentionalImage,
-    aboutFoundationLabel, aboutFoundationTitle, aboutFoundationText1, aboutFoundationText2, aboutFoundationImage,
+    aboutFoundationLabel, aboutFoundationTitle, aboutFoundationText1, aboutFoundationText2,
     aboutTeamLabel, aboutTeamTitle, aboutTeamDescription,
     aboutTeamMember1Name, aboutTeamMember1Title, aboutTeamMember1Image,
     aboutTeamMember2Name, aboutTeamMember2Title, aboutTeamMember2Image,
@@ -153,11 +153,20 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
       </section>
 
       {/* 3. OUR FOUNDATION SECTION */}
-      <section className="icare-index-section bg-[#F1F0ED] rounded-[12px] overflow-hidden py-8 md:py-12 px-4 md:px-12">
-        <div className="max-w-[1600px] mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+      <section className="icare-index-section relative flex min-h-[42rem] items-center overflow-hidden rounded-[12px] bg-[#F1F0ED] px-4 py-8 md:min-h-[70vh] md:px-12 md:py-12 lg:min-h-[80vh]">
+        <Image
+          src="/images/icare/icare-products-hero.png"
+          alt={t.aboutAltTexture}
+          fill
+          sizes="100vw"
+          className="object-cover"
+          style={{ objectPosition: '55% center' }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#F1F0ED]/95 via-[#F1F0ED]/72 to-[#F1F0ED]/10 md:via-[#F1F0ED]/55" />
+        <div className="relative z-10 mx-auto w-full max-w-[1600px]">
+          <div className="grid grid-cols-1 items-center lg:grid-cols-2 lg:gap-20">
             <ScrollReveal direction="left" viewportMargin="-80px">
-              <div className="flex flex-col items-center space-y-8 md:space-y-10 order-2 lg:order-1 px-4 lg:px-0">
+              <div className="flex max-w-2xl flex-col space-y-8 rounded-[16px] bg-[#F1F0ED]/82 px-6 py-8 shadow-[0_16px_50px_rgba(70,58,42,0.08)] backdrop-blur-[3px] md:space-y-10 md:px-10 md:py-12 lg:px-12">
                 <div className="space-y-2">
                   <span className="text-[10px] font-black tracking-[0.3em] uppercase text-[#999]">{aboutFallbacks.foundationLabel}</span>
                   <h2 className="text-[42px] md:text-[64px] font-bold leading-[0.9] tracking-[-0.04em] text-[#67645E] lowercase">
@@ -172,15 +181,6 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {
                     {aboutFallbacks.foundationText2}
                   </p>
                 </div>
-              </div>
-            </ScrollReveal>
-            <ScrollReveal direction="right" viewportMargin="-80px">
-              <div className="relative aspect-[3/4] rounded-[16px] md:rounded-[24px] overflow-hidden lg:h-[80vh] order-1 lg:order-2">
-                 <ImageWithFallback 
-                   src={aboutFoundationImage || DEFAULT_FOUNDATION_IMAGE} 
-                   alt={t.aboutAltTexture} 
-                  className="w-full h-full object-cover scale-110"
-                />
               </div>
             </ScrollReveal>
           </div>
