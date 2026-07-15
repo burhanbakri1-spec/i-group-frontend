@@ -23,6 +23,13 @@ export async function PUT(
   return proxyRequest(request, (await params).path);
 }
 
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ path: string[] }> },
+) {
+  return proxyRequest(request, (await params).path);
+}
+
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> },
@@ -53,6 +60,10 @@ async function proxyRequest(
   const contentType = request.headers.get('content-type');
   if (contentType) {
     headers['Content-Type'] = contentType;
+  }
+  const companyId = request.headers.get('x-company-id');
+  if (companyId) {
+    headers['X-Company-Id'] = companyId;
   }
 
   // Forward request body for mutating methods

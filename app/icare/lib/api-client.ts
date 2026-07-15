@@ -27,6 +27,7 @@ import {
   UserAddress,
 } from '../types';
 import type { ContentEnvelope } from './content-client';
+import { resolveCurrentStorefront } from '../../lib/storefront-context';
 
 type QueryValue = string | number | boolean | null | undefined;
 
@@ -139,6 +140,7 @@ const request = async <T>(
   const { token, query, signal, headers, ...init } = options;
   const hasBody = init.body !== undefined && init.body !== null;
   try {
+    const company = await resolveCurrentStorefront();
     const response = await fetch(buildUrl(path, query), {
       ...init,
       ...(signal ? { signal } : {}),
@@ -146,6 +148,7 @@ const request = async <T>(
         ...(hasBody ? { 'Content-Type': 'application/json' } : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...headers,
+        'X-Company-Id': company.id,
       },
     });
     return parseEnvelope<T>(response);

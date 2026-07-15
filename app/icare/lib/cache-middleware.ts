@@ -20,7 +20,10 @@ const CACHE_TIERS = {
 type CacheTier = keyof typeof CACHE_TIERS;
 
 const normalizeKey = (path: string, query?: Record<string, QueryValue>): string => {
-  let normalized = path.replace(/\/$/, '');
+  const tenantScope = typeof window === 'undefined'
+    ? 'server'
+    : `${window.location.host}:${window.location.pathname.split('/').filter(Boolean)[0] || 'root'}`;
+  let normalized = `${tenantScope}:${path.replace(/\/$/, '')}`;
   if (!query || Object.keys(query).length === 0) return normalized;
   const sorted = Object.entries(query)
     .filter(([, v]) => v !== undefined && v !== null && v !== '')

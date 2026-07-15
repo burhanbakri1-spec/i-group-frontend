@@ -85,6 +85,24 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     en: FALLBACK_CONTENT as Record<FallbackContentKey, string>,
     ar: FALLBACK_CONTENT as Record<FallbackContentKey, string>,
   }));
+
+  useEffect(() => {
+    const clearTenantState = () => {
+      window.localStorage.removeItem(GUEST_CART_STORAGE_KEY);
+      window.localStorage.removeItem(WISHLIST_STORAGE_KEY);
+      window.localStorage.removeItem(AUTH_STORAGE_KEY);
+      window.localStorage.removeItem('icare_access_token');
+      cacheMiddleware.clear();
+      setCartItems([]);
+      setWishlistItems([]);
+      setSession(null);
+      setAuthError(null);
+      setSettings(null);
+      setSocialLinks({});
+    };
+    window.addEventListener('igroup:storefront-changed', clearTenantState);
+    return () => window.removeEventListener('igroup:storefront-changed', clearTenantState);
+  }, []);
   // Content version timestamp (ISO) from the BE envelope. Kept for backward
   // compat in the context shape but no longer used for cache-busting —
   // image URLs are resolved once at map time, identical to the catalog path.
