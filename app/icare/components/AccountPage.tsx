@@ -491,6 +491,9 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
                 {mode === 'login' ? t.accountPage.signUp : t.accountPage.signIn}
               </button>
             </div>
+            <a href="/icare/dropshipping/register" className={`text-[12px] font-bold text-[#31534c] underline underline-offset-4 ${CONTROL_FOCUS_CLASS}`}>
+              التسجيل كمسوق دروبشيبينغ · Dropshipping Marketer
+            </a>
           </div>}
         </motion.div>
       </div>

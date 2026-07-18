@@ -51,9 +51,7 @@ export function resolveMediaUrl(value: string | null | undefined): string {
   if (trimmed.startsWith('/')) {
     // Upload paths → resolve to the backend media origin directly.
     // Browser loads from backend, no Next.js proxy hop, no socket hangup.
-    if (IMAGE_BASE_URL && startsWithAny(trimmed, UPLOAD_PREFIXES)) {
-      return `${IMAGE_BASE_URL}${trimmed}`;
-    }
+    if (startsWithAny(trimmed, UPLOAD_PREFIXES)) return trimmed;
     // Already-proxied paths (/api/icare/...) stay as-is.
     if (trimmed.startsWith('/api/icare/')) return trimmed;
     // Other root-relative paths → prefix with the base (backend or proxy).

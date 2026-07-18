@@ -41,7 +41,7 @@ export const PageHero: React.FC<PageHeroProps> = ({
         transition={{ duration: 0.65, ease: HERO_EASE }}
       >
         <div className="icare-page-hero__media">
-          {isLocalImage ? (
+          {!imageSrc ? null : isLocalImage ? (
             <Image
               src={imageSrc}
               alt={alt}

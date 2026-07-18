@@ -27,7 +27,6 @@ import {
   UserAddress,
 } from '../types';
 import type { ContentEnvelope } from './content-client';
-import { resolveCurrentStorefront } from '../../lib/storefront-context';
 
 type QueryValue = string | number | boolean | null | undefined;
 
@@ -52,18 +51,11 @@ const DEFAULT_API_ERROR_MESSAGE = 'iCare API request failed.';
  * If you need to bypass the proxy (e.g. server-side rendering or scripts),
  * set NEXT_PUBLIC_ICARE_API_URL to the real backend URL.
  */
-const APPROVED_BACKEND_FALLBACK_URL = 'https://backend.igroup.website';
 const BROWSER_API_BASE_URL = '/api/icare';
 
-export const getIcareApprovedBackendFallbackUrl = () => APPROVED_BACKEND_FALLBACK_URL;
+export const getIcareApprovedBackendFallbackUrl = () => '';
 
-export const getIcareApiBaseUrl = () => {
-  const envUrl = process.env.NEXT_PUBLIC_ICARE_API_URL;
-  if (envUrl) {
-    return envUrl.replace(/\/$/, '');
-  }
-  return BROWSER_API_BASE_URL;
-};
+export const getIcareApiBaseUrl = () => BROWSER_API_BASE_URL;
 
 const buildUrl = (path: string, query?: Record<string, QueryValue>) => {
   const baseUrl = getIcareApiBaseUrl();
@@ -140,7 +132,6 @@ const request = async <T>(
   const { token, query, signal, headers, ...init } = options;
   const hasBody = init.body !== undefined && init.body !== null;
   try {
-    const company = await resolveCurrentStorefront();
     const response = await fetch(buildUrl(path, query), {
       ...init,
       ...(signal ? { signal } : {}),
@@ -148,7 +139,6 @@ const request = async <T>(
         ...(hasBody ? { 'Content-Type': 'application/json' } : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...headers,
-        'X-Company-Id': company.id,
       },
     });
     return parseEnvelope<T>(response);
@@ -239,19 +229,19 @@ export const icareApi = {
 
   cart: {
     get: (token: string) => request<BackendCart>('/api/v1/cart', { token }),
-    add: (token: string, productId: number, variantId: number | null | undefined, quantity: number) =>
+    add: (token: string, productId: string | number, variantId: string | number | null | undefined, quantity: number) =>
       request<BackendCart>('/api/v1/cart', {
         method: 'POST',
         token,
         body: JSON.stringify({ productId, variantId: variantId ?? null, quantity }),
       }),
-    update: (token: string, cartItemId: number, quantity: number) =>
+    update: (token: string, cartItemId: string | number, quantity: number) =>
       request<BackendCart>(`/api/v1/cart/${cartItemId}`, {
         method: 'PUT',
         token,
         body: JSON.stringify({ quantity }),
       }),
-    remove: (token: string, cartItemId: number) =>
+    remove: (token: string, cartItemId: string | number) =>
       request<BackendCart>(`/api/v1/cart/${cartItemId}`, { method: 'DELETE', token }),
     clear: (token: string) => request<BackendCart>('/api/v1/cart/clear', { method: 'POST', token }),
     syncPrices: (token: string) => request<BackendCart>('/api/v1/cart/sync-prices', { method: 'POST', token }),

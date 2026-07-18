@@ -54,13 +54,9 @@ describe('storefront tenant resolution', () => {
     await expect(resolveCurrentStorefront()).rejects.toThrow('not found or inactive');
   });
 
-  it('adds the resolved company to centralized storefront API requests', async () => {
+  it('does not send a browser-selected company override in storefront API requests', async () => {
     window.history.replaceState({}, '', '/icare/shop');
     const fetchMock = vi.spyOn(globalThis, 'fetch')
-      .mockResolvedValueOnce(new Response(JSON.stringify({
-        id: 'icare', slug: 'icare', name: 'iCare', status: 'active', isDefault: false,
-        domain: '', storefrontUrl: 'https://igroup.website/icare', storefrontPath: '/icare', settings: {},
-      }), { status: 200, headers: { 'Content-Type': 'application/json' } }))
       .mockResolvedValueOnce(new Response(JSON.stringify({ success: true, data: [] }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
@@ -68,8 +64,8 @@ describe('storefront tenant resolution', () => {
     const { icareApi } = await import('../app/icare/lib/api-client');
 
     await expect(icareApi.products.list()).resolves.toEqual([]);
-    expect(fetchMock).toHaveBeenCalledTimes(2);
-    const requestInit = fetchMock.mock.calls[1][1] as RequestInit;
-    expect(requestInit.headers).toMatchObject({ 'X-Company-Id': 'icare' });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const requestInit = fetchMock.mock.calls[0][1] as RequestInit;
+    expect(requestInit.headers).not.toHaveProperty('X-Company-Id');
   });
 });

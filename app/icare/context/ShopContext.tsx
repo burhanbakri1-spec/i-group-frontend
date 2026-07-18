@@ -11,6 +11,9 @@ import { FALLBACK_CONTENT } from '../lib/fallback-content';
 const GUEST_CART_STORAGE_KEY = 'icare_guest_cart';
 const WISHLIST_STORAGE_KEY = 'icare_wishlist';
 const AUTH_STORAGE_KEY = 'icare_auth_session';
+const EMPTY_CONTENT = Object.fromEntries(
+  Object.keys(FALLBACK_CONTENT).map((key) => [key, '']),
+) as Record<FallbackContentKey, string>;
 
 const ShopContext = createContext<ShopContextType | undefined>(undefined);
 
@@ -74,7 +77,7 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [authError, setAuthError] = useState<string | null>(null);
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [socialLinks, setSocialLinks] = useState<unknown>({});
-  const [content, setContent] = useState<Record<FallbackContentKey, string>>(() => FALLBACK_CONTENT as Record<FallbackContentKey, string>);
+  const [content, setContent] = useState<Record<FallbackContentKey, string>>(() => EMPTY_CONTENT);
   // Per-locale merged content (en + ar). `content` is kept as the en slice
   // for backward compatibility; `contentByLocale` lets useSiteContent pick
   // the active locale at read time so AR admin translations actually render.
@@ -82,8 +85,8 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     en: Record<FallbackContentKey, string>;
     ar: Record<FallbackContentKey, string>;
   }>(() => ({
-    en: FALLBACK_CONTENT as Record<FallbackContentKey, string>,
-    ar: FALLBACK_CONTENT as Record<FallbackContentKey, string>,
+    en: EMPTY_CONTENT,
+    ar: EMPTY_CONTENT,
   }));
 
   useEffect(() => {
@@ -99,6 +102,8 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setAuthError(null);
       setSettings(null);
       setSocialLinks({});
+      setContent(EMPTY_CONTENT);
+      setContentByLocale({ en: EMPTY_CONTENT, ar: EMPTY_CONTENT });
     };
     window.addEventListener('igroup:storefront-changed', clearTenantState);
     return () => window.removeEventListener('igroup:storefront-changed', clearTenantState);
@@ -129,6 +134,10 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const refreshSession = useCallback(async (currentSession: AuthSession) => {
     if (!icareApi.isConfigured()) throw new IcareApiError('iCare API is not configured.', 0);
+    if (!currentSession.refreshToken) {
+      clearSession();
+      throw new IcareApiError('Your session expired. Please sign in again.', 401);
+    }
     try {
       const nextSession = await icareApi.auth.refresh(currentSession.refreshToken);
       setSession(nextSession);
@@ -258,7 +267,7 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const addToCart = (product: Product, quantity = 1) => {
     cacheMiddleware.invalidate('/api/v1/cart');
     if (session && product.backendId && icareApi.isConfigured()) {
-      runCartRequest((token) => icareApi.cart.add(token, product.backendId as number, product.variantId, quantity), session)
+      runCartRequest((token) => icareApi.cart.add(token, product.backendId, product.variantId, quantity), session)
         .catch((error: Error) => {
           setAuthError(error.message);
           addGuestCartItem(product, quantity);
@@ -273,7 +282,7 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     cacheMiddleware.invalidate('/api/v1/cart');
     const item = cartItems.find((cartItem) => cartItem.id === id);
     if (session && item?.cartItemId && icareApi.isConfigured()) {
-      runCartRequest((token) => icareApi.cart.remove(token, item.cartItemId as number), session)
+      runCartRequest((token) => icareApi.cart.remove(token, item.cartItemId), session)
         .catch((error: Error) => setAuthError(error.message));
       return;
     }
@@ -289,7 +298,7 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const item = cartItems.find((cartItem) => cartItem.id === id);
     if (session && item?.cartItemId && icareApi.isConfigured()) {
-      runCartRequest((token) => icareApi.cart.update(token, item.cartItemId as number, quantity), session)
+      runCartRequest((token) => icareApi.cart.update(token, item.cartItemId, quantity), session)
         .catch((error: Error) => setAuthError(error.message));
       return;
     }
@@ -316,7 +325,7 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (icareApi.isConfigured()) {
       await Promise.all(guestItems
         .filter((item) => item.backendId)
-        .map((item) => icareApi.cart.add(nextSession.accessToken, item.backendId as number, item.variantId, item.quantity)));
+        .map((item) => icareApi.cart.add(nextSession.accessToken, item.backendId!, item.variantId, item.quantity)));
       window.localStorage.removeItem(GUEST_CART_STORAGE_KEY);
       const backendCart = await icareApi.cart.get(nextSession.accessToken);
       setCartItems(mapBackendCartToCartItems(backendCart));

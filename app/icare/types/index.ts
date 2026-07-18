@@ -43,9 +43,9 @@ export type {
 
 export interface Product {
   id: string;
-  backendId?: number;
+  backendId?: string | number;
   slug?: string;
-  variantId?: number | null;
+  variantId?: string | number | null;
   title?: string;
   name: string;
   price: string;
@@ -69,9 +69,9 @@ export interface Product {
   reviews?: string;
   label?: string;
   brand?: string;
-  brandId?: number;
+  brandId?: string | number;
   category?: string;
-  categoryId?: number;
+  categoryId?: string | number;
   stock?: number;
   stockStatus?: string;
   size?: string | null;
@@ -100,7 +100,7 @@ export interface ProductGalleryMedia {
 }
 
 export interface CartItem extends Product {
-  cartItemId?: number;
+  cartItemId?: string | number;
   quantity: number;
 }
 
@@ -277,18 +277,18 @@ export type BackendNumeric = string | number;
 export type LocalizedText = string | { en?: string | null; ar?: string | null };
 
 export interface BackendCategory {
-  id: number;
+  id: string | number;
   slug: string;
   name: LocalizedText;
   description?: LocalizedText | null;
   image?: string | null;
-  parentId?: number | null;
+  parentId?: string | number | null;
   isActive?: boolean;
   productCount?: number;
 }
 
 export interface BackendBrand {
-  id: number;
+  id: string | number;
   slug: string;
   name: LocalizedText;
   description?: LocalizedText | null;
@@ -321,7 +321,7 @@ export interface ProductVariantColor {
 }
 
 export interface ProductVariant {
-  id: number;
+  id: string | number;
   name: LocalizedText;
   sku?: string | null;
   colorCode?: string | null;
@@ -347,7 +347,7 @@ export interface BackendProductImage {
 }
 
 export interface BackendProduct {
-  id: number;
+  id: string | number;
   slug: string;
   name: LocalizedText;
   sku?: string | null;
@@ -530,7 +530,7 @@ export interface AdminListData<T> {
 }
 
 export interface BackendCartItem {
-  id: number;
+  id: string | number;
   quantity: number;
   product: Pick<BackendProduct, 'id' | 'slug' | 'name' | 'price' | 'salePrice' | 'primaryImage'> & {
     deletedAt?: string | null;
@@ -549,7 +549,7 @@ export interface BackendCart {
 }
 
 export interface AuthUser {
-  id: number;
+  id: string | number;
   email: string;
   name: string;
   phone?: string | null;
@@ -573,8 +573,8 @@ export interface AuthSession {
 }
 
 export interface OrderItemInput {
-  productId: number;
-  variantId?: number | null;
+  productId: string | number;
+  variantId?: string | number | null;
   quantity: number;
 }
 
@@ -634,8 +634,8 @@ export interface CreateAddressInput {
 }
 
 export interface OrderSummaryItem {
-  productId: number;
-  variantId?: number | null;
+  productId: string | number;
+  variantId?: string | number | null;
   productName: string;
   variantName?: string | null;
   sku?: string | null;
@@ -660,7 +660,7 @@ export interface OrderSummary {
 }
 
 export interface OrderListItem {
-  id: number;
+  id: string | number;
   orderNumber: string;
   status: string;
   paymentStatus?: string;
@@ -670,7 +670,7 @@ export interface OrderListItem {
 }
 
 export interface CreatedOrder {
-  id: number;
+  id: string | number;
   orderNumber: string;
   status: string;
   paymentMethod?: 'cash_on_delivery' | 'online';

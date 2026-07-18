@@ -54,7 +54,9 @@ export function mergeWithFallback(
   localeSlice: Record<string, string> | null | undefined,
   activeLocale: 'en' | 'ar' = 'en',
 ): Record<FallbackContentKey, string> {
-  const merged: Record<string, string> = { ...FALLBACK_CONTENT };
+  const merged: Record<string, string> = Object.fromEntries(
+    Object.keys(FALLBACK_CONTENT).map((key) => [key, '']),
+  );
 
   if (!localeSlice || typeof localeSlice !== 'object') {
     return merged as Record<FallbackContentKey, string>;

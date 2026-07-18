@@ -44,12 +44,14 @@ import type { NextConfig } from "next";
  * src="/public/uploads/x.png">` URL hits the rewrite and lands on the
  * backend. Without this, the Next.js origin would 404 for every upload.
  *
- * The destination uses `ICARE_API_BASE_URL` (server-only) and falls back to
- * the production backend if unset. The same env var is consumed by the
+ * The destination uses the current platform API URL and falls back to the
+ * reviewed staging API if unset. The same env var is consumed by the
  * Next.js API proxy at `app/api/icare/[...path]/route.ts`.
  */
 const BACKEND_MEDIA_ORIGIN = (
-  process.env.ICARE_API_BASE_URL ?? 'https://backend.igroup.website'
+  process.env.PLATFORM_API_BASE_URL
+  ?? process.env.ICARE_API_BASE_URL
+  ?? 'http://cg8hv00dppir2hu99ds4p75h.187.55.225.56.sslip.io'
 ).replace(/\/$/, '');
 
 const nextConfig: NextConfig = {

@@ -3,8 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 const PLATFORM_API_BASE_URL = (
   process.env.PLATFORM_API_BASE_URL
   ?? process.env.ICARE_API_BASE_URL
-  ?? process.env.NEXT_PUBLIC_ICARE_API_URL
-  ?? 'https://backend.igroup.website'
+  ?? 'http://cg8hv00dppir2hu99ds4p75h.187.55.225.56.sslip.io'
 ).replace(/\/$/, '');
 
 export async function GET(request: NextRequest) {
