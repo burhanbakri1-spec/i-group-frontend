@@ -166,6 +166,7 @@ function mapProduct(
   categories: Map<string, JsonRecord>,
   brands: Map<string, JsonRecord>,
 ) {
+  const fields = isRecord(product.fields) ? product.fields : {};
   const category = categories.get(String(product.categoryId ?? ''));
   const brand = brands.get(String(product.brandId ?? ''));
   const variants = Array.isArray(product.variants)
@@ -193,10 +194,30 @@ function mapProduct(
     name: localized(product.name),
     shortDescription: localized(product.shortDescription ?? product.short_description),
     description: localized(product.description ?? product.fullDescription),
+    howToUse: fields.howToUse ?? product.howToUse ?? null,
+    ingredients: Array.isArray(fields.featuredIngredients)
+      ? fields.featuredIngredients
+      : typeof fields.ingredients === 'string'
+        ? fields.ingredients.split(/\r?\n|,/).map((item) => item.trim()).filter(Boolean)
+        : product.ingredients ?? [],
+    benefits: Array.isArray(fields.benefits) ? fields.benefits : product.benefits ?? [],
+    skinTypes: Array.isArray(fields.skinTypes) ? fields.skinTypes : product.skinTypes ?? [],
+    hairTypes: Array.isArray(fields.hairTypes) ? fields.hairTypes : [],
+    warnings: fields.warnings ?? null,
+    suitableFor: fields.suitableFor ?? [],
+    productType: fields.productType ?? null,
+    finish: fields.finish ?? null,
+    coverage: fields.coverage ?? null,
+    texture: fields.texture ?? null,
+    countryOfOrigin: fields.countryOfOrigin ?? null,
+    productFaqs: Array.isArray(fields.faqs) ? fields.faqs : [],
+    showcaseUnits: fields.showcaseUnits ?? [],
+    seo: { title: fields.metaTitle ?? null, description: fields.metaDescription ?? null, canonicalUrl: fields.canonicalUrl ?? null },
     price: numeric(product.price ?? product.primaryPrice ?? firstVariant?.price),
     salePrice: product.salePrice == null ? null : numeric(product.salePrice),
     primaryImage: absoluteMediaUrl(product.image ?? product.primaryImage),
     secondaryImage: absoluteMediaUrl(product.hoverImage ?? product.secondaryImage),
+    videoUrl: absoluteMediaUrl(fields.videoUrl ?? product.videoUrl),
     stockQuantity: variants.reduce((total, variant) => total + numeric(variant.stockQuantity), numeric(product.stockQty)),
     stockStatus: product.isActive === false ? 'out_of_stock' : 'in_stock',
     isFeatured: product.featured === true || product.isFeatured === true,
@@ -206,6 +227,7 @@ function mapProduct(
     brand: brand ? mapBrand(brand) : null,
     variants,
     images,
+    fields,
   };
 }
 
@@ -346,13 +368,29 @@ export async function handlePlatformRequest(
         return jsonResponse(result, 201);
       }
     }
+    const showcaseMatch = path.match(/^\/products\/([^/]+)\/showcase$/);
+    if (showcaseMatch && method === 'GET') {
+      const key = decodeURIComponent(showcaseMatch[1]);
+      const catalog = await catalogSnapshot(request, companyId);
+      const product = catalog.products.find((entry) => entry.slug === key || String(entry.id) === key);
+      if (!product) return NextResponse.json(errorEnvelope('Product not found.'), { status: 404 });
+      const details = await platformJson(request, companyId, `/api/products/${encodeURIComponent(String(product.id))}/details`);
+      const fields = isRecord(details) && isRecord(details.fields) ? details.fields : {};
+      return jsonResponse(Array.isArray(fields.showcaseUnits) ? fields.showcaseUnits : []);
+    }
     const productMatch = path.match(/^\/products\/([^/]+)$/);
     if (productMatch && method === 'GET') {
       const key = decodeURIComponent(productMatch[1]);
       const product = (await catalogSnapshot(request, companyId)).products.find(
         (entry) => entry.slug === key || String(entry.id) === key,
       );
-      return product ? jsonResponse(product) : NextResponse.json(errorEnvelope('Product not found.'), { status: 404 });
+      if (!product) return NextResponse.json(errorEnvelope('Product not found.'), { status: 404 });
+      const details = await platformJson(request, companyId, `/api/products/${encodeURIComponent(String(product.id))}/details`);
+      return jsonResponse({
+        ...mapProduct(isRecord(details) ? details : product, new Map(), new Map()),
+        category: product.category,
+        brand: product.brand,
+      });
     }
 
     if (path === '/categories' || path === '/categories/roots') {

@@ -101,12 +101,28 @@ export const IcareShell = ({ children }: { children: React.ReactNode }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [lang, setLang] = useState<Language>('en');
+  const [languageReady, setLanguageReady] = useState(false);
   const hasStandardHero = hasIcareStandardHero(pathname);
+
+  const toggleLanguage = useCallback(() => {
+    setLang((currentLang) => {
+      const next = currentLang === 'en' ? 'ar' : 'en';
+      document.cookie = `icare_lang=${next}; Path=/icare; Max-Age=31536000; SameSite=Lax`;
+      window.setTimeout(() => router.refresh(), 0);
+      return next;
+    });
+  }, [router]);
+
+  useEffect(() => {
+    if (/(?:^|; )icare_lang=ar(?:;|$)/.test(document.cookie)) setLang('ar');
+    setLanguageReady(true);
+  }, []);
 
   useEffect(() => {
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     document.documentElement.lang = lang;
-  }, [lang]);
+    if (languageReady) document.cookie = `icare_lang=${lang}; Path=/icare; Max-Age=31536000; SameSite=Lax`;
+  }, [lang, languageReady]);
 
   // Keep the fixed header pinned to the hero top (or announcement + gap when
   // no hero). Re-measure on resize, route change, and hero/bar layout shifts.
@@ -201,7 +217,7 @@ export const IcareShell = ({ children }: { children: React.ReactNode }) => {
             onOpenMenu={() => setIsMenuOpen(true)}
             isDrawerOpen={isCartOpen || isSearchOpen || isMenuOpen}
             lang={lang}
-            onToggleLang={() => setLang((currentLang) => currentLang === 'en' ? 'ar' : 'en')}
+            onToggleLang={toggleLanguage}
           />
 
           <MobileMenu
@@ -211,7 +227,7 @@ export const IcareShell = ({ children }: { children: React.ReactNode }) => {
             onProductSelect={handleProductSelect}
             onOpenCart={() => setIsCartOpen(true)}
             lang={lang}
-            onToggleLang={() => setLang((currentLang) => currentLang === 'en' ? 'ar' : 'en')}
+            onToggleLang={toggleLanguage}
           />
 
           <main className={hasStandardHero ? '' : 'icare-main--offset'}>

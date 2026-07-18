@@ -358,6 +358,17 @@ export interface BackendProduct {
   benefits?: string[];
   skinTypes?: string[];
   concerns?: string[];
+  hairTypes?: string[];
+  warnings?: LocalizedText | null;
+  suitableFor?: string[];
+  productType?: LocalizedText | null;
+  finish?: LocalizedText | null;
+  coverage?: LocalizedText | null;
+  texture?: LocalizedText | null;
+  countryOfOrigin?: LocalizedText | null;
+  productFaqs?: Array<{ question?: LocalizedText; answer?: LocalizedText; sort_order?: number; sortOrder?: number; is_active?: boolean; isActive?: boolean }>;
+  showcaseUnits?: ShowcaseUnit[];
+  seo?: { title?: LocalizedText | null; description?: LocalizedText | null; canonicalUrl?: string | null };
   price: BackendNumeric;
   priceCurrency?: string;
   salePrice?: BackendNumeric | null;

@@ -594,6 +594,10 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
             if (bp.benefits?.length) details.push({ label: t.product.benefits, value: bp.benefits });
             if (bp.skinTypes?.length) details.push({ label: t.product.skinTypes, value: bp.skinTypes });
             if (bp.concerns?.length) details.push({ label: t.product.concerns, value: bp.concerns });
+            if (bp.hairTypes?.length) details.push({ label: lang === 'ar' ? 'أنواع الشعر' : 'Hair types', value: bp.hairTypes });
+            const warnings = pickLocalized(bp.warnings, lang);
+            if (warnings) details.push({ label: lang === 'ar' ? 'التحذيرات' : 'Warnings', value: warnings });
+            if (bp.suitableFor?.length) details.push({ label: lang === 'ar' ? 'مناسب لـ' : 'Suitable for', value: bp.suitableFor });
 
             if (details.length === 0) return null;
 
@@ -627,6 +631,30 @@ export const ProductPage: React.FC<ProductPageProps> = ({ product, lang, onProdu
 
       {/* SHOWCASE SECTION */}
       <ShowcaseBlock slug={product.slug} lang={lang} />
+
+      {displayProduct.backendProduct?.videoUrl && /^(https?:\/\/|\/)/i.test(displayProduct.backendProduct.videoUrl) && (
+        <section className="icare-index-section pb-16" aria-label={lang === 'ar' ? 'فيديو المنتج' : 'Product video'}>
+          <video className="w-full rounded-[12px] bg-black" controls preload="metadata" src={displayProduct.backendProduct.videoUrl} />
+        </section>
+      )}
+
+      {(() => {
+        const faqs = (displayProduct.backendProduct?.productFaqs || [])
+          .filter((item) => item.is_active !== false && item.isActive !== false)
+          .sort((a, b) => Number(a.sort_order ?? a.sortOrder ?? 0) - Number(b.sort_order ?? b.sortOrder ?? 0))
+          .map((item) => ({ question: pickLocalized(item.question, lang), answer: pickLocalized(item.answer, lang) }))
+          .filter((item) => item.question && item.answer);
+        if (!faqs.length) return null;
+        return <section className="icare-index-section pb-24" aria-labelledby="product-faq-heading">
+          <h2 id="product-faq-heading" className="text-2xl font-black mb-6">{lang === 'ar' ? 'الأسئلة الشائعة' : 'Frequently asked questions'}</h2>
+          <div className="divide-y divide-black/10 border-y border-black/10">
+            {faqs.map((faq, index) => <details key={`${faq.question}-${index}`} className="py-5 group">
+              <summary className="cursor-pointer font-bold list-none flex justify-between gap-4">{faq.question}<span aria-hidden="true">+</span></summary>
+              <p className="pt-3 text-[#67645E] whitespace-pre-line">{faq.answer}</p>
+            </details>)}
+          </div>
+        </section>;
+      })()}
 
       {/* 2. REVIEWS SECTION */}
       <section className="icare-index-section pb-32">
