@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState, ReactNode } from 'react';
 import { AuthSession, AppSettings, BackendCart, CartItem, Product, WishlistItem, ShopContextType } from '../types';
 import { IcareApiError, icareApi } from '../lib/api-client';
-import { mapBackendCartToCartItems } from '../lib/mappers';
+import { mapBackendCartToCartItems, setDefaultCurrencyCode } from '../lib/mappers';
 import { normalizeSettingsGroups } from '../lib/settings';
 import { cachedFetch, cacheMiddleware } from '../lib/cache-middleware';
 import { fetchAllContent, mergeWithFallback } from '../lib/content-client';
@@ -191,6 +191,10 @@ export const ShopProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const normalizedSettings = normalizeSettingsGroups(data);
         if (normalizedSettings) {
           setSettings(normalizedSettings);
+          const currency = normalizedSettings.general?.currency_code
+            || normalizedSettings.general?.currency
+            || null;
+          setDefaultCurrencyCode(currency);
         }
       } catch (error) {
         warnInDevelopment('Failed to load iCare public settings.', error);

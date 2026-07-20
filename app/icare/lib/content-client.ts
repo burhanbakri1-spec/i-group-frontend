@@ -80,6 +80,9 @@ export function mergeWithFallback(
  * The BE sometimes returns `{ en, ar }` even for content text fields. We
  * pick the right locale (active → en fallback) and return a string, or
  * `null` if the value is unusable. Defensive — never throws.
+ *
+ * When the active locale value is empty, this falls back to English so that
+ * Arabic users see English content instead of unrelated hardcoded text.
  */
 function coerceToString(value: unknown, activeLocale: 'en' | 'ar'): string | null {
   if (value == null) return null;
@@ -95,6 +98,34 @@ function coerceToString(value: unknown, activeLocale: 'en' | 'ar'): string | nul
   }
   return null;
 }
+
+/**
+ * Content keys whose values are image URLs.
+ * These should not fall back to unrelated images when the API value is empty.
+ */
+export const CONTENT_IMAGE_KEYS: ReadonlySet<FallbackContentKey> = new Set([
+  'og_image',
+  'home_hero_image',
+  'home_intentional_image',
+  'home_foundation_image',
+  'home_commitment_image',
+  'home_promo_image',
+  'home_philosophy_image',
+  'home_social_grid_image_1',
+  'home_social_grid_image_2',
+  'home_social_grid_image_3',
+  'home_social_grid_image_4',
+  'about_hero_image',
+  'about_values_image',
+  'about_team_member_1_image',
+  'about_team_member_2_image',
+  'about_team_member_3_image',
+  'about_founder_signature_image',
+  'auth_login_image',
+  'contact_hero_image',
+  'faq_hero_image',
+  'vlog_hero_image',
+]);
 
 export const ALL_CONTENT_KEYS: ReadonlyArray<FallbackContentKey> = Object.keys(
   FALLBACK_CONTENT,

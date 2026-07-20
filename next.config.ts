@@ -28,31 +28,16 @@ import type { NextConfig } from "next";
  *      backend paths that the resolver prefixes with `/api/icare/`. This is
  *      the general-purpose path for bare basenames and unknown prefixes.
  *
- * We intentionally do NOT add a broad rewrite here (e.g. a catch-all that
- * forwards any root-relative path to the backend origin). Two reasons:
- *
- *   1. The proxy route already covers arbitrary paths. A rewrite that
- *      overlaps with `/api/icare/*` would risk a re-rewrite loop inside
- *      Next.js's rewrite engine.
- *   2. Keeping the rewrite list narrow makes the routing table auditable —
- *      each entry is a deliberate allow-list of backend-known prefixes.
- *
- * If a new backend prefix emerges that needs serve-from-origin support, add
- * a dedicated rewrite rule here. Do not broaden the pattern.
- *
- * Order matters: `rewrites()` runs before page rendering, so an `<img
- * src="/public/uploads/x.png">` URL hits the rewrite and lands on the
- * backend. Without this, the Next.js origin would 404 for every upload.
- *
- * The destination uses the current platform API URL and falls back to the
- * reviewed staging API if unset. The same env var is consumed by the
- * Next.js API proxy at `app/api/icare/[...path]/route.ts`.
+ * The backend origin comes from the centralized platform-origin utility
+ * (env-var-driven) so there is no hardcoded production or staging URL here.
  */
-const BACKEND_MEDIA_ORIGIN = (
-  process.env.PLATFORM_API_BASE_URL
-  ?? process.env.ICARE_API_BASE_URL
-  ?? 'http://cg8hv00dppir2hu99ds4p75h.187.55.225.56.sslip.io'
-).replace(/\/$/, '');
+const BACKEND_MEDIA_ORIGIN = (() => {
+  const origin =
+    process.env.PLATFORM_API_BASE_URL
+    ?? process.env.ICARE_API_BASE_URL
+    ?? 'http://localhost:54321';
+  return origin.replace(/\/$/, '');
+})();
 
 const nextConfig: NextConfig = {
   images: {
@@ -60,6 +45,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'via.placeholder.com' },
       { protocol: 'https', hostname: 'backend.igroup.website' },
+      { protocol: 'https', hostname: 'api-staging.igroup.website' },
     ],
   },
   async rewrites() {

@@ -50,12 +50,12 @@ const AccordionItem = ({ title, content, isOpen, onClick }: { title: string, con
   );
 };
 
-const DEFAULT_HERO_IMAGE = 'https://images.unsplash.com/photo-1713425886063-4a49da507ada?q=80&w=2000';
-const DEFAULT_INTENTIONAL_IMAGE = 'https://images.unsplash.com/photo-1644011047934-b00d5aa404d4?q=80&w=1200';
-const DEFAULT_VALUES_IMAGE = 'https://images.unsplash.com/photo-1642080668102-dc8f5ce8e752?q=80&w=1200';
-const DEFAULT_TEAM_1_IMAGE = 'https://images.unsplash.com/photo-1702261347927-11207f77e751?q=80&w=800';
-const DEFAULT_TEAM_2_IMAGE = 'https://images.unsplash.com/photo-1763692108454-6cfa2b0af5c1?q=80&w=800';
-const DEFAULT_TEAM_3_IMAGE = 'https://images.unsplash.com/photo-1631214565164-dd0b7fba0295?q=80&w=800';
+const DEFAULT_HERO_IMAGE = '';
+const DEFAULT_INTENTIONAL_IMAGE = '';
+const DEFAULT_VALUES_IMAGE = '';
+const DEFAULT_TEAM_1_IMAGE = '';
+const DEFAULT_TEAM_2_IMAGE = '';
+const DEFAULT_TEAM_3_IMAGE = '';
 
 
 export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate, lang }) => {

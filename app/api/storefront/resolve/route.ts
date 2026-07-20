@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { platformApiOrigin } from '../../../icare/lib/platform-origin';
 
-const PLATFORM_API_BASE_URL = (
-  process.env.PLATFORM_API_BASE_URL
-  ?? process.env.ICARE_API_BASE_URL
-  ?? 'http://cg8hv00dppir2hu99ds4p75h.187.55.225.56.sslip.io'
-).replace(/\/$/, '');
+const PLATFORM_API_BASE_URL = platformApiOrigin();
 
 export async function GET(request: NextRequest) {
   const host = request.nextUrl.searchParams.get('host') || '';

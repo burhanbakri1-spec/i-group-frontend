@@ -15,7 +15,7 @@ interface VlogPageProps {
 }
 
 
-const VLOG_HERO_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1590439471364-192aa70c47b53?q=80&w=2000';
+
 
 const VlogItemBase = ({ image, subtitle, thumbnailType, title, videoPreviewUrl, videoUrl, lang }: VlogContentItem & { lang: Language }) => (
   <motion.div 
@@ -113,13 +113,13 @@ export const VlogPage: React.FC<VlogPageProps> = ({ lang }) => {
   const vlogs = remoteVlogs ?? [];
   const isLoading = loading || remoteVlogs === null;
   const heroTitle = vlogHeroTitle?.trim() || t.pages.vlog.heroTitle;
-  const heroImage = resolveMediaUrl(vlogHeroImage) || VLOG_HERO_FALLBACK_IMAGE;
+  const heroImage = resolveMediaUrl(vlogHeroImage) || '';
 
   return (
     <div className="min-h-screen bg-white pb-32">
       <PageHero
         image={heroImage}
-        fallbackImage={VLOG_HERO_FALLBACK_IMAGE}
+        fallbackImage=""
         alt={t.pages.vlog.heroAlt}
         title={heroTitle}
         priority

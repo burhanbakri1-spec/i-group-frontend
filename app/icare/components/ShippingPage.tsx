@@ -38,8 +38,8 @@ export const ShippingPage: React.FC<ShippingPageProps> = ({ lang }) => {
   return (
     <div className="min-h-screen bg-white">
       <PageHero
-        image="https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?q=80&w=2000"
-        fallbackImage="https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?q=80&w=2000"
+        image=""
+        fallbackImage=""
         alt={text.title}
         title={text.title}
         subtitle={text.subtitle}

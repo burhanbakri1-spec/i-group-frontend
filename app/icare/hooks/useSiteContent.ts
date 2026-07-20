@@ -86,8 +86,8 @@ const FE_LITERALS = {
   enableWishlist: true,
   enableProductReviews: true,
   enableGuestCheckout: true,
-  defaultCountry: 'US',
-  currencyCode: 'USD',
+  defaultCountry: '',
+  currencyCode: '',
   itemsPerPage: 12,
 } as const;
 
@@ -359,8 +359,8 @@ export const useSiteContent = (lang: Language) => {
       enableWishlist: FE_LITERALS.enableWishlist,
       enableProductReviews: FE_LITERALS.enableProductReviews,
       enableGuestCheckout: FE_LITERALS.enableGuestCheckout,
-      defaultCountry: FE_LITERALS.defaultCountry,
-      currencyCode: g.currency_code || FE_LITERALS.currencyCode,
+      defaultCountry: g.country || g.default_country || FE_LITERALS.defaultCountry,
+      currencyCode: g.currency_code || g.currency || FE_LITERALS.currencyCode,
       itemsPerPage: FE_LITERALS.itemsPerPage,
     };
   }, [settings, contextSocialLinks, content, contentByLocale, lang]);

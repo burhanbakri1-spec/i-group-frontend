@@ -24,7 +24,7 @@ export const OurStory = () => {
              className="aspect-[4/5] rounded-[32px] overflow-hidden shadow-xl"
           >
             <ImageWithFallback 
-              src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=800" 
+              src=""
               alt="Skin texture" 
               className="w-full h-full object-cover"
             />

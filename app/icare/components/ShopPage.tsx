@@ -242,8 +242,8 @@ export const ShopPage: React.FC<ShopPageProps> = ({ lang, onProductSelect }) => 
   return (
     <div className="min-h-screen bg-white pb-32">
       <PageHero
-        image="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1920"
-        fallbackImage="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1920"
+        image=""
+        fallbackImage=""
         alt="Shop iCare"
         title={t.pages.shop.title}
         subtitle={t.pages.shop.subtitle}

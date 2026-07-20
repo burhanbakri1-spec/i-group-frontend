@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { platformApiOrigin } from '../../../icare/lib/platform-origin';
 
-const STAGING_API_FALLBACK = 'http://cg8hv00dppir2hu99ds4p75h.187.55.225.56.sslip.io';
 type JsonRecord = Record<string, unknown>;
 
 const isRecord = (value: unknown): value is JsonRecord =>
@@ -20,14 +20,21 @@ const numeric = (value: unknown, fallback = 0) => {
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
-export const platformApiBaseUrl = () => (
-  process.env.PLATFORM_API_BASE_URL
-  ?? process.env.ICARE_API_BASE_URL
-  ?? STAGING_API_FALLBACK
-).replace(/\/$/, '');
+export const platformApiBaseUrl = platformApiOrigin;
+
+const PLACEHOLDER_PATTERNS = [
+  '/images/products/product-placeholder',
+  '/images/product-placeholder',
+  '/product-placeholder',
+  'placeholder.svg',
+];
+
+const isKnownPlaceholder = (value: string): boolean =>
+  PLACEHOLDER_PATTERNS.some((pattern) => value.includes(pattern));
 
 const absoluteMediaUrl = (value: unknown) => {
   if (typeof value !== 'string' || !value.trim()) return '';
+  if (isKnownPlaceholder(value)) return '';
   return /^https?:\/\//i.test(value)
     ? value
     : new URL(value, platformApiBaseUrl()).toString();
@@ -218,8 +225,14 @@ function mapProduct(
     primaryImage: absoluteMediaUrl(product.image ?? product.primaryImage),
     secondaryImage: absoluteMediaUrl(product.hoverImage ?? product.secondaryImage),
     videoUrl: absoluteMediaUrl(fields.videoUrl ?? product.videoUrl),
-    stockQuantity: variants.reduce((total, variant) => total + numeric(variant.stockQuantity), numeric(product.stockQty)),
-    stockStatus: product.isActive === false ? 'out_of_stock' : 'in_stock',
+    stockQuantity: product.isActive === false
+      ? Math.max(numeric(product.stockQty), 0)
+      : Math.max(variants.filter((v) => v.isActive !== false).reduce((total, v) => total + numeric(v.stockQuantity), 0), numeric(product.stockQty)),
+    stockStatus: product.isActive === false
+      ? 'out_of_stock'
+      : variants.filter((v) => v.isActive !== false && v.stockStatus !== 'out_of_stock').length === 0
+        ? 'out_of_stock'
+        : 'in_stock',
     isFeatured: product.featured === true || product.isFeatured === true,
     isNew: product.isNew === true || product.newArrival === true,
     isBestseller: product.isBestseller === true || product.bestseller === true,

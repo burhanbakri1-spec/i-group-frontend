@@ -17,109 +17,84 @@
  */
 
 export const FALLBACK_CONTENT = {
-  // ── Marketing / brand ──
-  site_name: 'iCare Beauty',
-  og_image:
-    'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=400',
-  announcement_text: 'FREE SHIPPING AVAILABLE',
-  store_locator_tagline: 'find icare near you',
-  store_locator_no_results: 'no locations found in this area.',
+  // ── Marketing / brand — keep empty (must come from API Website Texts) ──
+  site_name: '',
+  og_image: '',
+  announcement_text: '',
+  store_locator_tagline: '',
+  store_locator_no_results: '',
 
-  // ── Home hero ──
-  home_hero_headline: 'the barrier butter.',
-  home_hero_image:
-    'https://images.unsplash.com/photo-1593231945511-9e141a85b017?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1600',
+  // ── Home hero — keep empty (must come from API Website Texts) ──
+  home_hero_headline: '',
+  home_hero_image: '',
   home_hero_subtitle: '',
   home_hero_badge: '',
   home_hero_description: '',
-  home_hero_cta: 'SHOP NOW',
+  home_hero_cta: '',
 
-  // ── Home sections ──
-  home_trending_title: 'trending essentials',
-  home_marquee_text:
-    'Free shipping available • Cruelty-Free • Dermatologist Tested • Vegan • High Performance Skincare •',
-  product_showcase_empty: 'no featured products are available yet',
+  // ── Home sections — keep empty (must come from API Website Texts) ──
+  home_trending_title: '',
+  home_marquee_text: '',
+  product_showcase_empty: '',
 
-  // ── Commitment section ──
-  home_commitment_headline:
-    "From consciously-sourced ingredients to packaging made with post-consumer recycled materials, we're committed to MINDFUL SKINCARE.",
-  home_commitment_cta: 'OUR FOOTPRINT',
-  home_commitment_image:
-    'https://images.unsplash.com/photo-1603189777895-1dcbe39ec57e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200',
+  // ── Commitment section — keep empty (must come from API Website Texts) ──
+  home_commitment_headline: '',
+  home_commitment_cta: '',
+  home_commitment_image: '',
 
-  // ── Promo ──
-  home_promo_badge: 'New Arrival',
-  home_promo_headline: 'chilly little flush',
-  home_promo_description:
-    'Warm up your cheeks with Pocket Blush. A touch of creamy, long-wearing color that mimics the flush you get after stepping in from the cold.',
-  home_promo_cta_label: 'POCKET BLUSH',
-  home_promo_image:
-    'https://images.unsplash.com/photo-1653784097013-786a8965ea3b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200',
+  // ── Promo — keep empty (must come from API Website Texts) ──
+  home_promo_badge: '',
+  home_promo_headline: '',
+  home_promo_description: '',
+  home_promo_cta_label: '',
+  home_promo_image: '',
 
-  // ── Philosophy ──
-  home_philosophy_headline: 'one of everything really good',
-  home_philosophy_text:
-    'At icare, our philosophy is to make one of everything really good. To us, that means a collection of intentional, high-performance essentials you reach for everyday. The ones you love, rely on, and always come back to for ultimate barrier nourishment, tint, and glow.',
-  home_philosophy_cta: 'SHOP ICARE',
-  home_philosophy_image:
-    'https://images.unsplash.com/photo-1638609927040-8a7e97cd9d6a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1920',
+  // ── Philosophy — keep empty (must come from API Website Texts) ──
+  home_philosophy_headline: '',
+  home_philosophy_text: '',
+  home_philosophy_cta: '',
+  home_philosophy_image: '',
 
-  // ── Social grid ──
-  home_social_grid_heading: 'icare + you',
-  home_social_grid_cta: 'FIND US ON SOCIAL',
-  home_social_grid_image_1:
-    'https://images.unsplash.com/photo-1679517354322-20fe85050b9d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800',
-  home_social_grid_image_2:
-    'https://images.unsplash.com/photo-1739980737820-b6bb1a9b8456?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800',
-  home_social_grid_image_3:
-    'https://images.unsplash.com/photo-1635631414456-6a9dc5051a3d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800',
-  home_social_grid_image_4:
-    'https://images.unsplash.com/photo-1627384113972-f4c0392fe5aa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=800',
+  // ── Social grid — keep empty (must come from API Website Texts) ──
+  home_social_grid_heading: '',
+  home_social_grid_cta: '',
+  home_social_grid_image_1: '',
+  home_social_grid_image_2: '',
+  home_social_grid_image_3: '',
+  home_social_grid_image_4: '',
 
-  // ── About ──
-  about_hero_headline: 'A new PHILOSOPHY on SKINCARE.',
-  about_hero_cta: 'SHOP NOW',
-  about_hero_image:
-    'https://images.unsplash.com/photo-1713425886063-4a49da507ada?q=80&w=2000',
-  home_intentional_title: 'intentional skincare',
-  home_intentional_text: 'icare is a line of curated skincare essentials.',
-  home_intentional_image:
-    'https://images.unsplash.com/photo-1644011047934-b00d5aa404d4?q=80&w=1200',
-  home_foundation_label: 'The Foundation',
-  home_foundation_title: 'one of everything really good.',
-  home_foundation_text_1:
-    'Founded on the belief that beauty is about essentials.',
-  home_foundation_text_2:
-    'Every icare product is developed with intent.',
-  home_foundation_image:
-    'https://images.unsplash.com/photo-1638609927040-8a7e97cd9d6a?q=80&w=1200',
-  about_values_image:
-    'https://images.unsplash.com/photo-1642080668102-dc8f5ce8e752?q=80&w=1200',
-  home_team_label: 'Meet the team',
-  home_team_title: 'our crew.',
-  home_team_description: 'A diverse group of experts.',
-  about_team_member_1_name: 'sarah jenkins',
-  about_team_member_1_title: 'creative director',
-  about_team_member_1_image:
-    'https://images.unsplash.com/photo-1702261347927-11207f77e751?q=80&w=800',
-  about_team_member_2_name: 'dr. amira fahad',
-  about_team_member_2_title: 'lead dermatologist',
-  about_team_member_2_image:
-    'https://images.unsplash.com/photo-1763692108454-6cfa2b0af5c1?q=80&w=800',
-  about_team_member_3_name: 'elena rodriguez',
-  about_team_member_3_title: 'product development',
-  about_team_member_3_image:
-    'https://images.unsplash.com/photo-1631214565164-dd0b7fba0295?q=80&w=800',
-  home_founder_note_heading: 'A NOTE FROM OUR FOUNDER',
-  home_founder_letter:
-    'My journey towards healthier skin inspired me.',
-  about_founder_signature_image:
-    'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=800',
+  // ── About — keep empty (must come from API Website Texts) ──
+  about_hero_headline: '',
+  about_hero_cta: '',
+  about_hero_image: '',
+  home_intentional_title: '',
+  home_intentional_text: '',
+  home_intentional_image: '',
+  home_foundation_label: '',
+  home_foundation_title: '',
+  home_foundation_text_1: '',
+  home_foundation_text_2: '',
+  home_foundation_image: '',
+  about_values_image: '',
+  home_team_label: '',
+  home_team_title: '',
+  home_team_description: '',
+  about_team_member_1_name: '',
+  about_team_member_1_title: '',
+  about_team_member_1_image: '',
+  about_team_member_2_name: '',
+  about_team_member_2_title: '',
+  about_team_member_2_image: '',
+  about_team_member_3_name: '',
+  about_team_member_3_title: '',
+  about_team_member_3_image: '',
+  home_founder_note_heading: '',
+  home_founder_letter: '',
+  about_founder_signature_image: '',
 
-  // ── Auth ──
-  auth_login_image:
-    'https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=1200&auto=format&fit=crop',
-  auth_login_tagline: "It's time to invest in your SKIN.",
+  // ── Auth — generic UI labels, non-branded ──
+  auth_login_image: '',
+  auth_login_tagline: '',
   auth_heading_login: 'Login',
   auth_heading_signup: 'Sign up',
   auth_heading_account: 'Account',
@@ -134,7 +109,7 @@ export const FALLBACK_CONTENT = {
   auth_toggle_to_register: "Don't have an account? Sign up!",
   auth_toggle_to_login: 'Already have an account? Sign in!',
 
-  // ── Search ──
+  // ── Search — generic UI labels ──
   search_drawer_title: 'search',
   search_placeholder: 'Type here',
   search_no_results: 'No results found',
@@ -143,7 +118,7 @@ export const FALLBACK_CONTENT = {
   search_brands_heading: 'Brands',
   search_collections_unavailable: 'collections unavailable',
 
-  // ── Cart ──
+  // ── Cart — generic UI labels ──
   cart_shipping_disclaimer: 'Shipping & taxes calculated at checkout',
   free_shipping_unlocked_text: 'Free standard shipping unlocked ✓',
   cart_bag_label: 'YOUR BAG',
@@ -151,7 +126,7 @@ export const FALLBACK_CONTENT = {
   cart_continue_shopping: 'Continue Shopping',
   cart_checkout_label: 'Checkout',
 
-  // ── Checkout ──
+  // ── Checkout — generic UI labels ──
   checkout_heading: 'CHECKOUT',
   checkout_shipping_heading: 'Shipping Information',
   checkout_payment_heading: 'Payment Method',
@@ -160,8 +135,7 @@ export const FALLBACK_CONTENT = {
   checkout_paypal_label: 'PayPal',
   checkout_cod_label: 'Cash on Delivery',
   checkout_review_heading: 'Review Your Order',
-  checkout_terms_text:
-    "By clicking 'Place Order', you agree to our terms and conditions.",
+  checkout_terms_text: "By clicking 'Place Order', you agree to our terms and conditions.",
   checkout_confirmed_heading: 'Order Confirmed!',
   checkout_confirmed_message: 'Thank you for your purchase.',
   checkout_nav_back: 'Back',
@@ -169,76 +143,71 @@ export const FALLBACK_CONTENT = {
   checkout_submitting_text: 'Placing order...',
   checkout_back_to_shop: 'Back to Shop',
 
-  // ── Wishlist ──
+  // ── Wishlist — generic UI labels ──
   wishlist_empty: 'Your wishlist is empty',
   wishlist_empty_subtext: 'Start adding products you love.',
   wishlist_recommendations_title: 'You Might Also Like',
 
-  // ── Footer ──
-  newsletter_text: 'Join us on the icare to an effortless glow.',
-  newsletter_subtitle:
-    'Glaze your inbox with tips, tricks & exclusive content.',
-  copyright_text: '© iCare 2026',
-  country_region: 'Country / Region',
-  email_placeholder: 'Email Address',
-  subscribe_btn: 'SUBSCRIBE',
-  privacy_notice: 'By signing up, you agree to our Privacy Policy*.',
-  columns_title_navigate: 'NAVIGATE',
-  columns_title_social: 'SOCIAL',
-  columns_title_official: 'OFFICIAL',
-  columns_title_support: 'SUPPORT',
-  support_subtext: 'Drop us a note anytime.',
-  cookie_link: 'Cookie Preferences',
-  link_shop: 'Shop',
-  link_story: 'Our Story',
-  link_vlog: 'Vlog',
-  link_find_us: 'Where to Find Us',
-  link_privacy: 'Privacy',
-  link_terms: 'Terms',
-  link_accessibility: 'Accessibility',
-  link_faq: 'FAQ',
-  link_contact: 'Contact',
-  support_hours: "We're here Monday-Friday 9am - 5pm.",
+  // ── Footer — keep empty (brand/site-specific content from API) ──
+  newsletter_text: '',
+  newsletter_subtitle: '',
+  copyright_text: '',
+  country_region: '',
+  email_placeholder: '',
+  subscribe_btn: '',
+  privacy_notice: '',
+  columns_title_navigate: '',
+  columns_title_social: '',
+  columns_title_official: '',
+  columns_title_support: '',
+  support_subtext: '',
+  cookie_link: '',
+  link_shop: '',
+  link_story: '',
+  link_vlog: '',
+  link_find_us: '',
+  link_privacy: '',
+  link_terms: '',
+  link_accessibility: '',
+  link_faq: '',
+  link_contact: '',
+  support_hours: '',
 
-  // ── Contact ──
-  contact_email: 'hello@icare.com',
-  contact_email_label: 'email',
-  contact_wholesale_email: 'wholesale@icare.com',
-  contact_wholesale_label: 'wholesale',
-  contact_hero_heading: 'get in touch',
-  contact_hero_image:
-    'https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=2000',
-  contact_info_title: "we're here to help.",
-  contact_support_info: 'Our team is available Monday-Friday 9am-5pm.',
-  contact_faq_title: 'frequently asked questions',
-  contact_faq_text: 'Chances are, your question has been answered.',
-  contact_faq_cta: 'visit faq',
+  // ── Contact — keep empty (business-specific from API) ──
+  contact_email: '',
+  contact_email_label: '',
+  contact_wholesale_email: '',
+  contact_wholesale_label: '',
+  contact_hero_heading: '',
+  contact_hero_image: '',
+  contact_info_title: '',
+  contact_support_info: '',
+  contact_faq_title: '',
+  contact_faq_text: '',
+  contact_faq_cta: '',
 
-  // ── FAQ page ──
-  faq_hero_title: 'Frequently Asked Questions',
-  faq_hero_image:
-    'https://images.unsplash.com/photo-1768483018807-bd0b9ab86539?q=80&w=2000',
+  // ── FAQ page — keep empty (must come from API Website Texts) ──
+  faq_hero_title: '',
+  faq_hero_image: '',
 
-  // ── Vlog page ──
-  vlog_hero_title: 'PRODUCT STORIES',
-  vlog_hero_image:
-    'https://images.unsplash.com/photo-1590439471364-192aa70c47b53?q=80&w=2000',
+  // ── Vlog page — keep empty (must come from API Website Texts) ──
+  vlog_hero_title: '',
+  vlog_hero_image: '',
 
-  // ── Product ──
+  // ── Product — generic UI labels, non-branded ──
   product_add_to_bag: 'add to bag',
   product_buy_now: 'BUY NOW',
   product_sold_out: 'sold out',
   product_afterpay_text: 'or 4 interest-free payments with Afterpay',
   product_no_reviews: 'No reviews yet',
   product_details_fallback: 'Product details are unavailable from the backend.',
-  product_unavailable_headline: 'We could not find this iCare product.',
-  product_unavailable_desc:
-    'It may have been removed, unpublished, or temporarily unavailable.',
+  product_unavailable_headline: 'We could not find this product.',
+  product_unavailable_desc: 'It may have been removed, unpublished, or temporarily unavailable.',
   product_unavailable_cta: 'back to shop',
   product_select_option: 'select option:',
   product_rating_label: 'AVERAGE RATING',
 
-  // ── Review ──
+  // ── Review — generic UI labels, non-branded ──
   review_verified_label: 'Verified Buyer',
   review_filter_button: 'FILTERS',
   review_sort_recent: 'MOST RECENT',
@@ -253,7 +222,7 @@ export const FALLBACK_CONTENT = {
   review_load_more: 'Load more reviews',
   review_filter_stars: 'Stars',
 
-  // ── Shop ──
+  // ── Shop — generic UI labels, non-branded ──
   shop_empty_all: 'No products are available yet.',
   shop_empty_filtered: 'No products found in this selection.',
   shop_back_to_all: 'back to all products',
@@ -501,12 +470,12 @@ export const HARDCODED_FALLBACKS: Record<string, string | number | boolean> = {
   reviewHydrationHigh: 'Super hydrated',
   productShowcaseLoading: '',
   storeLocatorMapImage: '',
-  metaTitle: 'iCare Beauty',
+  metaTitle: '',
   metaDescription: '',
   siteDescription: '',
   siteUrl: '',
-  ogImage: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=400',
-  productBuyNowTemplate: 'BUY NOW',
+  ogImage: '',
+  productBuyNowTemplate: '',
   // Legacy settings — sane defaults so the page renders without backend.
   freeShippingThreshold: 45,
   defaultShippingCost: 0,
@@ -515,7 +484,7 @@ export const HARDCODED_FALLBACKS: Record<string, string | number | boolean> = {
   enableWishlist: true,
   enableProductReviews: true,
   enableGuestCheckout: true,
-  defaultCountry: 'US',
-  currencyCode: 'USD',
+  defaultCountry: '',
+  currencyCode: '',
   itemsPerPage: 12,
 };

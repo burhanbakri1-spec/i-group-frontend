@@ -1,12 +1,8 @@
 import { AppSettings } from '../types';
+import { platformApiOrigin, storefrontHost } from './platform-origin';
 
-const PLATFORM_API_BASE_URL = (
-  process.env.PLATFORM_API_BASE_URL
-  ?? process.env.ICARE_API_BASE_URL
-  ?? 'http://cg8hv00dppir2hu99ds4p75h.187.55.225.56.sslip.io'
-).replace(/\/$/, '');
-
-const STOREFRONT_HOST = process.env.NEXT_PUBLIC_STOREFRONT_HOST || 'igroup.website';
+const PLATFORM_API_BASE_URL = platformApiOrigin();
+const STOREFRONT_HOST = storefrontHost();
 
 const snakeCase = (key: string) =>
   key.replace(/[A-Z]/g, (character) => `_${character.toLowerCase()}`);

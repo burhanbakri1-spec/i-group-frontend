@@ -16,7 +16,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ lang, onNa
     headline: philosophyHeadline || 'one of everything really good',
     text: philosophyText || 'At iCare, our philosophy is to make one of everything really good — intentional, high-performance essentials you reach for every day.',
     cta: philosophyCta || 'SHOP ICARE',
-    image: philosophyImage || 'https://images.unsplash.com/photo-1638609927040-8a7e97cd9d6a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1920',
+    image: philosophyImage || '',
   };
   return (
     <section className="icare-index-section icare-full-banner">

@@ -38,7 +38,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ lang }) => {
     <div className="min-h-screen bg-white pb-32">
       <PageHero
         image={contactHeroImage}
-        fallbackImage="https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=2000"
+        fallbackImage=""
         alt="Contact iCare"
         title={contactHeroHeading || t.pages.contact.heroHeading}
         subtitle={t.pages.contact.heroSubtitle}

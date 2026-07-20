@@ -35,7 +35,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ onNavigate, lang }) =>
     authToggleToRegister,
     authToggleToLogin,
   } = useSiteContent(lang);
-  const loginImage = authLoginImage || "https://images.unsplash.com/photo-1729952620303-4dc47fb5d93a?q=80&w=1200&auto=format&fit=crop";
+  const loginImage = authLoginImage || '';
   const t = translations[lang];
   const { user, isAuthenticated, accessToken, login, register, logout, authError } = useShop();
   const [mode, setMode] = useState<'login' | 'register'>('login');

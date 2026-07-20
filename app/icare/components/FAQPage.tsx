@@ -64,8 +64,8 @@ export const FAQPage: React.FC<FAQPageProps> = ({ lang }) => {
   return (
     <div className="min-h-screen bg-white pb-32">
       <PageHero
-        image="https://images.unsplash.com/photo-1768483018807-bd0b9ab86539?q=80&w=2000"
-        fallbackImage="https://images.unsplash.com/photo-1768483018807-bd0b9ab86539?q=80&w=2000"
+        image=""
+        fallbackImage=""
         alt="FAQ iCare"
         title={t.pages.faq.heroTitle}
         subtitle={t.pages.faq.heroSubtitle}

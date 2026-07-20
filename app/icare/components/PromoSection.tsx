@@ -17,7 +17,7 @@ export const PromoSection: React.FC<PromoSectionProps> = ({ lang, onNavigate }) 
     headline: promoHeadline || 'chilly little flush',
     description: promoDescription || 'Warm up your cheeks with Pocket Blush. A touch of creamy, long-wearing color that mimics the flush you get after stepping in from the cold.',
     cta: promoCtaLabel || 'POCKET BLUSH',
-    image: promoImage || 'https://images.unsplash.com/photo-1653784097013-786a8965ea3b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200',
+    image: promoImage || '',
   };
 
   const headline = lang === 'en'

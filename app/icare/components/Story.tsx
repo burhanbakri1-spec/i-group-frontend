@@ -11,7 +11,7 @@ export const Story: React.FC<{ onNavigate: (page: string) => void }> = ({ onNavi
         <ScrollReveal direction="left" viewportMargin="-80px">
           <div className="rounded-[32px] overflow-hidden aspect-[4/5]">
             <ImageWithFallback 
-              src="https://images.unsplash.com/photo-1501876725168-00c445821c9e?q=80&w=1000" 
+              src=""
               alt="Our Story" 
               className="w-full h-full object-cover"
             />

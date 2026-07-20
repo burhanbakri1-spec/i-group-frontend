@@ -119,7 +119,9 @@ export function ImageWithFallback({
         onLoad={() => setLoaded(true)}
         onError={() => {
           if (!shouldShowFallback) {
-            console.warn('[ImageWithFallback] failed to load:', { originalSrc: src, resolvedUrl: resolved });
+            if (process.env.NODE_ENV !== 'production') {
+              console.warn('[ImageWithFallback] failed to load:', resolved);
+            }
             setDidError(true);
           }
         }}

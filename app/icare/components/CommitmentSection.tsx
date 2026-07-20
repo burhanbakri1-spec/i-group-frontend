@@ -12,7 +12,7 @@ interface CommitmentSectionProps {
   onNavigate: (page: string) => void;
 }
 
-const DEFAULT_COMMITMENT_IMAGE = 'https://images.unsplash.com/photo-1603189777895-1dcbe39ec57e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1200';
+const DEFAULT_COMMITMENT_IMAGE = '';
 
 type CommitmentItem = {
   id: 'mission' | 'philanthropy' | 'sustainability';

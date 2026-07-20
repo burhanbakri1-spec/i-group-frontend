@@ -22,6 +22,15 @@ import { pickLocalized, pickLocalizedTrimmed } from './localized';
 
 type NumericInput = string | number | null | undefined;
 
+/** Module-level default currency code, updated when tenant settings load. */
+let defaultCurrencyCode: string | null = null;
+
+export const setDefaultCurrencyCode = (code: string | null | undefined): void => {
+  defaultCurrencyCode = code ?? null;
+};
+
+export const getDefaultCurrencyCode = (): string | null => defaultCurrencyCode;
+
 const normalizeFilterName = (value?: string | null) => value?.trim().toLowerCase() ?? '';
 
 
@@ -36,8 +45,26 @@ export const coerceNumber = (value: NumericInput) => {
   return null;
 };
 
-const getFirstValidNumber = (...values: NumericInput[]) => values.map(coerceNumber).find((value) => value !== null) ?? 0;
+export const getFirstValidNumber = (...values: NumericInput[]) => values.map(coerceNumber).find((value) => value !== null) ?? 0;
 
+export const getCurrencySymbol = (currencyCode?: string | null): string => {
+  switch (currencyCode?.toUpperCase()) {
+    case 'ILS': return '₪';
+    case 'USD': return '$';
+    case 'EUR': return '€';
+    case 'GBP': return '£';
+    case 'JOD': return 'د.ا';
+    case 'EGP': return 'E£';
+    default: return currencyCode ? `${currencyCode} ` : '$';
+  }
+};
+
+export const formatPrice = (price: NumericInput, currencyCode?: string | null): string => {
+  const symbol = getCurrencySymbol(currencyCode);
+  return `${symbol}${getFirstValidNumber(price).toFixed(2)}`;
+};
+
+/** @deprecated Use formatPrice(price, currencyCode) instead. */
 export const formatUsdPrice = (price: NumericInput) => `$${getFirstValidNumber(price).toFixed(2)}`;
 
 export const getDefaultVariant = (product: BackendProduct) => {
@@ -159,7 +186,8 @@ export const mapBackendProductGalleryMedia = (product: BackendProduct, lang: Lan
   ]);
 };
 
-export const mapBackendProductToProduct = (product: BackendProduct, lang: Language = 'en', selectedVariant?: ProductVariant | null): Product => {
+export const mapBackendProductToProduct = (product: BackendProduct, lang: Language = 'en', selectedVariant?: ProductVariant | null, currencyCode?: string | null): Product => {
+  const activeCurrency = currencyCode ?? defaultCurrencyCode;
   const variant = selectedVariant ?? getDefaultVariant(product);
 
   // When a variant is explicitly selected, the variant's price is the source
@@ -179,7 +207,7 @@ export const mapBackendProductToProduct = (product: BackendProduct, lang: Langua
 
   // Show original price only when the display (sale) price is lower than the regular price
   const originalPrice = regularPrice !== null && displayPrice < regularPrice
-    ? formatUsdPrice(regularPrice)
+    ? formatPrice(regularPrice, activeCurrency)
     : undefined;
   const ratingAverage = coerceNumber(product.ratingAverage);
   const ratingCount = coerceNumber(product.ratingCount);
@@ -210,7 +238,7 @@ export const mapBackendProductToProduct = (product: BackendProduct, lang: Langua
     variantId: variant?.id ?? null,
     title: productName,
     name: productName,
-    price: formatUsdPrice(displayPrice),
+    price: formatPrice(displayPrice, activeCurrency),
     originalPrice,
     description: shortDescription || fullDescription || undefined,
     // `image` is the legacy field kept for backwards compatibility with
@@ -219,9 +247,9 @@ export const mapBackendProductToProduct = (product: BackendProduct, lang: Langua
     image: cardPrimaryImage,
     primaryImage: cardPrimaryImage,
     secondaryImage: cardSecondaryImage,
-    cardPrice: formatUsdPrice(getFirstValidNumber(product.primaryPrice, product.price)),
-    cardSalePrice: product.primarySalePrice != null ? formatUsdPrice(getFirstValidNumber(product.primarySalePrice)) : undefined,
-    cardCostPrice: product.primaryCostPrice != null ? formatUsdPrice(getFirstValidNumber(product.primaryCostPrice)) : undefined,
+    cardPrice: formatPrice(getFirstValidNumber(product.primaryPrice, product.price), activeCurrency),
+    cardSalePrice: product.primarySalePrice != null ? formatPrice(getFirstValidNumber(product.primarySalePrice), activeCurrency) : undefined,
+    cardCostPrice: product.primaryCostPrice != null ? formatPrice(getFirstValidNumber(product.primaryCostPrice), activeCurrency) : undefined,
     images: backendImages,
     galleryMedia,
     rating: ratingAverage && ratingAverage > 0 ? ratingAverage.toFixed(1) : '0',
